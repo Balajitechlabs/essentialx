@@ -136,6 +136,8 @@ jobs:
                   sf.write(new_content)
           EOF
 
+          python3 scripts/validate_strings.py --fix
+
           AUTHOR_EMAIL="$CONTRIBUTOR_EMAIL"
           if [ -z "$AUTHOR_EMAIL" ]; then
             AUTHOR_EMAIL="${CONTRIBUTOR}@users.noreply.github.com"
