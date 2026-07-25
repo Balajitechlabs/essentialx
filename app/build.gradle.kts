@@ -25,6 +25,15 @@ android {
     namespace = "com.sameerasw.essentials"
     compileSdk = 37
 
+    androidResources {
+        localeFilters += listOf(
+            "en", "ach", "af", "ar", "bn", "bn-rBD", "ca", "cs", "da", "de", "el", "es", "fi", "fil", "fil-rPH",
+            "fr", "he", "hi", "hi-rIN", "hu", "id", "in", "in-rID", "it", "iw", "ja", "ko", "ml", "ml-rIN",
+            "ne", "ne-rNP", "nl", "no", "pl", "pt", "pt-rBR", "pt-rPT", "ro", "ru", "si", "sk", "sk-rSK",
+            "sr", "sv", "ta", "ta-rIN", "tr", "uk", "vi", "zh", "zh-rCN", "zh-rTW"
+        )
+    }
+
     defaultConfig {
         applicationId = "com.sameerasw.essentials"
         minSdk = 26

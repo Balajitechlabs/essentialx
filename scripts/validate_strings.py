@@ -237,6 +237,49 @@ def validate_file(file_path, base_strings, auto_fix=False):
 
     return issues_found, file_modified
 
+def check_or_update_locales_config(res_dir, auto_fix=False):
+    config_file = os.path.join(res_dir, "xml", "locales_config.xml")
+    if not os.path.exists(config_file):
+        return
+
+    files = glob.glob(os.path.join(res_dir, "values*", "strings.xml"))
+    locales = set()
+    for f in files:
+        dir_name = os.path.basename(os.path.dirname(f))
+        if dir_name == "values":
+            locales.add("en")
+        else:
+            code = dir_name.replace("values-", "")
+            if "-r" in code:
+                code = code.replace("-r", "-")
+            locales.add(code)
+
+    sorted_locales = sorted(locales)
+
+    try:
+        tree = ET.parse(config_file)
+        root = tree.getroot()
+        existing = set()
+        for elem in root.findall('locale'):
+            val = elem.get('{http://schemas.android.com/apk/res/android}name') or elem.get('android:name') or elem.get('name')
+            if val:
+                existing.add(val)
+
+        missing = set(sorted_locales) - existing
+        if missing:
+            if auto_fix:
+                lines = ['<?xml version="1.0" encoding="utf-8"?>\n', '<locale-config xmlns:android="http://schemas.android.com/apk/res/android">\n']
+                for loc in sorted_locales:
+                    lines.append(f'    <locale android:name="{loc}" />\n')
+                lines.append('</locale-config>\n')
+                with open(config_file, 'w', encoding='utf-8') as f:
+                    f.writelines(lines)
+                print(f"{BOLD}{GREEN}🔧 Updated locales_config.xml with missing locales: {sorted(missing)}{RESET}\n")
+            else:
+                print(f"{BOLD}{YELLOW}⚠️  locales_config.xml is missing locales: {sorted(missing)}{RESET}\n")
+    except Exception as e:
+        pass
+
 def main():
     parser = argparse.ArgumentParser(description="Validate Android translation strings.xml files.")
     parser.add_argument('--fix', action='store_true', help="Auto-fix simple escaping issues (unescaped ' and %%)")
@@ -248,6 +291,8 @@ def main():
     if not os.path.exists(res_dir):
         print(f"{RED}Error: Directory {res_dir} does not exist.{RESET}")
         sys.exit(1)
+
+    check_or_update_locales_config(res_dir, auto_fix=args.fix)
 
     base_strings_file = os.path.join(res_dir, "values", "strings.xml")
     base_strings = get_base_strings(base_strings_file)
