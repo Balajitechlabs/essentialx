@@ -134,8 +134,9 @@ jobs:
 
               with open(file_path, 'w', encoding='utf-8') as sf:
                   sf.write(new_content)
+          EOF
+
           python3 scripts/validate_strings.py --fix
-EOF
 
           AUTHOR_EMAIL="$CONTRIBUTOR_EMAIL"
           if [ -z "$AUTHOR_EMAIL" ]; then
