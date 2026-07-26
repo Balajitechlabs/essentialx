@@ -32,7 +32,7 @@
     <string name="setting_use_usage_access_desc">Statt des Barrierefreiheitsdienstes (Einfrieren, App-Sperre, Dynamisches Nachtlicht)</string>
     <!-- Button Remap -->
     <string name="button_remap_enable_title">Aktiviere Tastenneubelegung</string>
-    <string name="button_remap_use_shizuku_title">Use Shizuku</string>
+    <string name="button_remap_use_shizuku_title">Shizuku benutzen</string>
     <string name="button_remap_use_shizuku_desc">Funktioniert mit ausgeschaltetem Display (Empfohlen)</string>
     <string name="shizuku_not_running_toast">Shizuku läuft nicht</string>
     <string name="shizuku_detected_prefix">Erkannte %1$s</string>
@@ -1508,4 +1508,5 @@ ADB-Debugging-Zugriff direkt über die Schnelleinstellungen aktivieren oder deak
     <string name="settings_translate_mode">Ünersetzungs Modus</string>
     <string name="settings_translate_mode_desc">Halten Sie einen beliebigen Text gedrückt, um ihn zu übersetzen und zur Community beizutragen.</string>
     <string name="about_desc_restart_systemui_tile">Starten Sie SystemUl einfach direkt über Ihr Schnellzugriffsfeld neu. Hilfreich, um Fehler in der Statusleiste schnell zu beheben oder SystemUl-Änderungen sofort anzuwenden. Erfordert Root- oder Shizuku-Shell-Zugriff</string>
+    <string name="label_enable_firewall">Firewall aktivieren</string>
 </resources>
