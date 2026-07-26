@@ -18,9 +18,9 @@
     <string name="screen_off_widget_label">Empty screen off widget</string>
     <string name="app_freezing_tile_label">App Freezing</string>
     <string name="flashlight_pulse_tile_label">Flashlight Pulse</string>
-    <string name="check_pre_releases_label">Check for pre-releases</string>
-    <string name="check_pre_releases_desc">Might be unstable</string>
-    <string name="label_default_tab">Default tab</string>
+    <string name="check_pre_releases_label">প্রাক রিলিজের জন্য চেক করুন</string>
+    <string name="check_pre_releases_desc">অস্থির হতে পারে</string>
+    <string name="label_default_tab">ডিফল্ট ট্যাব</string>
     <!-- App Lock -->
     <string name="settings_section_security">Security</string>
     <string name="app_lock_enable_title">Enable app lock</string>
@@ -33,7 +33,7 @@
     <string name="app_lock_warning">Beware that this is not a robust solution as this is only a 3rd party application. If you need strong security, consider using Private Space or other such features.</string>
     <string name="app_lock_biometric_note">Another note, the biometric authentication prompt only lets you use STRONG secure class methods. Face unlock security methods in WEAK class in devices such as Pixel 7 will only be able to utilize the available other STRONG auth methods such as fingerprint or pin.</string>
     <string name="setting_use_usage_access_title">ব্যবহার অ্যাক্সেস ব্যবহার করুন</string>
-    <string name="setting_use_usage_access_desc">Instead of accessibility (Freeze, App Lock, Dynamic Night Light)</string>
+    <string name="setting_use_usage_access_desc">অ্যাক্সেসিবিলিটির পরিবর্তে (ফ্রিজ, অ্যাপ লক, ডায়নামিক নাইট লাইট)</string>
     <!-- Button Remap -->
     <string name="button_remap_enable_title">Enable Button Remap</string>
     <string name="button_remap_use_shizuku_title">Use Shizuku or Root</string>
@@ -174,7 +174,7 @@
     <string name="perm_usage_stats_desc_app_lock">Required to detect foreground apps for App Lock features when accessibility is not used.</string>
     <string name="perm_notif_listener_desc_freeze">Required to detect playing media and active notifications to avoid freezing them</string>
     <string name="freeze_mode_title">Freeze mode</string>
-    <string name="freeze_mode_freeze">Freezing</string>
+    <string name="freeze_mode_freeze">ফ্রিজিং</string>
     <string name="freeze_mode_suspend">App suspension</string>
     <string name="freeze_mode_warning_desc">Can not switch mode while apps are frozen. Please unfreeze all and try again.</string>
     <!-- Notification Lighting -->
@@ -668,10 +668,10 @@
     <string name="perm_battery_optimization_title">Battery Optimization</string>
     <string name="perm_battery_optimization_desc">Ensure the service is not killed by the system to save power.</string>
     <!-- Tabs -->
-    <string name="tab_essentials">Essentials</string>
+    <string name="tab_essentials">প্রয়োজনীয়</string>
     <string name="tab_freeze">Freeze</string>
-    <string name="tab_freeze_title">Frozen</string>
-    <string name="tab_diy">DIY</string>
+    <string name="tab_freeze_title">হিমায়িত</string>
+    <string name="tab_diy">ডিআইওয়াই</string>
     <string name="tab_apps">Apps</string>
     <string name="tab_freeze_subtitle">Disabled apps</string>
     <string name="tab_diy_subtitle">Do It Yourself</string>
@@ -720,9 +720,9 @@
     <string name="label_settings">Settings</string>
     <string name="action_report_bug">Report a Bug</string>
     <!-- Sentry Crash Reporting -->
-    <string name="sentry_report_mode_title">Crash reporting</string>
-    <string name="sentry_mode_off">Off</string>
-    <string name="sentry_mode_auto">Auto</string>
+    <string name="sentry_report_mode_title">ক্র্যাশ রিপোর্টিং</string>
+    <string name="sentry_mode_off">অফ</string>
+    <string name="sentry_mode_auto">স্বয়ংক্রিয়</string>
     <string name="sentry_crash_toast">Essentials crashed, Report sent</string>
     <string name="simulate_crash">Simulate crash</string>
     <string name="welcome_title">Welcome to Essentials</string>
@@ -742,9 +742,9 @@
     <string name="label_app_settings">App Settings</string>
     <string name="label_app_language">Language</string>
     <string name="label_haptic_feedback">হ্যাপটিক প্রতিক্রিয়া</string>
-    <string name="label_updates">Updates</string>
-    <string name="label_auto_check_updates">Auto check for updates</string>
-    <string name="desc_auto_check_updates">Check for updates at app launch</string>
+    <string name="label_updates">আপডেট</string>
+    <string name="label_auto_check_updates">আপডেটের জন্য অটো চেক</string>
+    <string name="desc_auto_check_updates">অ্যাপ লঞ্চে আপডেটের জন্য চেক করুন</string>
     <string name="action_all_set">All Set</string>
     <string name="action_check_whats_new">Check What\'s New?</string>
     <string name="welcome_back_title">Welcome back to Essentials</string>
@@ -762,8 +762,8 @@
     <string name="unit_seconds">%d seconds</string>
     <string name="unit_minute">1 minute</string>
     <string name="unit_minutes">%d minutes</string>
-    <string name="action_restart_systemui">Restart SystemUI</string>
-    <string name="desc_restart_systemui">Kills and restarts SystemUI process to apply some changes immediately</string>
+    <string name="action_restart_systemui">SystemUI পুনরায় আরম্ভ করুন</string>
+    <string name="desc_restart_systemui">অবিলম্বে কিছু পরিবর্তন প্রয়োগ করতে সিস্টেমইউআই প্রক্রিয়া হত্যা এবং পুনরায় আরম্ভ করে</string>
     <string name="tile_restart_systemui">SystemUI Restart</string>
     <string name="tile_restart_systemui_subtitle_restart">Now</string>
     <string name="about_desc_restart_systemui_tile">Easily restart SystemUI directly from your Quick Settings panel. Helpful to quickly resolve status bar glitches or apply system UI modifications immediately. Requires root or Shizuku shell access.</string>
@@ -1274,7 +1274,7 @@
     <string name="label_release_notes">Release Notes</string>
     <string name="msg_no_repos_tracked">No repositories tracked yet</string>
     <string name="label_no_app_linked">No app linked</string>
-    <string name="format_updated_relative">Updated %1$s</string>
+    <string name="format_updated_relative">আপডেট %1$s</string>
     <!-- Relative Time -->
     <string name="time_just_now">just now</string>
     <string name="today">Today</string>
@@ -1428,7 +1428,7 @@
     <string name="kaomoji_cat_apologizing">Apologizing</string>
     <string name="kaomoji_cat_bear">Bear</string>
     <string name="kaomoji_cat_bird">Bird</string>
-    <string name="kaomoji_cat_cat">Cat</string>
+    <string name="kaomoji_cat_cat">বিড়াল :3</string>
     <string name="kaomoji_cat_confusion">Confusion</string>
     <string name="kaomoji_cat_dog">Dog</string>
     <string name="kaomoji_cat_doubt">Doubt</string>
@@ -1514,11 +1514,11 @@
     <string name="tab_your_android">Your Android</string>
     <string name="label_device_storage">Storage</string>
     <string name="label_device_ram">Memory</string>
-    <string name="label_use_blur">Use blur</string>
-    <string name="desc_use_blur">Enable progressive blur elements across the UI</string>
+    <string name="label_use_blur">ব্লার ব্যবহার করুন</string>
+    <string name="desc_use_blur">UI জুড়ে প্রগতিশীল ব্লার উপাদান সক্ষম করুন</string>
     <string name="msg_blur_compatibility_error">Blur is disabled on this device to prevent a known display bug on Samsung devices with Android 15 or below.</string>
-    <string name="setting_swipe_tabs_title">Swipe between tabs</string>
-    <string name="setting_swipe_tabs_desc">In home screen</string>
+    <string name="setting_swipe_tabs_title">ট্যাবগুলির মধ্যে সোয়াইপ করুন</string>
+    <string name="setting_swipe_tabs_desc">হোম স্ক্রিনে</string>
     <!-- Empty State Actions -->
     <string name="msg_no_apps_frozen">No apps selected to freeze.</string>
     <string name="action_get_started">Get Started</string>
@@ -1684,10 +1684,10 @@
     <string name="label_wallpaper_a_few_minutes">a few minutes</string>
     <!-- In-App Translation Mode -->
     <string name="settings_translations_section">Translations</string>
-    <string name="settings_translate_mode">Translation Mode</string>
-    <string name="settings_translate_mode_desc">Long press any text to translate and contribute to the community</string>
-    <string name="settings_translated_texts">Translated</string>
-    <string name="settings_translated_texts_desc">%d edit(s) pending — tap to submit or discard</string>
+    <string name="settings_translate_mode">অনুবাদ মোড</string>
+    <string name="settings_translate_mode_desc">সম্প্রদায়ের অনুবাদ এবং অবদান রাখতে যে কোনও পাঠ্য দীর্ঘ টিপুন</string>
+    <string name="settings_translated_texts">অনুবাদিত</string>
+    <string name="settings_translated_texts_desc">%d এডিট মুলতুবি থাকা — জমা দিতে বা বাতিল করতে ট্যাপ করুন</string>
     <string name="translation_submit">Submit</string>
     <string name="translation_discard">Discard</string>
     <string name="translation_menu_translate">Translate</string>
