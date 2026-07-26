@@ -1474,4 +1474,6 @@ Kalender mit deinerUhr</string>
     <string name="feat_notification_snoozing_desc">Benachrichtigungen neu planen</string>
     <string name="feat_safe_volume_title">Warnung vor sicherer Lautstärke deaktivieren</string>
     <string name="feat_safe_volume_desc">Dialog für laute Lautstärke unterdrücken</string>
+    <string name="feat_pixel_searchbar_desc">Ersetzt die Standard-Suchleiste vom Pixel Launcher.</string>
+    <string name="feat_pixel_searchbar_title">Suchtleiste ersetzen</string>
 </resources>
