@@ -1459,6 +1459,33 @@ object FeatureRegistry {
             override fun isEnabled(viewModel: MainViewModel) = false
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
             override fun isDeviceSupported(context: Context) = DeviceUtils.isGoogleDevice()
-        }
+        },
+
+        object : Feature(
+            id = "Lockdown mode",
+            title = R.string.tile_lockdown_mode,
+            iconRes = R.drawable.rounded_lock_24,
+            category = R.string.cat_tools,
+            description = R.string.tile_lockdown_mode_desc,
+            aboutDescription = R.string.tile_lockdown_mode_about_desc,
+            permissionKeys = listOf(
+                if (ShellUtils.isRootEnabled(EssentialsApp.context)) "ROOT" else
+                    "SHIZUKU"
+            ),
+            showToggle = true,
+            isVisibleInMain = false,
+            hasMoreSettings = false,
+            parentFeatureId = "Security",
+            isBeta = true,
+        ) {
+            override fun isEnabled(viewModel: MainViewModel): Boolean =
+                viewModel.isLockdownModeEnabled.value
+
+            override fun isToggleEnabled(viewModel: MainViewModel, context: Context): Boolean =
+                ShellUtils.hasPermission(context)
+
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
+                viewModel.toggleLockdownMode()
+        },
     )
 }

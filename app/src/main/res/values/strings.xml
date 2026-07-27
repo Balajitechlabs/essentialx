@@ -293,6 +293,9 @@
     <string name="charge_opt_long_press_title">Toggle Options</string>
     <string name="charge_opt_long_press_desc">Choose which charging modes to switch between when tapping the Quick Settings tile.</string>
     <string name="permission_missing">Permission missing</string>
+    <string name="tile_lockdown_mode">Lockdown</string>
+    <string name="tile_lockdown_mode_desc">Force require pin/pattern to unlock</string>
+    <string name="tile_lockdown_mode_about_desc">Lock your phone or Lockdown if lockdown mode is turned on.\n\nLockdown mode disables weak unlock methods like face/fingerprint and require pattern or pin securely to unlock your phone.\n\nBoth works with Shizuku and normal lock works with Accessibility too.</string>
 
 
     <!-- Screen Locked Security -->

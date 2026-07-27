@@ -1607,6 +1607,7 @@ class MainViewModel : ViewModel() {
             startBatteryNotificationService(context)
         }
 
+        isLockdownModeEnabled.value = settingsRepository.getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE)
     }
 
     private fun startBatteryNotificationService(context: Context) {
@@ -4587,5 +4588,11 @@ class MainViewModel : ViewModel() {
     companion object {
         var cachedIsUpdateAvailable: Boolean = false
         var cachedUpdateInfo: UpdateInfo? = null
+    }
+
+    val isLockdownModeEnabled = mutableStateOf(false)
+    fun toggleLockdownMode() {
+        settingsRepository.putBoolean(SettingsRepository.KEY_LOCKDOWN_MODE, !isLockdownModeEnabled.value)
+        isLockdownModeEnabled.value = !isLockdownModeEnabled.value
     }
 }

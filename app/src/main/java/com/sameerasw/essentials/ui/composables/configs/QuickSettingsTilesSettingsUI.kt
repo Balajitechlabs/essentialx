@@ -59,6 +59,7 @@ import com.sameerasw.essentials.services.tiles.DeveloperOptionsTileService
 import com.sameerasw.essentials.services.tiles.DynamicNightLightTileService
 import com.sameerasw.essentials.services.tiles.FlashlightPulseTileService
 import com.sameerasw.essentials.services.tiles.FlashlightTileService
+import com.sameerasw.essentials.services.tiles.LockdownTileService
 import com.sameerasw.essentials.services.tiles.MapsPowerSavingTileService
 import com.sameerasw.essentials.services.tiles.MonoAudioTileService
 import com.sameerasw.essentials.services.tiles.NfcTileService
@@ -346,6 +347,14 @@ fun QuickSettingsTilesSettingsUI(
             R.string.about_desc_charge_optimization,
             R.string.cat_utils,
             isSupported = { _ -> DeviceUtils.isGoogleDevice() }
+        ),
+        QSTileInfo(
+            R.string.tile_lockdown_mode,
+            R.drawable.rounded_lock_24,
+            LockdownTileService::class.java,
+            listOf("ACCESSIBILITY", if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
+            R.string.tile_lockdown_mode_about_desc,
+            R.string.cat_privacy
         )
     )
 
