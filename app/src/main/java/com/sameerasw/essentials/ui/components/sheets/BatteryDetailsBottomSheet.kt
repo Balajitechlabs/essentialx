@@ -43,6 +43,7 @@ import com.sameerasw.essentials.utils.ColorUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -166,22 +167,22 @@ fun BatteryDetailsBottomSheet(
                 InfoDetailRow(
                     title = stringResource(R.string.label_battery_health),
                     value = BatteryInfoUtil.formatHealth(batteryDetails.health),
-                    iconRes = R.drawable.rounded_battery_android_frame_shield_24
+                    iconRes = R.drawable.rounded_ecg_heart_24
                 )
                 InfoDetailRow(
                     title = stringResource(R.string.label_battery_plug_type),
                     value = BatteryInfoUtil.formatPlugged(batteryDetails.plugged),
-                    iconRes = R.drawable.rounded_power_settings_new_24
+                    iconRes = R.drawable.rounded_cable_24
                 )
                 InfoDetailRow(
                     title = stringResource(R.string.label_battery_temperature),
-                    value = String.format(Locale.getDefault(), "%.1f °C", batteryDetails.temperature / 10.0f),
-                    iconRes = R.drawable.rounded_info_24
+                    value = String.format(LocalLocale.current.platformLocale, "%.1f °C", batteryDetails.temperature / 10.0f),
+                    iconRes = R.drawable.rounded_device_thermostat_24
                 )
                 InfoDetailRow(
                     title = stringResource(R.string.label_battery_voltage),
                     value = "${batteryDetails.voltage} mV",
-                    iconRes = R.drawable.rounded_info_24
+                    iconRes = R.drawable.rounded_power_input_24
                 )
                 InfoDetailRow(
                     title = stringResource(R.string.label_battery_technology),
@@ -209,7 +210,7 @@ fun BatteryDetailsBottomSheet(
                     InfoDetailRow(
                         title = stringResource(R.string.label_battery_charge_full),
                         value = "$fullMah mAh",
-                        iconRes = R.drawable.rounded_battery_android_frame_plus_24
+                        iconRes = R.drawable.battery_android_frame_bolt_24px
                     )
                 }
 
@@ -218,7 +219,7 @@ fun BatteryDetailsBottomSheet(
                     InfoDetailRow(
                         title = stringResource(R.string.label_battery_charge_full_design),
                         value = "$designMah mAh",
-                        iconRes = R.drawable.rounded_battery_android_frame_plus_24
+                        iconRes = R.drawable.battery_android_frame_shield_24px
                     )
                 }
 
@@ -227,7 +228,7 @@ fun BatteryDetailsBottomSheet(
                     InfoDetailRow(
                         title = stringResource(R.string.label_battery_capacity_health),
                         value = String.format(Locale.getDefault(), "%.1f %%", healthPct),
-                        iconRes = R.drawable.rounded_battery_android_frame_shield_24
+                        iconRes = R.drawable.rounded_ecg_heart_24
                     )
                 }
 
@@ -237,7 +238,7 @@ fun BatteryDetailsBottomSheet(
                     InfoDetailRow(
                         title = stringResource(R.string.label_battery_charge_counter),
                         value = "$counterMah mAh",
-                        iconRes = R.drawable.rounded_battery_android_frame_6_24
+                        iconRes = R.drawable.battery_android_frame_4_24px
                     )
                 }
 
@@ -247,7 +248,7 @@ fun BatteryDetailsBottomSheet(
                         InfoDetailRow(
                             title = stringResource(R.string.label_battery_max_current),
                             value = "$curMa mA",
-                            iconRes = R.drawable.rounded_power_settings_new_24
+                            iconRes = R.drawable.rounded_power_input_24
                         )
                     }
                 }
@@ -258,7 +259,7 @@ fun BatteryDetailsBottomSheet(
                         InfoDetailRow(
                             title = stringResource(R.string.label_battery_max_voltage),
                             value = "$volMv mV",
-                            iconRes = R.drawable.rounded_power_settings_new_24
+                            iconRes = R.drawable.rounded_power_input_24
                         )
                     }
                 }
@@ -267,7 +268,7 @@ fun BatteryDetailsBottomSheet(
                     InfoDetailRow(
                         title = stringResource(R.string.label_battery_charging_state),
                         value = "$state",
-                        iconRes = R.drawable.rounded_info_24
+                        iconRes = R.drawable.rounded_charger_24
                     )
                 }
 
@@ -283,7 +284,7 @@ fun BatteryDetailsBottomSheet(
                     InfoDetailRow(
                         title = stringResource(R.string.label_battery_capacity_level),
                         value = "$cap",
-                        iconRes = R.drawable.rounded_info_24
+                        iconRes = R.drawable.rounded_battery_android_0_24
                     )
                 }
             }
