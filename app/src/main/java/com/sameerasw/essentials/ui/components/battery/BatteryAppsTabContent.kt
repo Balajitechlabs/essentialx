@@ -107,6 +107,7 @@ fun BatteryAppsTabContent(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
+                    Spacer(modifier = Modifier.width(16.dp))
                     Text(
                         text = displayValue,
                         style = MaterialTheme.typography.bodyMedium,
