@@ -1460,4 +1460,6 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="feat_flashlight_title">Linterna</string>
     <string name="setting_enable_unsupported_features_title">Habilitar funciones insoportadas</string>
     <string name="setting_enable_unsupported_features_desc">Muestra las funciones específicas del fabricante o las redundantes que están ocultas de forma predeterminada.</string>
+    <string name="settings_translate_mode">Modo de traducción</string>
+    <string name="settings_translate_mode_desc">Mantén presionando cualquier texto para traducir y contribuir a la comunidad</string>
 </resources>
