@@ -1464,4 +1464,21 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="settings_translate_mode_desc">Mantén presionando cualquier texto para traducir y contribuir a la comunidad</string>
     <string name="setting_swipe_tabs_title">Desliza para abrir Mi android</string>
     <string name="setting_swipe_tabs_desc">En pantalla de inicio</string>
+    <string name="feat_daily_wallpaper_title">Fondo de pantalla</string>
+    <string name="feat_daily_wallpaper_desc">Selección diaria y fondo de pantalla en vivo</string>
+    <string name="feat_safe_volume_desc">Suprimir el diálogo de alto volumen</string>
+    <string name="feat_notification_snoozing_title">Posponer notificaciones</string>
+    <string name="feat_notification_snoozing_desc">Reprogramar notificaciones</string>
+    <string name="feat_flashlight_desc">Mejorar el comportamiento de linterna</string>
+    <string name="feat_power_battery_title">Poder y batería</string>
+    <string name="feat_power_battery_desc">Configura las politicas del ahorro de batería</string>
+    <string name="feat_pixel_searchbar_title">Reemplazar barra de búsqueda</string>
+    <string name="feat_pixel_searchbar_desc">Remplace la barra de búsqueda predeterminada de Pixel Launcher</string>
+    <string name="feat_pocket_mode_title">Modo bolsillo</string>
+    <string name="feat_pocket_mode_desc">Evita toques accidentales mientras está en el bolsillo</string>
+    <string name="feat_watch_wireless_debugging_title">Deduperacion inalámbrica</string>
+    <string name="feat_watch_wireless_debugging_desc">Habilitar remotamente</string>
+    <string name="feat_sync_sound_mode_title">Sincronizar modo de sonido</string>
+    <string name="feat_watch_controls_title">Personalizar</string>
+    <string name="feat_watch_controls_desc">Personalizar los controles de la app de WearOS</string>
 </resources>
