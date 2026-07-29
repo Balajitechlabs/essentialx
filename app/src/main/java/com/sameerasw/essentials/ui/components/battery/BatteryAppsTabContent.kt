@@ -16,9 +16,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -100,20 +102,10 @@ fun BatteryAppsTabContent(
         }
 
         if (usageApps.size > 20) {
-            Button(
-                onClick = {
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    onToggleShowAll()
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright,
-                    contentColor = MaterialTheme.colorScheme.primary
-                ),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Text(if (showAllApps) "Show only top apps" else "Show all")
-            }
+            com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton(
+                isExpanded = showAllApps,
+                onToggle = onToggleShowAll
+            )
         }
     }
 }
