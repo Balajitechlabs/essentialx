@@ -11,7 +11,18 @@ object StringLoader {
 
     fun getTranslationsForKey(context: Context, key: String): Map<String, String> {
         val all = getAllTranslations(context)
-        return all[key] ?: emptyMap()
+        val map = all[key] ?: return emptyMap()
+        val result = mutableMapOf<String, String>()
+        result.putAll(map)
+        for ((loc, valStr) in map) {
+            if (loc.contains("-")) {
+                val base = loc.split("-")[0]
+                if (!result.containsKey(base)) {
+                    result[base] = valStr
+                }
+            }
+        }
+        return result
     }
 
     @Synchronized
@@ -54,12 +65,45 @@ object StringLoader {
             val assets = context.assets
             // Common bundled locale subfolders in res/values-*
             val knownLocales = listOf(
-                "values-ach", "values-af", "values-ar", "values-ca", "values-cs", "values-da",
-                "values-de", "values-el", "values-en", "values-es", "values-fi", "values-fr",
-                "values-he", "values-hu", "values-in-rID", "values-it", "values-iw-rIL", "values-ja",
-                "values-ko", "values-nl", "values-no", "values-pl", "values-pt-rBR", "values-pt-rPT",
-                "values-ro", "values-ru", "values-si", "values-sr", "values-sv", "values-tr",
-                "values-uk", "values-vi", "values-zh-rCN", "values-zh-rTW"
+                "values-ach", "values-ach-rUG",
+                "values-af", "values-af-rZA",
+                "values-ar", "values-ar-rSA",
+                "values-bn-rBD",
+                "values-ca", "values-ca-rES",
+                "values-cs", "values-cs-rCZ",
+                "values-da", "values-da-rDK",
+                "values-de", "values-de-rDE",
+                "values-el", "values-el-rGR",
+                "values-en", "values-en-rUS",
+                "values-es", "values-es-rES",
+                "values-fi", "values-fi-rFI",
+                "values-fil-rPH",
+                "values-fr", "values-fr-rFR",
+                "values-he",
+                "values-hi-rIN",
+                "values-hu", "values-hu-rHU",
+                "values-id", "values-in-rID",
+                "values-it", "values-it-rIT",
+                "values-iw-rIL",
+                "values-ja", "values-ja-rJP",
+                "values-ko", "values-ko-rKR",
+                "values-ml-rIN",
+                "values-ne-rNP",
+                "values-nl", "values-nl-rNL",
+                "values-no", "values-no-rNO",
+                "values-pl", "values-pl-rPL",
+                "values-pt", "values-pt-rBR", "values-pt-rPT",
+                "values-ro", "values-ro-rRO",
+                "values-ru", "values-ru-rRU",
+                "values-si", "values-si-rLK",
+                "values-sk-rSK",
+                "values-sr", "values-sr-rSP",
+                "values-sv", "values-sv-rSE",
+                "values-ta-rIN",
+                "values-tr", "values-tr-rTR",
+                "values-uk", "values-uk-rUA",
+                "values-vi", "values-vi-rVN",
+                "values-zh", "values-zh-rCN", "values-zh-rTW"
             )
             list.addAll(knownLocales)
         } catch (e: Exception) {
