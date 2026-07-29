@@ -75,6 +75,8 @@ fun BatteryDetailsBottomSheet(
     var selectedTab by remember { mutableIntStateOf(0) }
     var showAllApps by remember { mutableStateOf(false) }
 
+    var showPercentage by remember { mutableStateOf(true) }
+
     var usageApps by remember { mutableStateOf<List<BatteryUsageApp>>(emptyList()) }
     var wakeupsList by remember { mutableStateOf<List<CpuWakeupItem>>(emptyList()) }
 
@@ -234,12 +236,16 @@ fun BatteryDetailsBottomSheet(
                     usageApps = usageApps,
                     showAllApps = showAllApps,
                     onToggleShowAll = { showAllApps = !showAllApps },
+                    showPercentage = showPercentage,
+                    onToggleUnit = { showPercentage = !showPercentage },
                     view = view
                 )
                 2 -> BatterySystemTabContent(
                     isLoadingAdvanced = isLoadingAdvanced,
                     powerProfile = batteryDetails.powerProfile,
-                    wakeupsList = wakeupsList
+                    wakeupsList = wakeupsList,
+                    showPercentage = showPercentage,
+                    onToggleUnit = { showPercentage = !showPercentage }
                 )
             }
 

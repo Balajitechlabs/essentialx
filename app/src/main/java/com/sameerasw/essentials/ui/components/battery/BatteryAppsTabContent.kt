@@ -33,12 +33,16 @@ import com.sameerasw.essentials.utils.BatteryUsageApp
 import com.sameerasw.essentials.utils.HapticUtil
 import java.util.Locale
 
+import androidx.compose.foundation.clickable
+
 @Composable
 fun BatteryAppsTabContent(
     isLoadingAdvanced: Boolean,
     usageApps: List<BatteryUsageApp>,
     showAllApps: Boolean,
     onToggleShowAll: () -> Unit,
+    showPercentage: Boolean,
+    onToggleUnit: () -> Unit,
     view: View
 ) {
     if (isLoadingAdvanced) {
@@ -55,9 +59,17 @@ fun BatteryAppsTabContent(
         }
     } else {
         val displayedApps = if (showAllApps) usageApps else usageApps.take(20)
+        val totalMah = usageApps.sumOf { it.powerMah }.coerceAtLeast(0.0001)
 
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             displayedApps.forEach { app ->
+                val displayValue = if (showPercentage) {
+                    val pct = (app.powerMah / totalMah) * 100.0
+                    String.format(Locale.getDefault(), "%.1f %%", pct)
+                } else {
+                    String.format(Locale.getDefault(), "%.2f mAh", app.powerMah)
+                }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -65,6 +77,10 @@ fun BatteryAppsTabContent(
                             MaterialTheme.colorScheme.surfaceBright,
                             shape = Shapes.extraSmall
                         )
+                        .clickable {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onToggleUnit()
+                        }
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -92,7 +108,7 @@ fun BatteryAppsTabContent(
                         modifier = Modifier.weight(1f)
                     )
                     Text(
-                        text = String.format(Locale.getDefault(), "%.2f mAh", app.powerMah),
+                        text = displayValue,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurface

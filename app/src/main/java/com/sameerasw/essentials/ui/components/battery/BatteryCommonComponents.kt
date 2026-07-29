@@ -20,18 +20,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.ui.theme.Shapes
 
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalView
+import com.sameerasw.essentials.utils.HapticUtil
+
 @Composable
 fun InfoDetailRow(
     title: String,
     value: String,
-    iconRes: Int
+    iconRes: Int,
+    onClick: (() -> Unit)? = null
 ) {
+    val view = LocalView.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(
                 MaterialTheme.colorScheme.surfaceBright,
                 shape = Shapes.extraSmall
+            )
+            .then(
+                if (onClick != null) {
+                    Modifier.clickable {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        onClick()
+                    }
+                } else Modifier
             )
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically

@@ -12,11 +12,15 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.CpuWakeupItem
 
+import java.util.Locale
+
 @Composable
 fun BatterySystemTabContent(
     isLoadingAdvanced: Boolean,
     powerProfile: Map<String, String>?,
-    wakeupsList: List<CpuWakeupItem>
+    wakeupsList: List<CpuWakeupItem>,
+    showPercentage: Boolean,
+    onToggleUnit: () -> Unit
 ) {
     if (isLoadingAdvanced) {
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
@@ -24,36 +28,48 @@ fun BatterySystemTabContent(
         }
     } else {
         if (!powerProfile.isNullOrEmpty()) {
+            val totalMa = powerProfile.values.mapNotNull { it.toDoubleOrNull() }.sum().coerceAtLeast(0.0001)
+
+            fun formatProfileValue(raw: String): String {
+                val num = raw.toDoubleOrNull() ?: return "$raw mA"
+                return if (showPercentage) {
+                    val pct = (num / totalMa) * 100.0
+                    String.format(Locale.getDefault(), "%.1f %%", pct)
+                } else {
+                    "$raw mA"
+                }
+            }
+
             RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
                 powerProfile["screen.on"]?.let {
-                    InfoDetailRow(title = "Screen On Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                    InfoDetailRow(title = "Screen On Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
                 }
                 powerProfile["screen.full"]?.let {
-                    InfoDetailRow(title = "Screen Max Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                    InfoDetailRow(title = "Screen Max Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
                 }
                 powerProfile["ambient.on"]?.let {
-                    InfoDetailRow(title = "Ambient/AOD Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                    InfoDetailRow(title = "Ambient/AOD Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
                 }
                 powerProfile["audio"]?.let {
-                    InfoDetailRow(title = "Audio Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                    InfoDetailRow(title = "Audio Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
                 }
                 powerProfile["video"]?.let {
-                    InfoDetailRow(title = "Video Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                    InfoDetailRow(title = "Video Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
                 }
                 powerProfile["camera.avg"]?.let {
-                    InfoDetailRow(title = "Camera Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                    InfoDetailRow(title = "Camera Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
                 }
                 powerProfile["camera.flashlight"]?.let {
-                    InfoDetailRow(title = "Flashlight Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                    InfoDetailRow(title = "Flashlight Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.active"]?.let {
-                    InfoDetailRow(title = "CPU Active Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
+                    InfoDetailRow(title = "CPU Active Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_memory_alt_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.idle"]?.let {
-                    InfoDetailRow(title = "CPU Idle Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
+                    InfoDetailRow(title = "CPU Idle Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_memory_alt_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.suspend"]?.let {
-                    InfoDetailRow(title = "CPU Suspend Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
+                    InfoDetailRow(title = "CPU Suspend Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_memory_alt_24, onClick = onToggleUnit)
                 }
             }
         }
