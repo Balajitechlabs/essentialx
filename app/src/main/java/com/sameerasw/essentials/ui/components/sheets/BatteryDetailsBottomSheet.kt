@@ -1,34 +1,23 @@
 package com.sameerasw.essentials.ui.components.sheets
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -44,9 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -55,11 +42,12 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.drawable.toBitmap
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.components.battery.BatteryAppsTabContent
+import com.sameerasw.essentials.ui.components.battery.BatteryInfoTabContent
+import com.sameerasw.essentials.ui.components.battery.BatterySystemTabContent
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.BatteryDetails
@@ -67,10 +55,10 @@ import com.sameerasw.essentials.utils.BatteryInfoUtil
 import com.sameerasw.essentials.utils.BatteryStatsUtil
 import com.sameerasw.essentials.utils.BatteryUsageApp
 import com.sameerasw.essentials.utils.CpuWakeupItem
+import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -137,7 +125,7 @@ fun BatteryDetailsBottomSheet(
     }
 
     val isCharging = batteryDetails.status == android.os.BatteryManager.BATTERY_STATUS_CHARGING
-    val isPowerSave = remember { com.sameerasw.essentials.utils.DeviceUtils.isPowerSaveMode(context) }
+    val isPowerSave = remember { DeviceUtils.isPowerSaveMode(context) }
     val iconRes = BatteryInfoUtil.getBatteryIconRes(
         context = context,
         level = batteryDetails.level,
@@ -237,401 +225,25 @@ fun BatteryDetailsBottomSheet(
             }
 
             when (selectedTab) {
-                0 -> {
-                    // TAB 0: Info (Health, Charging, Specs)
-                    
-                    // Section 1: Health
-                    Text(
-                        text = stringResource(R.string.label_battery_section_health),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-
-                    RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                        InfoDetailRow(
-                            title = stringResource(R.string.label_battery_health),
-                            value = BatteryInfoUtil.formatHealth(batteryDetails.health),
-                            iconRes = R.drawable.rounded_ecg_heart_24
-                        )
-                        InfoDetailRow(
-                            title = stringResource(R.string.label_battery_temperature),
-                            value = String.format(LocalLocale.current.platformLocale, "%.1f °C", batteryDetails.temperature / 10.0f),
-                            iconRes = R.drawable.rounded_device_thermostat_24
-                        )
-
-                        if (isLoadingAdvanced) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        MaterialTheme.colorScheme.surfaceBright,
-                                        shape = Shapes.extraSmall
-                                    )
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                LinearWavyProgressIndicator(
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        } else {
-                            val full = batteryDetails.chargeFull
-                            val design = batteryDetails.chargeFullDesign
-
-                            if (full != null && full > 0) {
-                                val fullMah = if (full > 10000) full / 1000 else full
-                                InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_charge_full),
-                                    value = "$fullMah mAh",
-                                    iconRes = R.drawable.battery_android_frame_bolt_24px
-                                )
-                            }
-
-                            if (design != null && design > 0) {
-                                val designMah = if (design > 10000) design / 1000 else design
-                                InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_charge_full_design),
-                                    value = "$designMah mAh",
-                                    iconRes = R.drawable.battery_android_frame_shield_24px
-                                )
-                            }
-
-                            if (full != null && design != null && design > 0) {
-                                val healthPct = (full.toDouble() / design.toDouble()) * 100.0
-                                InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_capacity_health),
-                                    value = String.format(Locale.getDefault(), "%.1f %%", healthPct),
-                                    iconRes = R.drawable.rounded_ecg_heart_24
-                                )
-                            }
-                        }
-                    }
-
-                    // Section 2: Charging
-                    Text(
-                        text = stringResource(R.string.label_battery_section_charging),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-
-                    RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                        InfoDetailRow(
-                            title = stringResource(R.string.label_battery_plug_type),
-                            value = BatteryInfoUtil.formatPlugged(batteryDetails.plugged),
-                            iconRes = R.drawable.rounded_cable_24
-                        )
-
-                        if (isLoadingAdvanced) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        MaterialTheme.colorScheme.surfaceBright,
-                                        shape = Shapes.extraSmall
-                                    )
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                LinearWavyProgressIndicator(
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        } else {
-                            batteryDetails.chargingState?.let { state ->
-                                InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_charging_state),
-                                    value = "$state",
-                                    iconRes = R.drawable.rounded_charger_24
-                                )
-                            }
-
-                            batteryDetails.chargingPolicy?.let { policy ->
-                                InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_charging_policy),
-                                    value = BatteryInfoUtil.formatChargingPolicy(policy),
-                                    iconRes = R.drawable.rounded_info_24
-                                )
-                            }
-
-                            batteryDetails.maxChargingCurrent?.let { maxCur ->
-                                if (maxCur > 0) {
-                                    val curMa = if (maxCur > 10000) maxCur / 1000 else maxCur
-                                    InfoDetailRow(
-                                        title = stringResource(R.string.label_battery_max_current),
-                                        value = "$curMa mA",
-                                        iconRes = R.drawable.rounded_power_input_24
-                                    )
-                                }
-                            }
-
-                            batteryDetails.maxChargingVoltage?.let { maxVol ->
-                                if (maxVol > 0) {
-                                    val volMv = if (maxVol > 100000) maxVol / 1000 else maxVol
-                                    InfoDetailRow(
-                                        title = stringResource(R.string.label_battery_max_voltage),
-                                        value = "$volMv mV",
-                                        iconRes = R.drawable.rounded_power_input_24
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Section 3: Specs
-                    Text(
-                        text = stringResource(R.string.label_battery_section_specs),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-
-                    RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                        InfoDetailRow(
-                            title = stringResource(R.string.label_battery_voltage),
-                            value = "${batteryDetails.voltage} mV",
-                            iconRes = R.drawable.rounded_power_input_24
-                        )
-                        InfoDetailRow(
-                            title = stringResource(R.string.label_battery_technology),
-                            value = batteryDetails.technology,
-                            iconRes = R.drawable.rounded_memory_alt_24
-                        )
-
-                        if (!isLoadingAdvanced) {
-                            val counter = batteryDetails.chargeCounter
-                            if (counter != null && counter > 0) {
-                                val counterMah = if (counter > 10000) counter / 1000 else counter
-                                InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_charge_counter),
-                                    value = "$counterMah mAh",
-                                    iconRes = R.drawable.battery_android_frame_4_24px
-                                )
-                            }
-
-                            batteryDetails.capacityLevel?.let { cap ->
-                                InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_capacity_level),
-                                    value = "$cap",
-                                    iconRes = R.drawable.rounded_battery_android_0_24
-                                )
-                            }
-                        }
-                    }
-                }
-
-                1 -> {
-                    // TAB 1: Apps (No section title)
-                    if (isLoadingAdvanced) {
-                        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        MaterialTheme.colorScheme.surfaceBright,
-                                        shape = Shapes.extraSmall
-                                    )
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                LinearWavyProgressIndicator(
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    } else if (usageApps.isEmpty()) {
-                        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                            InfoDetailRow(
-                                title = "Usage Data",
-                                value = "No data",
-                                iconRes = R.drawable.rounded_info_24
-                            )
-                        }
-                    } else {
-                        val displayedApps = if (showAllApps) usageApps else usageApps.take(20)
-
-                        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                            displayedApps.forEach { app ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            MaterialTheme.colorScheme.surfaceBright,
-                                            shape = Shapes.extraSmall
-                                        )
-                                        .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    if (app.icon != null) {
-                                        androidx.compose.foundation.Image(
-                                            bitmap = app.icon.toBitmap(48, 48).asImageBitmap(),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    } else {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.rounded_info_24),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = app.appName,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    Text(
-                                        text = String.format(Locale.getDefault(), "%.2f mAh", app.powerMah),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                }
-                            }
-                        }
-
-                        if (usageApps.size > 20) {
-                            Button(
-                                onClick = {
-                                    HapticUtil.performVirtualKeyHaptic(view)
-                                    showAllApps = !showAllApps
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceBright,
-                                    contentColor = MaterialTheme.colorScheme.primary
-                                ),
-                                shape = RoundedCornerShape(20.dp)
-                            ) {
-                                Text(if (showAllApps) "Show only top apps" else "Show all")
-                            }
-                        }
-                    }
-                }
-
-                2 -> {
-                    // TAB 2: System (No power profile title, keep CPU Wakeups title)
-                    if (isLoadingAdvanced) {
-                        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(
-                                        MaterialTheme.colorScheme.surfaceBright,
-                                        shape = Shapes.extraSmall
-                                    )
-                                    .padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                LinearWavyProgressIndicator(
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
-                    } else {
-                        val profile = batteryDetails.powerProfile
-                        if (!profile.isNullOrEmpty()) {
-                            RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                                profile["screen.on"]?.let {
-                                    InfoDetailRow(title = "Screen On Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                                }
-                                profile["screen.full"]?.let {
-                                    InfoDetailRow(title = "Screen Max Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                                }
-                                profile["ambient.on"]?.let {
-                                    InfoDetailRow(title = "Ambient/AOD Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                                }
-                                profile["audio"]?.let {
-                                    InfoDetailRow(title = "Audio Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                                }
-                                profile["video"]?.let {
-                                    InfoDetailRow(title = "Video Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                                }
-                                profile["camera.avg"]?.let {
-                                    InfoDetailRow(title = "Camera Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                                }
-                                profile["camera.flashlight"]?.let {
-                                    InfoDetailRow(title = "Flashlight Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                                }
-                                profile["cpu.active"]?.let {
-                                    InfoDetailRow(title = "CPU Active Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
-                                }
-                                profile["cpu.idle"]?.let {
-                                    InfoDetailRow(title = "CPU Idle Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
-                                }
-                                profile["cpu.suspend"]?.let {
-                                    InfoDetailRow(title = "CPU Suspend Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
-                                }
-                            }
-                        }
-
-                        if (wakeupsList.isNotEmpty()) {
-                            Text(
-                                text = stringResource(R.string.label_battery_wakeups_attribution),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
-
-                            RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                                wakeupsList.take(20).forEach { item ->
-                                    InfoDetailRow(
-                                        title = "${item.subsystem} (${item.timeAgo})",
-                                        value = item.attribution,
-                                        iconRes = item.iconRes
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+                0 -> BatteryInfoTabContent(
+                    batteryDetails = batteryDetails,
+                    isLoadingAdvanced = isLoadingAdvanced
+                )
+                1 -> BatteryAppsTabContent(
+                    isLoadingAdvanced = isLoadingAdvanced,
+                    usageApps = usageApps,
+                    showAllApps = showAllApps,
+                    onToggleShowAll = { showAllApps = !showAllApps },
+                    view = view
+                )
+                2 -> BatterySystemTabContent(
+                    isLoadingAdvanced = isLoadingAdvanced,
+                    powerProfile = batteryDetails.powerProfile,
+                    wakeupsList = wakeupsList
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
         }
-    }
-}
-
-@Composable
-private fun InfoDetailRow(
-    title: String,
-    value: String,
-    iconRes: Int
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.surfaceBright,
-                shape = Shapes.extraSmall
-            )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(id = iconRes),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
     }
 }
