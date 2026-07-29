@@ -279,6 +279,8 @@ fun DeviceHeroCard(
 
         }
 
+        com.sameerasw.essentials.ui.components.cards.BatteryInfoCard()
+
         if (isPixel) {
             Column(
                 modifier = Modifier
