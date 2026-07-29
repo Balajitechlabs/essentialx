@@ -52,6 +52,7 @@ fun BatteryDetailsBottomSheet(
     onDismiss: () -> Unit
 ) {
     val context = LocalContext.current
+    val view = androidx.compose.ui.platform.LocalView.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var batteryDetails by remember { mutableStateOf(initialDetails) }
@@ -287,6 +288,127 @@ fun BatteryDetailsBottomSheet(
                         iconRes = R.drawable.rounded_battery_android_0_24
                     )
                 }
+            }
+
+            val profile = batteryDetails.powerProfile
+            if (!profile.isNullOrEmpty()) {
+                Text(
+                    text = stringResource(R.string.label_battery_section_power_profile),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+
+                RoundedCardContainer(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    profile["screen.on"]?.let {
+                        InfoDetailRow(
+                            title = "Screen On Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_info_24
+                        )
+                    }
+                    profile["screen.full"]?.let {
+                        InfoDetailRow(
+                            title = "Screen Max Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_info_24
+                        )
+                    }
+                    profile["ambient.on"]?.let {
+                        InfoDetailRow(
+                            title = "Ambient/AOD Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_info_24
+                        )
+                    }
+                    profile["audio"]?.let {
+                        InfoDetailRow(
+                            title = "Audio Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_info_24
+                        )
+                    }
+                    profile["video"]?.let {
+                        InfoDetailRow(
+                            title = "Video Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_info_24
+                        )
+                    }
+                    profile["camera.avg"]?.let {
+                        InfoDetailRow(
+                            title = "Camera Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_info_24
+                        )
+                    }
+                    profile["camera.flashlight"]?.let {
+                        InfoDetailRow(
+                            title = "Flashlight Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_info_24
+                        )
+                    }
+                    profile["cpu.active"]?.let {
+                        InfoDetailRow(
+                            title = "CPU Active Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_memory_alt_24
+                        )
+                    }
+                    profile["cpu.idle"]?.let {
+                        InfoDetailRow(
+                            title = "CPU Idle Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_memory_alt_24
+                        )
+                    }
+                    profile["cpu.suspend"]?.let {
+                        InfoDetailRow(
+                            title = "CPU Suspend Drain",
+                            value = "$it mA",
+                            iconRes = R.drawable.rounded_memory_alt_24
+                        )
+                    }
+                }
+            }
+
+            var enforceLevel by remember(batteryDetails.batteryChargingEnforceLevel) {
+                mutableStateOf((batteryDetails.batteryChargingEnforceLevel ?: 90).toFloat())
+            }
+
+            Text(
+                text = stringResource(R.string.label_battery_enforce_level),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+
+            RoundedCardContainer(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem(
+                    title = stringResource(R.string.label_battery_enforce_level),
+                    value = enforceLevel,
+                    onValueChange = {
+                        enforceLevel = it
+                        com.sameerasw.essentials.utils.HapticUtil.performSliderHaptic(view)
+                    },
+                    onValueChangeFinished = {
+                        val intVal = enforceLevel.toInt()
+                        com.sameerasw.essentials.utils.ShellUtils.runCommand(
+                            context,
+                            "dumpsys batterystats --settings battery_charging_enforce_level=$intVal"
+                        )
+                    },
+                    valueRange = 50f..100f,
+                    increment = 5f,
+                    valueFormatter = { "%.0f%%".format(it) },
+                    iconRes = R.drawable.battery_android_frame_shield_24px,
+                    subtitle = stringResource(R.string.desc_battery_enforce_level)
+                )
             }
 
             Spacer(modifier = Modifier.height(16.dp))

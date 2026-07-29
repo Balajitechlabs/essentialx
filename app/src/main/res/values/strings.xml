@@ -1648,6 +1648,9 @@
     <string name="label_battery_voltage_now">Live Voltage</string>
     <string name="label_battery_section_general">General Specs</string>
     <string name="label_battery_section_advanced">Power &amp; Health Specs</string>
+    <string name="label_battery_section_power_profile">Power Profile Specs</string>
+    <string name="label_battery_enforce_level">Charging Enforce Level</string>
+    <string name="desc_battery_enforce_level">Set charging enforce level limit percentage</string>
     <string name="label_use_blur">Use blur</string>
     <string name="desc_use_blur">Enable progressive blur elements across the UI</string>
     <string name="msg_blur_compatibility_error">Blur is disabled on this device to prevent a known display bug on Samsung devices with Android 15 or below.</string>

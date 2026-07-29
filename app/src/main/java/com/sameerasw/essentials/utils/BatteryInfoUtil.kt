@@ -27,7 +27,9 @@ data class BatteryDetails(
     val chargingPolicy: Int? = null,
     val capacityLevel: Int? = null,
     val currentNow: Long? = null,
-    val voltageNow: Long? = null
+    val voltageNow: Long? = null,
+    val powerProfile: Map<String, String>? = null,
+    val batteryChargingEnforceLevel: Int? = null
 )
 
 object BatteryInfoUtil {
@@ -86,6 +88,12 @@ object BatteryInfoUtil {
         val chargingPolicy = dumpsysMap["Charging policy"]?.toIntOrNull()
         val capacityLevel = dumpsysMap["Capacity level"]?.toIntOrNull()
 
+        val powerProfileOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --power-profile")
+        val powerProfileMap = parsePowerProfile(powerProfileOutput)
+
+        val settingsOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --settings")
+        val enforceLevel = parseSettingsEnforceLevel(settingsOutput)
+
         return basic.copy(
             chargeFull = chargeFull,
             chargeFullDesign = chargeFullDesign,
@@ -96,8 +104,36 @@ object BatteryInfoUtil {
             chargingPolicy = chargingPolicy,
             capacityLevel = capacityLevel,
             currentNow = currentNow,
-            voltageNow = voltageNow
+            voltageNow = voltageNow,
+            powerProfile = powerProfileMap.takeIf { it.isNotEmpty() },
+            batteryChargingEnforceLevel = enforceLevel
         )
+    }
+
+    private fun parsePowerProfile(output: String?): Map<String, String> {
+        if (output.isNullOrBlank()) return emptyMap()
+        val map = mutableMapOf<String, String>()
+        output.lines().forEach { line ->
+            val trimmed = line.trim()
+            if (trimmed.contains("=")) {
+                val parts = trimmed.split("=", limit = 2)
+                if (parts.size == 2) {
+                    map[parts[0].trim()] = parts[1].trim()
+                }
+            }
+        }
+        return map
+    }
+
+    private fun parseSettingsEnforceLevel(output: String?): Int? {
+        if (output.isNullOrBlank()) return null
+        output.lines().forEach { line ->
+            val trimmed = line.trim()
+            if (trimmed.startsWith("battery_charging_enforce_level=")) {
+                return trimmed.substringAfter("=").trim().toIntOrNull()
+            }
+        }
+        return null
     }
 
     private fun readSysfsLong(context: Context, path: String): Long? {
