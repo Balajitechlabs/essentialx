@@ -42,34 +42,34 @@ fun BatterySystemTabContent(
 
             RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
                 powerProfile["screen.on"]?.let {
-                    InfoDetailRow(title = "Screen On Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "Screen On Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_24, onClick = onToggleUnit)
                 }
                 powerProfile["screen.full"]?.let {
-                    InfoDetailRow(title = "Screen Max Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "Screen Max Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_charge_24, onClick = onToggleUnit)
                 }
                 powerProfile["ambient.on"]?.let {
-                    InfoDetailRow(title = "Ambient/AOD Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "Ambient/AOD Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_screensaver_24, onClick = onToggleUnit)
                 }
                 powerProfile["audio"]?.let {
-                    InfoDetailRow(title = "Audio Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "Audio Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_sound_detection_loud_sound_24, onClick = onToggleUnit)
                 }
                 powerProfile["video"]?.let {
-                    InfoDetailRow(title = "Video Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "Video Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_slow_motion_video_24, onClick = onToggleUnit)
                 }
                 powerProfile["camera.avg"]?.let {
-                    InfoDetailRow(title = "Camera Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "Camera Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_camera_24, onClick = onToggleUnit)
                 }
                 powerProfile["camera.flashlight"]?.let {
-                    InfoDetailRow(title = "Flashlight Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_info_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "Flashlight Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_flashlight_on_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.active"]?.let {
-                    InfoDetailRow(title = "CPU Active Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_memory_alt_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "CPU Active Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_motion_play_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.idle"]?.let {
-                    InfoDetailRow(title = "CPU Idle Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_memory_alt_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "CPU Idle Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_motion_photos_paused_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.suspend"]?.let {
-                    InfoDetailRow(title = "CPU Suspend Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_memory_alt_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = "CPU Suspend Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_stop_circle_24, onClick = onToggleUnit)
                 }
             }
         }
