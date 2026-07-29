@@ -33,7 +33,11 @@ fun BatterySystemTabContent(
         }
     } else {
         if (!powerProfile.isNullOrEmpty()) {
-            val totalMa = powerProfile.values.mapNotNull { it.toDoubleOrNull() }.sum().coerceAtLeast(0.0001)
+            val activeKeys = listOf(
+                "screen.on", "ambient.on", "audio", "video",
+                "camera.avg", "camera.flashlight", "cpu.active", "cpu.idle", "cpu.suspend"
+            )
+            val totalMa = activeKeys.mapNotNull { powerProfile[it]?.toDoubleOrNull() }.sum().coerceAtLeast(0.0001)
 
             fun formatProfileValue(raw: String): String {
                 val num = raw.toDoubleOrNull() ?: return "$raw mA"
