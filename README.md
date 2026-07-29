@@ -197,11 +197,7 @@ This is a new restriction on Android with sideloaded apps that can receive sensi
 ## How to translate?
 https://github.com/user-attachments/assets/22ea02cd-1276-4088-8537-c41bd2c4a3fc
 
-Help us bring Essentials to more people around the world! If you're fluent in another language, you can contribute by translating the app on Crowdin.
-
-[![Crowdin](https://badges.crowdin.net/essentials-android/localized.svg)](https://crowdin.com/project/essentials-android)
-
-[Support translation on Crowdin](https://crowdin.com/project/essentials-android)
+Help us bring Essentials to more people around the world! If you're fluent in another language, you can contribute by translating tthe strings in-app.
 
 # Contributing
 
@@ -232,5 +228,5 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 ---
 
 <p align="center">
-  Last updated: 2026-07-21
+  Last updated: 2026-07-25
 </p>

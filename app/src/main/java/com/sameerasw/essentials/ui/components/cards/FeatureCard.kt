@@ -36,6 +36,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
+import androidx.compose.ui.graphics.toArgb
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
@@ -63,7 +66,8 @@ fun FeatureCard(
     onHelpClick: (() -> Unit)? = null,
     additionalMenuItems: (@Composable (onDismiss: () -> Unit) -> Unit)? = null,
     customTrailingContent: (@Composable () -> Unit)? = null,
-    iconPainter: androidx.compose.ui.graphics.painter.Painter? = null
+    iconPainter: androidx.compose.ui.graphics.painter.Painter? = null,
+    hasBadge: Boolean = false
 ) {
     val view = LocalView.current
     var showMenu by remember { mutableStateOf(false) }
@@ -119,44 +123,83 @@ fun FeatureCard(
             .blur(blurRadius),
         leadingContent = if (iconPainter != null || iconRes != null) {
             {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            color = ColorUtil.getPastelColorFor(resolvedTitle),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (iconPainter != null) {
-                        androidx.compose.foundation.Image(
-                            painter = iconPainter,
-                            contentDescription = resolvedTitle,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    } else if (iconRes != null) {
-                        val context = LocalContext.current
-                        val isValid = remember(iconRes) {
-                            try {
-                                val value = android.util.TypedValue()
-                                context.resources.getValue(iconRes, value, true)
-                                val path = value.string?.toString() ?: ""
-                                !path.endsWith(".gif", ignoreCase = true)
-                            } catch (e: Throwable) {
-                                false
+                Box {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                color = ColorUtil.getPastelColorFor(resolvedTitle),
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (iconPainter != null) {
+                            androidx.compose.foundation.Image(
+                                painter = iconPainter,
+                                contentDescription = resolvedTitle,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        } else if (iconRes != null) {
+                            val context = LocalContext.current
+                            val isValid = remember(iconRes) {
+                                try {
+                                    val value = android.util.TypedValue()
+                                    context.resources.getValue(iconRes, value, true)
+                                    val path = value.string?.toString() ?: ""
+                                    !path.endsWith(".gif", ignoreCase = true)
+                                } catch (e: Throwable) {
+                                    false
+                                }
                             }
+                            val painter = if (isValid) {
+                                painterResource(id = iconRes)
+                            } else {
+                                painterResource(id = R.drawable.rounded_settings_accessibility_24)
+                            }
+                            Icon(
+                                painter = painter,
+                                contentDescription = resolvedTitle,
+                                modifier = Modifier.size(24.dp),
+                                tint = ColorUtil.getVibrantColorFor(resolvedTitle)
+                            )
                         }
-                        val painter = if (isValid) {
-                            painterResource(id = iconRes)
-                        } else {
-                            painterResource(id = R.drawable.rounded_settings_accessibility_24)
+                    }
+
+                    if (hasBadge) {
+                        androidx.compose.material3.Badge(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .offset(x = 4.dp, y = (-4).dp)
+                                .size(18.dp),
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        ) {
+                            val composition by com.airbnb.lottie.compose.rememberLottieComposition(com.airbnb.lottie.compose.LottieCompositionSpec.RawRes(R.raw.update_motion))
+                            val progress by com.airbnb.lottie.compose.animateLottieCompositionAsState(
+                                composition = composition,
+                                iterations = com.airbnb.lottie.compose.LottieConstants.IterateForever
+                            )
+                            val onErrorColor = MaterialTheme.colorScheme.onError
+                            val dynamicProperties = com.airbnb.lottie.compose.rememberLottieDynamicProperties(
+                                com.airbnb.lottie.compose.rememberLottieDynamicProperty(
+                                    property = com.airbnb.lottie.LottieProperty.COLOR_FILTER,
+                                    value = android.graphics.PorterDuffColorFilter(
+                                        onErrorColor.toArgb(),
+                                        android.graphics.PorterDuff.Mode.SRC_ATOP
+                                    ),
+                                    keyPath = arrayOf("**")
+                                )
+                            )
+
+                            com.airbnb.lottie.compose.LottieAnimation(
+                                composition = composition,
+                                progress = { progress },
+                                dynamicProperties = dynamicProperties,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(1.dp)
+                            )
                         }
-                        Icon(
-                            painter = painter,
-                            contentDescription = resolvedTitle,
-                            modifier = Modifier.size(24.dp),
-                            tint = ColorUtil.getVibrantColorFor(resolvedTitle)
-                        )
                     }
                 }
             }
