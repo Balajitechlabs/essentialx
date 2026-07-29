@@ -121,9 +121,9 @@ fun BatteryUsageBreakdownHeader(
     val animatedSystemWeight by animateFloatAsState(targetValue = safeSystem.coerceAtLeast(1f), label = "system_weight")
     val animatedOtherWeight by animateFloatAsState(targetValue = safeOther.coerceAtLeast(1f), label = "other_weight")
 
-    // Colors: Selected tab gets Primary, other active tabs get Secondary/Tertiary, disabled/other gets surfaceVariant
-    val appsColor = if (activeTab == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
-    val systemColor = if (activeTab == 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.tertiary
+    // Colors: Only selected tab gets Primary accent color, all unselected sections use outlineVariant
+    val appsColor = if (activeTab == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    val systemColor = if (activeTab == 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
     val otherColor = MaterialTheme.colorScheme.outlineVariant
 
     Column(
@@ -176,19 +176,16 @@ fun BatteryUsageBreakdownHeader(
                 BreakdownLegendItem(
                     label = stringResource(R.string.label_battery_tab_apps),
                     percentage = safeApps,
-                    color = appsColor,
                     isSelected = activeTab == 1
                 )
                 BreakdownLegendItem(
                     label = stringResource(R.string.label_battery_tab_system),
                     percentage = safeSystem,
-                    color = systemColor,
                     isSelected = activeTab == 2
                 )
                 BreakdownLegendItem(
                     label = stringResource(R.string.label_battery_other),
                     percentage = safeOther,
-                    color = otherColor,
                     isSelected = false
                 )
             }
@@ -200,24 +197,12 @@ fun BatteryUsageBreakdownHeader(
 private fun BreakdownLegendItem(
     label: String,
     percentage: Float,
-    color: Color,
     isSelected: Boolean
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(10.dp)
-                .clip(CircleShape)
-                .background(color)
-        )
-        Text(
-            text = "$label ${String.format(Locale.getDefault(), "%.0f%%", percentage)}",
-            style = MaterialTheme.typography.labelLarge,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
+    Text(
+        text = "$label ${String.format(Locale.getDefault(), "%.0f%%", percentage)}",
+        style = MaterialTheme.typography.labelLarge,
+        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+    )
 }
