@@ -151,35 +151,55 @@ fun BatteryDetailsBottomSheet(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 12.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = iconRes),
-                    contentDescription = null,
-                    modifier = Modifier.size(52.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = "${batteryDetails.level}%",
-                    style = MaterialTheme.typography.displayMedium.copy(
-                        fontFamily = androidx.compose.ui.text.font.FontFamily(
-                            androidx.compose.ui.text.font.Font(
-                                R.font.google_sans_flex,
-                                variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(
-                                    androidx.compose.ui.text.font.FontVariation.width(150f),
-                                    androidx.compose.ui.text.font.FontVariation.weight(FontWeight.Normal.weight),
-                                    androidx.compose.ui.text.font.FontVariation.Setting("ROND", 100f)
+            val totalAppsMah = remember(usageApps) { usageApps.sumOf { it.powerMah } }
+            val systemDrainMa = remember(batteryDetails.powerProfile) {
+                batteryDetails.powerProfile?.values?.mapNotNull { it.toDoubleOrNull() }?.sum() ?: 0.0
+            }
+
+            // Estimate breakdown percentages (Apps vs System vs Other)
+            val totalCalculated = (totalAppsMah + systemDrainMa).coerceAtLeast(1.0)
+            val appsPct = ((totalAppsMah / totalCalculated) * 75.0).toFloat().coerceIn(10f, 80f)
+            val systemPct = ((systemDrainMa / totalCalculated) * 75.0).toFloat().coerceIn(10f, 80f)
+            val otherPct = (100f - appsPct - systemPct).coerceAtLeast(5f)
+
+            if (selectedTab == 0) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(76.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(52.dp),
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "${batteryDetails.level}%",
+                        style = MaterialTheme.typography.displayMedium.copy(
+                            fontFamily = androidx.compose.ui.text.font.FontFamily(
+                                androidx.compose.ui.text.font.Font(
+                                    R.font.google_sans_flex,
+                                    variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(
+                                        androidx.compose.ui.text.font.FontVariation.width(150f),
+                                        androidx.compose.ui.text.font.FontVariation.weight(FontWeight.Normal.weight),
+                                        androidx.compose.ui.text.font.FontVariation.Setting("ROND", 100f)
+                                    )
                                 )
                             )
-                        )
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            } else {
+                com.sameerasw.essentials.ui.components.battery.BatteryUsageBreakdownHeader(
+                    appsPct = appsPct,
+                    systemPct = systemPct,
+                    otherPct = otherPct,
+                    activeTab = selectedTab
                 )
             }
 

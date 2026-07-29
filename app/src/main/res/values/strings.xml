@@ -1657,6 +1657,7 @@
     <string name="label_battery_section_power_profile">Power Profile Specs</string>
     <string name="action_show_all">Show all</string>
     <string name="action_show_top_apps">Show only top apps</string>
+    <string name="label_battery_other">Other</string>
     <string name="label_use_blur">Use blur</string>
     <string name="desc_use_blur">Enable progressive blur elements across the UI</string>
     <string name="msg_blur_compatibility_error">Blur is disabled on this device to prevent a known display bug on Samsung devices with Android 15 or below.</string>
