@@ -1,5 +1,11 @@
 package com.sameerasw.essentials.ui.components.sheets
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,10 +22,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -45,6 +55,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.graphics.drawable.toBitmap
@@ -72,7 +83,9 @@ fun BatteryDetailsBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var batteryDetails by remember { mutableStateOf(initialDetails) }
+    var isLoadingAdvanced by remember { mutableStateOf(true) }
     var selectedTab by remember { mutableIntStateOf(0) }
+    var showAllApps by remember { mutableStateOf(false) }
 
     var usageApps by remember { mutableStateOf<List<BatteryUsageApp>>(emptyList()) }
     var wakeupsList by remember { mutableStateOf<List<CpuWakeupItem>>(emptyList()) }
@@ -118,6 +131,7 @@ fun BatteryDetailsBottomSheet(
                 batteryDetails = updated
                 usageApps = parsedApps
                 wakeupsList = parsedWakeups
+                isLoadingAdvanced = false
             }
         }
     }
@@ -143,6 +157,7 @@ fun BatteryDetailsBottomSheet(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
+                .animateContentSize()
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -178,11 +193,11 @@ fun BatteryDetailsBottomSheet(
                 )
             }
 
-                val tabLabels = listOf(
-                    stringResource(R.string.label_battery_tab_info),
-                    stringResource(R.string.label_battery_tab_apps),
-                    stringResource(R.string.label_battery_tab_system)
-                )
+            val tabLabels = listOf(
+                stringResource(R.string.label_battery_tab_info),
+                stringResource(R.string.label_battery_tab_apps),
+                stringResource(R.string.label_battery_tab_system)
+            )
 
             RoundedCardContainer {
                 Row(
@@ -223,32 +238,156 @@ fun BatteryDetailsBottomSheet(
 
             when (selectedTab) {
                 0 -> {
-                    // Info
+                    // TAB 0: Info (Health, Charging, Specs)
+                    
+                    // Section 1: Health
                     Text(
-                        text = stringResource(R.string.label_battery_section_general),
+                        text = stringResource(R.string.label_battery_section_health),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(start = 8.dp)
                     )
 
-                    RoundedCardContainer(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
                         InfoDetailRow(
                             title = stringResource(R.string.label_battery_health),
                             value = BatteryInfoUtil.formatHealth(batteryDetails.health),
                             iconRes = R.drawable.rounded_ecg_heart_24
                         )
                         InfoDetailRow(
-                            title = stringResource(R.string.label_battery_plug_type),
-                            value = BatteryInfoUtil.formatPlugged(batteryDetails.plugged),
-                            iconRes = R.drawable.rounded_cable_24
-                        )
-                        InfoDetailRow(
                             title = stringResource(R.string.label_battery_temperature),
                             value = String.format(LocalLocale.current.platformLocale, "%.1f °C", batteryDetails.temperature / 10.0f),
                             iconRes = R.drawable.rounded_device_thermostat_24
                         )
+
+                        if (isLoadingAdvanced) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceBright,
+                                        shape = Shapes.extraSmall
+                                    )
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                LinearWavyProgressIndicator(
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        } else {
+                            val full = batteryDetails.chargeFull
+                            val design = batteryDetails.chargeFullDesign
+
+                            if (full != null && full > 0) {
+                                val fullMah = if (full > 10000) full / 1000 else full
+                                InfoDetailRow(
+                                    title = stringResource(R.string.label_battery_charge_full),
+                                    value = "$fullMah mAh",
+                                    iconRes = R.drawable.battery_android_frame_bolt_24px
+                                )
+                            }
+
+                            if (design != null && design > 0) {
+                                val designMah = if (design > 10000) design / 1000 else design
+                                InfoDetailRow(
+                                    title = stringResource(R.string.label_battery_charge_full_design),
+                                    value = "$designMah mAh",
+                                    iconRes = R.drawable.battery_android_frame_shield_24px
+                                )
+                            }
+
+                            if (full != null && design != null && design > 0) {
+                                val healthPct = (full.toDouble() / design.toDouble()) * 100.0
+                                InfoDetailRow(
+                                    title = stringResource(R.string.label_battery_capacity_health),
+                                    value = String.format(Locale.getDefault(), "%.1f %%", healthPct),
+                                    iconRes = R.drawable.rounded_ecg_heart_24
+                                )
+                            }
+                        }
+                    }
+
+                    // Section 2: Charging
+                    Text(
+                        text = stringResource(R.string.label_battery_section_charging),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+
+                    RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                        InfoDetailRow(
+                            title = stringResource(R.string.label_battery_plug_type),
+                            value = BatteryInfoUtil.formatPlugged(batteryDetails.plugged),
+                            iconRes = R.drawable.rounded_cable_24
+                        )
+
+                        if (isLoadingAdvanced) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceBright,
+                                        shape = Shapes.extraSmall
+                                    )
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                LinearWavyProgressIndicator(
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        } else {
+                            batteryDetails.chargingState?.let { state ->
+                                InfoDetailRow(
+                                    title = stringResource(R.string.label_battery_charging_state),
+                                    value = "$state",
+                                    iconRes = R.drawable.rounded_charger_24
+                                )
+                            }
+
+                            batteryDetails.chargingPolicy?.let { policy ->
+                                InfoDetailRow(
+                                    title = stringResource(R.string.label_battery_charging_policy),
+                                    value = BatteryInfoUtil.formatChargingPolicy(policy),
+                                    iconRes = R.drawable.rounded_info_24
+                                )
+                            }
+
+                            batteryDetails.maxChargingCurrent?.let { maxCur ->
+                                if (maxCur > 0) {
+                                    val curMa = if (maxCur > 10000) maxCur / 1000 else maxCur
+                                    InfoDetailRow(
+                                        title = stringResource(R.string.label_battery_max_current),
+                                        value = "$curMa mA",
+                                        iconRes = R.drawable.rounded_power_input_24
+                                    )
+                                }
+                            }
+
+                            batteryDetails.maxChargingVoltage?.let { maxVol ->
+                                if (maxVol > 0) {
+                                    val volMv = if (maxVol > 100000) maxVol / 1000 else maxVol
+                                    InfoDetailRow(
+                                        title = stringResource(R.string.label_battery_max_voltage),
+                                        value = "$volMv mV",
+                                        iconRes = R.drawable.rounded_power_input_24
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Section 3: Specs
+                    Text(
+                        text = stringResource(R.string.label_battery_section_specs),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+
+                    RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
                         InfoDetailRow(
                             title = stringResource(R.string.label_battery_voltage),
                             value = "${batteryDetails.voltage} mV",
@@ -259,126 +398,61 @@ fun BatteryDetailsBottomSheet(
                             value = batteryDetails.technology,
                             iconRes = R.drawable.rounded_memory_alt_24
                         )
-                    }
 
-                    Text(
-                        text = stringResource(R.string.label_battery_section_advanced),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-
-                    RoundedCardContainer(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        val full = batteryDetails.chargeFull
-                        val design = batteryDetails.chargeFullDesign
-
-                        if (full != null && full > 0) {
-                            val fullMah = if (full > 10000) full / 1000 else full
-                            InfoDetailRow(
-                                title = stringResource(R.string.label_battery_charge_full),
-                                value = "$fullMah mAh",
-                                iconRes = R.drawable.battery_android_frame_bolt_24px
-                            )
-                        }
-
-                        if (design != null && design > 0) {
-                            val designMah = if (design > 10000) design / 1000 else design
-                            InfoDetailRow(
-                                title = stringResource(R.string.label_battery_charge_full_design),
-                                value = "$designMah mAh",
-                                iconRes = R.drawable.battery_android_frame_shield_24px
-                            )
-                        }
-
-                        if (full != null && design != null && design > 0) {
-                            val healthPct = (full.toDouble() / design.toDouble()) * 100.0
-                            InfoDetailRow(
-                                title = stringResource(R.string.label_battery_capacity_health),
-                                value = String.format(Locale.getDefault(), "%.1f %%", healthPct),
-                                iconRes = R.drawable.rounded_ecg_heart_24
-                            )
-                        }
-
-                        val counter = batteryDetails.chargeCounter
-                        if (counter != null && counter > 0) {
-                            val counterMah = if (counter > 10000) counter / 1000 else counter
-                            InfoDetailRow(
-                                title = stringResource(R.string.label_battery_charge_counter),
-                                value = "$counterMah mAh",
-                                iconRes = R.drawable.battery_android_frame_4_24px
-                            )
-                        }
-
-                        batteryDetails.maxChargingCurrent?.let { maxCur ->
-                            if (maxCur > 0) {
-                                val curMa = if (maxCur > 10000) maxCur / 1000 else maxCur
+                        if (!isLoadingAdvanced) {
+                            val counter = batteryDetails.chargeCounter
+                            if (counter != null && counter > 0) {
+                                val counterMah = if (counter > 10000) counter / 1000 else counter
                                 InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_max_current),
-                                    value = "$curMa mA",
-                                    iconRes = R.drawable.rounded_power_input_24
+                                    title = stringResource(R.string.label_battery_charge_counter),
+                                    value = "$counterMah mAh",
+                                    iconRes = R.drawable.battery_android_frame_4_24px
                                 )
                             }
-                        }
 
-                        batteryDetails.maxChargingVoltage?.let { maxVol ->
-                            if (maxVol > 0) {
-                                val volMv = if (maxVol > 100000) maxVol / 1000 else maxVol
+                            batteryDetails.capacityLevel?.let { cap ->
                                 InfoDetailRow(
-                                    title = stringResource(R.string.label_battery_max_voltage),
-                                    value = "$volMv mV",
-                                    iconRes = R.drawable.rounded_power_input_24
+                                    title = stringResource(R.string.label_battery_capacity_level),
+                                    value = "$cap",
+                                    iconRes = R.drawable.rounded_battery_android_0_24
                                 )
                             }
-                        }
-
-                        batteryDetails.chargingState?.let { state ->
-                            InfoDetailRow(
-                                title = stringResource(R.string.label_battery_charging_state),
-                                value = "$state",
-                                iconRes = R.drawable.rounded_charger_24
-                            )
-                        }
-
-                        batteryDetails.chargingPolicy?.let { policy ->
-                            InfoDetailRow(
-                                title = stringResource(R.string.label_battery_charging_policy),
-                                value = BatteryInfoUtil.formatChargingPolicy(policy),
-                                iconRes = R.drawable.rounded_info_24
-                            )
-                        }
-
-                        batteryDetails.capacityLevel?.let { cap ->
-                            InfoDetailRow(
-                                title = stringResource(R.string.label_battery_capacity_level),
-                                value = "$cap",
-                                iconRes = R.drawable.rounded_battery_android_0_24
-                            )
                         }
                     }
                 }
 
                 1 -> {
-                    // Apps
-                    Text(
-                        text = stringResource(R.string.label_battery_usage_attribution),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-
-                    RoundedCardContainer(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        if (usageApps.isEmpty()) {
+                    // TAB 1: Apps (No section title)
+                    if (isLoadingAdvanced) {
+                        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceBright,
+                                        shape = Shapes.extraSmall
+                                    )
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                LinearWavyProgressIndicator(
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+                    } else if (usageApps.isEmpty()) {
+                        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
                             InfoDetailRow(
                                 title = "Usage Data",
                                 value = "No data",
                                 iconRes = R.drawable.rounded_info_24
                             )
-                        } else {
-                            usageApps.forEach { app ->
+                        }
+                    } else {
+                        val displayedApps = if (showAllApps) usageApps else usageApps.take(20)
+
+                        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                            displayedApps.forEach { app ->
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -408,6 +482,8 @@ fun BatteryDetailsBottomSheet(
                                         text = app.appName,
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.weight(1f)
                                     )
                                     Text(
@@ -419,73 +495,98 @@ fun BatteryDetailsBottomSheet(
                                 }
                             }
                         }
+
+                        if (usageApps.size > 20) {
+                            Button(
+                                onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    showAllApps = !showAllApps
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                    contentColor = MaterialTheme.colorScheme.primary
+                                ),
+                                shape = RoundedCornerShape(20.dp)
+                            ) {
+                                Text(if (showAllApps) "Show only top apps" else "Show all")
+                            }
+                        }
                     }
                 }
 
                 2 -> {
-                    // System
-                    val profile = batteryDetails.powerProfile
-                    if (!profile.isNullOrEmpty()) {
-                        Text(
-                            text = stringResource(R.string.label_battery_section_power_profile),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-
-                        RoundedCardContainer(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            profile["screen.on"]?.let {
-                                InfoDetailRow(title = "Screen On Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                            }
-                            profile["screen.full"]?.let {
-                                InfoDetailRow(title = "Screen Max Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                            }
-                            profile["ambient.on"]?.let {
-                                InfoDetailRow(title = "Ambient/AOD Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                            }
-                            profile["audio"]?.let {
-                                InfoDetailRow(title = "Audio Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                            }
-                            profile["video"]?.let {
-                                InfoDetailRow(title = "Video Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                            }
-                            profile["camera.avg"]?.let {
-                                InfoDetailRow(title = "Camera Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                            }
-                            profile["camera.flashlight"]?.let {
-                                InfoDetailRow(title = "Flashlight Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
-                            }
-                            profile["cpu.active"]?.let {
-                                InfoDetailRow(title = "CPU Active Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
-                            }
-                            profile["cpu.idle"]?.let {
-                                InfoDetailRow(title = "CPU Idle Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
-                            }
-                            profile["cpu.suspend"]?.let {
-                                InfoDetailRow(title = "CPU Suspend Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
+                    // TAB 2: System (No power profile title, keep CPU Wakeups title)
+                    if (isLoadingAdvanced) {
+                        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceBright,
+                                        shape = Shapes.extraSmall
+                                    )
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                LinearWavyProgressIndicator(
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                             }
                         }
-                    }
+                    } else {
+                        val profile = batteryDetails.powerProfile
+                        if (!profile.isNullOrEmpty()) {
+                            RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                                profile["screen.on"]?.let {
+                                    InfoDetailRow(title = "Screen On Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                                }
+                                profile["screen.full"]?.let {
+                                    InfoDetailRow(title = "Screen Max Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                                }
+                                profile["ambient.on"]?.let {
+                                    InfoDetailRow(title = "Ambient/AOD Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                                }
+                                profile["audio"]?.let {
+                                    InfoDetailRow(title = "Audio Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                                }
+                                profile["video"]?.let {
+                                    InfoDetailRow(title = "Video Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                                }
+                                profile["camera.avg"]?.let {
+                                    InfoDetailRow(title = "Camera Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                                }
+                                profile["camera.flashlight"]?.let {
+                                    InfoDetailRow(title = "Flashlight Drain", value = "$it mA", iconRes = R.drawable.rounded_info_24)
+                                }
+                                profile["cpu.active"]?.let {
+                                    InfoDetailRow(title = "CPU Active Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
+                                }
+                                profile["cpu.idle"]?.let {
+                                    InfoDetailRow(title = "CPU Idle Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
+                                }
+                                profile["cpu.suspend"]?.let {
+                                    InfoDetailRow(title = "CPU Suspend Drain", value = "$it mA", iconRes = R.drawable.rounded_memory_alt_24)
+                                }
+                            }
+                        }
 
-                    if (wakeupsList.isNotEmpty()) {
-                        Text(
-                            text = stringResource(R.string.label_battery_wakeups_attribution),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+                        if (wakeupsList.isNotEmpty()) {
+                            Text(
+                                text = stringResource(R.string.label_battery_wakeups_attribution),
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
 
-                        RoundedCardContainer(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            wakeupsList.take(20).forEach { item ->
-                                InfoDetailRow(
-                                    title = "${item.subsystem} (${item.timeAgo})",
-                                    value = item.attribution,
-                                    iconRes = item.iconRes
-                                )
+                            RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                                wakeupsList.take(20).forEach { item ->
+                                    InfoDetailRow(
+                                        title = "${item.subsystem} (${item.timeAgo})",
+                                        value = item.attribution,
+                                        iconRes = item.iconRes
+                                    )
+                                }
                             }
                         }
                     }

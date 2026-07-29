@@ -1646,8 +1646,9 @@
     <string name="label_battery_capacity_level">Capacity Level</string>
     <string name="label_battery_current_now">Live Current</string>
     <string name="label_battery_voltage_now">Live Voltage</string>
-    <string name="label_battery_section_general">General Specs</string>
-    <string name="label_battery_section_advanced">Power &amp; Health Specs</string>
+    <string name="label_battery_section_health">Health</string>
+    <string name="label_battery_section_charging">Charging</string>
+    <string name="label_battery_section_specs">Specs</string>
     <string name="label_battery_tab_info">Info</string>
     <string name="label_battery_tab_apps">Apps</string>
     <string name="label_battery_tab_system">System</string>
