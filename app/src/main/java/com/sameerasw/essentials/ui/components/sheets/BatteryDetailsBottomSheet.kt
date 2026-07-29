@@ -64,7 +64,15 @@ fun BatteryDetailsBottomSheet(
     }
 
     val isCharging = batteryDetails.status == android.os.BatteryManager.BATTERY_STATUS_CHARGING
-    val iconRes = BatteryInfoUtil.getBatteryIconRes(batteryDetails.level, isCharging)
+    val isPowerSave = remember { com.sameerasw.essentials.utils.DeviceUtils.isPowerSaveMode(context) }
+    val iconRes = BatteryInfoUtil.getBatteryIconRes(
+        level = batteryDetails.level,
+        isCharging = isCharging,
+        status = batteryDetails.status,
+        health = batteryDetails.health,
+        isPresent = batteryDetails.isPresent,
+        isPowerSave = isPowerSave
+    )
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,

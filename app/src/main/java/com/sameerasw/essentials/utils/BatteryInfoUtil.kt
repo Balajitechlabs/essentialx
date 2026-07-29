@@ -120,14 +120,37 @@ object BatteryInfoUtil {
         return map
     }
 
-    fun getBatteryIconRes(level: Int, isCharging: Boolean): Int {
-        if (isCharging) return R.drawable.rounded_battery_charging_60_24
+    fun getBatteryIconRes(
+        level: Int,
+        isCharging: Boolean,
+        status: Int = BatteryManager.BATTERY_STATUS_UNKNOWN,
+        health: Int = BatteryManager.BATTERY_HEALTH_UNKNOWN,
+        isPresent: Boolean = true,
+        isPowerSave: Boolean = false
+    ): Int {
+        if (!isPresent || health == BatteryManager.BATTERY_HEALTH_OVERHEAT || health == BatteryManager.BATTERY_HEALTH_DEAD || health == BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE || health == BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE) {
+            return R.drawable.battery_android_frame_alert_24px
+        }
+        if (level >= 100) {
+            return R.drawable.battery_android_frame_full_24px
+        }
+        if (isCharging) {
+            return R.drawable.battery_android_frame_bolt_24px
+        }
+        if (status == 4 || (status == BatteryManager.BATTERY_STATUS_NOT_CHARGING && level >= 80)) {
+            return R.drawable.battery_android_frame_shield_24px
+        }
+        if (isPowerSave) {
+            return R.drawable.battery_android_frame_plus_24px
+        }
         return when {
-            level <= 0 -> R.drawable.rounded_battery_android_0_24
-            level <= 30 -> R.drawable.rounded_battery_android_frame_3_24
-            level <= 70 -> R.drawable.rounded_battery_android_frame_6_24
-            level <= 99 -> R.drawable.rounded_battery_android_frame_shield_24
-            else -> R.drawable.rounded_battery_android_frame_plus_24
+            level <= 0 -> R.drawable.battery_android_0_24px
+            level <= 15 -> R.drawable.battery_android_frame_1_24px
+            level <= 30 -> R.drawable.battery_android_frame_2_24px
+            level <= 45 -> R.drawable.battery_android_frame_3_24px
+            level <= 60 -> R.drawable.battery_android_frame_4_24px
+            level <= 80 -> R.drawable.battery_android_frame_5_24px
+            else -> R.drawable.battery_android_frame_6_24px
         }
     }
 

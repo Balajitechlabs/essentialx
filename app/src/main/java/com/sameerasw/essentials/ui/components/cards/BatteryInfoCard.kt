@@ -46,7 +46,15 @@ fun BatteryInfoCard(
     val basicDetails = remember { BatteryInfoUtil.getBasicDetails(context) }
 
     val isCharging = basicDetails.status == BatteryManager.BATTERY_STATUS_CHARGING
-    val iconRes = BatteryInfoUtil.getBatteryIconRes(basicDetails.level, isCharging)
+    val isPowerSave = remember { com.sameerasw.essentials.utils.DeviceUtils.isPowerSaveMode(context) }
+    val iconRes = BatteryInfoUtil.getBatteryIconRes(
+        level = basicDetails.level,
+        isCharging = isCharging,
+        status = basicDetails.status,
+        health = basicDetails.health,
+        isPresent = basicDetails.isPresent,
+        isPowerSave = isPowerSave
+    )
 
     if (showSheet) {
         BatteryDetailsBottomSheet(
