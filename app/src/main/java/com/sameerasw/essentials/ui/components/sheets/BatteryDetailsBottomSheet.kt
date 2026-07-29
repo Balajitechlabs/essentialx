@@ -21,6 +21,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +55,38 @@ fun BatteryDetailsBottomSheet(
 
     var batteryDetails by remember { mutableStateOf(initialDetails) }
 
+    DisposableEffect(context) {
+        val receiver = object : android.content.BroadcastReceiver() {
+            override fun onReceive(ctx: android.content.Context, intent: android.content.Intent) {
+                if (intent.action == android.content.Intent.ACTION_BATTERY_CHANGED || intent.action == android.os.PowerManager.ACTION_POWER_SAVE_MODE_CHANGED) {
+                    val freshBasic = BatteryInfoUtil.getBasicDetails(ctx)
+                    batteryDetails = batteryDetails.copy(
+                        level = freshBasic.level,
+                        scale = freshBasic.scale,
+                        status = freshBasic.status,
+                        health = freshBasic.health,
+                        plugged = freshBasic.plugged,
+                        voltage = freshBasic.voltage,
+                        temperature = freshBasic.temperature,
+                        technology = freshBasic.technology,
+                        isPresent = freshBasic.isPresent
+                    )
+                }
+            }
+        }
+        val filter = android.content.IntentFilter().apply {
+            addAction(android.content.Intent.ACTION_BATTERY_CHANGED)
+            addAction(android.os.PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+        }
+        context.registerReceiver(receiver, filter)
+        onDispose {
+            try {
+                context.unregisterReceiver(receiver)
+            } catch (e: Exception) {
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
             val updated = BatteryInfoUtil.fetchAdvancedDetails(context, initialDetails)
@@ -86,34 +119,34 @@ fun BatteryDetailsBottomSheet(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(80.dp)
-                        .background(
-                            color = ColorUtil.getPastelColorFor("BatteryDetails"),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = iconRes),
-                        contentDescription = null,
-                        modifier = Modifier.size(44.dp),
-                        tint = ColorUtil.getVibrantColorFor("BatteryDetails")
-                    )
-                }
-
+                Icon(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = null,
+                    modifier = Modifier.size(52.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = "${batteryDetails.level}%",
-                    style = MaterialTheme.typography.displayMedium,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontFamily = androidx.compose.ui.text.font.FontFamily(
+                            androidx.compose.ui.text.font.Font(
+                                R.font.google_sans_flex,
+                                variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(
+                                    androidx.compose.ui.text.font.FontVariation.width(150f),
+                                    androidx.compose.ui.text.font.FontVariation.weight(FontWeight.Normal.weight),
+                                    androidx.compose.ui.text.font.FontVariation.Setting("ROND", 100f)
+                                )
+                            )
+                        )
+                    ),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }

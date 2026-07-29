@@ -1,20 +1,22 @@
 package com.sameerasw.essentials.ui.components.cards
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.BatteryManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,7 +32,9 @@ import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.sheets.BatteryDetailsBottomSheet
 import com.sameerasw.essentials.ui.theme.Shapes
+import com.sameerasw.essentials.utils.BatteryDetails
 import com.sameerasw.essentials.utils.BatteryInfoUtil
+import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.ShellUtils
 
@@ -43,22 +47,43 @@ fun BatteryInfoCard(
     var showSheet by remember { mutableStateOf(false) }
 
     val hasPermission = remember { ShellUtils.hasPermission(context) }
-    val basicDetails = remember { BatteryInfoUtil.getBasicDetails(context) }
+    var batteryDetails by remember { mutableStateOf(BatteryInfoUtil.getBasicDetails(context)) }
 
-    val isCharging = basicDetails.status == BatteryManager.BATTERY_STATUS_CHARGING
-    val isPowerSave = remember { com.sameerasw.essentials.utils.DeviceUtils.isPowerSaveMode(context) }
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(ctx: Context, intent: Intent) {
+                if (intent.action == Intent.ACTION_BATTERY_CHANGED || intent.action == android.os.PowerManager.ACTION_POWER_SAVE_MODE_CHANGED) {
+                    batteryDetails = BatteryInfoUtil.getBasicDetails(ctx)
+                }
+            }
+        }
+        val filter = IntentFilter().apply {
+            addAction(Intent.ACTION_BATTERY_CHANGED)
+            addAction(android.os.PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+        }
+        context.registerReceiver(receiver, filter)
+        onDispose {
+            try {
+                context.unregisterReceiver(receiver)
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    val isCharging = batteryDetails.status == BatteryManager.BATTERY_STATUS_CHARGING
+    val isPowerSave = DeviceUtils.isPowerSaveMode(context)
     val iconRes = BatteryInfoUtil.getBatteryIconRes(
-        level = basicDetails.level,
+        level = batteryDetails.level,
         isCharging = isCharging,
-        status = basicDetails.status,
-        health = basicDetails.health,
-        isPresent = basicDetails.isPresent,
+        status = batteryDetails.status,
+        health = batteryDetails.health,
+        isPresent = batteryDetails.isPresent,
         isPowerSave = isPowerSave
     )
 
     if (showSheet) {
         BatteryDetailsBottomSheet(
-            initialDetails = basicDetails,
+            initialDetails = batteryDetails,
             onDismiss = { showSheet = false }
         )
     }
@@ -105,7 +130,7 @@ fun BatteryInfoCard(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "${basicDetails.level}%",
+                text = "${batteryDetails.level}%",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
