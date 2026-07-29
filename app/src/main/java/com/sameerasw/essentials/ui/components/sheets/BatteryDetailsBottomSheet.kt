@@ -138,10 +138,9 @@ fun BatteryDetailsBottomSheet(
         isPowerSave = isPowerSave
     )
 
-    ModalBottomSheet(
+    EssentialsBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        sheetState = sheetState
     ) {
         Column(
             modifier = Modifier
