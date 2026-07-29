@@ -1462,4 +1462,6 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="setting_enable_unsupported_features_desc">Muestra las funciones específicas del fabricante o las redundantes que están ocultas de forma predeterminada.</string>
     <string name="settings_translate_mode">Modo de traducción</string>
     <string name="settings_translate_mode_desc">Mantén presionando cualquier texto para traducir y contribuir a la comunidad</string>
+    <string name="setting_swipe_tabs_title">Desliza para abrir Mi android</string>
+    <string name="setting_swipe_tabs_desc">En pantalla de inicio</string>
 </resources>
