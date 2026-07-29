@@ -8,6 +8,7 @@ import android.os.BatteryManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -73,6 +74,7 @@ fun BatteryInfoCard(
     val isCharging = batteryDetails.status == BatteryManager.BATTERY_STATUS_CHARGING
     val isPowerSave = DeviceUtils.isPowerSaveMode(context)
     val iconRes = BatteryInfoUtil.getBatteryIconRes(
+        context = context,
         level = batteryDetails.level,
         isCharging = isCharging,
         status = batteryDetails.status,
@@ -88,7 +90,7 @@ fun BatteryInfoCard(
         )
     }
 
-    Row(
+    Box(
         modifier = modifier
             .fillMaxWidth()
             .background(
@@ -103,19 +105,24 @@ fun BatteryInfoCard(
                     }
                 } else Modifier
             )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .padding(vertical = 20.dp, horizontal = 16.dp),
+        contentAlignment = Alignment.Center
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Icon(
                 painter = painterResource(id = iconRes),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
+            )
+            Text(
+                text = "${batteryDetails.level}%",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
             )
             Text(
                 text = stringResource(R.string.label_device_battery),
@@ -125,25 +132,15 @@ fun BatteryInfoCard(
             )
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "${batteryDetails.level}%",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+        if (hasPermission) {
+            Icon(
+                painter = painterResource(id = R.drawable.rounded_chevron_right_24),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(20.dp)
             )
-
-            if (hasPermission) {
-                Icon(
-                    painter = painterResource(id = R.drawable.rounded_chevron_right_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
         }
     }
 }

@@ -121,6 +121,7 @@ object BatteryInfoUtil {
     }
 
     fun getBatteryIconRes(
+        context: Context,
         level: Int,
         isCharging: Boolean,
         status: Int = BatteryManager.BATTERY_STATUS_UNKNOWN,
@@ -131,14 +132,19 @@ object BatteryInfoUtil {
         if (!isPresent || health == BatteryManager.BATTERY_HEALTH_OVERHEAT || health == BatteryManager.BATTERY_HEALTH_DEAD || health == BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE || health == BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE) {
             return R.drawable.battery_android_frame_alert_24px
         }
+        val isChargeLimitEnabled = try {
+            android.provider.Settings.Secure.getInt(context.contentResolver, "charge_optimization_mode", 0) == 1
+        } catch (e: Exception) {
+            false
+        }
+        if (isCharging && level >= 80 && isChargeLimitEnabled) {
+            return R.drawable.battery_android_frame_shield_24px
+        }
         if (level >= 100) {
             return R.drawable.battery_android_frame_full_24px
         }
         if (isCharging) {
             return R.drawable.battery_android_frame_bolt_24px
-        }
-        if (status == 4 || (status == BatteryManager.BATTERY_STATUS_NOT_CHARGING && level >= 80)) {
-            return R.drawable.battery_android_frame_shield_24px
         }
         if (isPowerSave) {
             return R.drawable.battery_android_frame_plus_24px

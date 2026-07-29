@@ -99,6 +99,7 @@ fun BatteryDetailsBottomSheet(
     val isCharging = batteryDetails.status == android.os.BatteryManager.BATTERY_STATUS_CHARGING
     val isPowerSave = remember { com.sameerasw.essentials.utils.DeviceUtils.isPowerSaveMode(context) }
     val iconRes = BatteryInfoUtil.getBatteryIconRes(
+        context = context,
         level = batteryDetails.level,
         isCharging = isCharging,
         status = batteryDetails.status,
