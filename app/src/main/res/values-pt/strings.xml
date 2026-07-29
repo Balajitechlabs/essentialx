@@ -684,8 +684,8 @@
     <string name="preferences_title">Preferences</string>
     <string name="preferences_desc">Configure algumas coisas básicas para começar.</string>
     <string name="label_app_settings">Configurações do aplicativo</string>
-    <string name="label_app_language">Language</string>
-    <string name="label_haptic_feedback">Haptic Feedback</string>
+    <string name="label_app_language">Idioma</string>
+    <string name="label_haptic_feedback">Vibração ao Toque</string>
     <string name="label_updates">Updates</string>
     <string name="label_auto_check_updates">Procurar por atualizações automaticamente</string>
     <string name="desc_auto_check_updates">Procurar por atualização no início do aplicativo</string>
@@ -1140,7 +1140,7 @@
     <string name="location_reached_alarm_subtitle">Prepare-se para descer</string>
     <string name="location_reached_dismiss">Liberar</string>
     <string name="location_reached_toast_set">Conjunto de destino: %1$.4f, %2$.4f</string>
-    <string name="setting_use_root_title">Usar raiz</string>
+    <string name="setting_use_root_title">Usar Root</string>
     <string name="setting_use_root_desc">Em vez de Shizuku</string>
     <string name="root_not_available_toast">Acesso root não disponível. Por favor, verifique seu gerenciador root.</string>
     <!-- System Keyboard -->
