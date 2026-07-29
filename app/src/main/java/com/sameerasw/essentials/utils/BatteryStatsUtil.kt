@@ -83,7 +83,8 @@ object BatteryStatsUtil {
         output.lines().forEach { line ->
             val trimmed = line.trim()
             if (trimmed.startsWith("-") && trimmed.endsWith(":")) {
-                currentTimeAgo = trimmed.removeSuffix(":")
+                val rawTime = trimmed.removePrefix("-").removeSuffix(":")
+                currentTimeAgo = formatReadableDuration(rawTime)
             } else if (trimmed.startsWith("Attribution:")) {
                 val attr = trimmed.removePrefix("Attribution:").trim()
                 val subsystem = when {
@@ -105,6 +106,13 @@ object BatteryStatsUtil {
         }
 
         return list.take(50)
+    }
+
+    private fun formatReadableDuration(raw: String): String {
+        // Raw example: "1m9s227ms" or "2h12m56s324ms"
+        var str = raw.substringBefore("ms")
+        if (str.isEmpty()) str = raw
+        return "$str ago"
     }
 
     private fun getAppName(pm: PackageManager, packageName: String): String {

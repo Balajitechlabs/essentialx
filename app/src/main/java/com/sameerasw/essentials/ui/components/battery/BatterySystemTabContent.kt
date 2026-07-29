@@ -12,6 +12,11 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.CpuWakeupItem
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
 import java.util.Locale
 
 @Composable
@@ -42,53 +47,57 @@ fun BatterySystemTabContent(
 
             RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
                 powerProfile["screen.on"]?.let {
-                    InfoDetailRow(title = "Screen On Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_screen_on_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_24, onClick = onToggleUnit)
                 }
                 powerProfile["screen.full"]?.let {
-                    InfoDetailRow(title = "Screen Max Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_charge_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_screen_max_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_charge_24, onClick = onToggleUnit)
                 }
                 powerProfile["ambient.on"]?.let {
-                    InfoDetailRow(title = "Ambient/AOD Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_screensaver_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_ambient_aod_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_mobile_screensaver_24, onClick = onToggleUnit)
                 }
                 powerProfile["audio"]?.let {
-                    InfoDetailRow(title = "Audio Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_sound_detection_loud_sound_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_audio_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_sound_detection_loud_sound_24, onClick = onToggleUnit)
                 }
                 powerProfile["video"]?.let {
-                    InfoDetailRow(title = "Video Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_slow_motion_video_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_video_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_slow_motion_video_24, onClick = onToggleUnit)
                 }
                 powerProfile["camera.avg"]?.let {
-                    InfoDetailRow(title = "Camera Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_camera_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_camera_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_camera_24, onClick = onToggleUnit)
                 }
                 powerProfile["camera.flashlight"]?.let {
-                    InfoDetailRow(title = "Flashlight Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_flashlight_on_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_flashlight_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_flashlight_on_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.active"]?.let {
-                    InfoDetailRow(title = "CPU Active Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_motion_play_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_cpu_active_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_motion_play_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.idle"]?.let {
-                    InfoDetailRow(title = "CPU Idle Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_motion_photos_paused_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_cpu_idle_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_motion_photos_paused_24, onClick = onToggleUnit)
                 }
                 powerProfile["cpu.suspend"]?.let {
-                    InfoDetailRow(title = "CPU Suspend Drain", value = formatProfileValue(it), iconRes = R.drawable.rounded_stop_circle_24, onClick = onToggleUnit)
+                    InfoDetailRow(title = stringResource(R.string.label_cpu_suspend_drain), value = formatProfileValue(it), iconRes = R.drawable.rounded_stop_circle_24, onClick = onToggleUnit)
                 }
             }
         }
 
         if (wakeupsList.isNotEmpty()) {
-            Text(
-                text = stringResource(R.string.label_battery_wakeups_attribution),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 8.dp)
+            var showWakeups by remember { mutableStateOf(false) }
+
+            ListExpandToggleButton(
+                isExpanded = showWakeups,
+                onToggle = { showWakeups = !showWakeups },
+                expandedText = stringResource(R.string.action_hide_wakeups),
+                collapsedText = stringResource(R.string.action_show_wakeups)
             )
 
-            RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                wakeupsList.take(20).forEach { item ->
-                    InfoDetailRow(
-                        title = "${item.subsystem} (${item.timeAgo})",
-                        value = item.attribution,
-                        iconRes = item.iconRes
-                    )
+            if (showWakeups) {
+                RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                    wakeupsList.take(20).forEach { item ->
+                        InfoDetailRow(
+                            title = "${item.subsystem} (${item.timeAgo})",
+                            value = item.attribution,
+                            iconRes = item.iconRes
+                        )
+                    }
                 }
             }
         }
