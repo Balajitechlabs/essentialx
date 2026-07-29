@@ -275,7 +275,7 @@ fun BatteryDetailsBottomSheet(
                 batteryDetails.chargingPolicy?.let { policy ->
                     InfoDetailRow(
                         title = stringResource(R.string.label_battery_charging_policy),
-                        value = "$policy",
+                        value = BatteryInfoUtil.formatChargingPolicy(policy),
                         iconRes = R.drawable.rounded_info_24
                     )
                 }

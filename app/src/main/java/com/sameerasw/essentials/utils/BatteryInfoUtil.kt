@@ -192,4 +192,13 @@ object BatteryInfoUtil {
             else -> "Plugged"
         }
     }
+
+    fun formatChargingPolicy(policy: Int?): String {
+        return when (policy) {
+            1 -> "Not optimized"
+            2 -> "Limited capacity"
+            3 -> "Adaptive charging"
+            else -> policy?.toString() ?: "Unknown"
+        }
+    }
 }
