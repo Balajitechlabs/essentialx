@@ -16,7 +16,7 @@
     <string name="flashlight_pulse_tile_label">Xung đèn pin</string>
     <string name="check_pre_releases_label">Kiểm tra các bản phát hành trước</string>
     <string name="check_pre_releases_desc">Có thể không ổn định</string>
-    <string name="label_default_tab">Default tab</string>
+    <string name="label_default_tab">Thẻ mặc định</string>
     <!-- App Lock -->
     <string name="settings_section_security">Bảo vệ</string>
     <string name="app_lock_enable_title">Bật khóa ứng dụng</string>
@@ -684,10 +684,10 @@
     <string name="preferences_title">Preferences</string>
     <string name="preferences_desc">Configure some basic settings to get started.</string>
     <string name="label_app_settings">App Settings</string>
-    <string name="label_app_language">Language</string>
+    <string name="label_app_language">Ngôn ngữ</string>
     <string name="label_haptic_feedback">Haptic Feedback</string>
-    <string name="label_updates">Updates</string>
-    <string name="label_auto_check_updates">Auto check for updates</string>
+    <string name="label_updates">Cập nhật</string>
+    <string name="label_auto_check_updates">Tự động kiểm tra cập nhật</string>
     <string name="desc_auto_check_updates">Check for updates at app launch</string>
     <string name="action_all_set">All Set</string>
     <string name="action_check_whats_new">Check What\'s New?</string>
@@ -1454,4 +1454,7 @@
     <string name="whats_new_specs_desc">Inaccurate GSMArena-powered specifications have been removed to keep device insights clean, fast, and completely reliable.</string>
     <string name="whats_new_apps_title">App Updates Migrated</string>
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
+    <string name="settings_translate_mode">Chế độ dịch</string>
+    <string name="setting_swipe_tabs_title">Vuốt giữa các thẻ</string>
+    <string name="setting_swipe_tabs_desc">Trên màn hình chính</string>
 </resources>

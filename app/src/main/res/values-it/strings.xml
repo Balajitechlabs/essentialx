@@ -1140,7 +1140,7 @@
     <string name="location_reached_alarm_subtitle">Preparati a scendere</string>
     <string name="location_reached_dismiss">Congedare</string>
     <string name="location_reached_toast_set">Destinazione impostata: %1$.4f, %2$.4f</string>
-    <string name="setting_use_root_title">Usa Radice</string>
+    <string name="setting_use_root_title">Usa Root</string>
     <string name="setting_use_root_desc">Invece di Shizuku</string>
     <string name="root_not_available_toast">Accesso root non disponibile. Controlla il tuo root manager.</string>
     <!-- System Keyboard -->
