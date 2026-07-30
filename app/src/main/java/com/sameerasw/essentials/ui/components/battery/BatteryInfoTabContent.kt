@@ -187,7 +187,9 @@ fun BatteryInfoTabContent(
             enter = expandVertically() + fadeIn(),
             exit = shrinkVertically() + fadeOut()
         ) {
-            Column {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
                 if (isLoadingAdvanced) {
                     BatteryLoadingIndicatorCard()
                 } else {
