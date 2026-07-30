@@ -1,6 +1,12 @@
 package com.sameerasw.essentials.ui.components.battery
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,12 +85,34 @@ fun InfoDetailRow(
             modifier = Modifier.weight(1f)
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        AnimatedContent(
+            targetState = value,
+            transitionSpec = {
+                fun parseNum(s: String): Double? {
+                    val digits = s.replace("-", "").replace(Regex("[^0-9.]"), "")
+                    return digits.toDoubleOrNull()
+                }
+                val oldVal = parseNum(initialState)
+                val newVal = parseNum(targetState)
+                val isIncreasing = if (oldVal != null && newVal != null) newVal > oldVal else true
+
+                if (isIncreasing) {
+                    (slideInVertically { height -> -height } + fadeIn())
+                        .togetherWith(slideOutVertically { height -> height } + fadeOut())
+                } else {
+                    (slideInVertically { height -> height } + fadeIn())
+                        .togetherWith(slideOutVertically { height -> -height } + fadeOut())
+                }
+            },
+            label = "info_row_value"
+        ) { targetVal ->
+            Text(
+                text = targetVal,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
 

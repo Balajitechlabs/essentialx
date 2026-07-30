@@ -112,7 +112,7 @@ fun BatteryDetailsBottomSheet(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(selectedTab) {
         withContext(Dispatchers.IO) {
             val updated = BatteryInfoUtil.fetchAdvancedDetails(context, initialDetails)
             val parsedApps = BatteryStatsUtil.parseUsageApps(context)
@@ -122,6 +122,19 @@ fun BatteryDetailsBottomSheet(
                 usageApps = parsedApps
                 wakeupsList = parsedWakeups
                 isLoadingAdvanced = false
+            }
+        }
+
+        if (selectedTab == 0) {
+            while (kotlinx.coroutines.currentCoroutineContext().let { true }) {
+                kotlinx.coroutines.delay(5000)
+                withContext(Dispatchers.IO) {
+                    val freshBasic = BatteryInfoUtil.getBasicDetails(context)
+                    val updated = BatteryInfoUtil.fetchAdvancedDetails(context, freshBasic)
+                    withContext(Dispatchers.Main) {
+                        batteryDetails = updated
+                    }
+                }
             }
         }
     }

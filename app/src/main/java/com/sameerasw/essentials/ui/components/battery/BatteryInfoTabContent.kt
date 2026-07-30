@@ -1,7 +1,11 @@
 package com.sameerasw.essentials.ui.components.battery
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -94,7 +98,7 @@ fun BatteryInfoTabContent(
         }
     }
 
-    // Health
+    // Health Section
     Text(
         text = stringResource(R.string.label_battery_section_health),
         style = MaterialTheme.typography.titleMedium,
@@ -120,20 +124,27 @@ fun BatteryInfoTabContent(
             val full = batteryDetails.chargeFull
             val design = batteryDetails.chargeFullDesign
 
-            if (full != null && full > 0) {
+            // Merged Capacity row: "full charge capacity / design capacity mAh" using design icon
+            if (full != null && design != null && full > 0 && design > 0) {
                 val fullMah = if (full > 10000) full / 1000 else full
-                InfoDetailRow(
-                    title = stringResource(R.string.label_battery_charge_full),
-                    value = "$fullMah mAh",
-                    iconRes = R.drawable.battery_android_frame_bolt_24px
-                )
-            }
-
-            if (design != null && design > 0) {
                 val designMah = if (design > 10000) design / 1000 else design
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_charge_full_design),
+                    title = stringResource(R.string.label_battery_capacity),
+                    value = "$fullMah / $designMah mAh",
+                    iconRes = R.drawable.battery_android_frame_shield_24px
+                )
+            } else if (design != null && design > 0) {
+                val designMah = if (design > 10000) design / 1000 else design
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_capacity),
                     value = "$designMah mAh",
+                    iconRes = R.drawable.battery_android_frame_shield_24px
+                )
+            } else if (full != null && full > 0) {
+                val fullMah = if (full > 10000) full / 1000 else full
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_capacity),
+                    value = "$fullMah mAh",
                     iconRes = R.drawable.battery_android_frame_shield_24px
                 )
             }
@@ -157,7 +168,8 @@ fun BatteryInfoTabContent(
         }
     }
 
-    // Charging
+    // Charging Section
+    val isPlugged = batteryDetails.plugged > 0
     Text(
         text = stringResource(R.string.label_battery_section_charging),
         style = MaterialTheme.typography.titleMedium,
@@ -166,72 +178,76 @@ fun BatteryInfoTabContent(
     )
 
     RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+        // Plug type renamed to "Mode"
         InfoDetailRow(
-            title = stringResource(R.string.label_battery_plug_type),
+            title = stringResource(R.string.label_battery_mode),
             value = BatteryInfoUtil.formatPlugged(batteryDetails.plugged),
             iconRes = R.drawable.rounded_cable_24
         )
 
-        if (isLoadingAdvanced) {
-            BatteryLoadingIndicatorCard()
-        } else {
-            batteryDetails.chargingState?.let { state ->
-                InfoDetailRow(
-                    title = stringResource(R.string.label_battery_charging_state),
-                    value = "$state",
-                    iconRes = R.drawable.rounded_charger_24
-                )
-            }
+        // Dynamically show remaining charging cards only when plugged with expand/collapse animation
+        AnimatedVisibility(
+            visible = isPlugged,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            Column {
+                if (isLoadingAdvanced) {
+                    BatteryLoadingIndicatorCard()
+                } else {
+                    // chargingState commented out for now
 
-            batteryDetails.chargingPolicy?.let { policy ->
-                InfoDetailRow(
-                    title = stringResource(R.string.label_battery_charging_policy),
-                    value = BatteryInfoUtil.formatChargingPolicy(policy),
-                    iconRes = R.drawable.rounded_info_24
-                )
-            }
+                    batteryDetails.chargingPolicy?.let { policy ->
+                        InfoDetailRow(
+                            title = stringResource(R.string.label_battery_charging_policy),
+                            value = BatteryInfoUtil.formatChargingPolicy(policy),
+                            iconRes = R.drawable.rounded_info_24
+                        )
+                    }
 
-            batteryDetails.maxChargingCurrent?.let { maxCur ->
-                if (maxCur > 0) {
-                    val curMa = if (maxCur > 10000) maxCur / 1000 else maxCur
-                    InfoDetailRow(
-                        title = stringResource(R.string.label_battery_max_current),
-                        value = "$curMa mA",
-                        iconRes = R.drawable.rounded_power_input_24
-                    )
+                    batteryDetails.maxChargingCurrent?.let { maxCur ->
+                        if (maxCur > 0) {
+                            val curMa = if (maxCur > 10000) maxCur / 1000 else maxCur
+                            InfoDetailRow(
+                                title = stringResource(R.string.label_battery_max_current),
+                                value = "$curMa mA",
+                                iconRes = R.drawable.rounded_power_input_24
+                            )
+                        }
+                    }
+
+                    batteryDetails.maxChargingVoltage?.let { maxVol ->
+                        if (maxVol > 0) {
+                            val volMv = if (maxVol > 100000) maxVol / 1000 else maxVol
+                            InfoDetailRow(
+                                title = stringResource(R.string.label_battery_max_voltage),
+                                value = "$volMv mV",
+                                iconRes = R.drawable.rounded_power_input_24
+                            )
+                        }
+                    }
+
+                    batteryDetails.chargingStatusNew?.let { statusNew ->
+                        InfoDetailRow(
+                            title = stringResource(R.string.label_battery_charging_status),
+                            value = BatteryInfoUtil.formatChargingStatusNew(statusNew),
+                            iconRes = R.drawable.rounded_charger_24
+                        )
+                    }
+
+                    batteryDetails.chargeTimeRemainingMs?.let { timeMs ->
+                        InfoDetailRow(
+                            title = stringResource(R.string.label_battery_charge_time_remaining),
+                            value = BatteryInfoUtil.formatChargeTimeRemaining(timeMs),
+                            iconRes = R.drawable.battery_android_frame_bolt_24px
+                        )
+                    }
                 }
-            }
-
-            batteryDetails.maxChargingVoltage?.let { maxVol ->
-                if (maxVol > 0) {
-                    val volMv = if (maxVol > 100000) maxVol / 1000 else maxVol
-                    InfoDetailRow(
-                        title = stringResource(R.string.label_battery_max_voltage),
-                        value = "$volMv mV",
-                        iconRes = R.drawable.rounded_power_input_24
-                    )
-                }
-            }
-
-            batteryDetails.chargingStatusNew?.let { statusNew ->
-                InfoDetailRow(
-                    title = stringResource(R.string.label_battery_charging_status),
-                    value = BatteryInfoUtil.formatChargingStatusNew(statusNew),
-                    iconRes = R.drawable.rounded_charger_24
-                )
-            }
-
-            batteryDetails.chargeTimeRemainingMs?.let { timeMs ->
-                InfoDetailRow(
-                    title = stringResource(R.string.label_battery_charge_time_remaining),
-                    value = BatteryInfoUtil.formatChargeTimeRemaining(timeMs),
-                    iconRes = R.drawable.battery_android_frame_bolt_24px
-                )
             }
         }
     }
 
-    // Specs
+    // Specs Section
     Text(
         text = stringResource(R.string.label_battery_section_specs),
         style = MaterialTheme.typography.titleMedium,
@@ -262,13 +278,7 @@ fun BatteryInfoTabContent(
                 )
             }
 
-            batteryDetails.capacityLevel?.let { cap ->
-                InfoDetailRow(
-                    title = stringResource(R.string.label_battery_capacity_level),
-                    value = "$cap",
-                    iconRes = R.drawable.rounded_battery_android_0_24
-                )
-            }
+            // capacityLevel commented out
 
             batteryDetails.currentNowMa?.let { curNow ->
                 InfoDetailRow(
@@ -291,6 +301,26 @@ fun BatteryInfoTabContent(
                     title = stringResource(R.string.label_battery_remaining_energy),
                     value = "$energy mWh",
                     iconRes = R.drawable.battery_android_frame_4_24px
+                )
+            }
+
+            // Average Remaining calculation (Current Charge / Average Current)
+            val chargeCounterMah = batteryDetails.chargeCounter?.let { if (it > 10000) it / 1000 else it }
+            val avgCurrentMa = batteryDetails.currentAvgMa?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
+            if (chargeCounterMah != null && chargeCounterMah > 0 && avgCurrentMa != null) {
+                val remainingHours = chargeCounterMah.toDouble() / avgCurrentMa.toDouble()
+                val formattedRemaining = if (remainingHours >= 1.0) {
+                    val h = remainingHours.toInt()
+                    val m = ((remainingHours - h) * 60).toInt()
+                    if (m > 0) "${h}h ${m}m" else "${h}h"
+                } else {
+                    val m = (remainingHours * 60).toInt().coerceAtLeast(1)
+                    "${m}m"
+                }
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_avg_remaining),
+                    value = formattedRemaining,
+                    iconRes = R.drawable.rounded_av_timer_24
                 )
             }
 
@@ -317,7 +347,7 @@ fun BatteryInfoTabContent(
     // Permission Grant Card at the very bottom if BATTERY_STATS permission is missing AND Shizuku/Root is available & permitted
     val hasStatsPerm = BatteryInfoUtil.hasBatteryStatsPermission(context)
     val isShellAvailable = com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
-    if (!hasStatsPerm && batteryDetails.cycleCount == null && android.os.Build.VERSION.SDK_INT >= 34 && isShellAvailable) {
+    if (!hasStatsPerm && batteryDetails.stateOfHealth == null && batteryDetails.cycleCount == null && android.os.Build.VERSION.SDK_INT >= 34 && isShellAvailable) {
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier
