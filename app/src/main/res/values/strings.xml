@@ -1674,6 +1674,21 @@
     <string name="label_battery_capacity">Capacity</string>
     <string name="label_battery_mode">Mode</string>
     <string name="label_battery_avg_remaining">Average Remaining</string>
+
+    <!-- Thermal Strings -->
+    <string name="label_thermal_system_thermals">System Thermals</string>
+    <string name="label_thermal_cpu">CPU Temp</string>
+    <string name="label_thermal_gpu">GPU Temp</string>
+    <string name="label_thermal_skin">Skin Temp</string>
+    <string name="label_thermal_battery">Battery Temp</string>
+    <string name="label_thermal_throttling_status">Throttling Status</string>
+    <string name="label_thermal_status_none">Normal</string>
+    <string name="label_thermal_status_light">Light Throttling</string>
+    <string name="label_thermal_status_moderate">Moderate Throttling</string>
+    <string name="label_thermal_status_severe">Severe Throttling</string>
+    <string name="label_thermal_status_critical">Critical Throttling</string>
+    <string name="label_thermal_status_emergency">Emergency Throttling</string>
+    <string name="label_thermal_status_shutdown">Shutdown Imminent</string>
     <string name="action_charging_qs_tile_options">Charging mode QS tile options</string>
     <string name="action_show_wakeups">CPU wakeup history</string>
     <string name="action_hide_wakeups">Hide CPU wakeups</string>

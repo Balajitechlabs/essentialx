@@ -43,7 +43,8 @@ data class BatteryDetails(
     val firstUsageDate: Long? = null,
     val serialNumber: String? = null,
     val partStatus: Int? = null,
-    val hasBatteryStatsPermission: Boolean = false
+    val hasBatteryStatsPermission: Boolean = false,
+    val thermalInfo: ThermalInfo? = null
 )
 
 object BatteryInfoUtil {
@@ -181,6 +182,8 @@ object BatteryInfoUtil {
         val settingsOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --settings")
         val enforceLevel = parseSettingsEnforceLevel(settingsOutput)
 
+        val thermalInfo = ThermalUtil.getThermalInfo(context)
+
         return basic.copy(
             chargeFull = chargeFull,
             chargeFullDesign = chargeFullDesign,
@@ -195,7 +198,8 @@ object BatteryInfoUtil {
             powerProfile = powerProfileMap.takeIf { it.isNotEmpty() },
             batteryChargingEnforceLevel = enforceLevel,
             serialNumber = basic.serialNumber ?: dumpsysSerial,
-            partStatus = basic.partStatus ?: dumpsysPart
+            partStatus = basic.partStatus ?: dumpsysPart,
+            thermalInfo = thermalInfo
         )
     }
 

@@ -35,6 +35,7 @@ import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.BatteryDetails
 import com.sameerasw.essentials.utils.BatteryInfoUtil
+import com.sameerasw.essentials.utils.ThermalInfo
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -356,7 +357,6 @@ fun BatteryInfoTabContent(
                     )
                 }
             }
-
             batteryDetails.partStatus?.let { part ->
                 InfoDetailRow(
                     title = stringResource(R.string.label_battery_part_status),
@@ -364,6 +364,59 @@ fun BatteryInfoTabContent(
                     iconRes = R.drawable.battery_android_frame_shield_24px
                 )
             }
+        }
+    }
+
+    // System Thermals Section (Shizuku / Root)
+    batteryDetails.thermalInfo?.takeIf { it.items.isNotEmpty() }?.let { thermal ->
+        Text(
+            text = stringResource(R.string.label_thermal_system_thermals),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+
+        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+            thermal.maxCpuTemp?.let { cpu ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_thermal_cpu),
+                    value = "${"%.1f".format(Locale.US, cpu)} °C",
+                    iconRes = R.drawable.rounded_memory_alt_24
+                )
+            }
+
+            thermal.maxGpuTemp?.let { gpu ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_thermal_gpu),
+                    value = "${"%.1f".format(Locale.US, gpu)} °C",
+                    iconRes = R.drawable.rounded_memory_alt_24
+                )
+            }
+
+            thermal.skinTemp?.let { skin ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_thermal_skin),
+                    value = "${"%.1f".format(Locale.US, skin)} °C",
+                    iconRes = R.drawable.rounded_device_thermostat_24
+                )
+            }
+
+            val statusText = when (thermal.maxThrottlingStatus) {
+                ThermalInfo.THROTTLING_NONE -> stringResource(R.string.label_thermal_status_none)
+                ThermalInfo.THROTTLING_LIGHT -> stringResource(R.string.label_thermal_status_light)
+                ThermalInfo.THROTTLING_MODERATE -> stringResource(R.string.label_thermal_status_moderate)
+                ThermalInfo.THROTTLING_SEVERE -> stringResource(R.string.label_thermal_status_severe)
+                ThermalInfo.THROTTLING_CRITICAL -> stringResource(R.string.label_thermal_status_critical)
+                ThermalInfo.THROTTLING_EMERGENCY -> stringResource(R.string.label_thermal_status_emergency)
+                ThermalInfo.THROTTLING_SHUTDOWN -> stringResource(R.string.label_thermal_status_shutdown)
+                else -> stringResource(R.string.label_thermal_status_none)
+            }
+
+            InfoDetailRow(
+                title = stringResource(R.string.label_thermal_throttling_status),
+                value = statusText,
+                iconRes = if (thermal.maxThrottlingStatus > ThermalInfo.THROTTLING_NONE) R.drawable.rounded_release_alert_24 else R.drawable.rounded_device_thermostat_24
+            )
         }
     }
 
