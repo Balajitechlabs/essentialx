@@ -130,7 +130,7 @@ fun BatteryUsageBreakdownHeader(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(76.dp)
+            .height(88.dp)
             .padding(vertical = 4.dp),
         verticalArrangement = Arrangement.Center
     ) {

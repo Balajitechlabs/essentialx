@@ -1,25 +1,99 @@
 package com.sameerasw.essentials.ui.components.battery
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLocale
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.BatteryDetails
 import com.sameerasw.essentials.utils.BatteryInfoUtil
+import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.ShizukuUtils
 import java.util.Locale
 
 @Composable
 fun BatteryInfoTabContent(
     batteryDetails: BatteryDetails,
-    isLoadingAdvanced: Boolean
+    isLoadingAdvanced: Boolean,
+    onRefresh: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val view = LocalView.current
+
+    // State of Health Dial
+    batteryDetails.stateOfHealth?.let { soh ->
+        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceBright,
+                        shape = Shapes.extraSmall
+                    )
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.label_battery_state_of_health),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "$soh%",
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (soh >= 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                    )
+                }
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(64.dp)
+                ) {
+                    CircularProgressIndicator(
+                        progress = { soh / 100f },
+                        modifier = Modifier.size(64.dp),
+                        color = if (soh >= 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        trackColor = MaterialTheme.colorScheme.outlineVariant,
+                        strokeWidth = 6.dp
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_ecg_heart_24),
+                        contentDescription = null,
+                        tint = if (soh >= 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+        }
+    }
+
     // Health
     Text(
         text = stringResource(R.string.label_battery_section_health),
@@ -70,6 +144,14 @@ fun BatteryInfoTabContent(
                     title = stringResource(R.string.label_battery_capacity_health),
                     value = String.format(Locale.getDefault(), "%.1f %%", healthPct),
                     iconRes = R.drawable.rounded_ecg_heart_24
+                )
+            }
+
+            batteryDetails.cycleCount?.let { cycles ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_cycle_count),
+                    value = "$cycles",
+                    iconRes = R.drawable.rounded_cycle_24
                 )
             }
         }
@@ -130,6 +212,22 @@ fun BatteryInfoTabContent(
                     )
                 }
             }
+
+            batteryDetails.chargingStatusNew?.let { statusNew ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_charging_status),
+                    value = BatteryInfoUtil.formatChargingStatusNew(statusNew),
+                    iconRes = R.drawable.rounded_charger_24
+                )
+            }
+
+            batteryDetails.chargeTimeRemainingMs?.let { timeMs ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_charge_time_remaining),
+                    value = BatteryInfoUtil.formatChargeTimeRemaining(timeMs),
+                    iconRes = R.drawable.battery_android_frame_bolt_24px
+                )
+            }
         }
     }
 
@@ -170,6 +268,102 @@ fun BatteryInfoTabContent(
                     value = "$cap",
                     iconRes = R.drawable.rounded_battery_android_0_24
                 )
+            }
+
+            batteryDetails.currentNowMa?.let { curNow ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_current_now),
+                    value = "$curNow mA",
+                    iconRes = R.drawable.rounded_power_input_24
+                )
+            }
+
+            batteryDetails.currentAvgMa?.let { curAvg ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_current_avg),
+                    value = "$curAvg mA",
+                    iconRes = R.drawable.rounded_power_input_24
+                )
+            }
+
+            batteryDetails.remainingEnergyMwh?.let { energy ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_remaining_energy),
+                    value = "$energy mWh",
+                    iconRes = R.drawable.battery_android_frame_4_24px
+                )
+            }
+
+            batteryDetails.manufacturingDate?.let { mfg ->
+                val (dateStr, isSuspicious) = BatteryInfoUtil.formatDate(mfg)
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_manufacturing_date),
+                    value = dateStr,
+                    iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24
+                )
+            }
+
+            batteryDetails.firstUsageDate?.let { firstUse ->
+                val (dateStr, isSuspicious) = BatteryInfoUtil.formatDate(firstUse)
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_first_usage_date),
+                    value = dateStr,
+                    iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24
+                )
+            }
+        }
+    }
+
+    // Permission Grant Card at the very bottom if BATTERY_STATS permission is missing AND Shizuku/Root is available & permitted
+    val hasStatsPerm = BatteryInfoUtil.hasBatteryStatsPermission(context)
+    val isShellAvailable = com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
+    if (!hasStatsPerm && batteryDetails.cycleCount == null && android.os.Build.VERSION.SDK_INT >= 34 && isShellAvailable) {
+        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceBright,
+                        shape = Shapes.extraSmall
+                    )
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_info_24),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.label_battery_grant_stats_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                Text(
+                    text = stringResource(R.string.label_battery_grant_stats_desc),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                if (ShizukuUtils.isShizukuAvailable() && ShizukuUtils.hasPermission()) {
+                    Button(
+                        onClick = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            if (ShizukuUtils.grantBatteryStatsPermission()) {
+                                onRefresh()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = stringResource(R.string.action_grant_shizuku))
+                    }
+                }
             }
         }
     }

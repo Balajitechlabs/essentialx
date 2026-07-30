@@ -167,7 +167,7 @@ fun BatteryDetailsBottomSheet(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(76.dp)
+                        .height(88.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = iconRes),
@@ -248,7 +248,11 @@ fun BatteryDetailsBottomSheet(
             when (selectedTab) {
                 0 -> BatteryInfoTabContent(
                     batteryDetails = batteryDetails,
-                    isLoadingAdvanced = isLoadingAdvanced
+                    isLoadingAdvanced = isLoadingAdvanced,
+                    onRefresh = {
+                        val freshBasic = BatteryInfoUtil.getBasicDetails(context)
+                        batteryDetails = BatteryInfoUtil.fetchAdvancedDetails(context, freshBasic)
+                    }
                 )
                 1 -> BatteryAppsTabContent(
                     isLoadingAdvanced = isLoadingAdvanced,

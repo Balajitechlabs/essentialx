@@ -1658,6 +1658,17 @@
     <string name="action_show_all">Show all</string>
     <string name="action_show_top_apps">Show only top apps</string>
     <string name="label_battery_other">Other</string>
+    <string name="label_battery_cycle_count">Cycle Count</string>
+    <string name="label_battery_charging_status">Charging Status</string>
+    <string name="label_battery_charge_time_remaining">Time Until Full</string>
+    <string name="label_battery_current_avg">Average Current</string>
+    <string name="label_battery_remaining_energy">Remaining Energy</string>
+    <string name="label_battery_state_of_health">State of Health</string>
+    <string name="label_battery_manufacturing_date">Manufacturing Date</string>
+    <string name="label_battery_first_usage_date">First Usage Date</string>
+    <string name="label_battery_grant_stats_title">Unlock Advanced Battery Info</string>
+    <string name="label_battery_grant_stats_desc">Grant BATTERY_STATS permission via Shizuku/ADB to see battery health %, manufacturing date &amp; first usage date.</string>
+    <string name="action_grant_shizuku">Grant via Shizuku</string>
     <string name="action_show_wakeups">CPU wakeup history</string>
     <string name="action_hide_wakeups">Hide CPU wakeups</string>
     <string name="label_screen_on_drain">Screen On Drain</string>
