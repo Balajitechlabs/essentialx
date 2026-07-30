@@ -1,6 +1,11 @@
 package com.sameerasw.essentials.ui.components.battery
 
-import android.view.View
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -32,6 +37,7 @@ import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.BatteryUsageApp
 import com.sameerasw.essentials.utils.HapticUtil
+import android.view.View
 import java.util.Locale
 
 import androidx.compose.foundation.clickable
@@ -109,12 +115,34 @@ fun BatteryAppsTabContent(
                         modifier = Modifier.weight(1f)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(
-                        text = displayValue,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    AnimatedContent(
+                        targetState = displayValue,
+                        transitionSpec = {
+                            fun parseNum(s: String): Double? {
+                                val digits = s.replace("-", "").replace(Regex("[^0-9.]"), "")
+                                return digits.toDoubleOrNull()
+                            }
+                            val oldVal = parseNum(initialState)
+                            val newVal = parseNum(targetState)
+                            val isIncreasing = if (oldVal != null && newVal != null) newVal > oldVal else true
+
+                            if (isIncreasing) {
+                                (slideInVertically { height -> -height } + fadeIn())
+                                    .togetherWith(slideOutVertically { height -> height } + fadeOut())
+                            } else {
+                                (slideInVertically { height -> height } + fadeIn())
+                                    .togetherWith(slideOutVertically { height -> -height } + fadeOut())
+                            }
+                        },
+                        label = "app_value_anim"
+                    ) { targetVal ->
+                        Text(
+                            text = targetVal,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
         }
