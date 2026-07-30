@@ -223,6 +223,7 @@ fun BatteryInfoTabContent(
                         }
                     }
 
+                    /*
                     batteryDetails.chargingStatusNew?.let { statusNew ->
                         InfoDetailRow(
                             title = stringResource(R.string.label_battery_charging_status),
@@ -230,6 +231,7 @@ fun BatteryInfoTabContent(
                             iconRes = R.drawable.rounded_charger_24
                         )
                     }
+                    */
 
                     batteryDetails.chargeTimeRemainingMs?.let { timeMs ->
                         InfoDetailRow(

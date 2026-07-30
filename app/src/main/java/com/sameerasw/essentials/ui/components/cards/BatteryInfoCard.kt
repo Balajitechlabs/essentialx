@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -39,6 +41,7 @@ import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.ShellUtils
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BatteryInfoCard(
     modifier: Modifier = Modifier
@@ -90,6 +93,17 @@ fun BatteryInfoCard(
         )
     }
 
+    val isTranslationModeActive by com.sameerasw.essentials.translation.TranslationManager.isTranslationModeEnabled
+    var showMenu by remember { mutableStateOf(false) }
+    var translationSheetKey by remember { mutableStateOf<String?>(null) }
+
+    val onClickAction = {
+        if (hasPermission) {
+            HapticUtil.performVirtualKeyHaptic(view)
+            showSheet = true
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -97,13 +111,14 @@ fun BatteryInfoCard(
                 MaterialTheme.colorScheme.surfaceBright,
                 shape = Shapes.extraSmall
             )
-            .then(
-                if (hasPermission) {
-                    Modifier.clickable {
+            .combinedClickable(
+                onClick = onClickAction,
+                onLongClick = if (isTranslationModeActive) {
+                    {
                         HapticUtil.performVirtualKeyHaptic(view)
-                        showSheet = true
+                        showMenu = true
                     }
-                } else Modifier
+                } else null
             )
             .padding(vertical = 20.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
@@ -142,5 +157,29 @@ fun BatteryInfoCard(
                     .size(20.dp)
             )
         }
+
+        com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false }
+        ) {
+            com.sameerasw.essentials.translation.ui.TranslationMenuItems(
+                title = R.string.label_device_battery,
+                onSelectKey = { key ->
+                    showMenu = false
+                    translationSheetKey = key
+                }
+            )
+        }
+    }
+
+    val targetKey = translationSheetKey
+    if (targetKey != null) {
+        val resolvedKey = remember(targetKey) {
+            com.sameerasw.essentials.translation.TranslationManager.resolveKey(context, targetKey) ?: targetKey
+        }
+        com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
+            stringKey = resolvedKey,
+            onDismissRequest = { translationSheetKey = null }
+        )
     }
 }
