@@ -375,7 +375,7 @@
             android:theme="@style/Theme.Essentials.Translucent" />
 
         <activity
-            android:name=".ui.activities.ChargeOptimizationSettingsActivity"
+            android:name=".ui.activities.BatteryDetailsActivity"
             android:excludeFromRecents="true"
             android:exported="true"
             android:noHistory="true"
