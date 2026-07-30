@@ -90,10 +90,9 @@ fun UpdateBottomSheet(
         }
     }
 
-    ModalBottomSheet(
+    EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        sheetState = sheetState
     ) {
         androidx.compose.foundation.layout.Box(
             modifier = Modifier

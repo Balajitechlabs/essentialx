@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearWavyProgressIndicator
@@ -148,21 +149,21 @@ fun BatteryUsageBreakdownHeader(
                     modifier = Modifier
                         .weight(animatedAppsWeight)
                         .fillMaxHeight()
-                        .clip(androidx.compose.material3.ButtonGroupDefaults.connectedLeadingButtonShapes().shape)
+                        .clip(ButtonGroupDefaults.connectedLeadingButtonShapes().shape)
                         .background(appsColor)
                 )
                 Box(
                     modifier = Modifier
                         .weight(animatedSystemWeight)
                         .fillMaxHeight()
-                        .clip(androidx.compose.material3.ButtonGroupDefaults.connectedMiddleButtonShapes().shape)
+                        .clip(ButtonGroupDefaults.connectedMiddleButtonShapes().shape)
                         .background(systemColor)
                 )
                 Box(
                     modifier = Modifier
                         .weight(animatedOtherWeight)
                         .fillMaxHeight()
-                        .clip(androidx.compose.material3.ButtonGroupDefaults.connectedTrailingButtonShapes().shape)
+                        .clip(ButtonGroupDefaults.connectedTrailingButtonShapes().shape)
                         .background(otherColor)
                 )
             }
