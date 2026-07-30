@@ -24,7 +24,7 @@ fun BatterySystemTabContent(
     isLoadingAdvanced: Boolean,
     powerProfile: Map<String, String>?,
     wakeupsList: List<CpuWakeupItem>,
-    showPercentage: Boolean,
+    showPercentage: Boolean = false,
     onToggleUnit: () -> Unit
 ) {
     if (isLoadingAdvanced) {

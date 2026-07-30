@@ -76,6 +76,7 @@ fun BatteryDetailsBottomSheet(
     var showAllApps by remember { mutableStateOf(false) }
 
     var showPercentage by remember { mutableStateOf(true) }
+    var showSystemPercentage by remember { mutableStateOf(false) }
 
     var usageApps by remember { mutableStateOf<List<BatteryUsageApp>>(emptyList()) }
     var wakeupsList by remember { mutableStateOf<List<CpuWakeupItem>>(emptyList()) }
@@ -280,8 +281,8 @@ fun BatteryDetailsBottomSheet(
                     isLoadingAdvanced = isLoadingAdvanced,
                     powerProfile = batteryDetails.powerProfile,
                     wakeupsList = wakeupsList,
-                    showPercentage = showPercentage,
-                    onToggleUnit = { showPercentage = !showPercentage }
+                    showPercentage = showSystemPercentage,
+                    onToggleUnit = { showSystemPercentage = !showSystemPercentage }
                 )
             }
 
