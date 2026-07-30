@@ -1672,6 +1672,7 @@
     <string name="label_battery_capacity">Capacity</string>
     <string name="label_battery_mode">Mode</string>
     <string name="label_battery_avg_remaining">Average Remaining</string>
+    <string name="action_charging_qs_tile_options">Charging mode QS tile options</string>
     <string name="action_show_wakeups">CPU wakeup history</string>
     <string name="action_hide_wakeups">Hide CPU wakeups</string>
     <string name="label_screen_on_drain">Screen On Drain</string>

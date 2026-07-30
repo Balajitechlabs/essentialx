@@ -35,8 +35,13 @@ import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.BatteryDetails
 import com.sameerasw.essentials.utils.BatteryInfoUtil
-import com.sameerasw.essentials.utils.HapticUtil
-import com.sameerasw.essentials.utils.ShizukuUtils
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
+import com.sameerasw.essentials.ui.components.pickers.MultiSegmentedPicker
 import java.util.Locale
 
 @Composable
@@ -344,6 +349,88 @@ fun BatteryInfoTabContent(
         }
     }
 
+    // Expandable Settings section for Charging mode QS tile options
+    var showSettings by remember { mutableStateOf(false) }
+    ListExpandToggleButton(
+        isExpanded = showSettings,
+        onToggle = { showSettings = !showSettings },
+        expandedText = stringResource(R.string.action_charging_qs_tile_options),
+        collapsedText = stringResource(R.string.action_charging_qs_tile_options)
+    )
+
+    if (showSettings) {
+        val settingsRepository = remember { SettingsRepository(context) }
+        var enableAdaptive by remember {
+            mutableStateOf(settingsRepository.getBoolean("charge_opt_toggle_adaptive", true))
+        }
+        var enableLimit by remember {
+            mutableStateOf(settingsRepository.getBoolean("charge_opt_toggle_limit", true))
+        }
+        var enableDeactivated by remember {
+            mutableStateOf(settingsRepository.getBoolean("charge_opt_toggle_deactivated", true))
+        }
+
+        val items = listOf("deactivated", "adaptive", "limit")
+        val selectedItems = remember(enableDeactivated, enableAdaptive, enableLimit) {
+            mutableSetOf<String>().apply {
+                if (enableDeactivated) add("deactivated")
+                if (enableAdaptive) add("adaptive")
+                if (enableLimit) add("limit")
+            }.toSet()
+        }
+
+        RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceBright,
+                        shape = Shapes.extraSmall
+                    )
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.charge_opt_long_press_desc),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Text(
+                    text = stringResource(R.string.charge_opt_long_press_title),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                MultiSegmentedPicker(
+                    items = items,
+                    selectedItems = selectedItems,
+                    onItemsSelected = { newSelection ->
+                        if (newSelection.size >= 2) {
+                            enableDeactivated = newSelection.contains("deactivated")
+                            enableAdaptive = newSelection.contains("adaptive")
+                            enableLimit = newSelection.contains("limit")
+
+                            settingsRepository.putBoolean("charge_opt_toggle_deactivated", enableDeactivated)
+                            settingsRepository.putBoolean("charge_opt_toggle_adaptive", enableAdaptive)
+                            settingsRepository.putBoolean("charge_opt_toggle_limit", enableLimit)
+                        }
+                    },
+                    labelProvider = { item ->
+                        when (item) {
+                            "deactivated" -> context.getString(R.string.deactivated)
+                            "adaptive" -> context.getString(R.string.adaptive_charging)
+                            "limit" -> context.getString(R.string.limit_to_80)
+                            else -> ""
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    allowEmpty = false
+                )
+            }
+        }
+    }
+
     // Permission Grant Card at the very bottom if BATTERY_STATS permission is missing AND Shizuku/Root is available & permitted
     val hasStatsPerm = BatteryInfoUtil.hasBatteryStatsPermission(context)
     val isShellAvailable = com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
@@ -381,11 +468,11 @@ fun BatteryInfoTabContent(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                if (ShizukuUtils.isShizukuAvailable() && ShizukuUtils.hasPermission()) {
+                if (com.sameerasw.essentials.utils.ShizukuUtils.isShizukuAvailable() && com.sameerasw.essentials.utils.ShizukuUtils.hasPermission()) {
                     Button(
                         onClick = {
-                            HapticUtil.performVirtualKeyHaptic(view)
-                            if (ShizukuUtils.grantBatteryStatsPermission()) {
+                            com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
+                            if (com.sameerasw.essentials.utils.ShizukuUtils.grantBatteryStatsPermission()) {
                                 onRefresh()
                             }
                         },
