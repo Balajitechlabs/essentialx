@@ -636,11 +636,12 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                     }
 
                                     "Statusbar icons" -> {
-                                        StatusBarIconSettingsUI(
-                                            viewModel = statusBarViewModel,
-                                            modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
-                                        )
+                                         StatusBarIconSettingsUI(
+                                             viewModel = statusBarViewModel,
+                                             mainViewModel = viewModel,
+                                             modifier = Modifier.padding(top = 16.dp),
+                                             highlightSetting = highlightSetting
+                                         )
                                     }
 
                                     "Caffeinate" -> {

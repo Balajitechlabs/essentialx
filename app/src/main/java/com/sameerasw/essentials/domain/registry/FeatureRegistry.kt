@@ -396,7 +396,7 @@ object FeatureRegistry {
                     "privacy_chip"
                 )
             ),
-            showToggle = false,
+            showToggle = true,
             parentFeatureId = "Display",
             animationRes = R.raw.status_animation
         ) {
