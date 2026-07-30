@@ -105,21 +105,16 @@ fun BatteryInfoTabContent(
     }
 
     // Health Section
-    Text(
-        text = stringResource(R.string.label_battery_section_health),
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 8.dp)
-    )
+    SectionHeaderTitle(title = R.string.label_battery_section_health)
 
     RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
         InfoDetailRow(
-            title = stringResource(R.string.label_battery_health),
+            title = R.string.label_battery_health,
             value = BatteryInfoUtil.formatHealth(batteryDetails.health),
             iconRes = R.drawable.rounded_ecg_heart_24
         )
         InfoDetailRow(
-            title = stringResource(R.string.label_battery_temperature),
+            title = R.string.label_battery_temperature,
             value = String.format(LocalLocale.current.platformLocale, "%.1f °C", batteryDetails.temperature / 10.0f),
             iconRes = R.drawable.rounded_device_thermostat_24
         )
@@ -176,12 +171,7 @@ fun BatteryInfoTabContent(
 
     // Charging Section
     val isPlugged = batteryDetails.plugged > 0
-    Text(
-        text = stringResource(R.string.label_battery_section_charging),
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 8.dp)
-    )
+    SectionHeaderTitle(title = R.string.label_battery_section_charging)
 
     RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
         // Plug type renamed to "Mode"
@@ -254,12 +244,7 @@ fun BatteryInfoTabContent(
     }
 
     // Specs Section
-    Text(
-        text = stringResource(R.string.label_battery_section_specs),
-        style = MaterialTheme.typography.titleMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(start = 8.dp)
-    )
+    SectionHeaderTitle(title = R.string.label_battery_section_specs)
 
     RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
         InfoDetailRow(
@@ -369,12 +354,7 @@ fun BatteryInfoTabContent(
 
     // System Thermals Section (Shizuku / Root)
     batteryDetails.thermalInfo?.takeIf { it.items.isNotEmpty() }?.let { thermal ->
-        Text(
-            text = stringResource(R.string.label_thermal_system_thermals),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 8.dp)
-        )
+        SectionHeaderTitle(title = R.string.label_thermal_system_thermals)
 
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             thermal.maxCpuTemp?.let { cpu ->
@@ -425,8 +405,8 @@ fun BatteryInfoTabContent(
     ListExpandToggleButton(
         isExpanded = showSettings,
         onToggle = { showSettings = !showSettings },
-        expandedText = stringResource(R.string.action_charging_qs_tile_options),
-        collapsedText = stringResource(R.string.action_charging_qs_tile_options)
+        title = R.string.action_charging_qs_tile_options,
+        description = null
     )
 
     if (showSettings) {

@@ -4,6 +4,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroupDefaults
@@ -60,7 +63,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun BatteryDetailsBottomSheet(
     initialDetails: BatteryDetails,
@@ -152,6 +155,19 @@ fun BatteryDetailsBottomSheet(
         isPowerSave = isPowerSave
     )
 
+    val isTranslationModeActive by com.sameerasw.essentials.translation.TranslationManager.isTranslationModeEnabled
+    var showTabMenu by remember { mutableStateOf(false) }
+    var tabTranslationSheetKey by remember { mutableStateOf<String?>(null) }
+
+    val tabResIds = remember {
+        listOf(
+            R.string.label_battery_tab_info,
+            R.string.label_battery_tab_apps,
+            R.string.label_battery_tab_system
+        )
+    }
+    val tabLabels = tabResIds.map { stringResource(it) }
+
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState
@@ -216,47 +232,25 @@ fun BatteryDetailsBottomSheet(
                 )
             }
 
-            val tabLabels = listOf(
-                stringResource(R.string.label_battery_tab_info),
-                stringResource(R.string.label_battery_tab_apps),
-                stringResource(R.string.label_battery_tab_system)
-            )
+            RoundedCardContainer{
+                com.sameerasw.essentials.ui.components.pickers.SegmentedPicker(
+                    items = tabResIds,
+                    selectedItem = tabResIds[selectedTab],
+                    onItemSelected = { selectedTab = tabResIds.indexOf(it) },
+                    labelProvider = { context.getString(it) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-            RoundedCardContainer {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = Shapes.extraSmall
-                        )
-                        .padding(6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-                ) {
-                    val modifiers = List(tabLabels.size) { Modifier.weight(1f) }
-                    tabLabels.forEachIndexed { index, label ->
-                        ToggleButton(
-                            checked = selectedTab == index,
-                            onCheckedChange = {
-                                selectedTab = index
-                                HapticUtil.performLightHaptic(view)
-                            },
-                            modifier = modifiers[index].semantics { role = Role.RadioButton },
-                            shapes = when (index) {
-                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                tabLabels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            },
-                        ) {
-                            Text(
-                                text = label,
-                                fontSize = dimensionResource(R.dimen.font_small).value.sp,
-                                modifier = Modifier.basicMarquee(),
-                                maxLines = 1
-                            )
-                        }
-                    }
+            val targetTabKey = tabTranslationSheetKey
+            if (targetTabKey != null) {
+                val resolvedTabKey = remember(targetTabKey) {
+                    com.sameerasw.essentials.translation.TranslationManager.resolveKey(context, targetTabKey) ?: targetTabKey
                 }
+                com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
+                    stringKey = resolvedTabKey,
+                    onDismissRequest = { tabTranslationSheetKey = null }
+                )
             }
 
             when (selectedTab) {
