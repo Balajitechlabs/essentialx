@@ -1666,6 +1666,8 @@
     <string name="label_battery_state_of_health">State of Health</string>
     <string name="label_battery_manufacturing_date">Manufacturing Date</string>
     <string name="label_battery_first_usage_date">First Usage Date</string>
+    <string name="label_battery_serial_number">Serial Number</string>
+    <string name="label_battery_part_status">Part Status</string>
     <string name="label_battery_grant_stats_title">Unlock Advanced Battery Info</string>
     <string name="label_battery_grant_stats_desc">Grant BATTERY_STATS permission via Shizuku/ADB to see battery health %, manufacturing date &amp; first usage date.</string>
     <string name="action_grant_shizuku">Grant via Shizuku</string>

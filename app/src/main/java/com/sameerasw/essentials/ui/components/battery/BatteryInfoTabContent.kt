@@ -346,6 +346,24 @@ fun BatteryInfoTabContent(
                     iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24
                 )
             }
+
+            batteryDetails.serialNumber?.let { serial ->
+                if (serial.isNotBlank()) {
+                    InfoDetailRow(
+                        title = stringResource(R.string.label_battery_serial_number),
+                        value = serial,
+                        iconRes = R.drawable.rounded_info_24
+                    )
+                }
+            }
+
+            batteryDetails.partStatus?.let { part ->
+                InfoDetailRow(
+                    title = stringResource(R.string.label_battery_part_status),
+                    value = BatteryInfoUtil.formatPartStatus(part),
+                    iconRes = R.drawable.battery_android_frame_shield_24px
+                )
+            }
         }
     }
 

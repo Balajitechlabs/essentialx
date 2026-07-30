@@ -41,6 +41,8 @@ data class BatteryDetails(
     val stateOfHealth: Int? = null,
     val manufacturingDate: Long? = null,
     val firstUsageDate: Long? = null,
+    val serialNumber: String? = null,
+    val partStatus: Int? = null,
     val hasBatteryStatsPermission: Boolean = false
 )
 
@@ -97,9 +99,11 @@ object BatteryInfoUtil {
         var stateOfHealth: Int? = null
         var mfgDate: Long? = null
         var firstUseDate: Long? = null
+        var serialNum: String? = null
+        var partStat: Int? = null
 
         if (android.os.Build.VERSION.SDK_INT >= 34 && hasStatsPerm && bm != null) {
-            // Property IDs: 10: SoH %, 7: Mfg date, 8: First usage date
+            // Property IDs: 10: SoH %, 7: Mfg date, 8: First usage date, 11: Serial number, 12: Part status
             val soh = bm.getIntProperty(10)
             if (soh in 1..100) stateOfHealth = soh
 
@@ -108,6 +112,15 @@ object BatteryInfoUtil {
 
             val firstUse = bm.getLongProperty(8)
             if (firstUse > 0 && firstUse != Long.MIN_VALUE) firstUseDate = firstUse
+
+            try {
+                val getStringPropMethod = bm.javaClass.getMethod("getStringProperty", Int::class.javaPrimitiveType)
+                serialNum = getStringPropMethod.invoke(bm, 11) as? String
+            } catch (e: Exception) {
+            }
+
+            val part = bm.getIntProperty(12)
+            if (part > 0 && part != Integer.MIN_VALUE) partStat = part
         }
 
         return BatteryDetails(
@@ -129,6 +142,8 @@ object BatteryInfoUtil {
             stateOfHealth = stateOfHealth,
             manufacturingDate = mfgDate,
             firstUsageDate = firstUseDate,
+            serialNumber = serialNum,
+            partStatus = partStat,
             hasBatteryStatsPermission = hasStatsPerm
         )
     }
@@ -157,6 +172,9 @@ object BatteryInfoUtil {
         val chargingPolicy = dumpsysMap["Charging policy"]?.toIntOrNull()
         val capacityLevel = dumpsysMap["Capacity level"]?.toIntOrNull()
 
+        val dumpsysSerial = dumpsysMap["Serial number"] ?: dumpsysMap["serial_number"] ?: dumpsysMap["Serial Number"]
+        val dumpsysPart = dumpsysMap["Part status"]?.toIntOrNull() ?: dumpsysMap["part_status"]?.toIntOrNull() ?: dumpsysMap["Part Status"]?.toIntOrNull()
+
         val powerProfileOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --power-profile")
         val powerProfileMap = parsePowerProfile(powerProfileOutput)
 
@@ -175,7 +193,9 @@ object BatteryInfoUtil {
             currentNow = currentNow,
             voltageNow = voltageNow,
             powerProfile = powerProfileMap.takeIf { it.isNotEmpty() },
-            batteryChargingEnforceLevel = enforceLevel
+            batteryChargingEnforceLevel = enforceLevel,
+            serialNumber = basic.serialNumber ?: dumpsysSerial,
+            partStatus = basic.partStatus ?: dumpsysPart
         )
     }
 
@@ -342,5 +362,27 @@ object BatteryInfoUtil {
 
         val isSuspicious = (year < 2021) || (year == 2020 && month == 11 && day == 1)
         return Pair(formatted, isSuspicious)
+    }
+
+    fun formatPartStatus(status: Int?): String {
+        return when (status) {
+            1 -> "Original"
+            2 -> "Replaced"
+            0 -> "Unsupported"
+            else -> status?.toString() ?: "Unknown"
+        }
+    }
+
+    fun formatCapacityLevel(level: Int?): String {
+        return when (level) {
+            1 -> "Critical"
+            2 -> "Low"
+            3 -> "Normal"
+            4 -> "High"
+            5 -> "Full"
+            0 -> "Unknown"
+            -1 -> "Unsupported"
+            else -> level?.toString() ?: "Unknown"
+        }
     }
 }
