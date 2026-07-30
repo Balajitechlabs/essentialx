@@ -28,7 +28,7 @@
     <string name="app_lock_description">Bảo mật ứng dụng của bạn bằng xác thực sinh trắc học. Các ứng dụng bị khóa sẽ yêu cầu xác thực khi khởi chạy, Luôn mở khóa cho đến khi màn hình tắt.</string>
     <string name="app_lock_warning">Xin lưu ý rằng đây không phải là giải pháp mạnh mẽ vì đây chỉ là ứng dụng của bên thứ 3. Nếu bạn cần bảo mật mạnh mẽ, hãy cân nhắc sử dụng Không gian riêng tư hoặc các tính năng tương tự khác.</string>
     <string name="app_lock_biometric_note">Một lưu ý khác, lời nhắc xác thực sinh trắc học chỉ cho phép bạn sử dụng các phương thức lớp bảo mật MẠNH. Các phương thức bảo mật mở khóa bằng khuôn mặt ở lớp YẾU trong các thiết bị như Pixel 7 sẽ chỉ có thể sử dụng các phương thức xác thực MẠNH khác có sẵn khác như dấu vân tay hoặc mã pin.</string>
-    <string name="setting_use_usage_access_title">Use usage access</string>
+    <string name="setting_use_usage_access_title">Sử dụng quyền truy cập</string>
     <string name="setting_use_usage_access_desc">Instead of accessibility (Freeze, App Lock, Dynamic Night Light)</string>
     <!-- Button Remap -->
     <string name="button_remap_enable_title">Bật bản đồ lại nút</string>
@@ -65,7 +65,7 @@
     <string name="like_song_toast_enabled">Hiển thị tin nhắn bánh mì nướng</string>
     <string name="like_song_aod_overlay_title">Hiển thị lớp phủ trên AOD</string>
     <string name="feat_essentials_on_display_title">Essentials On Display</string>
-    <string name="feat_essentials_on_display_desc">Glance at media and info on AOD</string>
+    <string name="feat_essentials_on_display_desc">Xem qua các phương tiện truyền thông và thông tin về AOD</string>
     <string name="essentials_on_display_docked_mode_title">Docked mode</string>
     <string name="essentials_on_display_docked_mode_desc">Keep the overlay visible indefinitely while music is playing on AOD</string>
     <string name="essentials_on_display_respect_notifications_title">Respect new notifications</string>
@@ -276,7 +276,7 @@
     <string name="warning_title">⚠️ CẢNH BÁO</string>
     <string name="screen_locked_security_auth_enable">Xác thực để bật bảo mật khóa màn hình</string>
     <string name="screen_locked_security_auth_disable">Xác thực để tắt bảo mật khóa màn hình</string>
-    <string name="screen_locked_security_desc">Disable quick setting tiles when the device is locked</string>
+    <string name="screen_locked_security_desc">Vô hiệu hóa các ô cài đặt nhanh khi thiết bị đang khóa</string>
     <string name="search_disable_qs_locked_title">Disable QS Locked</string>
     <string name="search_disable_qs_locked_desc">Prevent expanding Quick Settings when device is locked</string>
     <!-- Sound Mode -->
@@ -361,8 +361,8 @@
     <string name="feat_circle_to_search_gesture_desc">Long-press the bottom area to trigger Circle to Search</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
-    <string name="feat_other_customizations_title">Other customizations</string>
-    <string name="feat_other_customizations_desc">Additional system tweaks and modifications</string>
+    <string name="feat_other_customizations_title">Các tùy chỉnh khác</string>
+    <string name="feat_other_customizations_desc">Các tinh chỉnh và sửa đổi hệ thống bổ sung</string>
     <string name="status_bar_icons_disclaimer">Xin lưu ý rằng việc triển khai các tùy chọn này có thể phụ thuộc vào OEM và một số tùy chọn có thể không hoạt động.</string>
     <!-- Network Type Picker -->
     <string name="network_type_other">Khác</string>
@@ -442,9 +442,9 @@
     <string name="feat_always_on_display_title">Luôn hiển thị</string>
     <string name="feat_always_on_display_desc">Hiển thị thời gian và thông tin khi màn hình tắt</string>
     <string name="feat_calendar_sync_title">Đồng bộ hóa lịch</string>
-    <string name="feat_calendar_sync_desc">Sync your phone calendar to your watch</string>
-    <string name="feat_lock_from_watch_title">Lock from Watch</string>
-    <string name="feat_lock_from_watch_desc">Lock your phone remotely</string>
+    <string name="feat_calendar_sync_desc">Đồng bộ lịch trên điện thoại của bạn với đồng hồ.</string>
+    <string name="feat_lock_from_watch_title">Khóa từ đồng hồ</string>
+    <string name="feat_lock_from_watch_desc">Khóa điện thoại từ xa</string>
     <string name="remote_lock_mode_title">Lock Mode</string>
     <string name="remote_lock_mode_screen_off">Screen off</string>
     <string name="remote_lock_mode_lock">Lock</string>
@@ -612,10 +612,10 @@
     <string name="perm_battery_optimization_title">Tối ưu hóa pin</string>
     <string name="perm_battery_optimization_desc">Đảm bảo dịch vụ không bị hệ thống tắt để tiết kiệm điện năng.</string>
     <!-- Tabs -->
-    <string name="tab_essentials">Yếu tố cần thiết</string>
+    <string name="tab_essentials">Essentials</string>
     <string name="tab_freeze">Đông cứng</string>
-    <string name="tab_freeze_title">đông lạnh</string>
-    <string name="tab_diy">tự làm lấy</string>
+    <string name="tab_freeze_title">Frozen</string>
+    <string name="tab_diy">DIY</string>
     <string name="tab_apps">Ứng dụng</string>
     <string name="tab_freeze_subtitle">Ứng dụng bị vô hiệu hóa</string>
     <string name="tab_diy_subtitle">Tự làm</string>
@@ -706,8 +706,8 @@
     <string name="unit_seconds">%d seconds</string>
     <string name="unit_minute">1 minute</string>
     <string name="unit_minutes">%d minutes</string>
-    <string name="action_restart_systemui">Restart SystemUI</string>
-    <string name="desc_restart_systemui">Kills and restarts SystemUI process to apply some changes immediately</string>
+    <string name="action_restart_systemui">Khởi động lại giao diện người dùng hệ thống (SystemUI).</string>
+    <string name="desc_restart_systemui">Tắt và khởi động lại tiến trình SystemUI để áp dụng một số thay đổi ngay lập tức.</string>
     <string name="msg_error_load_release_notes">Couldn\'t load the release note</string>
     <string name="action_view_on_web">View on web</string>
     <string name="action_done">Xong</string>
@@ -1301,8 +1301,8 @@
     <string name="label_apps">Ứng dụng</string>
     <string name="feat_text_animations_title">Quy mô và hình ảnh động</string>
     <string name="feat_text_animations_desc">Điều chỉnh quy mô hệ thống và hình ảnh động</string>
-    <string name="feat_screen_refresh_rate_title">Screen Refresh Rate</string>
-    <string name="feat_screen_refresh_rate_desc">Set a fixed or ranged screen refresh rate</string>
+    <string name="feat_screen_refresh_rate_title">Tốc độ làm mới màn hình</string>
+    <string name="feat_screen_refresh_rate_desc">Đặt tốc độ làm mới màn hình cố định hoặc trong phạm vi nhất định.</string>
     <string name="settings_section_text">Chữ</string>
     <string name="label_font_scale">Tỷ lệ phông chữ</string>
     <string name="label_font_weight">Trọng lượng phông chữ</string>
@@ -1321,8 +1321,8 @@
     <string name="refresh_rate_section_values">Refresh Rate</string>
     <string name="refresh_rate_mode_fixed">Fixed</string>
     <string name="refresh_rate_mode_range">Range</string>
-    <string name="refresh_rate_fixed_title">Fixed refresh rate</string>
-    <string name="refresh_rate_fixed_desc">Set both minimum and peak refresh rate to the same value</string>
+    <string name="refresh_rate_fixed_title">Tốc độ làm mới cố định</string>
+    <string name="refresh_rate_fixed_desc">Đặt tốc độ làm mới tối thiểu và tốc độ làm mới tối đa bằng nhau.</string>
     <string name="refresh_rate_min_title">Minimum refresh rate</string>
     <string name="refresh_rate_min_desc">Choose the lowest refresh rate the display may use</string>
     <string name="refresh_rate_peak_title">Peak refresh rate</string>
@@ -1413,8 +1413,8 @@
     <string name="shut_up_auto_archive_action_freeze">Freeze now</string>
     <string name="shut_up_auto_archive_action_abort">Abort</string>
     <!-- Lock Screen Clock -->
-    <string name="feat_lock_screen_clock_title">Lock screen clock</string>
-    <string name="feat_lock_screen_clock_desc">Customize lock screen clock on Pixels</string>
+    <string name="feat_lock_screen_clock_title">Đồng hồ màn hình khóa</string>
+    <string name="feat_lock_screen_clock_desc">Tùy chỉnh đồng hồ màn hình khóa trên điện thoại Pixel</string>
     <string name="about_desc_lock_screen_clock">Change the lock screen clock style on Pixels. Select from the available clock faces provided by the System UI. Some old styles might not be available.</string>
     <string name="lock_screen_clock_bignum">Big Number</string>
     <string name="lock_screen_clock_calligraphy">Calligraphy</string>
@@ -1455,6 +1455,20 @@
     <string name="whats_new_apps_title">App Updates Migrated</string>
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
     <string name="settings_translate_mode">Chế độ dịch</string>
-    <string name="setting_swipe_tabs_title">Vuốt giữa các thẻ</string>
+    <string name="setting_swipe_tabs_title">Vuốt để chuyển đổi giữa các tab</string>
     <string name="setting_swipe_tabs_desc">Trên màn hình chính</string>
+    <string name="feat_safe_volume_title">Vô hiệu hóa cảnh báo âm lượng an toàn</string>
+    <string name="feat_safe_volume_desc">Ẩn hộp thoại cảnh báo âm lượng lớn</string>
+    <string name="feat_notification_snoozing_title">Tạm dừng thông báo</string>
+    <string name="feat_notification_snoozing_desc">Thay đổi lịch thông báo</string>
+    <string name="feat_power_battery_title">Nguồn và pin</string>
+    <string name="feat_power_battery_desc">Cấu hình các chính sách tiết kiệm năng lượng</string>
+    <string name="feat_flashlight_title">Đèn pin</string>
+    <string name="feat_flashlight_desc">Cải thiện hoạt động của đèn pin</string>
+    <string name="feat_pixel_searchbar_title">Thay thế thanh tìm kiếm</string>
+    <string name="feat_pixel_searchbar_desc">Thay thế thanh tìm kiếm mặc định của Pixel Launcher.</string>
+    <string name="feat_pocket_mode_desc">Tránh chạm nhầm khi đang để trong túi.</string>
+    <string name="feat_watch_controls_desc">Tùy chỉnh các điều khiển ứng dụng WearOS</string>
+    <string name="setting_enable_unsupported_features_title">Kích hoạt các tính năng chưa được hỗ trợ</string>
+    <string name="setting_enable_unsupported_features_desc">Hiển thị các tính năng dành riêng cho nhà sản xuất thiết bị gốc (OEM) hoặc các tính năng dư thừa bị ẩn theo mặc định.</string>
 </resources>
