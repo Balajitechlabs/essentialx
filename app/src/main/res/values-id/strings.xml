@@ -17,4 +17,22 @@ Sebuah ikon praktis untuk mengubah mode dering tanpa menggunakan tombol volume a
     <string name="about_desc_notification_lighting">Notification Lighting menambahkan efek pencahayaan tepi yang indah saat Anda menerima notifikasi.
 
 Anda dapat menyesuaikan gaya animasi, warna, dan perilakunya. Fitur ini berfungsi bahkan saat layar mati (tergantung OEM) atau berada di atas aplikasi yang sedang Anda gunakan. Pilih aplikasi, prioritas notifikasi, atau perilaku apa yang seharusnya dipicu dari kontrol yang tersedia. Jika OEM Anda tidak mendukung overlay di atas AOD, gunakan opsi Tampilan Ambient yang terdapat di bawah ini.</string>
+    <string name="feat_safe_volume_title">Nonaktifkan peringatan volume aman</string>
+    <string name="feat_safe_volume_desc">Redam dialog dengan volume keras.</string>
+    <string name="feat_screen_locked_security_title">Keamanan layar terkunci</string>
+    <string name="screen_locked_security_desc">Nonaktifkan ubin pengaturan cepat saat perangkat terkunci.</string>
+    <string name="screen_locked_security_dialog_title">Nonaktifkan ubin QS saat perangkat terkunci.</string>
+    <string name="shut_up_restore_delay_title">Penundaan Pemulihan</string>
+    <string name="shut_up_restore_delay_desc">Waktu tunggu sebelum memulihkan pengaturan setelah keluar dari aplikasi Shut-Up!</string>
+    <string name="feat_notification_lighting_title">Lampu notifikasi</string>
+    <string name="feat_notification_lighting_desc">Lampu indikator menyala untuk notifikasi.</string>
+    <string name="flashlight_pulse_title">Denyut cahaya senter</string>
+    <string name="feat_flashlight_pulse_desc">Nyalakan senter sebentar untuk menerima notifikasi.</string>
+    <string name="feat_snooze_notifications_title">Tunda notifikasi sistem</string>
+    <string name="feat_snooze_notifications_desc">Tunda notifikasi tetap</string>
+    <string name="perm_notif_listener_title">Pendengar Notifikasi</string>
+    <string name="feat_notification_snoozing_title">Notifikasi tertunda</string>
+    <string name="feat_notification_snoozing_desc">Pemberitahuan penjadwalan ulang</string>
+    <string name="feat_battery_notification_title">Pemberitahuan baterai</string>
+    <string name="feat_battery_notification_desc">Notifikasi status baterai yang terus-menerus</string>
 </resources>
