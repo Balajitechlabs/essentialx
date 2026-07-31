@@ -1471,4 +1471,15 @@
     <string name="flashlight_overheat_desc">Uzun süreli kullanımda parlaklığı düşür</string>
     <string name="feat_daily_wallpaper_title">Duvar kağıdı</string>
     <string name="feat_daily_wallpaper_desc">Günlük olarak derlenen ve canlı duvar kağıdı</string>
+    <string name="about_desc_notification_snoozing">Bildirimlerde erteleme düğmesini etkinleştirin ve bildirimleri daha sonraya ertelemek için özel aralık seçeneklerini ve varsayılan süreyi yapılandırın.</string>
+    <string name="feat_pocket_mode_title">Cep modu</string>
+    <string name="feat_pocket_mode_desc">Cepteyken yanlışlıkla dokunmayı önleyin</string>
+    <string name="feat_watch_controls_desc">WearOS uygulama kontrollerini özelleştirin</string>
+    <string name="feat_watch_controls_title">Özelleştir</string>
+    <string name="feat_sync_location_reached_title">Henüz orada mıyız durumunu senkronize et</string>
+    <string name="feat_sync_location_reached_desc">Cihaz kutucuğunda gösterilecek</string>
+    <string name="feat_watch_wireless_debugging_title">Kablosuz Hata Ayıklama</string>
+    <string name="feat_watch_wireless_debugging_desc">Uzaktan etkinleştirin</string>
+    <string name="feat_sync_sound_mode_title">Ses modunu senkronize et</string>
+    <string name="feat_sync_sound_mode_desc">Saatle otomatik olarak senkronize et</string>
 </resources>
