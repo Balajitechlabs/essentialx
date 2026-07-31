@@ -174,7 +174,7 @@
     <string name="notification_lighting_skip_silent_title">Bỏ qua thông báo im lặng</string>
     <string name="notification_lighting_skip_persistent_title">Bỏ qua thông báo liên tục</string>
     <string name="settings_section_flashlight_pulse">Xung đèn pin</string>
-    <string name="flashlight_pulse_title">Xung đèn pin</string>
+    <string name="flashlight_pulse_title">Sáng đèn pin</string>
     <string name="flashlight_pulse_facedown_title">Chỉ khi úp mặt xuống</string>
     <string name="flashlight_pulse_same_as_lighting_title">Ứng dụng tương tự như đèn thông báo</string>
     <string name="flashlight_pulse_max_brightness">Max brightness</string>
@@ -313,7 +313,7 @@
     <string name="icon_clock">Cái đồng hồ</string>
     <string name="icon_ime">Phương thức nhập (IME)</string>
     <string name="icon_alarm">Báo thức</string>
-    <string name="icon_battery">Ắc quy</string>
+    <string name="icon_battery">Pin</string>
     <string name="icon_power_saving">Tiết kiệm điện</string>
     <string name="icon_data_saver">Trình tiết kiệm dữ liệu</string>
     <string name="icon_rotation_lock">Khóa xoay</string>
@@ -397,7 +397,7 @@
     <string name="feat_maps_power_saving_desc">Dành cho mọi thiết bị Android</string>
     <string name="feat_notification_lighting_title">Chiếu sáng thông báo</string>
     <string name="feat_notification_lighting_desc">Sáng lên để nhận thông báo</string>
-    <string name="feat_flashlight_pulse_desc">Xung đèn pin để thông báo</string>
+    <string name="feat_flashlight_pulse_desc">Tự động sáng đèn pin khi có thông báo</string>
     <string name="feat_sound_mode_tile_title">Ô chế độ âm thanh</string>
     <string name="feat_call_vibrations_title">Rung cuộc gọi</string>
     <string name="feat_call_vibrations_desc">Rung khi thực hiện cuộc gọi</string>
@@ -437,14 +437,14 @@
     <string name="app_lock_auto_lock_delay_30min">30 minutes</string>
     <string name="feat_freeze_title">Đông cứng</string>
     <string name="feat_freeze_desc">Vô hiệu hóa các ứng dụng ít sử dụng</string>
-    <string name="feat_watermark_title">Hình mờ</string>
+    <string name="feat_watermark_title">Dấu chìm</string>
     <string name="feat_watermark_desc">Thêm dữ liệu EXIF ​​​​và logo vào ảnh</string>
     <string name="feat_always_on_display_title">Luôn hiển thị</string>
     <string name="feat_always_on_display_desc">Hiển thị thời gian và thông tin khi màn hình tắt</string>
     <string name="feat_calendar_sync_title">Đồng bộ hóa lịch</string>
-    <string name="feat_calendar_sync_desc">Sync your phone calendar to your watch</string>
-    <string name="feat_lock_from_watch_title">Lock from Watch</string>
-    <string name="feat_lock_from_watch_desc">Lock your phone remotely</string>
+    <string name="feat_calendar_sync_desc">Đồng bộ lịch trên điện thoại của bạn với đồng hồ</string>
+    <string name="feat_lock_from_watch_title">Khoá thiết bị từ Đồng hồ</string>
+    <string name="feat_lock_from_watch_desc">Khóa điện thoại từ xa</string>
     <string name="remote_lock_mode_title">Lock Mode</string>
     <string name="remote_lock_mode_screen_off">Screen off</string>
     <string name="remote_lock_mode_lock">Lock</string>
@@ -1130,7 +1130,7 @@
     <string name="location_reached_open_maps">Mở Bản đồ</string>
     <string name="location_reached_fsi_title">Quyền báo động toàn màn hình</string>
     <string name="location_reached_fsi_desc">Cần thiết để đánh thức thiết bị của bạn khi đến nơi. Nhấn để cấp.</string>
-    <string name="location_reached_dist_m">%1$d tôi</string>
+    <string name="location_reached_dist_m">RAM</string>
     <string name="location_reached_dist_km">%1$.1f km</string>
     <string name="location_reached_service_title">Cảnh báo hành trình đang hoạt động</string>
     <string name="location_reached_service_remaining">%1$s còn lại (%2$d%%)</string>
@@ -1173,7 +1173,7 @@
     <string name="download_airsync">Tải xuống ứng dụng AirSync</string>
     <string name="download_airsync_summary">Cần thiết để đồng bộ hóa pin Mac</string>
     <string name="feat_battery_notification_title">Thông báo pin</string>
-    <string name="feat_battery_notification_desc">Thông báo trạng thái pin liên tục</string>
+    <string name="feat_battery_notification_desc">Thông báo trạng thái pin của thiết bị liên tục</string>
     <string name="battery_notification_hint">This notification displays battery levels for your connected Mac and Bluetooth devices. You can configure which devices to show in the Battery Widget settings.</string>
     <string name="about_desc_battery_notification">Tái tạo trải nghiệm tiện ích pin trong bóng thông báo của bạn. Nó sẽ hiển thị mức pin của tất cả các thiết bị được kết nối của bạn trong một thông báo liên tục, được cập nhật theo thời gian thực. Điều này bao gồm máy Mac của bạn (thông qua AirSync) và các phụ kiện Bluetooth.</string>
     <string name="battery_notification_channel_name">Thông báo trạng thái pin</string>
@@ -1228,9 +1228,9 @@
     <string name="feat_notifications_alerts_desc">Không bao giờ bỏ lỡ các ưu tiên của bạn</string>
     <string name="feat_input_actions_title">Đầu vào và hành động</string>
     <string name="feat_input_actions_desc">Điều khiển thiết bị của bạn một cách dễ dàng</string>
-    <string name="feat_widgets_title">Widget</string>
+    <string name="feat_widgets_title">Tiện ích</string>
     <string name="feat_widgets_desc">Nhìn thoáng qua trên màn hình chính của bạn</string>
-    <string name="feat_display_visuals_title">Trưng bày</string>
+    <string name="feat_display_visuals_title">Màn hình</string>
     <string name="feat_display_visuals_desc">Hình ảnh để nâng cao trải nghiệm của bạn</string>
     <string name="feat_watch_title">Đồng hồ</string>
     <string name="feat_watch_desc">Tích hợp với WearOS</string>
@@ -1344,7 +1344,7 @@
     <string name="feat_auto_accessibility_desc">Tự động cấp quyền truy cập khi khởi chạy ứng dụng nếu bị thiếu bằng cách sử dụng WRITE_SECURE_SETTINGS.</string>
     <string name="label_help_guide">Trợ giúp và hướng dẫn</string>
     <string name="tab_your_android">Android của bạn</string>
-    <string name="label_device_storage">Kho</string>
+    <string name="label_device_storage">Bộ nhớ</string>
     <string name="label_device_ram">Ký ức</string>
     <string name="label_use_blur">Sử dụng làm mờ</string>
     <string name="desc_use_blur">Bật các phần tử làm mờ lũy tiến trên giao diện người dùng</string>
@@ -1384,8 +1384,8 @@
     <string name="live_wallpaper_label">Live Wallpaper</string>
     <string name="live_wallpaper_description">A video live wallpaper that plays when unlocked.</string>
     <string name="live_wallpaper_playback_trigger_title">Play when</string>
-    <string name="live_wallpaper_trigger_unlock">Unlock</string>
-    <string name="live_wallpaper_trigger_screen_on">Screen on</string>
+    <string name="live_wallpaper_trigger_unlock">Mở khoá</string>
+    <string name="live_wallpaper_trigger_screen_on">Màn hình bật</string>
     <string name="live_wallpaper_video_title">Video</string>
     <string name="btn_apply">Apply</string>
     <string name="add_video">Add video</string>
@@ -1393,7 +1393,7 @@
     <string name="about_desc_live_wallpaper">Set your favorite video as your home screen wallpaper. Choose between triggering the animation upon unlocking or simply whenever the screen turns on for a dynamic experience.</string>
     <!-- Shut-Up! Feature -->
     <string name="feat_shut_up_title">Shut-Up!</string>
-    <string name="feat_shut_up_desc">I know what I\'m doing</string>
+    <string name="feat_shut_up_desc">Tôi biết tôi đang làm cái gì</string>
     <string name="shut_up_description">Shut-Up! bypasses app restrictions and checks for developer options, accessibility and debugging by dynamically hiding them when you launch sensitive apps. \n\nUse the custom shortcuts to ensure settings are hidden before the app launches.</string>
     <string name="shut_up_select_apps_title">Select Apps</string>
     <string name="shut_up_select_apps_desc">Choose apps to apply Shut-Up! logic</string>
@@ -1457,4 +1457,22 @@
     <string name="settings_translate_mode">Chế độ dịch</string>
     <string name="setting_swipe_tabs_title">Vuốt giữa các thẻ</string>
     <string name="setting_swipe_tabs_desc">Trên màn hình chính</string>
+    <string name="feat_daily_wallpaper_title">Hình nền</string>
+    <string name="feat_daily_wallpaper_desc">Những hình nền hàng ngày và hình nền động</string>
+    <string name="label_battery_tab_info">Thông tin</string>
+    <string name="feat_safe_volume_title">Tắt cảnh báo âm lượng an toàn</string>
+    <string name="feat_notification_snoozing_title">Tạm dừng thông báo</string>
+    <string name="feat_notification_snoozing_desc">Thay đổi lịch thông báo</string>
+    <string name="feat_power_battery_title">Năng lượng và pin</string>
+    <string name="feat_power_battery_desc">Cấu hình các chính sách tiết kiệm năng lượng</string>
+    <string name="feat_flashlight_title">Đèn pin</string>
+    <string name="feat_flashlight_desc">Cải thiện hoạt động của đèn pin</string>
+    <string name="feat_sync_sound_mode_title">Đồng bộ chế độ âm thanh</string>
+    <string name="feat_sync_sound_mode_desc">Tự động đồng bộ với đồng hồ</string>
+    <string name="feat_watch_controls_title">Tùy chỉnh</string>
+    <string name="feat_watch_controls_desc">Tùy chỉnh các điều khiển ứng dụng WearOS</string>
+    <string name="feat_sync_location_reached_title">Đồng bộ hóa trạng thái Chúng ta đã đến nơi chưa</string>
+    <string name="feat_sync_location_reached_desc">Sẽ được hiển thị trong ô trên thiết bị</string>
+    <string name="feat_watch_wireless_debugging_title">Gỡ lỗi không dây</string>
+    <string name="feat_watch_wireless_debugging_desc">Kích hoạt từ xa</string>
 </resources>
