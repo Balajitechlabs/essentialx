@@ -1484,4 +1484,12 @@
     <string name="setting_enable_unsupported_features_desc">Mostrar recursos específicos do fabricante ou redundantes que estão ocultos por padrão.</string>
     <string name="setting_swipe_tabs_title">Deslizar entre guias</string>
     <string name="setting_swipe_tabs_desc">Na tela inicial</string>
+    <string name="label_screen_on_drain">Consumo Com A Tela Ligada</string>
+    <string name="label_screen_max_drain">Consumo Máximo da Tela</string>
+    <string name="label_camera_drain">Consumo da Câmera</string>
+    <string name="label_cpu_idle_drain">Consumo da CPU Em Repouso</string>
+    <string name="label_cpu_suspend_drain">Consumo da CPU Em Suspensão</string>
+    <string name="label_thermal_skin">Temperatura da Superfície</string>
+    <string name="label_thermal_gpu">Temperatura da GPU</string>
+    <string name="label_thermal_cpu">Temperatura da CPU</string>
 </resources>
