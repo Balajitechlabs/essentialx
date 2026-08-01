@@ -763,7 +763,7 @@
     <string name="unit_minute">1 minute</string>
     <string name="unit_minutes">%d minutes</string>
     <string name="action_restart_systemui">Mulai ulang SystemUI</string>
-    <string name="desc_restart_systemui">Kills and restarts SystemUI process to apply some changes immediately</string>
+    <string name="desc_restart_systemui">Matikan dan mulai ulang proses SystemUI untuk segera mengatur perubahan</string>
     <string name="tile_restart_systemui">SystemUI Restart</string>
     <string name="tile_restart_systemui_subtitle_restart">Now</string>
     <string name="about_desc_restart_systemui_tile">Easily restart SystemUI directly from your Quick Settings panel. Helpful to quickly resolve status bar glitches or apply system UI modifications immediately. Requires root or Shizuku shell access.</string>
