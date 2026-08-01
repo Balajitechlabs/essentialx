@@ -1512,7 +1512,7 @@
     <string name="feat_auto_accessibility_desc">Automatically grants the accessibility permission on app launch if missing using WRITE_SECURE_SETTINGS.</string>
     <string name="label_help_guide">Bantuan dan Pedoman</string>
     <string name="tab_your_android">Your Android</string>
-    <string name="label_device_storage">Storage</string>
+    <string name="label_device_storage">Penyimpanan</string>
     <string name="label_device_ram">Memory</string>
     <string name="label_use_blur">Gunakan blur</string>
     <string name="desc_use_blur">Enable progressive blur elements across the UI</string>
