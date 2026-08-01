@@ -292,7 +292,7 @@
     <string name="warning_title">⚠️ PERINGATAN</string>
     <string name="screen_locked_security_auth_enable">Konfirmasi untuk menghidupkan fitur ini</string>
     <string name="screen_locked_security_auth_disable">Konfirmasi untuk menonaktifkan fitur ini</string>
-    <string name="screen_locked_security_desc">Disable quick setting tiles when the device is locked</string>
+    <string name="screen_locked_security_desc">Matikan ubin pengaturan cepat saat perangkat dikunci</string>
     <string name="search_disable_qs_locked_title">Disable QS Locked</string>
     <string name="search_disable_qs_locked_desc">Prevent expanding Quick Settings when device is locked</string>
     <!-- Sound Mode -->
@@ -424,8 +424,8 @@
     <string name="feat_caffeinate_desc">Keep the screen awake</string>
     <string name="feat_maps_power_saving_title">Maps mode daya rendah</string>
     <string name="feat_maps_power_saving_desc">Untuk semua perangkat Android</string>
-    <string name="feat_notification_lighting_title">Notification lighting</string>
-    <string name="feat_notification_lighting_desc">Light up for notifications</string>
+    <string name="feat_notification_lighting_title">Cahaya pemberitahuan</string>
+    <string name="feat_notification_lighting_desc">Nyalakan untuk pemberitahuan</string>
     <string name="feat_flashlight_pulse_desc">Pulse the flashlight for notifications</string>
     <string name="feat_sound_mode_tile_title">Sound mode tile</string>
     <string name="feat_call_vibrations_title">Call vibrations</string>
@@ -447,9 +447,9 @@
     <string name="diy_create_pixel_searchbar_desc">Tap action for Pixel searchbar replacement</string>
     <string name="diy_editor_new_title">New Automation</string>
     <string name="diy_editor_edit_title">Edit Automation</string>
-    <string name="feat_link_actions_title">Link actions</string>
+    <string name="feat_link_actions_title">Aksi tautan</string>
     <string name="feat_link_actions_desc">Handle links with multiple apps</string>
-    <string name="feat_flashlight_title">Flashlight</string>
+    <string name="feat_flashlight_title">Lampu kilat</string>
     <string name="feat_flashlight_desc">Improve flashlight behavior</string>
     <string name="label_restore_mode">Restore mode</string>
     <string name="feat_snooze_notifications_title">Snooze system notifications</string>
@@ -460,8 +460,8 @@
     <string name="feat_button_remap_desc">Remap hardware button actions</string>
     <string name="feat_dynamic_night_light_title">Dynamic night light</string>
     <string name="feat_dynamic_night_light_desc">Toggle night light based on app</string>
-    <string name="feat_screen_locked_security_title">Screen locked security</string>
-    <string name="feat_app_lock_title">App lock</string>
+    <string name="feat_screen_locked_security_title">Keamanan layar kunci</string>
+    <string name="feat_app_lock_title">Kunci aplikasi</string>
     <string name="feat_app_lock_desc">Lindungi aplikasi dengan Biometrik</string>
     <string name="app_lock_auto_lock_delay_title">Auto lock delay</string>
     <string name="app_lock_auto_lock_delay_desc">After leaving the app</string>
@@ -742,9 +742,9 @@
     <string name="label_app_settings">App Settings</string>
     <string name="label_app_language">Bahasa</string>
     <string name="label_haptic_feedback">Haptic Feedback</string>
-    <string name="label_updates">Updates</string>
-    <string name="label_auto_check_updates">Auto check for updates</string>
-    <string name="desc_auto_check_updates">Check for updates at app launch</string>
+    <string name="label_updates">Pembaruan</string>
+    <string name="label_auto_check_updates">Periksa otomatis untuk pembaruan</string>
+    <string name="desc_auto_check_updates">Periksa pembaruan saat aplikasi dimulai</string>
     <string name="action_all_set">Semua selesai</string>
     <string name="action_check_whats_new">Check What\'s New?</string>
     <string name="welcome_back_title">Welcome back to Essentials</string>
@@ -1222,8 +1222,8 @@
     <string name="location_reached_alarm_subtitle">Prepare to get off</string>
     <string name="location_reached_dismiss">Dismiss</string>
     <string name="location_reached_toast_set">Destination set: %1$.4f, %2$.4f</string>
-    <string name="setting_use_root_title">Use Root</string>
-    <string name="setting_use_root_desc">Instead of Shizuku</string>
+    <string name="setting_use_root_title">Gunakan Root</string>
+    <string name="setting_use_root_desc">Daripada dengan Shizuku</string>
     <string name="root_not_available_toast">Root access not available. Please check your root manager.</string>
     <!-- System Keyboard -->
     <string name="feat_system_keyboard_title">Keyboard</string>
@@ -1274,7 +1274,7 @@
     <string name="label_release_notes">Release Notes</string>
     <string name="msg_no_repos_tracked">No repositories tracked yet</string>
     <string name="label_no_app_linked">No app linked</string>
-    <string name="format_updated_relative">Updated %1$s</string>
+    <string name="format_updated_relative">Diperbarui %1$s</string>
     <!-- Relative Time -->
     <string name="time_just_now">just now</string>
     <string name="today">Today</string>
@@ -1335,7 +1335,7 @@
     <string name="feat_sync_location_reached_desc">To be shown in device tile</string>
     <string name="perm_watch_write_secure_title">Watch Secure Settings</string>
     <string name="perm_watch_write_secure_desc">Requires secure settings write permission on your Watch. Grant it using the ADB command below.</string>
-    <string name="feat_power_battery_title">Power and battery</string>
+    <string name="feat_power_battery_title">Daya dan baterai</string>
     <string name="feat_power_battery_desc">Configure the power saving policies</string>
     <string name="label_low_power_trigger_level">Custom trigger level</string>
     <string name="desc_low_power_trigger_level">for power saving</string>
@@ -1510,7 +1510,7 @@
     <string name="feat_aod_force_turn_off_desc">Force turn off the AOD when no notifications. Requires accessibility permission.</string>
     <string name="feat_auto_accessibility_title">Auto accessibility</string>
     <string name="feat_auto_accessibility_desc">Automatically grants the accessibility permission on app launch if missing using WRITE_SECURE_SETTINGS.</string>
-    <string name="label_help_guide">Help and Guides</string>
+    <string name="label_help_guide">Bantuan dan Pedoman</string>
     <string name="tab_your_android">Your Android</string>
     <string name="label_device_storage">Storage</string>
     <string name="label_device_ram">Memory</string>
@@ -1562,7 +1562,7 @@
     <string name="custom_video">Custom video</string>
     <string name="about_desc_live_wallpaper">Atur video favorit Anda sebagai wallpaper layar beranda. Pilih antara memicu animasi saat membuka kunci atau setiap kali layar menyala untuk pengalaman yang dinamis.</string>
     <!-- Shut-Up! Feature -->
-    <string name="feat_shut_up_title">Shut-Up!</string>
+    <string name="feat_shut_up_title">Diam!</string>
     <string name="feat_shut_up_desc">Aku tau apa yang kulakukan</string>
     <string name="shut_up_description">Shut-Up! melewati pembatasan aplikasi dan pemeriksaan opsi pengembang, aksesibilitas, dan debugging dengan menyembunyikannya secara dinamis saat Anda meluncurkan aplikasi sensitif. \n\nGunakan pintasan khusus untuk memastikan pengaturan disembunyikan sebelum aplikasi diluncurkan.</string>
     <string name="shut_up_select_apps_title">Pilih aplikasi</string>
