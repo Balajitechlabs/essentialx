@@ -443,8 +443,8 @@
     <string name="feat_always_on_display_desc">屏幕关闭时显示时间和信息</string>
     <string name="feat_calendar_sync_title">日历同步</string>
     <string name="feat_calendar_sync_desc">Sync your phone calendar to your watch</string>
-    <string name="feat_lock_from_watch_title">Lock from Watch</string>
-    <string name="feat_lock_from_watch_desc">Lock your phone remotely</string>
+    <string name="feat_lock_from_watch_title">通过手表锁定</string>
+    <string name="feat_lock_from_watch_desc">远程锁定手机</string>
     <string name="remote_lock_mode_title">Lock Mode</string>
     <string name="remote_lock_mode_screen_off">Screen off</string>
     <string name="remote_lock_mode_lock">Lock</string>
@@ -1516,4 +1516,11 @@
     <string name="pocket_mode_trigger_delay_title">触发延迟</string>
     <string name="pocket_mode_lock_screen_only_title">仅限锁屏</string>
     <string name="pocket_mode_lock_screen_only_desc">仅在设备锁定时触发口袋模式</string>
+    <string name="feat_daily_wallpaper_title">壁纸</string>
+    <string name="feat_daily_wallpaper_desc">每日精选壁纸</string>
+    <string name="feat_safe_volume_title">关闭安全音量警告</string>
+    <string name="feat_safe_volume_desc">抑制高音量对话框</string>
+    <string name="feat_watch_wireless_debugging_title">无线调试</string>
+    <string name="feat_sync_location_reached_title">同步“我们到了吗”状态</string>
+    <string name="feat_sync_sound_mode_title">同步声音模式</string>
 </resources>
