@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -43,6 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.components.cards.SelectionCardItem
+import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.WifiUtil
 import kotlinx.coroutines.Dispatchers
@@ -118,29 +121,17 @@ fun WifiNetworkSelectionSheet(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(savedNetworks) { network ->
-                            ListItem(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        HapticUtil.performUIHaptic(view)
-                                        onSave(network)
-                                    },
-                                headlineContent = { Text(network) },
-                                leadingContent = {
-                                    Icon(
-                                        painter = painterResource(R.drawable.rounded_android_wifi_4_bar_plus_24),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary
-                                    )
-                                },
-                                colors = ListItemDefaults.colors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceBright
+                    RoundedCardContainer {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            items(savedNetworks) { network ->
+                                SelectionCardItem(
+                                    title = network,
+                                    iconRes = R.drawable.rounded_android_wifi_4_bar_plus_24,
+                                    onClick = { onSave(network) }
                                 )
-                            )
+                            }
                         }
                     }
                 }

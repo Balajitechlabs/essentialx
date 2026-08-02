@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,9 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -27,15 +23,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.components.cards.SelectionCardItem
+import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.BluetoothPairedDevicesUtil
-import com.sameerasw.essentials.utils.HapticUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +39,6 @@ fun BluetoothDeviceSelectionSheet(
     onSave: (address: String, name: String) -> Unit
 ) {
     val context = LocalContext.current
-    val view = LocalView.current
 
     var hasPermission by remember {
         mutableStateOf(
@@ -101,30 +95,18 @@ fun BluetoothDeviceSelectionSheet(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    items(devices) { device ->
-                        ListItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    HapticUtil.performUIHaptic(view)
-                                    onSave(device.address, device.name)
-                                },
-                            headlineContent = { Text(device.name) },
-                            supportingContent = { Text(device.address) },
-                            leadingContent = {
-                                Icon(
-                                    painter = painterResource(R.drawable.rounded_bluetooth_24),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            colors = ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.surfaceBright
+                RoundedCardContainer {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        items(devices) { device ->
+                            SelectionCardItem(
+                                title = device.name,
+                                description = device.address,
+                                iconRes = R.drawable.rounded_bluetooth_24,
+                                onClick = { onSave(device.address, device.name) }
                             )
-                        )
+                        }
                     }
                 }
             }
