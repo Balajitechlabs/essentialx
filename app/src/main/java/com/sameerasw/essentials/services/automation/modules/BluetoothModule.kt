@@ -46,20 +46,26 @@ class BluetoothModule : AutomationModule {
         }
     }
 
+    private var appContext: Context? = null
+
     override fun start(context: Context) {
+        val appCtx = context.applicationContext
+        appContext = appCtx
         val filter = IntentFilter().apply {
             addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
         }
-        context.registerReceiver(receiver, filter)
+        appCtx.registerReceiver(receiver, filter)
     }
 
     override fun stop(context: Context) {
+        val appCtx = appContext ?: context.applicationContext
         try {
-            context.unregisterReceiver(receiver)
+            appCtx.unregisterReceiver(receiver)
         } catch (e: Exception) {
             // Ignore if not registered
         }
+        appContext = null
     }
 
     override fun updateAutomations(automations: List<Automation>) {
