@@ -877,6 +877,17 @@
     <string name="diy_trigger_charger_connected">Charger Connected</string>
     <string name="diy_trigger_charger_disconnected">Charger Disconnected</string>
     <string name="diy_trigger_schedule">Schedule</string>
+    <string name="diy_trigger_bluetooth_connected">Bluetooth Device Connected</string>
+    <string name="diy_trigger_bluetooth_disconnected">Bluetooth Device Disconnected</string>
+    <string name="diy_trigger_wifi_connected">Wi-Fi Network Connected</string>
+    <string name="diy_trigger_wifi_disconnected">Wi-Fi Network Disconnected</string>
+    <string name="diy_select_bluetooth_device_title">Select Bluetooth Device</string>
+    <string name="diy_bluetooth_permission_required">Bluetooth permission is required to list paired devices.</string>
+    <string name="diy_no_paired_bluetooth_devices">No paired Bluetooth devices found. Pair a device first in system settings.</string>
+    <string name="diy_select_wifi_network_title">Select Wi-Fi Network</string>
+    <string name="diy_wifi_ssid_label">Network name (SSID)</string>
+    <string name="diy_use_current_network">Use Current Network</string>
+    <string name="diy_saved_networks_via_shizuku">Saved networks (via Shizuku)</string>
     <string name="diy_state_time_period">Time Period</string>
     <string name="diy_time_selection_title">Select Time</string>
     <string name="diy_time_range_selection_title">Select Time Range</string>
