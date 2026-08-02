@@ -42,9 +42,8 @@ fun FeatureHelpBottomSheet(
     viewModel: MainViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+    EssentialsBottomSheet(
+        onDismissRequest = onDismissRequest
     ) {
         Column(
             modifier = Modifier

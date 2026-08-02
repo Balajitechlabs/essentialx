@@ -1462,4 +1462,7 @@
     <string name="feat_flashlight_desc">Améliorer le fonctionnement de la lampe de poche</string>
     <string name="feat_notification_snoozing_title">Mise en veille des notifications</string>
     <string name="feat_notification_snoozing_desc">Reprogrammer les notifications</string>
+    <string name="feat_pixel_searchbar_title">Remplacer la barre de recherche</string>
+    <string name="feat_pixel_searchbar_desc">Remplacer la barre de recherche par défaut de Pixel Launcher.</string>
+    <string name="feat_pocket_mode_title">Mode poche</string>
 </resources>

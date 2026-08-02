@@ -41,7 +41,7 @@
     <string name="settings_section_flashlight">Torcia</string>
     <string name="flashlight_options_title">Impostazioni torcia</string>
     <string name="flashlight_options_desc">Regola la dissolvenza e altre impostazioni</string>
-    <string name="setting_pitch_black_theme_title">Tema nero OLED</string>
+    <string name="setting_pitch_black_theme_title">Tema scuro OLED</string>
     <string name="setting_pitch_black_theme_desc">Utilizza lo sfondo nero puro in modalità scura</string>
     <string name="settings_section_haptic">Feedback Aptico</string>
     <string name="button_remap_section_long_press">Rimappa pressione prolungata</string>
@@ -1140,7 +1140,7 @@
     <string name="location_reached_alarm_subtitle">Preparati a scendere</string>
     <string name="location_reached_dismiss">Congedare</string>
     <string name="location_reached_toast_set">Destinazione impostata: %1$.4f, %2$.4f</string>
-    <string name="setting_use_root_title">Usa Radice</string>
+    <string name="setting_use_root_title">Usa Root</string>
     <string name="setting_use_root_desc">Invece di Shizuku</string>
     <string name="root_not_available_toast">Accesso root non disponibile. Controlla il tuo root manager.</string>
     <!-- System Keyboard -->
@@ -1458,4 +1458,9 @@
     <string name="feat_sync_location_reached_desc">Da mostrare nel pulsante del dispositivo</string>
     <string name="feat_daily_wallpaper_desc">Sfondo curato scelto a mano ogni giorno</string>
     <string name="settings_translated_texts">Tradotto</string>
+    <string name="setting_enable_unsupported_features_title">Attiva funzioni non supportate</string>
+    <string name="feat_daily_wallpaper_title">Sfondo</string>
+    <string name="feat_pocket_mode_title">Modalità tasca</string>
+    <string name="feat_pocket_mode_desc">Previene tocchi accidentali quando il telefono è in tasca</string>
+    <string name="feat_watch_wireless_debugging_desc">Attiva da remoto</string>
 </resources>

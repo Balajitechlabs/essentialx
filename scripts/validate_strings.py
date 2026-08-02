@@ -145,6 +145,7 @@ def validate_file(file_path, base_strings, auto_fix=False):
             'key': 'XML_SYNTAX',
             'type': 'XML_SYNTAX_ERROR',
             'msg': f"XML syntax error: {pe}",
+            'is_error': True,
             'fixable': False
         }], False
 
@@ -172,6 +173,7 @@ def validate_file(file_path, base_strings, auto_fix=False):
                     'key': key,
                     'type': 'DUPLICATE_KEY',
                     'msg': f"Duplicate string resource key '{key}' in same file.",
+                    'is_error': True,
                     'fixable': False
                 })
             seen_keys.add(key)
