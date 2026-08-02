@@ -33,14 +33,14 @@ data class DeviceInfo(
 
 object DeviceUtils {
     fun isGoogleDevice(): Boolean {
-        return Build.MANUFACTURER.equalsIgnoreCase("google") ||
-                Build.BRAND.equalsIgnoreCase("google") ||
+        return Build.MANUFACTURER.equals("google", ignoreCase = true) ||
+                Build.BRAND.equals("google", ignoreCase = true) ||
                 Build.PRODUCT.contains("pixel", ignoreCase = true)
     }
 
     fun isSamsungDevice(): Boolean {
-        return Build.MANUFACTURER.equalsIgnoreCase("samsung") ||
-                Build.BRAND.equalsIgnoreCase("samsung")
+        return Build.MANUFACTURER.equals("samsung", ignoreCase = true) ||
+                Build.BRAND.equals("samsung", ignoreCase = true)
     }
 
     fun getDeviceInfo(context: Context): DeviceInfo {
