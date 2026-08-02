@@ -177,7 +177,7 @@ object BatteryInfoUtil {
             ?: dumpsysMap["mCycle"]?.cleanNumericValue()?.toIntOrNull()
             ?: dumpsysMap["CycleCount"]?.cleanNumericValue()?.toIntOrNull()
             ?: readSysfsLong(context, "/sys/class/power_supply/battery/cycle_count")?.toInt()
-            ?: readSysfsLong(context, "/efs/FactoryApp/batt_discharge_level")?.toInt()?.let { it / 100 }
+            ?: readSysfsLong(context, "/efs/FactoryApp/batt_discharge_level")?.toInt()?.let { if (it > 0) it / 100 else null }
             ?: readSysfsLong(context, "/sys/class/power_supply/battery/battery_cycle")?.toInt()
 
         val samsungSoH = dumpsysMap["mSavedBatteryAsoc"]?.cleanNumericValue()?.toIntOrNull()
@@ -185,15 +185,15 @@ object BatteryInfoUtil {
             ?: readSysfsLong(context, "/sys/class/power_supply/battery/fg_asoc")?.toInt()
 
         if (chargeFull == null) {
-            dumpsysMap["mSavedBatteryMax"]?.cleanNumericValue()?.toLongOrNull()?.let { chargeFull = it * 1000 }
+            dumpsysMap["mSavedBatteryMax"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()?.let { chargeFull = it * 1000 }
         }
 
-        val chargeCounter = dumpsysMap["Charge counter"]?.cleanNumericValue()?.toLongOrNull()
-            ?: dumpsysMap["mSavedBattery"]?.cleanNumericValue()?.toLongOrNull()?.let { it * 1000 }
+        val chargeCounter = dumpsysMap["Charge counter"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()
+            ?: dumpsysMap["mSavedBattery"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()?.let { it * 1000 }
             ?: readSysfsLong(context, "/sys/class/power_supply/battery/charge_counter")
 
-        val maxChargingCurrent = dumpsysMap["Max charging current"]?.cleanNumericValue()?.toIntOrNull()
-        val maxChargingVoltage = dumpsysMap["Max charging voltage"]?.cleanNumericValue()?.toIntOrNull()
+        val maxChargingCurrent = dumpsysMap["Max charging current"]?.cleanNumericValue()?.toDoubleOrNull()?.toInt()
+        val maxChargingVoltage = dumpsysMap["Max charging voltage"]?.cleanNumericValue()?.toDoubleOrNull()?.toInt()
         val chargingState = dumpsysMap["Charging state"]?.cleanNumericValue()?.toIntOrNull()
         val chargingPolicy = dumpsysMap["Charging policy"]?.cleanNumericValue()?.toIntOrNull()
         val capacityLevel = dumpsysMap["Capacity level"]?.cleanNumericValue()?.toIntOrNull()
@@ -257,11 +257,11 @@ object BatteryInfoUtil {
 
     private fun readSysfsLong(context: Context, path: String): Long? {
         val out = ShellUtils.runCommandWithOutput(context, "cat $path") ?: return null
-        return out.trim().cleanNumericValue().toLongOrNull()
+        return out.trim().cleanNumericValue().toDoubleOrNull()?.toLong()
     }
 
     private fun String.cleanNumericValue(): String {
-        return this.filter { it.isDigit() || it == '-' }
+        return this.filter { it.isDigit() || it == '-' || it == '.' }
     }
 
     private fun parseDumpsysBattery(output: String?): Map<String, String> {
