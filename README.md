@@ -197,7 +197,19 @@ This is a new restriction on Android with sideloaded apps that can receive sensi
 ## How to translate?
 https://github.com/user-attachments/assets/22ea02cd-1276-4088-8537-c41bd2c4a3fc
 
-Help us bring Essentials to more people around the world! If you're fluent in another language, you can contribute by translating tthe strings in-app.
+Help us bring Essentials to more people around the world! If you're fluent in another language, you can contribute by translating the strings in-app.
+
+### Validating Translations
+
+Before submitting translation PRs, validate your changes using the local validation script to ensure proper formatting and XML syntax:
+
+```bash
+# Validate all translation files for syntax, escaping & placeholder errors
+python3 scripts/validate_strings.py
+
+# Auto-fix quote and percent escaping issues automatically
+python3 scripts/validate_strings.py --fix
+```
 
 # Contributing
 
