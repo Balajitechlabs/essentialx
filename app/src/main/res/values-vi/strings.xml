@@ -1413,8 +1413,8 @@
     <string name="shut_up_auto_archive_action_freeze">Freeze now</string>
     <string name="shut_up_auto_archive_action_abort">Abort</string>
     <!-- Lock Screen Clock -->
-    <string name="feat_lock_screen_clock_title">Lock screen clock</string>
-    <string name="feat_lock_screen_clock_desc">Customize lock screen clock on Pixels</string>
+    <string name="feat_lock_screen_clock_title">Đồng hồ màn hình khóa</string>
+    <string name="feat_lock_screen_clock_desc">Tùy chỉnh đồng hồ màn hình khóa trên điện thoại Pixel</string>
     <string name="about_desc_lock_screen_clock">Change the lock screen clock style on Pixels. Select from the available clock faces provided by the System UI. Some old styles might not be available.</string>
     <string name="lock_screen_clock_bignum">Big Number</string>
     <string name="lock_screen_clock_calligraphy">Calligraphy</string>
@@ -1455,7 +1455,7 @@
     <string name="whats_new_apps_title">App Updates Migrated</string>
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
     <string name="settings_translate_mode">Chế độ dịch</string>
-    <string name="setting_swipe_tabs_title">Vuốt giữa các thẻ</string>
+    <string name="setting_swipe_tabs_title">Vuốt để chuyển đổi giữa các tab</string>
     <string name="setting_swipe_tabs_desc">Trên màn hình chính</string>
     <string name="feat_daily_wallpaper_title">Hình nền</string>
     <string name="feat_daily_wallpaper_desc">Những hình nền hàng ngày và hình nền động</string>
