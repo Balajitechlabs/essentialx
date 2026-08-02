@@ -38,6 +38,11 @@ object DeviceUtils {
                 Build.PRODUCT.contains("pixel", ignoreCase = true)
     }
 
+    fun isSamsungDevice(): Boolean {
+        return Build.MANUFACTURER.equalsIgnoreCase("samsung") ||
+                Build.BRAND.equalsIgnoreCase("samsung")
+    }
+
     fun getDeviceInfo(context: Context): DeviceInfo {
         val deviceName = try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
