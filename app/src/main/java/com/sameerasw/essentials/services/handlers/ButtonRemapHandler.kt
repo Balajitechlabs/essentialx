@@ -83,11 +83,38 @@ class ButtonRemapHandler(
 
         // Flashlight Brightness Control (Volume Keys + Torch On)
         if (flashlightHandler.isTorchOn && (isAdjustEnabled || isGlobalEnabled) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isAlwaysTurnOffEnabled = prefs.getBoolean("flashlight_always_turn_off_enabled", false)
+            val isVolUpFlashlight =
+                prefs.getString("button_remap_vol_up_action_off", "None") == "Toggle flashlight" ||
+                        prefs.getString("button_remap_vol_up_action_on", "None") == "Toggle flashlight"
+            val isVolDownFlashlight =
+                prefs.getString("button_remap_vol_down_action_off", "None") == "Toggle flashlight" ||
+                        prefs.getString("button_remap_vol_down_action_on", "None") == "Toggle flashlight"
+            val isFlashlightCapableButton =
+                (keyCode == KeyEvent.KEYCODE_VOLUME_UP && isVolUpFlashlight) ||
+                        (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && isVolDownFlashlight)
+
+            val actionKeySuffix = if (isScreenInteractive) "_on" else "_off"
+            val actionKey = if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                "button_remap_vol_up_action$actionKeySuffix"
+            } else {
+                "button_remap_vol_down_action$actionKeySuffix"
+            }
+            val mappedAction = prefs.getString(actionKey, "None") ?: "None"
+
+            val targetLongPressAction = if (isAlwaysTurnOffEnabled && isFlashlightCapableButton) {
+                "Toggle flashlight"
+            } else if (mappedAction != "None") {
+                mappedAction
+            } else {
+                "Toggle flashlight"
+            }
+
             if (event.action == KeyEvent.ACTION_DOWN) {
                 if (event.repeatCount == 0) {
                     isLongPressTriggered = false
                     lastPressedKeyCode = keyCode
-                    lastPendingAction = "Toggle flashlight"
+                    lastPendingAction = targetLongPressAction
                     handler.postDelayed(longPressRunnable, longPressTimeout)
                 }
                 return true
