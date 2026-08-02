@@ -1514,7 +1514,6 @@
     <string name="pocket_mode_lock_screen_only_desc">仅在设备锁定时触发口袋模式</string>
     <string name="feat_daily_wallpaper_title">壁纸</string>
     <string name="feat_daily_wallpaper_desc">每日精选动态壁纸</string>
-    <string name="feat_safe_volume_title">关闭安全音量警告</string>
     <string name="feat_safe_volume_desc">抑制音量过大提示</string>
     <string name="feat_watch_wireless_debugging_title">无线调试</string>
     <string name="feat_sync_location_reached_title">同步“我们到了吗”状态</string>
@@ -1531,3 +1530,4 @@
     <string name="desc_low_power_trigger_level">用于省电</string>
     <string name="settings_translated_texts">已翻译</string>
     <string name="about_desc_safe_volume">欧洲法规要求智能手机在音量超过特定级别（85分贝）时发出警告。此​​警告必须在每次重启后或连续播放音乐20小时后显示一次。使用此开关可永久禁用它。</string>
+</resources>
