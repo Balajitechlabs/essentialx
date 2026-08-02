@@ -15,7 +15,7 @@
     <string name="app_freezing_tile_label">تجميد التطبيق</string>
     <string name="flashlight_pulse_tile_label">نبض المصباح</string>
     <string name="check_pre_releases_label">التحقق من أحدث إصدار بيتا</string>
-    <string name="check_pre_releases_desc">قد تكون غير مستقرة</string>
+    <string name="check_pre_releases_desc">قد تكون النسخة غير مستقرة</string>
     <string name="label_default_tab">علامة التبويب الافتراضية</string>
     <!-- App Lock -->
     <string name="settings_section_security">الحماية</string>
@@ -313,7 +313,7 @@
     <string name="icon_clock">ساعة</string>
     <string name="icon_ime">أسلوب الإدخال (IME)</string>
     <string name="icon_alarm">إنذار</string>
-    <string name="icon_battery">بطارية</string>
+    <string name="icon_battery">البطارية</string>
     <string name="icon_power_saving">توفير الطاقة</string>
     <string name="icon_data_saver">توفير البيانات</string>
     <string name="icon_rotation_lock">قفل الدوران</string>
@@ -685,7 +685,7 @@
     <string name="preferences_desc">قم بضبط بعض الإعدادات الأساسية للبدء. </string>
     <string name="label_app_settings">إعدادات التطبيق</string>
     <string name="label_app_language">اللغة</string>
-    <string name="label_haptic_feedback">الاهتزاز</string>
+    <string name="label_haptic_feedback">اللمس الحسي (الاهتزاز عند الضغط)</string>
     <string name="label_updates">التحديثات</string>
     <string name="label_auto_check_updates">البحث التلقائي عن التحديثات</string>
     <string name="desc_auto_check_updates">البحث عن التحديثات عند فتح التطبيق</string>
@@ -1344,7 +1344,7 @@
     <string name="feat_auto_accessibility_desc">يمنح إذن الوصول تلقائيًا عند تشغيل التطبيق في حالة فقده باستخدام WRITE_SECURE_SETTINGS.</string>
     <string name="label_help_guide">مساعدة وأدلة</string>
     <string name="tab_your_android">الروبوت الخاص بك</string>
-    <string name="label_device_storage">تخزين</string>
+    <string name="label_device_storage">التخزين</string>
     <string name="label_device_ram">ذاكرة</string>
     <string name="label_use_blur">استخدم التمويه</string>
     <string name="desc_use_blur">تمكين عناصر التمويه التقدمية عبر واجهة المستخدم</string>
