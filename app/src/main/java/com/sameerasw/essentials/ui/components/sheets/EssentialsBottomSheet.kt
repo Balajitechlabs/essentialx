@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.windowInsetsBottomHeight
 
 import androidx.compose.foundation.layout.statusBarsPadding
 
+import androidx.compose.material3.BottomSheetDefaults
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EssentialsBottomSheet(
@@ -29,12 +31,14 @@ fun EssentialsBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
     content: @Composable ColumnScope.() -> Unit
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = containerColor,
+        dragHandle = dragHandle,
         contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
         modifier = modifier.statusBarsPadding()
     ) {

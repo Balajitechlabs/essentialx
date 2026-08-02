@@ -24,7 +24,7 @@ fun BatterySystemTabContent(
     isLoadingAdvanced: Boolean,
     powerProfile: Map<String, String>?,
     wakeupsList: List<CpuWakeupItem>,
-    showPercentage: Boolean,
+    showPercentage: Boolean = false,
     onToggleUnit: () -> Unit
 ) {
     if (isLoadingAdvanced) {
@@ -89,8 +89,8 @@ fun BatterySystemTabContent(
             ListExpandToggleButton(
                 isExpanded = showWakeups,
                 onToggle = { showWakeups = !showWakeups },
-                expandedText = stringResource(R.string.action_hide_wakeups),
-                collapsedText = stringResource(R.string.action_show_wakeups)
+                title = R.string.action_hide_wakeups,
+                description = R.string.action_show_wakeups
             )
 
             if (showWakeups) {

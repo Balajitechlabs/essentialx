@@ -17,7 +17,7 @@ data class BatteryDetails(
     val technology: String,
     val isPresent: Boolean,
 
-    // Shell / sysfs attributes
+    // Shell / sysfs / Android 14+ attributes
     val chargeFull: Long? = null,
     val chargeFullDesign: Long? = null,
     val chargeCounter: Long? = null,
@@ -29,7 +29,22 @@ data class BatteryDetails(
     val currentNow: Long? = null,
     val voltageNow: Long? = null,
     val powerProfile: Map<String, String>? = null,
-    val batteryChargingEnforceLevel: Int? = null
+    val batteryChargingEnforceLevel: Int? = null,
+
+    // Android 14+ public & system APIs
+    val cycleCount: Int? = null,
+    val chargingStatusNew: Int? = null,
+    val currentNowMa: Int? = null,
+    val currentAvgMa: Int? = null,
+    val remainingEnergyMwh: Long? = null,
+    val chargeTimeRemainingMs: Long? = null,
+    val stateOfHealth: Int? = null,
+    val manufacturingDate: Long? = null,
+    val firstUsageDate: Long? = null,
+    val serialNumber: String? = null,
+    val partStatus: Int? = null,
+    val hasBatteryStatsPermission: Boolean = false,
+    val thermalInfo: ThermalInfo? = null
 )
 
 object BatteryInfoUtil {
@@ -37,6 +52,13 @@ object BatteryInfoUtil {
     fun getBatteryIntent(context: Context): Intent? {
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         return context.registerReceiver(null, filter)
+    }
+
+    fun hasBatteryStatsPermission(context: Context): Boolean {
+        return androidx.core.content.PermissionChecker.checkSelfPermission(
+            context,
+            "android.permission.BATTERY_STATS"
+        ) == androidx.core.content.PermissionChecker.PERMISSION_GRANTED
     }
 
     fun getBasicDetails(context: Context): BatteryDetails {
@@ -51,6 +73,57 @@ object BatteryInfoUtil {
         val tech = intent?.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY) ?: "Li-ion"
         val present = intent?.getBooleanExtra(BatteryManager.EXTRA_PRESENT, true) ?: true
 
+        // Android 14+ public Extras
+        val cycleCount = if (android.os.Build.VERSION.SDK_INT >= 34) {
+            intent?.getIntExtra("android.os.extra.CYCLE_COUNT", -1)?.takeIf { it >= 0 }
+        } else null
+
+        val chargingStatusNew = if (android.os.Build.VERSION.SDK_INT >= 34) {
+            intent?.getIntExtra("android.os.extra.CHARGING_STATUS", -1)?.takeIf { it >= 0 }
+        } else null
+
+        // BatteryManager Property queries
+        val bm = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
+        val rawCurrentNow = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)?.takeIf { it != Int.MIN_VALUE }
+        val currentNowMa = rawCurrentNow?.let { it / 1000 }
+
+        val rawCurrentAvg = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE)?.takeIf { it != Int.MIN_VALUE }
+        val currentAvgMa = rawCurrentAvg?.let { it / 1000 }
+
+        val rawEnergy = bm?.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)?.takeIf { it != Long.MIN_VALUE }
+        val remainingEnergyMwh = rawEnergy?.let { it / 1_000_000 } // nWh to mWh
+
+        val chargeTimeRemaining = bm?.computeChargeTimeRemaining()?.takeIf { it >= 0 }
+
+        val hasStatsPerm = hasBatteryStatsPermission(context)
+
+        var stateOfHealth: Int? = null
+        var mfgDate: Long? = null
+        var firstUseDate: Long? = null
+        var serialNum: String? = null
+        var partStat: Int? = null
+
+        if (android.os.Build.VERSION.SDK_INT >= 34 && hasStatsPerm && bm != null) {
+            // Property IDs: 10: SoH %, 7: Mfg date, 8: First usage date, 11: Serial number, 12: Part status
+            val soh = bm.getIntProperty(10)
+            if (soh in 1..100) stateOfHealth = soh
+
+            val mfg = bm.getLongProperty(7)
+            if (mfg > 0 && mfg != Long.MIN_VALUE) mfgDate = mfg
+
+            val firstUse = bm.getLongProperty(8)
+            if (firstUse > 0 && firstUse != Long.MIN_VALUE) firstUseDate = firstUse
+
+            try {
+                val getStringPropMethod = bm.javaClass.getMethod("getStringProperty", Int::class.javaPrimitiveType)
+                serialNum = getStringPropMethod.invoke(bm, 11) as? String
+            } catch (e: Exception) {
+            }
+
+            val part = bm.getIntProperty(12)
+            if (part > 0 && part != Integer.MIN_VALUE) partStat = part
+        }
+
         return BatteryDetails(
             level = level,
             scale = scale,
@@ -60,7 +133,19 @@ object BatteryInfoUtil {
             voltage = voltage,
             temperature = temp,
             technology = tech,
-            isPresent = present
+            isPresent = present,
+            cycleCount = cycleCount,
+            chargingStatusNew = chargingStatusNew,
+            currentNowMa = currentNowMa,
+            currentAvgMa = currentAvgMa,
+            remainingEnergyMwh = remainingEnergyMwh,
+            chargeTimeRemainingMs = chargeTimeRemaining,
+            stateOfHealth = stateOfHealth,
+            manufacturingDate = mfgDate,
+            firstUsageDate = firstUseDate,
+            serialNumber = serialNum,
+            partStatus = partStat,
+            hasBatteryStatsPermission = hasStatsPerm
         )
     }
 
@@ -88,11 +173,16 @@ object BatteryInfoUtil {
         val chargingPolicy = dumpsysMap["Charging policy"]?.toIntOrNull()
         val capacityLevel = dumpsysMap["Capacity level"]?.toIntOrNull()
 
+        val dumpsysSerial = dumpsysMap["Serial number"] ?: dumpsysMap["serial_number"] ?: dumpsysMap["Serial Number"]
+        val dumpsysPart = dumpsysMap["Part status"]?.toIntOrNull() ?: dumpsysMap["part_status"]?.toIntOrNull() ?: dumpsysMap["Part Status"]?.toIntOrNull()
+
         val powerProfileOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --power-profile")
         val powerProfileMap = parsePowerProfile(powerProfileOutput)
 
         val settingsOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --settings")
         val enforceLevel = parseSettingsEnforceLevel(settingsOutput)
+
+        val thermalInfo = ThermalUtil.getThermalInfo(context)
 
         return basic.copy(
             chargeFull = chargeFull,
@@ -106,7 +196,10 @@ object BatteryInfoUtil {
             currentNow = currentNow,
             voltageNow = voltageNow,
             powerProfile = powerProfileMap.takeIf { it.isNotEmpty() },
-            batteryChargingEnforceLevel = enforceLevel
+            batteryChargingEnforceLevel = enforceLevel,
+            serialNumber = basic.serialNumber ?: dumpsysSerial,
+            partStatus = basic.partStatus ?: dumpsysPart,
+            thermalInfo = thermalInfo
         )
     }
 
@@ -235,6 +328,65 @@ object BatteryInfoUtil {
             2 -> "Limited capacity"
             3 -> "Adaptive charging"
             else -> policy?.toString() ?: "Unknown"
+        }
+    }
+
+    fun formatChargingStatusNew(status: Int?): String {
+        return when (status) {
+            1 -> "Unknown"
+            2 -> "Charging"
+            3 -> "Discharging"
+            4 -> "Not Charging"
+            5 -> "Full"
+            else -> status?.toString() ?: "Unknown"
+        }
+    }
+
+    fun formatChargeTimeRemaining(ms: Long): String {
+        val totalSeconds = ms / 1000
+        val hours = totalSeconds / 3600
+        val minutes = (totalSeconds % 3600) / 60
+        return if (hours > 0) {
+            "${hours}h ${minutes}m"
+        } else {
+            "${minutes}m"
+        }
+    }
+
+    fun formatDate(epochSeconds: Long): Pair<String, Boolean> {
+        val date = java.util.Date(epochSeconds * 1000)
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val formatted = sdf.format(date)
+        
+        // Suspicious / sentinel check (e.g. 2020-12-01 default or Unix epoch 1970-01-01)
+        val cal = java.util.Calendar.getInstance().apply { time = date }
+        val year = cal.get(java.util.Calendar.YEAR)
+        val month = cal.get(java.util.Calendar.MONTH) // 0-indexed, Dec = 11
+        val day = cal.get(java.util.Calendar.DAY_OF_MONTH)
+
+        val isSuspicious = (year < 2021) || (year == 2020 && month == 11 && day == 1)
+        return Pair(formatted, isSuspicious)
+    }
+
+    fun formatPartStatus(status: Int?): String {
+        return when (status) {
+            1 -> "Original"
+            2 -> "Replaced"
+            0 -> "Unsupported"
+            else -> status?.toString() ?: "Unknown"
+        }
+    }
+
+    fun formatCapacityLevel(level: Int?): String {
+        return when (level) {
+            1 -> "Critical"
+            2 -> "Low"
+            3 -> "Normal"
+            4 -> "High"
+            5 -> "Full"
+            0 -> "Unknown"
+            -1 -> "Unsupported"
+            else -> level?.toString() ?: "Unknown"
         }
     }
 }

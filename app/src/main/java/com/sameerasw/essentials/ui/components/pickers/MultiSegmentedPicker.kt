@@ -1,6 +1,10 @@
 package com.sameerasw.essentials.ui.components.pickers
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.sp
+import com.sameerasw.essentials.R
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Arrangement
@@ -113,7 +117,12 @@ fun <T> MultiSegmentedPicker(
                         else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                     },
                 ) {
-                    Text(label)
+                    Text(
+                        label,
+                        fontSize = dimensionResource(R.dimen.font_small).value.sp,
+                        modifier = Modifier.basicMarquee(),
+                        maxLines = 1
+                    )
                 }
 
                 if (activeMenuIndex == index) {
