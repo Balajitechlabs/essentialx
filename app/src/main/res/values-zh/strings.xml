@@ -1417,9 +1417,7 @@
     <!-- Lock Screen Clock -->
     <string name="feat_lock_screen_clock_title">锁屏时钟</string>
     <string name="feat_lock_screen_clock_desc">自定义 Pixel 上的锁屏时钟</string>
-    <string name="about_desc_lock_screen_clock">更改 Pixel 手机的锁屏时钟样式。从系统 UI 提供的可用表盘中选择。
-
-某些旧样式可能不可用。</string>
+    <string name="about_desc_lock_screen_clock">更改 Pixel 手机的锁屏时钟样式。从系统 UI 提供的可用表盘中选择。\n\n某些旧样式可能不可用。</string>
     <string name="lock_screen_clock_bignum">Big Number</string>
     <string name="lock_screen_clock_calligraphy">Calligraphy</string>
     <string name="lock_screen_clock_flex">Flex</string>
@@ -1443,8 +1441,8 @@
     <string name="label_variation">Variation</string>
     <string name="label_color">Color</string>
     <string name="label_style_font">Style &amp; Font</string>
-    <string name="about_title">關於</string>
-    <string name="color_default">預設</string>
+    <string name="about_title">关于</string>
+    <string name="color_default">预设</string>
     <string name="color_red">Red</string>
     <string name="color_green">Green</string>
     <string name="color_blue">Blue</string>
@@ -1465,10 +1463,10 @@
     <string name="about_desc_notification_snoozing">启用通知暂缓按钮，并配置自定义间隔选项和默认持续时间，以便稍后查看通知</string>
     <string name="feat_safe_volume_title">关闭安全音量警告</string>
     <string name="feat_safe_volume_desc">抑制音量过大提示</string>
-    <string name="feat_daily_wallpaper_title">壁紙</string>
+    <string name="feat_daily_wallpaper_title">壁纸</string>
     <string name="feat_daily_wallpaper_desc">每日精选动态壁纸</string>
     <string name="feat_pixel_searchbar_title">Pixel 搜索栏</string>
-    <string name="feat_pixel_searchbar_desc">将 Essentials 设置为 Pixel 啟動器主屏幕搜索栏的默认搜索提供程序。</string>
+    <string name="feat_pixel_searchbar_desc">将 Essentials 设置为 Pixel 启动器主屏幕搜索栏的默认搜索提供程序。</string>
     <string name="feat_watch_controls_title">自定义</string>
     <string name="feat_watch_wireless_debugging_title">无线调试</string>
     <string name="feat_watch_controls_desc">自定义 WearOS 应用控件</string>
@@ -1479,7 +1477,7 @@
     <string name="feat_watch_wireless_debugging_desc">远程启用</string>
     <string name="about_desc_restart_systemui_tile">直接从快速设置面板轻松重启 SystemUI。有助于快速解决状态栏故障或立即应用系统 UI 修改。需要 root 权限或 Shizuku shell 访问权限。</string>
     <string name="setting_enable_unsupported_features_title">启用不支持的功能</string>
-    <string name="feat_flashlight_title">手電筒</string>
+    <string name="feat_flashlight_title">手电筒</string>
     <string name="feat_flashlight_desc">改进手电筒行为</string>
     <string name="flashlight_overheat_title">过热预防</string>
     <string name="flashlight_overheat_desc">长时间使用降低亮度</string>
