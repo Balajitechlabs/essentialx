@@ -1462,4 +1462,5 @@
     <string name="feat_daily_wallpaper_title">Sfondo</string>
     <string name="feat_pocket_mode_title">Modalità tasca</string>
     <string name="feat_pocket_mode_desc">Previene tocchi accidentali quando il telefono è in tasca</string>
+    <string name="feat_watch_wireless_debugging_desc">Attiva da remoto</string>
 </resources>
