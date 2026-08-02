@@ -25,25 +25,7 @@ class WifiModule : AutomationModule {
     private val scope = CoroutineScope(Dispatchers.IO)
     private var connectivityManager: ConnectivityManager? = null
     private var appContext: Context? = null
-    private var currentSsid: String? = null
-
-    // NetworkCapabilities.getTransportInfo() only exists from API 31 onward, and querying it
-    // on older OS versions throws NoSuchMethodError inside the (system-swallowed) callback.
-    // WifiManager.connectionInfo works on every API level and respects the same location
-    // permission gating, so it's used unconditionally instead of branching by SDK level.
-    @Suppress("DEPRECATION")
-    private fun currentWifiSsid(): String? {
-        val wifiManager =
-            appContext?.getSystemService(Context.WIFI_SERVICE) as? WifiManager ?: return null
-        val ssid = try {
-            wifiManager.connectionInfo?.ssid
-        } catch (e: Exception) {
-            Log.w(ID, "Failed to read current SSID", e)
-            null
-        }
-        if (ssid.isNullOrEmpty() || ssid == UNKNOWN_SSID) return null
-        return ssid.removeSurrounding("\"")
-    }
+    private val activeNetworkSsids = java.util.concurrent.ConcurrentHashMap<Network, String>()
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
@@ -53,16 +35,15 @@ class WifiModule : AutomationModule {
                 Log.d(ID, "Wi-Fi capabilities changed but SSID unavailable (check location permission/services)")
                 return
             }
-            if (ssid == currentSsid) return
+            if (activeNetworkSsids[network] == ssid) return
             Log.d(ID, "Wi-Fi connected: $ssid")
-            currentSsid = ssid
+            activeNetworkSsids[network] = ssid
             handleTrigger { it is Trigger.WifiConnected && it.ssid == ssid }
         }
 
         override fun onLost(network: Network) {
-            val ssid = currentSsid ?: return
+            val ssid = activeNetworkSsids.remove(network) ?: return
             Log.d(ID, "Wi-Fi disconnected: $ssid")
-            currentSsid = null
             handleTrigger { it is Trigger.WifiDisconnected && it.ssid == ssid }
         }
     }
@@ -85,6 +66,24 @@ class WifiModule : AutomationModule {
         }
     }
 
+    // NetworkCapabilities.getTransportInfo() only exists from API 31 onward, and querying it
+    // on older OS versions throws NoSuchMethodError inside the (system-swallowed) callback.
+    // WifiManager.connectionInfo works on every API level and respects the same location
+    // permission gating, so it's used unconditionally instead of branching by SDK level.
+    @Suppress("DEPRECATION")
+    private fun currentWifiSsid(): String? {
+        val wifiManager =
+            appContext?.getSystemService(Context.WIFI_SERVICE) as? WifiManager ?: return null
+        val ssid = try {
+            wifiManager.connectionInfo?.ssid
+        } catch (e: Exception) {
+            Log.w(ID, "Failed to read current SSID", e)
+            null
+        }
+        if (ssid.isNullOrEmpty() || ssid == UNKNOWN_SSID) return null
+        return ssid.removeSurrounding("\"")
+    }
+
     override fun stop(context: Context) {
         try {
             connectivityManager?.unregisterNetworkCallback(networkCallback)
@@ -93,7 +92,7 @@ class WifiModule : AutomationModule {
         }
         connectivityManager = null
         appContext = null
-        currentSsid = null
+        activeNetworkSsids.clear()
     }
 
     override fun updateAutomations(automations: List<Automation>) {
