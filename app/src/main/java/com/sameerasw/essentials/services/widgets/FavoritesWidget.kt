@@ -100,9 +100,15 @@ class FavoritesWidget : GlanceAppWidget() {
                         val cellWidth = width / columnsCount.toFloat()
                         val cellHeight = height / rowsCount.toFloat()
 
+                        val scrollMode = if (Build.VERSION.SDK_INT >= 37) {
+                            VerticalScrollMode.SnapScrollMatchHeight(height)
+                        } else {
+                            VerticalScrollMode.Normal
+                        }
+
                         LazyColumn(
                             modifier = GlanceModifier.fillMaxSize(),
-                            verticalScrollMode = VerticalScrollMode.SnapScrollMatchHeight(height)
+                            verticalScrollMode = scrollMode
                         ) {
                             items(pages) { pageFeatures ->
                                 Column(
