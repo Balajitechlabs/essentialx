@@ -15,11 +15,21 @@ class QsTileClickActionCallback : ActionCallback {
         parameters: ActionParameters
     ) {
         val serviceClassName = parameters[SERVICE_CLASS_KEY] ?: return
+        // action
         val intent = Intent(context, QsTileActionRouter::class.java).apply {
             action = QsTileActionRouter.ACTION_TRIGGER_TILE
             putExtra(QsTileActionRouter.EXTRA_SERVICE_CLASS_NAME, serviceClassName)
         }
         context.sendBroadcast(intent)
+
+        // Refresh widget
+        try {
+            QsTilesWidget().update(context, glanceId)
+            kotlinx.coroutines.delay(200)
+            QsTilesWidget().update(context, glanceId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     companion object {

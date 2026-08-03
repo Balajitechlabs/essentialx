@@ -47,7 +47,7 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
     private var proximitySensor: Sensor? = null
 
     // Handlers
-    private lateinit var flashlightHandler: FlashlightHandler
+    lateinit var flashlightHandler: FlashlightHandler
     private lateinit var notificationLightingHandler: NotificationLightingHandler
     private lateinit var buttonRemapHandler: ButtonRemapHandler
     private lateinit var appFlowHandler: AppFlowHandler

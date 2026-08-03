@@ -52,6 +52,11 @@ class QsTilesWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             GlanceTheme {
+                val prefs = androidx.glance.currentState<androidx.datastore.preferences.core.Preferences>()
+                val KEY_UPDATE = androidx.datastore.preferences.core.longPreferencesKey("qs_widget_last_update")
+                @Suppress("UNUSED_VARIABLE")
+                val lastUpdate = prefs[KEY_UPDATE] ?: 0L
+
                 val repository = SettingsRepository(context)
                 val pinnedClassNames = repository.getPinnedQsTiles()
 

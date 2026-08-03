@@ -26,7 +26,23 @@ class QsTilesWidgetReceiver : GlanceAppWidgetReceiver() {
                     }
 
                     val glanceIds = glanceAppWidgetManager.getGlanceIds(QsTilesWidget::class.java)
+                    val timestamp = System.currentTimeMillis()
                     glanceIds.forEach { glanceId ->
+                        androidx.glance.appwidget.state.updateAppWidgetState(context, glanceId) { prefs ->
+                            val KEY_UPDATE = androidx.datastore.preferences.core.longPreferencesKey("qs_widget_last_update")
+                            prefs[KEY_UPDATE] = timestamp
+                        }
+                        glanceAppWidget.update(context, glanceId)
+                    }
+
+                    // delay for qs status
+                    val updatedGlanceIds = glanceAppWidgetManager.getGlanceIds(QsTilesWidget::class.java)
+                    val newTimestamp = System.currentTimeMillis()
+                    updatedGlanceIds.forEach { glanceId ->
+                        androidx.glance.appwidget.state.updateAppWidgetState(context, glanceId) { prefs ->
+                            val KEY_UPDATE = androidx.datastore.preferences.core.longPreferencesKey("qs_widget_last_update")
+                            prefs[KEY_UPDATE] = newTimestamp
+                        }
                         glanceAppWidget.update(context, glanceId)
                     }
                 } catch (e: Exception) {

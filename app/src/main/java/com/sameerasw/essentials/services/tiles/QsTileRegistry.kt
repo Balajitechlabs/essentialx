@@ -54,6 +54,24 @@ object QsTileRegistry {
                     com.sameerasw.essentials.domain.controller.CaffeinateController.isActive.value ||
                             com.sameerasw.essentials.domain.controller.CaffeinateController.isStarting.value
                 }
+                FlashlightTileService::class.java.name -> {
+                    val instance = ScreenOffAccessibilityService.instance
+                    if (instance != null) {
+                        instance.flashlightHandler.isTorchOn
+                    } else {
+                        val clazz = Class.forName(className)
+                        val tileService = clazz.getDeclaredConstructor().newInstance() as BaseTileService
+                        val attachBaseContextMethod = android.content.ContextWrapper::class.java.getDeclaredMethod(
+                            "attachBaseContext",
+                            android.content.Context::class.java
+                        )
+                        attachBaseContextMethod.isAccessible = true
+                        attachBaseContextMethod.invoke(tileService, context)
+                        val getTileStateMethod = BaseTileService::class.java.getDeclaredMethod("getTileState")
+                        getTileStateMethod.isAccessible = true
+                        (getTileStateMethod.invoke(tileService) as Int) == android.service.quicksettings.Tile.STATE_ACTIVE
+                    }
+                }
                 else -> {
                     val clazz = Class.forName(className)
                     if (BaseTileService::class.java.isAssignableFrom(clazz)) {
