@@ -21,15 +21,6 @@ class QsTileClickActionCallback : ActionCallback {
             putExtra(QsTileActionRouter.EXTRA_SERVICE_CLASS_NAME, serviceClassName)
         }
         context.sendBroadcast(intent)
-
-        // Refresh widget
-        try {
-            QsTilesWidget().update(context, glanceId)
-            kotlinx.coroutines.delay(200)
-            QsTilesWidget().update(context, glanceId)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
 
     companion object {
