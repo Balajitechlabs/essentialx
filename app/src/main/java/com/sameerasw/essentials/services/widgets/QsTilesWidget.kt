@@ -62,8 +62,6 @@ class QsTilesWidget : GlanceAppWidget() {
                 Box(
                     modifier = GlanceModifier
                         .fillMaxSize()
-                        .cornerRadius(16.dp)
-                        .background(GlanceTheme.colors.primary)
                 ) {
                     if (pinnedTiles.isEmpty()) {
                         Column(
@@ -71,7 +69,7 @@ class QsTilesWidget : GlanceAppWidget() {
                                 .fillMaxSize()
                                 .padding(8.dp)
                                 .cornerRadius(16.dp)
-                                .background(GlanceTheme.colors.widgetBackground)
+                                .background(GlanceTheme.colors.primary)
                                 .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalAlignment = Alignment.CenterVertically
@@ -79,7 +77,7 @@ class QsTilesWidget : GlanceAppWidget() {
                             Text(
                                 text = context.getString(R.string.qs_tiles_widget_empty_state),
                                 style = TextStyle(
-                                    color = GlanceTheme.colors.onSurfaceVariant,
+                                    color = GlanceTheme.colors.onPrimary,
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Normal,
                                     fontFamily = FontFamily("google-sans-flex"),
@@ -90,13 +88,13 @@ class QsTilesWidget : GlanceAppWidget() {
                         }
                     } else {
                         val columnsCount = if (width >= 300.dp) 2 else 1
-                        val rowsCount = if (height >= 130.dp) 2 else 1
+                        val targetRowHeight = 65.dp
+                        val rowsCount = (height / targetRowHeight).toInt().coerceAtLeast(1)
                         val pageSize = columnsCount * rowsCount
                         val pages = pinnedTiles.chunked(pageSize)
 
                         val halfSpacing = 4.dp
-                        val cellWidth = width / columnsCount.toFloat()
-                        val cellHeight = height / rowsCount.toFloat()
+                        val cellHeight = targetRowHeight
 
                         val scrollMode = if (Build.VERSION.SDK_INT >= 37) {
                             VerticalScrollMode.SnapScrollMatchHeight(height)
@@ -132,22 +130,33 @@ class QsTilesWidget : GlanceAppWidget() {
                                                         val pastelColor =
                                                             ColorUtil.getPastelColorFor(
                                                                 resolvedTitle
-                                                            )
+                                                             )
                                                         val vibrantColor =
                                                             ColorUtil.getVibrantColorFor(
                                                                 resolvedTitle
                                                             )
 
-                                                        val isVertical =
-                                                            cellHeight >= (cellWidth - 40.dp)
-                                                        val isSmall = cellHeight < 90.dp
-                                                        val iconBoxSize =
-                                                            if (isSmall) 36.dp else 48.dp
-                                                        val iconCornerRadius =
-                                                            if (isSmall) 8.dp else 12.dp
-                                                        val iconSize = if (isSmall) 22.dp else 28.dp
-                                                        val fontSize = if (isSmall) 12.sp else 15.sp
-                                                        val spacerSize = if (isSmall) 4.dp else 8.dp
+                                                        val isActive = QsTileRegistry.isTileActive(
+                                                            context,
+                                                            tile.serviceClass.name
+                                                        )
+
+                                                        val tileBg = if (isActive) {
+                                                            GlanceTheme.colors.primary
+                                                        } else {
+                                                            GlanceTheme.colors.widgetBackground
+                                                        }
+                                                        val tileTextColor = if (isActive) {
+                                                            GlanceTheme.colors.onPrimary
+                                                        } else {
+                                                            GlanceTheme.colors.onSurface
+                                                        }
+
+                                                        val iconBoxSize = 38.dp
+                                                        val iconCornerRadius = 10.dp
+                                                        val iconSize = 22.dp
+                                                        val fontSize = 13.sp
+                                                        val spacerSize = 8.dp
 
                                                         Box(
                                                             modifier = GlanceModifier
@@ -162,7 +171,7 @@ class QsTilesWidget : GlanceAppWidget() {
                                                             val cardModifier = GlanceModifier
                                                                 .fillMaxSize()
                                                                 .cornerRadius(16.dp)
-                                                                .background(GlanceTheme.colors.widgetBackground)
+                                                                .background(tileBg)
                                                                 .clickable(
                                                                     actionRunCallback<QsTileClickActionCallback>(
                                                                         actionParametersOf(
@@ -171,112 +180,58 @@ class QsTilesWidget : GlanceAppWidget() {
                                                                     )
                                                                 )
 
-                                                            if (isVertical) {
-                                                                Column(
-                                                                    modifier = cardModifier.padding(
-                                                                        8.dp
-                                                                    ),
-                                                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                                                    verticalAlignment = Alignment.CenterVertically
+                                                            Row(
+                                                                modifier = cardModifier.padding(
+                                                                    horizontal = 12.dp,
+                                                                    vertical = 6.dp
+                                                                ),
+                                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                                verticalAlignment = Alignment.CenterVertically
+                                                            ) {
+                                                                Box(
+                                                                    modifier = GlanceModifier
+                                                                        .size(iconBoxSize)
+                                                                        .cornerRadius(
+                                                                            iconCornerRadius
+                                                                        )
+                                                                        .background(pastelColor),
+                                                                    contentAlignment = Alignment.Center
                                                                 ) {
-                                                                    Box(
-                                                                        modifier = GlanceModifier
-                                                                            .size(iconBoxSize)
-                                                                            .cornerRadius(
-                                                                                iconCornerRadius
-                                                                            )
-                                                                            .background(pastelColor),
-                                                                        contentAlignment = Alignment.Center
-                                                                    ) {
-                                                                        Image(
-                                                                            provider = ImageProvider(
-                                                                                tile.iconRes
-                                                                            ),
-                                                                            contentDescription = resolvedTitle,
-                                                                            colorFilter = ColorFilter.tint(
-                                                                                ColorProvider(
-                                                                                    vibrantColor
-                                                                                )
-                                                                            ),
-                                                                            modifier = GlanceModifier.size(
-                                                                                iconSize
-                                                                            )
-                                                                        )
-                                                                    }
-
-                                                                    Spacer(
-                                                                        modifier = GlanceModifier.height(
-                                                                            spacerSize
-                                                                        )
-                                                                    )
-
-                                                                    Text(
-                                                                        text = resolvedTitle,
-                                                                        style = TextStyle(
-                                                                            color = GlanceTheme.colors.onSurface,
-                                                                            fontSize = fontSize,
-                                                                            fontWeight = FontWeight.Normal,
-                                                                            fontFamily = FontFamily(
-                                                                                "google-sans-flex"
-                                                                            ),
-                                                                            textAlign = TextAlign.Center
-                                                                        )
-                                                                    )
-                                                                }
-                                                            } else {
-                                                                Row(
-                                                                    modifier = cardModifier.padding(
-                                                                        horizontal = 12.dp,
-                                                                        vertical = 6.dp
-                                                                    ),
-                                                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                                                    verticalAlignment = Alignment.CenterVertically
-                                                                ) {
-                                                                    Box(
-                                                                        modifier = GlanceModifier
-                                                                            .size(iconBoxSize)
-                                                                            .cornerRadius(
-                                                                                iconCornerRadius
-                                                                            )
-                                                                            .background(pastelColor),
-                                                                        contentAlignment = Alignment.Center
-                                                                    ) {
-                                                                        Image(
-                                                                            provider = ImageProvider(
-                                                                                tile.iconRes
-                                                                            ),
-                                                                            contentDescription = resolvedTitle,
-                                                                            colorFilter = ColorFilter.tint(
-                                                                                ColorProvider(
-                                                                                    vibrantColor
-                                                                                )
-                                                                            ),
-                                                                            modifier = GlanceModifier.size(
-                                                                                iconSize
-                                                                            )
-                                                                        )
-                                                                    }
-
-                                                                    Spacer(
-                                                                        modifier = GlanceModifier.width(
-                                                                            spacerSize
-                                                                        )
-                                                                    )
-
-                                                                    Text(
-                                                                        text = resolvedTitle,
-                                                                        style = TextStyle(
-                                                                            color = GlanceTheme.colors.onSurface,
-                                                                            fontSize = fontSize,
-                                                                            fontWeight = FontWeight.Normal,
-                                                                            fontFamily = FontFamily(
-                                                                                "google-sans-flex"
-                                                                            ),
-                                                                            textAlign = TextAlign.Start
+                                                                    Image(
+                                                                        provider = ImageProvider(
+                                                                            tile.iconRes
                                                                         ),
-                                                                        modifier = GlanceModifier.defaultWeight()
+                                                                        contentDescription = resolvedTitle,
+                                                                        colorFilter = ColorFilter.tint(
+                                                                            ColorProvider(
+                                                                                vibrantColor
+                                                                            )
+                                                                        ),
+                                                                        modifier = GlanceModifier.size(
+                                                                            iconSize
+                                                                        )
                                                                     )
                                                                 }
+
+                                                                Spacer(
+                                                                    modifier = GlanceModifier.width(
+                                                                        spacerSize
+                                                                    )
+                                                                )
+
+                                                                Text(
+                                                                    text = resolvedTitle,
+                                                                    style = TextStyle(
+                                                                        color = tileTextColor,
+                                                                        fontSize = fontSize,
+                                                                        fontWeight = FontWeight.Normal,
+                                                                        fontFamily = FontFamily(
+                                                                            "google-sans-flex"
+                                                                        ),
+                                                                        textAlign = TextAlign.Start
+                                                                    ),
+                                                                    modifier = GlanceModifier.defaultWeight()
+                                                                )
                                                             }
                                                         }
                                                     } else {
@@ -296,7 +251,7 @@ class QsTilesWidget : GlanceAppWidget() {
                                             Spacer(
                                                 modifier = GlanceModifier
                                                     .fillMaxWidth()
-                                                    .defaultWeight()
+                                                    .height(cellHeight)
                                                     .padding(vertical = halfSpacing)
                                             )
                                         }

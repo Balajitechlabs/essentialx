@@ -46,4 +46,34 @@ object QsTileRegistry {
     fun getTileByClassName(className: String): QsTileEntry? {
         return tilesMapByClassName[className]
     }
+
+    fun isTileActive(context: android.content.Context, className: String): Boolean {
+        return try {
+            when (className) {
+                CaffeinateTileService::class.java.name -> {
+                    com.sameerasw.essentials.domain.controller.CaffeinateController.isActive.value ||
+                            com.sameerasw.essentials.domain.controller.CaffeinateController.isStarting.value
+                }
+                else -> {
+                    val clazz = Class.forName(className)
+                    if (BaseTileService::class.java.isAssignableFrom(clazz)) {
+                        val tileService = clazz.getDeclaredConstructor().newInstance() as BaseTileService
+                        val attachBaseContextMethod = android.content.ContextWrapper::class.java.getDeclaredMethod(
+                            "attachBaseContext",
+                            android.content.Context::class.java
+                        )
+                        attachBaseContextMethod.isAccessible = true
+                        attachBaseContextMethod.invoke(tileService, context)
+
+                        val getTileStateMethod = BaseTileService::class.java.getDeclaredMethod("getTileState")
+                        getTileStateMethod.isAccessible = true
+                        val state = getTileStateMethod.invoke(tileService) as Int
+                        state == android.service.quicksettings.Tile.STATE_ACTIVE
+                    } else false
+                }
+            }
+        } catch (e: Exception) {
+            false
+        }
+    }
 }
