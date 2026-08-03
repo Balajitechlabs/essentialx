@@ -156,6 +156,11 @@ class QsTilesWidget : GlanceAppWidget() {
                                                         } else {
                                                             GlanceTheme.colors.onSurface
                                                         }
+                                                        val tileSubtextColor = if (isActive) {
+                                                            GlanceTheme.colors.onPrimary
+                                                        } else {
+                                                            GlanceTheme.colors.onSurfaceVariant
+                                                        }
 
                                                         val iconBoxSize = 38.dp
                                                         val iconCornerRadius = 10.dp
@@ -224,19 +229,44 @@ class QsTilesWidget : GlanceAppWidget() {
                                                                     )
                                                                 )
 
-                                                                Text(
-                                                                    text = resolvedTitle,
-                                                                    style = TextStyle(
-                                                                        color = tileTextColor,
-                                                                        fontSize = fontSize,
-                                                                        fontWeight = FontWeight.Normal,
-                                                                        fontFamily = FontFamily(
-                                                                            "google-sans-flex"
-                                                                        ),
-                                                                        textAlign = TextAlign.Start
-                                                                    ),
-                                                                    modifier = GlanceModifier.defaultWeight()
+                                                                val subtitle = QsTileRegistry.getTileSubtitle(
+                                                                    context,
+                                                                    tile.serviceClass.name
                                                                 )
+
+                                                                Column(
+                                                                    modifier = GlanceModifier.defaultWeight(),
+                                                                    verticalAlignment = Alignment.CenterVertically
+                                                                ) {
+                                                                    Text(
+                                                                        text = resolvedTitle,
+                                                                        style = TextStyle(
+                                                                            color = tileTextColor,
+                                                                            fontSize = fontSize,
+                                                                            fontWeight = FontWeight.Normal,
+                                                                            fontFamily = FontFamily(
+                                                                                "google-sans-flex"
+                                                                            ),
+                                                                            textAlign = TextAlign.Start
+                                                                        ),
+                                                                        maxLines = 1
+                                                                    )
+                                                                    if (subtitle.isNotEmpty()) {
+                                                                        Text(
+                                                                            text = subtitle,
+                                                                            style = TextStyle(
+                                                                                color = tileSubtextColor,
+                                                                                fontSize = 11.sp,
+                                                                                fontWeight = FontWeight.Normal,
+                                                                                fontFamily = FontFamily(
+                                                                                    "google-sans-flex"
+                                                                                ),
+                                                                                textAlign = TextAlign.Start
+                                                                            ),
+                                                                            maxLines = 1
+                                                                        )
+                                                                    }
+                                                                }
                                                             }
                                                         }
                                                     } else {

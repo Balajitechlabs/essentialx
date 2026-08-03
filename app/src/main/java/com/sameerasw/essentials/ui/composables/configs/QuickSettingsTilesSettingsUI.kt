@@ -745,7 +745,7 @@ fun QSTileCard(
                 modifier = Modifier.padding(8.dp)
             )
 
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(tile.titleRes),
                     style = MaterialTheme.typography.titleMedium,
@@ -761,6 +761,17 @@ fun QSTileCard(
                     color = contentColor.copy(alpha = 0.8f),
                     maxLines = 1,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+            }
+
+            if (isPinned) {
+                Icon(
+                    painter = painterResource(id = R.drawable.round_star_24),
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .padding(top = 2.dp)
                 )
             }
         }

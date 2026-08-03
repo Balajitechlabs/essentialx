@@ -94,4 +94,43 @@ object QsTileRegistry {
             false
         }
     }
+
+    fun getTileSubtitle(context: android.content.Context, className: String): String {
+        return try {
+            when (className) {
+                CaffeinateTileService::class.java.name -> {
+                    if (com.sameerasw.essentials.domain.controller.CaffeinateController.isActive.value) {
+                        "Active"
+                    } else if (com.sameerasw.essentials.domain.controller.CaffeinateController.isStarting.value) {
+                        "Starting"
+                    } else "Off"
+                }
+                FlashlightTileService::class.java.name -> {
+                    val instance = ScreenOffAccessibilityService.instance
+                    val isTorchOn = if (instance != null) {
+                        instance.flashlightHandler.isTorchOn
+                    } else false
+                    if (isTorchOn) "On" else "Off"
+                }
+                else -> {
+                    val clazz = Class.forName(className)
+                    if (BaseTileService::class.java.isAssignableFrom(clazz)) {
+                        val tileService = clazz.getDeclaredConstructor().newInstance() as BaseTileService
+                        val attachBaseContextMethod = android.content.ContextWrapper::class.java.getDeclaredMethod(
+                            "attachBaseContext",
+                            android.content.Context::class.java
+                        )
+                        attachBaseContextMethod.isAccessible = true
+                        attachBaseContextMethod.invoke(tileService, context)
+
+                        val getTileSubtitleMethod = BaseTileService::class.java.getDeclaredMethod("getTileSubtitle")
+                        getTileSubtitleMethod.isAccessible = true
+                        (getTileSubtitleMethod.invoke(tileService) as? String) ?: ""
+                    } else ""
+                }
+            }
+        } catch (e: Exception) {
+            ""
+        }
+    }
 }
