@@ -534,6 +534,14 @@
                 android:resource="@xml/favorites_widget_info" />
         </receiver>
 
+        <activity
+            android:name=".ui.activities.QsTilesWidgetConfigurationActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".services.widgets.QsTilesWidgetReceiver"
             android:exported="true"
