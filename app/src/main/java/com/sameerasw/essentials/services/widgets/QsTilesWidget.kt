@@ -190,6 +190,12 @@ class QsTilesWidget : GlanceAppWidget() {
                                                                     )
                                                                 )
 
+                                                            val activeIconRes = QsTileRegistry.getTileIcon(
+                                                                context,
+                                                                tile.serviceClass.name,
+                                                                tile.iconRes
+                                                            )
+
                                                             Row(
                                                                 modifier = cardModifier.padding(
                                                                     horizontal = 12.dp,
@@ -198,6 +204,7 @@ class QsTilesWidget : GlanceAppWidget() {
                                                                 horizontalAlignment = Alignment.CenterHorizontally,
                                                                 verticalAlignment = Alignment.CenterVertically
                                                             ) {
+
                                                                 Box(
                                                                     modifier = GlanceModifier
                                                                         .size(iconBoxSize)
@@ -209,7 +216,7 @@ class QsTilesWidget : GlanceAppWidget() {
                                                                 ) {
                                                                     Image(
                                                                         provider = ImageProvider(
-                                                                            tile.iconRes
+                                                                            activeIconRes
                                                                         ),
                                                                         contentDescription = resolvedTitle,
                                                                         colorFilter = ColorFilter.tint(

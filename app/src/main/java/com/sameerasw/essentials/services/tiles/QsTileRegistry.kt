@@ -133,4 +133,42 @@ object QsTileRegistry {
             ""
         }
     }
+
+    fun getTileIcon(context: android.content.Context, className: String, fallbackIconRes: Int): Int {
+        return try {
+            when (className) {
+                FlashlightTileService::class.java.name -> {
+                    val instance = ScreenOffAccessibilityService.instance
+                    val isTorchOn = if (instance != null) {
+                        instance.flashlightHandler.isTorchOn
+                    } else false
+                    if (isTorchOn) R.drawable.round_flashlight_on_24 else R.drawable.rounded_flashlight_on_24
+                }
+                else -> {
+                    val clazz = Class.forName(className)
+                    if (BaseTileService::class.java.isAssignableFrom(clazz)) {
+                        val tileService = clazz.getDeclaredConstructor().newInstance() as BaseTileService
+                        val attachBaseContextMethod = android.content.ContextWrapper::class.java.getDeclaredMethod(
+                            "attachBaseContext",
+                            android.content.Context::class.java
+                        )
+                        attachBaseContextMethod.isAccessible = true
+                        attachBaseContextMethod.invoke(tileService, context)
+
+                        val getTileIconMethod = BaseTileService::class.java.getDeclaredMethod("getTileIcon")
+                        getTileIconMethod.isAccessible = true
+                        val iconObj = getTileIconMethod.invoke(tileService) as? android.graphics.drawable.Icon
+                        if (iconObj != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                            val resId = iconObj.resId
+                            if (resId != 0) resId else fallbackIconRes
+                        } else {
+                            fallbackIconRes
+                        }
+                    } else fallbackIconRes
+                }
+            }
+        } catch (e: Exception) {
+            fallbackIconRes
+        }
+    }
 }
