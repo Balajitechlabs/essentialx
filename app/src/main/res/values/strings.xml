@@ -1709,7 +1709,8 @@
     <string name="label_battery_graph_title">Battery Drain &amp; Prediction</string>
     <string name="label_battery_graph_actual">Actual drain</string>
     <string name="label_battery_graph_predicted">Predicted</string>
-    <string name="label_battery_graph_remaining">~%s remaining</string>
+    <string name="label_battery_graph_remaining">%s to go</string>
+    <string name="label_battery_graph_ago">%s ago</string>
     <string name="action_show_wakeups">CPU wakeup history</string>
     <string name="action_hide_wakeups">Hide CPU wakeups</string>
     <string name="label_screen_on_drain">Screen On Drain</string>

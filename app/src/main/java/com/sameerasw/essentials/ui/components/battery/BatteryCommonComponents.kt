@@ -53,6 +53,7 @@ import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.HapticUtil
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.material3.Card
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import java.util.Locale
 
@@ -366,92 +367,131 @@ fun BatteryDrainGraphCard(
     val onSurfaceVariant = MaterialTheme.colorScheme.onSurfaceVariant
     val dashedColor = primaryColor.copy(alpha = 0.5f)
 
-    // Calculate prediction duration
-    val predictedDurationMs = remember(currentLevel, chargeTimeRemainingMs, avgCurrentMa) {
-        if (chargeTimeRemainingMs != null && chargeTimeRemainingMs > 0) {
-            chargeTimeRemainingMs
-        } else if (avgCurrentMa != null && avgCurrentMa > 0 && currentLevel > 0) {
-            val estimatedHours = (currentLevel.toDouble() / 100.0) * 12.0
-            (estimatedHours * 3600 * 1000).toLong()
+    // format hours
+    fun formatHoursRounded(hours: Double): String {
+        val rounded = (Math.round(hours * 4.0) / 4.0)
+        return if (rounded % 1.0 == 0.0) {
+            "${rounded.toInt()}h"
         } else {
-            // Default 6 hours prediction
-            6 * 3600 * 1000L
+            "$rounded" + "h"
         }
     }
 
-    val formattedRemainingTime = remember(predictedDurationMs) {
-        val hours = (predictedDurationMs / (1000 * 60 * 60)).toInt()
-        val mins = ((predictedDurationMs / (1000 * 60)) % 60).toInt()
-        if (hours > 0) "${hours}h ${mins}m" else "${mins}m"
+    //  prediction duration
+    val predictedDurationMs = remember(chargeTimeRemainingMs) {
+        if (chargeTimeRemainingMs != null && chargeTimeRemainingMs > 0) {
+            chargeTimeRemainingMs
+        } else {
+            null
+        }
     }
 
-    RoundedCardContainer(
-        containerColor = surfaceColor
+    val formattedToGo = remember(predictedDurationMs) {
+        if (predictedDurationMs != null) {
+            val hours = predictedDurationMs.toDouble() / (1000.0 * 3600.0)
+            "${formatHoursRounded(hours)} to go"
+        } else {
+            "¯\\_(ツ)_/¯"
+        }
+    }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val formattedAgo = remember(currentLevel) {
+        val repo = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+        val lastResetTime = repo.getLong("last_battery_stats_reset_time", -1L)
+        val elapsedMs = if (lastResetTime > 0L) {
+            (System.currentTimeMillis() - lastResetTime).coerceAtLeast(0L)
+        } else {
+            android.os.SystemClock.elapsedRealtime()
+        }
+        val hours = elapsedMs.toDouble() / (1000.0 * 3600.0)
+        "${formatHoursRounded(hours)} ago"
+    }
+
+    RoundedCardContainer{
+Card(
+    shape = Shapes.extraSmall,
+    colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = surfaceColor)
+) {
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(160.dp)
     ) {
+        val width = size.width
+        val height = size.height
+        val padding = 20.dp.toPx()
 
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(160.dp)
-        ) {
-            val width = size.width
-            val height = size.height
-            val padding = 20.dp.toPx()
+        val graphWidth = width - padding * 2
+        val graphHeight = height - padding * 2
 
-            val graphWidth = width - padding * 2
-            val graphHeight = height - padding * 2
+        // guides
+        val lineY100 = padding
+        val lineY50 = padding + graphHeight / 2
+        val lineY0 = padding + graphHeight
 
-            // guides
-            val lineY100 = padding
-            val lineY50 = padding + graphHeight / 2
-            val lineY0 = padding + graphHeight
+        val strokeWidthPx = 2.dp.toPx()
+        val gridColor = outlineVariant.copy(alpha = 0.4f)
 
-            val strokeWidthPx = 2.dp.toPx()
-            val gridColor = outlineVariant.copy(alpha = 0.4f)
+        drawLine(
+            color = gridColor,
+            start = androidx.compose.ui.geometry.Offset(padding, lineY100),
+            end = androidx.compose.ui.geometry.Offset(width - padding, lineY100),
+            strokeWidth = 1.dp.toPx()
+        )
+        drawLine(
+            color = gridColor,
+            start = androidx.compose.ui.geometry.Offset(padding, lineY50),
+            end = androidx.compose.ui.geometry.Offset(width - padding, lineY50),
+            strokeWidth = 1.dp.toPx()
+        )
+        drawLine(
+            color = gridColor,
+            start = androidx.compose.ui.geometry.Offset(padding, lineY0),
+            end = androidx.compose.ui.geometry.Offset(width - padding, lineY0),
+            strokeWidth = 1.dp.toPx()
+        )
 
-            drawLine(color = gridColor, start = androidx.compose.ui.geometry.Offset(padding, lineY100), end = androidx.compose.ui.geometry.Offset(width - padding, lineY100), strokeWidth = 1.dp.toPx())
-            drawLine(color = gridColor, start = androidx.compose.ui.geometry.Offset(padding, lineY50), end = androidx.compose.ui.geometry.Offset(width - padding, lineY50), strokeWidth = 1.dp.toPx())
-            drawLine(color = gridColor, start = androidx.compose.ui.geometry.Offset(padding, lineY0), end = androidx.compose.ui.geometry.Offset(width - padding, lineY0), strokeWidth = 1.dp.toPx())
+        // Define points
+        val midX = padding + graphWidth * 0.55f
+        val actualStartY = padding
+        val currentY = padding + graphHeight * (1f - currentLevel / 100f)
 
-            // Define points
-            val midX = padding + graphWidth * 0.55f
-            val actualStartY = padding
-            val currentY = padding + graphHeight * (1f - currentLevel / 100f)
-
-            // drain path
-            val actualPath = Path().apply {
-                moveTo(padding, actualStartY)
-                cubicTo(
-                    padding + (midX - padding) * 0.5f, actualStartY,
-                    padding + (midX - padding) * 0.5f, currentY,
-                    midX, currentY
-                )
-            }
-
-            // Fill area
-            val fillPath = Path().apply {
-                addPath(actualPath)
-                lineTo(midX, lineY0)
-                lineTo(padding, lineY0)
-                close()
-            }
-
-            drawPath(
-                path = fillPath,
-                brush = Brush.verticalGradient(
-                    colors = listOf(primaryColor.copy(alpha = 0.25f), Color.Transparent),
-                    startY = padding,
-                    endY = lineY0
-                )
+        // drain path
+        val actualPath = Path().apply {
+            moveTo(padding, actualStartY)
+            cubicTo(
+                padding + (midX - padding) * 0.5f, actualStartY,
+                padding + (midX - padding) * 0.5f, currentY,
+                midX, currentY
             )
+        }
 
-            drawPath(
-                path = actualPath,
-                color = primaryColor,
-                style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
+        // Fill area
+        val fillPath = Path().apply {
+            addPath(actualPath)
+            lineTo(midX, lineY0)
+            lineTo(padding, lineY0)
+            close()
+        }
+
+        drawPath(
+            path = fillPath,
+            brush = Brush.verticalGradient(
+                colors = listOf(primaryColor.copy(alpha = 0.25f), Color.Transparent),
+                startY = padding,
+                endY = lineY0
             )
+        )
 
-            // predicted path
+        drawPath(
+            path = actualPath,
+            color = primaryColor,
+            style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round)
+        )
+
+        // predicted path
+        if (predictedDurationMs != null) {
             val endX = width - padding
             val predictedY = lineY0 // 0%
 
@@ -472,31 +512,40 @@ fun BatteryDrainGraphCard(
                     pathEffect = PathEffect.dashPathEffect(floatArrayOf(12f, 12f), 0f)
                 )
             )
-
-            //  current level
-            drawCircle(
-                color = surfaceColor,
-                radius = 6.dp.toPx(),
-                center = androidx.compose.ui.geometry.Offset(midX, currentY)
-            )
-            drawCircle(
-                color = primaryColor,
-                radius = 4.dp.toPx(),
-                center = androidx.compose.ui.geometry.Offset(midX, currentY)
-            )
         }
 
+        //  current level
+        drawCircle(
+            color = surfaceColor,
+            radius = 6.dp.toPx(),
+            center = androidx.compose.ui.geometry.Offset(midX, currentY)
+        )
+        drawCircle(
+            color = primaryColor,
+            radius = 4.dp.toPx(),
+            center = androidx.compose.ui.geometry.Offset(midX, currentY)
+        )
+    }
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(12.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-                Text(
-                    text = stringResource(R.string.label_battery_graph_remaining, formattedRemainingTime),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = onSurfaceVariant
-                )
-        }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = formattedAgo,
+            style = MaterialTheme.typography.bodyMedium,
+            color = onSurfaceVariant
+        )
+        Text(
+            text = formattedToGo,
+            style = MaterialTheme.typography.bodyMedium,
+            color = onSurfaceVariant
+        )
+    }
+}
     }
 }

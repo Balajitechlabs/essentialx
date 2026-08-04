@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.data.repository.SettingsRepository
 
 data class BatteryUsageApp(
     val uid: Int,
@@ -27,6 +28,10 @@ object BatteryStatsUtil {
     fun resetStats(context: Context): Boolean {
         val res1 = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --reset")
         ShellUtils.runCommand(context, "cmd battery reset")
+        if (res1 != null) {
+            val repo = SettingsRepository(context)
+            repo.putLong("last_battery_stats_reset_time", System.currentTimeMillis())
+        }
         return res1 != null
     }
 
