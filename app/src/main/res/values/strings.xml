@@ -1702,7 +1702,10 @@
     <string name="label_thermal_status_critical">Critical Throttling</string>
     <string name="label_thermal_status_emergency">Emergency Throttling</string>
     <string name="label_thermal_status_shutdown">Shutdown Imminent</string>
-    <string name="action_charging_qs_tile_options">Charging mode QS tile options</string>
+    <string name="action_charging_qs_tile_options">Options</string>
+    <string name="action_reset_battery_stats">Reset stats</string>
+    <string name="label_reset_battery_stats_title">Reset Battery Statistics</string>
+    <string name="label_reset_battery_stats_desc">Resets system battery statistics (dumpsys batterystats --reset). This clears historical battery usage and app drain data so it starts tracking fresh from the current charge.</string>
     <string name="action_show_wakeups">CPU wakeup history</string>
     <string name="action_hide_wakeups">Hide CPU wakeups</string>
     <string name="label_screen_on_drain">Screen On Drain</string>

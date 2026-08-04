@@ -484,6 +484,47 @@ fun BatteryInfoTabContent(
                 )
             }
         }
+
+        val isShellAvailableForReset = com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
+        if (isShellAvailableForReset) {
+            RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surfaceBright,
+                            shape = Shapes.extraSmall
+                        )
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.label_reset_battery_stats_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Text(
+                        text = stringResource(R.string.label_reset_battery_stats_desc),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Button(
+                        onClick = {
+                            com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
+                            if (com.sameerasw.essentials.utils.BatteryStatsUtil.resetStats(context)) {
+                                onRefresh()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(text = stringResource(R.string.action_reset_battery_stats))
+                    }
+                }
+            }
+        }
     }
 
     // Permission Grant Card at the very bottom if BATTERY_STATS permission is missing AND Shizuku/Root is available & permitted
