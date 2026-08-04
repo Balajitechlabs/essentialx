@@ -269,7 +269,10 @@ fun BatteryDetailsBottomSheet(
                     onToggleShowAll = { showAllApps = !showAllApps },
                     showPercentage = showPercentage,
                     onToggleUnit = { showPercentage = !showPercentage },
-                    view = view
+                    view = view,
+                    currentLevel = batteryDetails.level,
+                    chargeTimeRemainingMs = batteryDetails.chargeTimeRemainingMs,
+                    avgCurrentMa = batteryDetails.currentAvgMa
                 )
                 2 -> BatterySystemTabContent(
                     isLoadingAdvanced = isLoadingAdvanced,

@@ -56,7 +56,10 @@ fun BatteryAppsTabContent(
     onToggleShowAll: () -> Unit,
     showPercentage: Boolean,
     onToggleUnit: () -> Unit,
-    view: View
+    view: View,
+    currentLevel: Int = 100,
+    chargeTimeRemainingMs: Long? = null,
+    avgCurrentMa: Int? = null
 ) {
     if (isLoadingAdvanced) {
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
@@ -73,6 +76,13 @@ fun BatteryAppsTabContent(
     } else {
         val displayedApps = if (showAllApps) usageApps else usageApps.take(20)
         val totalMah = usageApps.sumOf { it.powerMah }.coerceAtLeast(0.0001)
+
+        BatteryDrainGraphCard(
+            currentLevel = currentLevel,
+            chargeTimeRemainingMs = chargeTimeRemainingMs,
+            avgCurrentMa = avgCurrentMa,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
 
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             displayedApps.forEach { app ->

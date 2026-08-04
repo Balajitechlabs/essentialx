@@ -25,7 +25,9 @@ data class CpuWakeupItem(
 object BatteryStatsUtil {
 
     fun resetStats(context: Context): Boolean {
-        return ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --reset") != null
+        val res1 = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --reset")
+        ShellUtils.runCommand(context, "cmd battery reset")
+        return res1 != null
     }
 
     fun parseUsageApps(context: Context): List<BatteryUsageApp> {
