@@ -523,6 +523,20 @@ fun BatteryInfoTabContent(
                         Text(text = stringResource(R.string.action_reset_battery_stats))
                     }
                 }
+
+            var autoResetEnabled by remember {
+                mutableStateOf(settingsRepository.getBoolean("auto_reset_battery_stats", false))
+            }
+            com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+                title = stringResource(R.string.label_auto_reset_battery_stats_title),
+                description = stringResource(R.string.label_auto_reset_battery_stats_desc),
+                isChecked = autoResetEnabled,
+                onCheckedChange = { isChecked ->
+                    autoResetEnabled = isChecked
+                    settingsRepository.putBoolean("auto_reset_battery_stats", isChecked)
+                },
+                iconRes = R.drawable.rounded_cycle_24
+            )
             }
         }
     }

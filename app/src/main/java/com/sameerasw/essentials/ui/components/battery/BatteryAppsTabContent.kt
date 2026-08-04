@@ -59,7 +59,8 @@ fun BatteryAppsTabContent(
     view: View,
     currentLevel: Int = 100,
     chargeTimeRemainingMs: Long? = null,
-    avgCurrentMa: Int? = null
+    avgCurrentMa: Int? = null,
+    isPlugged: Boolean = false
 ) {
     if (isLoadingAdvanced) {
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
@@ -81,6 +82,7 @@ fun BatteryAppsTabContent(
             currentLevel = currentLevel,
             chargeTimeRemainingMs = chargeTimeRemainingMs,
             avgCurrentMa = avgCurrentMa,
+            isPlugged = isPlugged,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 

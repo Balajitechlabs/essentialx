@@ -276,7 +276,8 @@ fun BatteryDetailsBottomSheet(
                     view = view,
                     currentLevel = batteryDetails.level,
                     chargeTimeRemainingMs = batteryDetails.chargeTimeRemainingMs,
-                    avgCurrentMa = batteryDetails.currentAvgMa
+                    avgCurrentMa = batteryDetails.currentAvgMa,
+                    isPlugged = batteryDetails.plugged > 0
                 )
                 2 -> BatterySystemTabContent(
                     isLoadingAdvanced = isLoadingAdvanced,

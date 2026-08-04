@@ -1045,6 +1045,14 @@
         </receiver>
 
         <receiver
+            android:name=".services.receivers.BatteryAutomationReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".services.receivers.AppBootReceiver"
             android:exported="true">
             <intent-filter>

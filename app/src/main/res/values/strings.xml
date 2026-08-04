@@ -1706,6 +1706,8 @@
     <string name="action_reset_battery_stats">Reset stats</string>
     <string name="label_reset_battery_stats_title">Reset Battery Statistics</string>
     <string name="label_reset_battery_stats_desc">Resets system battery statistics (dumpsys batterystats --reset). This clears historical battery usage and app drain data so it starts tracking fresh from the current charge.</string>
+    <string name="label_auto_reset_battery_stats_title">Auto reset</string>
+    <string name="label_auto_reset_battery_stats_desc">Automatically reset battery statistics when the device is unplugged above 90% charge.</string>
     <string name="label_battery_graph_title">Battery Drain &amp; Prediction</string>
     <string name="label_battery_graph_actual">Actual drain</string>
     <string name="label_battery_graph_predicted">Predicted</string>

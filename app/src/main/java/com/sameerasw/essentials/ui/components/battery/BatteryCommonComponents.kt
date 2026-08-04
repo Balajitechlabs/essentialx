@@ -455,6 +455,7 @@ fun BatteryDrainGraphCard(
     currentLevel: Int,
     chargeTimeRemainingMs: Long? = null,
     avgCurrentMa: Int? = null,
+    isPlugged: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -551,10 +552,10 @@ Card(
 
         // Define points
         val midX = padding + graphWidth * 0.55f
-        val actualStartY = padding
+        val actualStartY = if (isPlugged) lineY0 else lineY100
         val currentY = padding + graphHeight * (1f - currentLevel / 100f)
 
-        // drain path
+        // drain / charge path
         val actualPath = Path().apply {
             moveTo(padding, actualStartY)
             cubicTo(
@@ -590,7 +591,7 @@ Card(
         // predicted path
         if (predictedDurationMs != null) {
             val endX = width - padding
-            val predictedY = lineY0 // 0%
+            val predictedY = if (isPlugged) lineY100 else lineY0
 
             val predictedPath = Path().apply {
                 moveTo(midX, currentY)
