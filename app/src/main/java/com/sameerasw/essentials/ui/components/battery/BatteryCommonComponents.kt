@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.graphics.drawable.toBitmap
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonGroupDefaults
@@ -250,6 +253,100 @@ fun BatteryLoadingIndicatorCard() {
         LinearWavyProgressIndicator(
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@Composable
+fun TopAppsBreakdownHeader(
+    usageApps: List<com.sameerasw.essentials.utils.BatteryUsageApp>
+) {
+    if (usageApps.isEmpty()) return
+
+    val top7Apps = remember(usageApps) { usageApps.take(7) }
+    val remainingApps = remember(usageApps) { usageApps.drop(7) }
+    val otherMah = remember(remainingApps) { remainingApps.sumOf { it.powerMah } }
+    val totalAllMah = remember(usageApps) { usageApps.sumOf { it.powerMah }.coerceAtLeast(0.0001) }
+
+    val hasOther = otherMah > 0.0001
+    val totalSegments = top7Apps.size + (if (hasOther) 1 else 0)
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(88.dp)
+            .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            top7Apps.forEachIndexed { index, app ->
+                val weight = ((app.powerMah / totalAllMah) * 100.0).toFloat().coerceAtLeast(1f)
+                var brandColor by remember(app.packageName) {
+                    mutableStateOf<Color?>(null)
+                }
+
+                androidx.compose.runtime.LaunchedEffect(app.packageName) {
+                    if (app.packageName != null) {
+                        com.sameerasw.essentials.utils.AppUtil.getAppBrandColor(context, app.packageName) { argb ->
+                            if (argb != android.graphics.Color.TRANSPARENT && argb != android.graphics.Color.GRAY) {
+                                brandColor = Color(argb)
+                            }
+                        }
+                    }
+                }
+
+                val barColor = brandColor ?: MaterialTheme.colorScheme.primaryContainer
+
+                val shape = when {
+                    totalSegments == 1 -> CircleShape
+                    index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes().shape
+                    index == totalSegments - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes().shape
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes().shape
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(weight)
+                        .fillMaxHeight()
+                        .clip(shape)
+                        .background(barColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (app.icon != null) {
+                        val bitmap = remember(app.icon) { app.icon.toBitmap(48, 48).asImageBitmap() }
+                        Image(
+                            bitmap = bitmap,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_info_24),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+
+            if (hasOther) {
+                val otherWeight = ((otherMah / totalAllMah) * 100.0).toFloat().coerceAtLeast(1f)
+                val otherShape = if (top7Apps.isEmpty()) CircleShape else ButtonGroupDefaults.connectedTrailingButtonShapes().shape
+                Box(
+                    modifier = Modifier
+                        .weight(otherWeight)
+                        .fillMaxHeight()
+                        .clip(otherShape)
+                        .background(MaterialTheme.colorScheme.outlineVariant)
+                )
+            }
+        }
     }
 }
 

@@ -223,6 +223,10 @@ fun BatteryDetailsBottomSheet(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
+            } else if (selectedTab == 1) {
+                com.sameerasw.essentials.ui.components.battery.TopAppsBreakdownHeader(
+                    usageApps = usageApps
+                )
             } else {
                 com.sameerasw.essentials.ui.components.battery.BatteryUsageBreakdownHeader(
                     appsPct = appsPct,
