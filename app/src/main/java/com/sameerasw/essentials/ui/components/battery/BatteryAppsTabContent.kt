@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -93,6 +94,11 @@ fun BatteryAppsTabContent(
                 var showMenu by remember { mutableStateOf(false) }
                 var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
+                val context = LocalContext.current
+                val canOpenAppInfo = remember(app.packageName) {
+                    app.packageName != null && app.packageName.contains(".")
+                }
+
                 Box {
                     Row(
                         modifier = Modifier
@@ -106,7 +112,7 @@ fun BatteryAppsTabContent(
                                     HapticUtil.performVirtualKeyHaptic(view)
                                     onToggleUnit()
                                 },
-                                onLongClick = if (isTranslationModeActive) {
+                                onLongClick = if (isTranslationModeActive || canOpenAppInfo) {
                                     {
                                         HapticUtil.performVirtualKeyHaptic(view)
                                         showMenu = true
@@ -174,13 +180,38 @@ fun BatteryAppsTabContent(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
-                        com.sameerasw.essentials.translation.ui.TranslationMenuItems(
-                            title = app.appName,
-                            onSelectKey = { key ->
-                                showMenu = false
-                                translationSheetKey = key
-                            }
-                        )
+                        if (canOpenAppInfo && app.packageName != null) {
+                            com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem(
+                                text = { Text(stringResource(R.string.label_app_info)) },
+                                onClick = {
+                                    showMenu = false
+                                    try {
+                                        val intent = android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data = android.net.Uri.fromParts("package", app.packageName, null)
+                                            addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        }
+                                        context.startActivity(intent)
+                                    } catch (_: Exception) {
+                                    }
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.rounded_info_24),
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                        }
+
+                        if (isTranslationModeActive) {
+                            com.sameerasw.essentials.translation.ui.TranslationMenuItems(
+                                title = app.appName,
+                                onSelectKey = { key ->
+                                    showMenu = false
+                                    translationSheetKey = key
+                                }
+                            )
+                        }
                     }
                 }
 

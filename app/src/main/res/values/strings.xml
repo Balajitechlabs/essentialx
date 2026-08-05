@@ -1,4 +1,5 @@
 <resources>
+    <string name="label_app_info">App Info</string>
     <string name="label_customization">Customization</string>
     <string name="label_beta">BETA</string>
     <string name="shut_up_attempt_shizuku_restart">Attempt Shizuku restart</string>
