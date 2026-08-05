@@ -1340,7 +1340,7 @@ object FeatureRegistry {
                 context.startActivity(
                     Intent(
                         context,
-                        com.sameerasw.essentials.AppUpdatesActivity::class.java
+                        com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java
                     )
                 )
             }
