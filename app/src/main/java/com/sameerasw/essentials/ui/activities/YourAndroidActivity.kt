@@ -564,7 +564,9 @@ fun YourAndroidContent(
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     ImportExportButtons(
-                        modifier = Modifier.wrapContentWidth().weight(1f),
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .weight(1f),
                         view = view,
                         exportLauncher = exportLauncher,
                         importLauncher = importLauncher,

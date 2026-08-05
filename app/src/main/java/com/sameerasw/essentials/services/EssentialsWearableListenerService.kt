@@ -64,7 +64,8 @@ class EssentialsWearableListenerService : WearableListenerService() {
                     SettingsRepository.KEY_REMOTE_LOCK_MODE,
                     0
                 )
-                val method = if (mode == 1) ScreenOffMethod.DEVICE_ADMIN else ScreenOffMethod.ACCESSIBILITY
+                val method =
+                    if (mode == 1) ScreenOffMethod.DEVICE_ADMIN else ScreenOffMethod.ACCESSIBILITY
                 DeviceLockUtils.lockDevice(this, method)
             }
 

@@ -7,7 +7,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,11 +22,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.Image
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.core.graphics.drawable.toBitmap
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -39,25 +38,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.foundation.Canvas
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.core.graphics.drawable.toBitmap
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.HapticUtil
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.material3.Card
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -113,7 +103,10 @@ fun SectionHeaderTitle(
     val keyForSheet1 = translationSheetKey
     if (keyForSheet1 != null) {
         val resolvedKey = remember(keyForSheet1) {
-            com.sameerasw.essentials.translation.TranslationManager.resolveKey(context, keyForSheet1) ?: keyForSheet1
+            com.sameerasw.essentials.translation.TranslationManager.resolveKey(
+                context,
+                keyForSheet1
+            ) ?: keyForSheet1
         }
         com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
             stringKey = resolvedKey,
@@ -188,9 +181,11 @@ fun InfoDetailRow(
                         val digits = s.replace("-", "").replace(Regex("[^0-9.]"), "")
                         return digits.toDoubleOrNull()
                     }
+
                     val oldVal = parseNum(initialState)
                     val newVal = parseNum(targetState)
-                    val isIncreasing = if (oldVal != null && newVal != null) newVal > oldVal else true
+                    val isIncreasing =
+                        if (oldVal != null && newVal != null) newVal > oldVal else true
 
                     if (isIncreasing) {
                         (slideInVertically { height -> -height } + fadeIn())
@@ -228,7 +223,10 @@ fun InfoDetailRow(
     val keyForSheet2 = translationSheetKey
     if (keyForSheet2 != null) {
         val resolvedKey = remember(keyForSheet2) {
-            com.sameerasw.essentials.translation.TranslationManager.resolveKey(context, keyForSheet2) ?: keyForSheet2
+            com.sameerasw.essentials.translation.TranslationManager.resolveKey(
+                context,
+                keyForSheet2
+            ) ?: keyForSheet2
         }
         com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
             stringKey = resolvedKey,
@@ -296,7 +294,10 @@ fun TopAppsBreakdownHeader(
 
                 androidx.compose.runtime.LaunchedEffect(app.packageName) {
                     if (app.packageName != null) {
-                        com.sameerasw.essentials.utils.AppUtil.getAppBrandColor(context, app.packageName) { argb ->
+                        com.sameerasw.essentials.utils.AppUtil.getAppBrandColor(
+                            context,
+                            app.packageName
+                        ) { argb ->
                             if (argb != android.graphics.Color.TRANSPARENT && argb != android.graphics.Color.GRAY) {
                                 brandColor = Color(argb)
                             }
@@ -322,7 +323,8 @@ fun TopAppsBreakdownHeader(
                     contentAlignment = Alignment.Center
                 ) {
                     if (app.icon != null) {
-                        val bitmap = remember(app.icon) { app.icon.toBitmap(48, 48).asImageBitmap() }
+                        val bitmap =
+                            remember(app.icon) { app.icon.toBitmap(48, 48).asImageBitmap() }
                         Image(
                             bitmap = bitmap,
                             contentDescription = null,
@@ -341,7 +343,8 @@ fun TopAppsBreakdownHeader(
 
             if (hasOther) {
                 val otherWeight = ((otherMah / totalAllMah) * 100.0).toFloat().coerceAtLeast(1f)
-                val otherShape = if (majorApps.isEmpty()) CircleShape else ButtonGroupDefaults.connectedTrailingButtonShapes().shape
+                val otherShape =
+                    if (majorApps.isEmpty()) CircleShape else ButtonGroupDefaults.connectedTrailingButtonShapes().shape
                 Box(
                     modifier = Modifier
                         .weight(otherWeight)
@@ -365,13 +368,24 @@ fun BatteryUsageBreakdownHeader(
     val safeSystem = systemPct.coerceIn(0f, 100f)
     val safeOther = otherPct.coerceIn(0f, 100f)
 
-    val animatedAppsWeight by animateFloatAsState(targetValue = safeApps.coerceAtLeast(1f), label = "apps_weight")
-    val animatedSystemWeight by animateFloatAsState(targetValue = safeSystem.coerceAtLeast(1f), label = "system_weight")
-    val animatedOtherWeight by animateFloatAsState(targetValue = safeOther.coerceAtLeast(1f), label = "other_weight")
+    val animatedAppsWeight by animateFloatAsState(
+        targetValue = safeApps.coerceAtLeast(1f),
+        label = "apps_weight"
+    )
+    val animatedSystemWeight by animateFloatAsState(
+        targetValue = safeSystem.coerceAtLeast(1f),
+        label = "system_weight"
+    )
+    val animatedOtherWeight by animateFloatAsState(
+        targetValue = safeOther.coerceAtLeast(1f),
+        label = "other_weight"
+    )
 
     // Colors: Only selected tab gets Primary accent color, all unselected sections use outlineVariant
-    val appsColor = if (activeTab == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
-    val systemColor = if (activeTab == 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    val appsColor =
+        if (activeTab == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+    val systemColor =
+        if (activeTab == 2) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
     val otherColor = MaterialTheme.colorScheme.outlineVariant
 
     Column(

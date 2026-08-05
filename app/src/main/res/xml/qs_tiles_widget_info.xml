@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:configure="com.sameerasw.essentials.ui.activities.QsTilesWidgetConfigurationActivity"
     android:description="@string/qs_tiles_widget_description"
     android:initialLayout="@layout/glance_default_loading_layout"
     android:minWidth="80dp"
@@ -9,7 +10,6 @@
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="2"
     android:targetCellHeight="1"
-    android:configure="com.sameerasw.essentials.ui.activities.QsTilesWidgetConfigurationActivity"
-    android:widgetFeatures="reconfigurable|configuration_optional"
     android:updatePeriodMillis="0"
-    android:widgetCategory="home_screen" />
+    android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable|configuration_optional" />

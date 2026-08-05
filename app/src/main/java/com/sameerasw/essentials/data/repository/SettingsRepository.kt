@@ -125,7 +125,8 @@ class SettingsRepository(private val context: Context) {
         const val KEY_FLASHLIGHT_PULSE_MAX_INTENSITY = "flashlight_pulse_max_intensity"
         const val KEY_FLASHLIGHT_PULSE_DISABLE_ON_DND = "flashlight_pulse_disable_on_dnd"
         const val KEY_FLASHLIGHT_POCKET_TURN_OFF_ENABLED = "flashlight_pocket_turn_off_enabled"
-        const val KEY_FLASHLIGHT_OVERHEAT_PREVENTION_ENABLED = "flashlight_overheat_prevention_enabled"
+        const val KEY_FLASHLIGHT_OVERHEAT_PREVENTION_ENABLED =
+            "flashlight_overheat_prevention_enabled"
 
         const val KEY_SCREEN_LOCKED_SECURITY_ENABLED = "screen_locked_security_enabled"
         const val KEY_HIDE_SYSTEM_ICONS = "hide_system_icons"
@@ -298,9 +299,11 @@ class SettingsRepository(private val context: Context) {
         const val KEY_LOCKDOWN_MODE = "lockdown_mode"
     }
 
-    fun isTranslationModeWarningSuppressed(): Boolean = getBoolean(KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING, false)
-    fun setTranslationModeWarningSuppressed(suppressed: Boolean) = putBoolean(KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING, suppressed)
+    fun isTranslationModeWarningSuppressed(): Boolean =
+        getBoolean(KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING, false)
 
+    fun setTranslationModeWarningSuppressed(suppressed: Boolean) =
+        putBoolean(KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING, suppressed)
 
 
     // Observe changes
@@ -791,7 +794,7 @@ class SettingsRepository(private val context: Context) {
 
             allConfigs.forEach { (fileName, prefWrapper) ->
                 val p = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
-                
+
                 // Preserve sensitive or volatile local state not present in backups
                 val preservedValues = mutableMapOf<String, Any?>()
                 val keysToPreserve = listOf(
@@ -811,8 +814,8 @@ class SettingsRepository(private val context: Context) {
                 }
 
                 p.edit().apply {
-                    if(!keepPrefs) clear()
-                    
+                    if (!keepPrefs) clear()
+
                     // Restore preserved values
                     preservedValues.forEach { (key, value) ->
                         if (value != null) {

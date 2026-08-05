@@ -83,13 +83,23 @@ class ButtonRemapHandler(
 
         // Flashlight Brightness Control (Volume Keys + Torch On)
         if (flashlightHandler.isTorchOn && (isAdjustEnabled || isGlobalEnabled) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val isAlwaysTurnOffEnabled = prefs.getBoolean("flashlight_always_turn_off_enabled", false)
+            val isAlwaysTurnOffEnabled =
+                prefs.getBoolean("flashlight_always_turn_off_enabled", false)
             val isVolUpFlashlight =
                 prefs.getString("button_remap_vol_up_action_off", "None") == "Toggle flashlight" ||
-                        prefs.getString("button_remap_vol_up_action_on", "None") == "Toggle flashlight"
+                        prefs.getString(
+                            "button_remap_vol_up_action_on",
+                            "None"
+                        ) == "Toggle flashlight"
             val isVolDownFlashlight =
-                prefs.getString("button_remap_vol_down_action_off", "None") == "Toggle flashlight" ||
-                        prefs.getString("button_remap_vol_down_action_on", "None") == "Toggle flashlight"
+                prefs.getString(
+                    "button_remap_vol_down_action_off",
+                    "None"
+                ) == "Toggle flashlight" ||
+                        prefs.getString(
+                            "button_remap_vol_down_action_on",
+                            "None"
+                        ) == "Toggle flashlight"
             val isFlashlightCapableButton =
                 (keyCode == KeyEvent.KEYCODE_VOLUME_UP && isVolUpFlashlight) ||
                         (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && isVolDownFlashlight)

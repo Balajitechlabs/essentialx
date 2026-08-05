@@ -42,9 +42,10 @@ object DeviceInfoSyncManager {
                 isIntensitySupported = FlashlightUtil.isIntensitySupported(context, cameraId)
                 syncDeviceInfo(context)
 
-                val intent = Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
-                    setPackage(context.packageName)
-                }
+                val intent =
+                    Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
+                        setPackage(context.packageName)
+                    }
                 context.sendBroadcast(intent)
             }
         }
@@ -177,16 +178,27 @@ object DeviceInfoSyncManager {
             ?: android.os.Build.MODEL
 
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-        val syncLocationReachedEnabled = prefs.getBoolean("watch_sync_location_reached_enabled", true)
-        
-        val travelActive = if (syncLocationReachedEnabled) prefs.getBoolean("travel_active", false) else false
-        val travelName = if (syncLocationReachedEnabled) (prefs.getString("travel_name", "") ?: "") else ""
-        val travelProgress = if (syncLocationReachedEnabled) prefs.getFloat("travel_progress", 0f) else 0f
-        val travelRemainingTime = if (syncLocationReachedEnabled) (prefs.getString("travel_remaining_time", "") ?: "") else ""
-        val travelRemainingDistance = if (syncLocationReachedEnabled) (prefs.getString("travel_remaining_distance", "") ?: "") else ""
-        val travelIconName = if (syncLocationReachedEnabled) (prefs.getString("travel_icon_name", "") ?: "") else ""
-        val travelIsPaused = if (syncLocationReachedEnabled) prefs.getBoolean("travel_is_paused", false) else false
-        val travelArrived = if (syncLocationReachedEnabled) prefs.getBoolean("travel_arrived", false) else false
+        val syncLocationReachedEnabled =
+            prefs.getBoolean("watch_sync_location_reached_enabled", true)
+
+        val travelActive =
+            if (syncLocationReachedEnabled) prefs.getBoolean("travel_active", false) else false
+        val travelName =
+            if (syncLocationReachedEnabled) (prefs.getString("travel_name", "") ?: "") else ""
+        val travelProgress =
+            if (syncLocationReachedEnabled) prefs.getFloat("travel_progress", 0f) else 0f
+        val travelRemainingTime =
+            if (syncLocationReachedEnabled) (prefs.getString("travel_remaining_time", "")
+                ?: "") else ""
+        val travelRemainingDistance =
+            if (syncLocationReachedEnabled) (prefs.getString("travel_remaining_distance", "")
+                ?: "") else ""
+        val travelIconName =
+            if (syncLocationReachedEnabled) (prefs.getString("travel_icon_name", "") ?: "") else ""
+        val travelIsPaused =
+            if (syncLocationReachedEnabled) prefs.getBoolean("travel_is_paused", false) else false
+        val travelArrived =
+            if (syncLocationReachedEnabled) prefs.getBoolean("travel_arrived", false) else false
 
         val flashlightPulseEnabled = prefs.getBoolean("flashlight_pulse_enabled", false)
         val aodState = when {

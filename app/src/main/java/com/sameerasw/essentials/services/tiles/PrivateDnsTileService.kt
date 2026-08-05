@@ -97,7 +97,11 @@ class PrivateDnsTileService : BaseTileService() {
                 // Turn on with the first preset
                 val firstPreset = presets.first()
                 try {
-                    Settings.Global.putString(contentResolver, PRIVATE_DNS_SPECIFIER, firstPreset.hostname)
+                    Settings.Global.putString(
+                        contentResolver,
+                        PRIVATE_DNS_SPECIFIER,
+                        firstPreset.hostname
+                    )
                     Settings.Global.putString(contentResolver, PRIVATE_DNS_MODE, MODE_HOSTNAME)
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -116,7 +120,11 @@ class PrivateDnsTileService : BaseTileService() {
                     // Next preset
                     val nextPreset = presets[currentIndex + 1]
                     try {
-                        Settings.Global.putString(contentResolver, PRIVATE_DNS_SPECIFIER, nextPreset.hostname)
+                        Settings.Global.putString(
+                            contentResolver,
+                            PRIVATE_DNS_SPECIFIER,
+                            nextPreset.hostname
+                        )
                         Settings.Global.putString(contentResolver, PRIVATE_DNS_MODE, MODE_HOSTNAME)
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -131,6 +139,7 @@ class PrivateDnsTileService : BaseTileService() {
                     MODE_AUTO -> {
                         if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
                     }
+
                     MODE_HOSTNAME -> MODE_OFF
                     else -> MODE_OFF
                 }
@@ -139,9 +148,11 @@ class PrivateDnsTileService : BaseTileService() {
                     MODE_OFF -> {
                         if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
                     }
+
                     MODE_AUTO -> {
                         if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
                     }
+
                     MODE_HOSTNAME -> MODE_OFF
                     else -> MODE_OFF
                 }

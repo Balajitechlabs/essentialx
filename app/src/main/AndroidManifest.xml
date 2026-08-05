@@ -1185,6 +1185,7 @@
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
+
             <meta-data
                 android:name="android.service.quicksettings.ACTION_QS_TILE_PREFERENCES"
                 android:value="com.sameerasw.essentials.ui.activities.QSPreferencesActivity" />

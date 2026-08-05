@@ -51,7 +51,12 @@ fun TranslationMenuItems(
         val keyOpt = remember(option) { TranslationManager.resolveKey(context, option) }
         val labelOpt = remember(option) {
             when (option) {
-                is Int -> try { context.getString(option) } catch (e: Exception) { option.toString() }
+                is Int -> try {
+                    context.getString(option)
+                } catch (e: Exception) {
+                    option.toString()
+                }
+
                 is String -> option
                 else -> option.toString()
             }
@@ -70,7 +75,12 @@ fun TranslationMenuItems(
         }
     }
 
-    val hasAnyKey = keyTitle != null || keyDesc != null || options.any { TranslationManager.resolveKey(context, it) != null }
+    val hasAnyKey = keyTitle != null || keyDesc != null || options.any {
+        TranslationManager.resolveKey(
+            context,
+            it
+        ) != null
+    }
     if (!hasAnyKey) {
         SegmentedDropdownMenuItem(
             text = { Text("No string key found") },

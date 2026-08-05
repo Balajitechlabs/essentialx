@@ -1,10 +1,8 @@
 package com.sameerasw.essentials.ui.components.sheets
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,18 +11,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -38,32 +31,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.battery.BatteryAppsTabContent
 import com.sameerasw.essentials.ui.components.battery.BatteryInfoTabContent
 import com.sameerasw.essentials.ui.components.battery.BatterySystemTabContent
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.BatteryDetails
 import com.sameerasw.essentials.utils.BatteryInfoUtil
 import com.sameerasw.essentials.utils.BatteryStatsUtil
 import com.sameerasw.essentials.utils.BatteryUsageApp
 import com.sameerasw.essentials.utils.CpuWakeupItem
 import com.sameerasw.essentials.utils.DeviceUtils
-import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun BatteryDetailsBottomSheet(
     initialDetails: BatteryDetails,
@@ -182,7 +172,8 @@ fun BatteryDetailsBottomSheet(
         ) {
             val totalAppsMah = remember(usageApps) { usageApps.sumOf { it.powerMah } }
             val systemDrainMa = remember(batteryDetails.powerProfile) {
-                batteryDetails.powerProfile?.values?.mapNotNull { it.toDoubleOrNull() }?.sum() ?: 0.0
+                batteryDetails.powerProfile?.values?.mapNotNull { it.toDoubleOrNull() }?.sum()
+                    ?: 0.0
             }
 
             // Estimate breakdown percentages (Apps vs System vs Other)
@@ -214,8 +205,13 @@ fun BatteryDetailsBottomSheet(
                                     R.font.google_sans_flex,
                                     variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(
                                         androidx.compose.ui.text.font.FontVariation.width(150f),
-                                        androidx.compose.ui.text.font.FontVariation.weight(FontWeight.Normal.weight),
-                                        androidx.compose.ui.text.font.FontVariation.Setting("ROND", 100f)
+                                        androidx.compose.ui.text.font.FontVariation.weight(
+                                            FontWeight.Normal.weight
+                                        ),
+                                        androidx.compose.ui.text.font.FontVariation.Setting(
+                                            "ROND",
+                                            100f
+                                        )
                                     )
                                 )
                             )
@@ -236,7 +232,7 @@ fun BatteryDetailsBottomSheet(
                 )
             }
 
-            RoundedCardContainer{
+            RoundedCardContainer {
                 com.sameerasw.essentials.ui.components.pickers.SegmentedPicker(
                     items = tabResIds,
                     selectedItem = tabResIds[selectedTab],
@@ -249,7 +245,10 @@ fun BatteryDetailsBottomSheet(
             val targetTabKey = tabTranslationSheetKey
             if (targetTabKey != null) {
                 val resolvedTabKey = remember(targetTabKey) {
-                    com.sameerasw.essentials.translation.TranslationManager.resolveKey(context, targetTabKey) ?: targetTabKey
+                    com.sameerasw.essentials.translation.TranslationManager.resolveKey(
+                        context,
+                        targetTabKey
+                    ) ?: targetTabKey
                 }
                 com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
                     stringKey = resolvedTabKey,
@@ -266,6 +265,7 @@ fun BatteryDetailsBottomSheet(
                         batteryDetails = BatteryInfoUtil.fetchAdvancedDetails(context, freshBasic)
                     }
                 )
+
                 1 -> BatteryAppsTabContent(
                     isLoadingAdvanced = isLoadingAdvanced,
                     usageApps = usageApps,
@@ -279,6 +279,7 @@ fun BatteryDetailsBottomSheet(
                     avgCurrentMa = batteryDetails.currentAvgMa,
                     isPlugged = batteryDetails.plugged > 0
                 )
+
                 2 -> BatterySystemTabContent(
                     isLoadingAdvanced = isLoadingAdvanced,
                     powerProfile = batteryDetails.powerProfile,

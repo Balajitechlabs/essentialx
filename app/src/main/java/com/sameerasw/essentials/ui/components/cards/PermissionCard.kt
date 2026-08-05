@@ -173,9 +173,20 @@ fun PermissionCard(
                         onDismissRequest = { showMenu = false }
                     ) {
                         val context = LocalContext.current
-                        val keyTitle = remember(title) { TranslationManager.resolveKey(context, title) }
-                        val keyDesc = remember(description) { TranslationManager.resolveKey(context, description) }
-                        val keyInst = remember(instructions) { TranslationManager.resolveKey(context, instructions) }
+                        val keyTitle =
+                            remember(title) { TranslationManager.resolveKey(context, title) }
+                        val keyDesc = remember(description) {
+                            TranslationManager.resolveKey(
+                                context,
+                                description
+                            )
+                        }
+                        val keyInst = remember(instructions) {
+                            TranslationManager.resolveKey(
+                                context,
+                                instructions
+                            )
+                        }
 
                         if (keyTitle != null) {
                             SegmentedDropdownMenuItem(

@@ -1,7 +1,7 @@
 package com.sameerasw.essentials.ui.activities
 
-import android.content.res.Configuration
 import android.content.Intent
+import android.content.res.Configuration
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -565,7 +565,10 @@ private fun CompassScreen(
         androidx.compose.material3.OutlinedIconButton(
             onClick = {
                 HapticUtil.performUIHaptic(view)
-                val intent = Intent(context, com.sameerasw.essentials.FeatureSettingsActivity::class.java).apply {
+                val intent = Intent(
+                    context,
+                    com.sameerasw.essentials.FeatureSettingsActivity::class.java
+                ).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     putExtra("feature", "Location reached")
                 }

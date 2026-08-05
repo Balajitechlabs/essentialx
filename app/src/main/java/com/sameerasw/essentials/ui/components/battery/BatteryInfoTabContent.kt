@@ -21,6 +21,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,18 +35,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.components.pickers.MultiSegmentedPicker
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.BatteryDetails
 import com.sameerasw.essentials.utils.BatteryInfoUtil
 import com.sameerasw.essentials.utils.ThermalInfo
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import com.sameerasw.essentials.data.repository.SettingsRepository
-import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
-import com.sameerasw.essentials.ui.components.pickers.MultiSegmentedPicker
 import java.util.Locale
 
 @Composable
@@ -115,7 +115,11 @@ fun BatteryInfoTabContent(
         )
         InfoDetailRow(
             title = R.string.label_battery_temperature,
-            value = String.format(LocalLocale.current.platformLocale, "%.1f °C", batteryDetails.temperature / 10.0f),
+            value = String.format(
+                LocalLocale.current.platformLocale,
+                "%.1f °C",
+                batteryDetails.temperature / 10.0f
+            ),
             iconRes = R.drawable.rounded_device_thermostat_24
         )
 
@@ -300,8 +304,10 @@ fun BatteryInfoTabContent(
             }
 
             // Average Remaining calculation (Current Charge / Average Current)
-            val chargeCounterMah = batteryDetails.chargeCounter?.let { if (it > 10000) it / 1000 else it }
-            val avgCurrentMa = batteryDetails.currentAvgMa?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
+            val chargeCounterMah =
+                batteryDetails.chargeCounter?.let { if (it > 10000) it / 1000 else it }
+            val avgCurrentMa =
+                batteryDetails.currentAvgMa?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
             if (chargeCounterMah != null && chargeCounterMah > 0 && avgCurrentMa != null) {
                 val remainingHours = chargeCounterMah.toDouble() / avgCurrentMa.toDouble()
                 val formattedRemaining = if (remainingHours >= 1.0) {
@@ -466,8 +472,14 @@ fun BatteryInfoTabContent(
                             enableAdaptive = newSelection.contains("adaptive")
                             enableLimit = newSelection.contains("limit")
 
-                            settingsRepository.putBoolean("charge_opt_toggle_deactivated", enableDeactivated)
-                            settingsRepository.putBoolean("charge_opt_toggle_adaptive", enableAdaptive)
+                            settingsRepository.putBoolean(
+                                "charge_opt_toggle_deactivated",
+                                enableDeactivated
+                            )
+                            settingsRepository.putBoolean(
+                                "charge_opt_toggle_adaptive",
+                                enableAdaptive
+                            )
                             settingsRepository.putBoolean("charge_opt_toggle_limit", enableLimit)
                         }
                     },
@@ -485,7 +497,10 @@ fun BatteryInfoTabContent(
             }
         }
 
-        val isShellAvailableForReset = com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
+        val isShellAvailableForReset =
+            com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                context
+            )
         if (isShellAvailableForReset) {
             RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
                 Column(
@@ -524,26 +539,29 @@ fun BatteryInfoTabContent(
                     }
                 }
 
-            var autoResetEnabled by remember {
-                mutableStateOf(settingsRepository.getBoolean("auto_reset_battery_stats", false))
-            }
-            com.sameerasw.essentials.ui.components.cards.IconToggleItem(
-                title = stringResource(R.string.label_auto_reset_battery_stats_title),
-                description = stringResource(R.string.label_auto_reset_battery_stats_desc),
-                isChecked = autoResetEnabled,
-                onCheckedChange = { isChecked ->
-                    autoResetEnabled = isChecked
-                    settingsRepository.putBoolean("auto_reset_battery_stats", isChecked)
-                },
-                iconRes = R.drawable.rounded_cycle_24
-            )
+                var autoResetEnabled by remember {
+                    mutableStateOf(settingsRepository.getBoolean("auto_reset_battery_stats", false))
+                }
+                com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+                    title = stringResource(R.string.label_auto_reset_battery_stats_title),
+                    description = stringResource(R.string.label_auto_reset_battery_stats_desc),
+                    isChecked = autoResetEnabled,
+                    onCheckedChange = { isChecked ->
+                        autoResetEnabled = isChecked
+                        settingsRepository.putBoolean("auto_reset_battery_stats", isChecked)
+                    },
+                    iconRes = R.drawable.rounded_cycle_24
+                )
             }
         }
     }
 
     // Permission Grant Card at the very bottom if BATTERY_STATS permission is missing AND Shizuku/Root is available & permitted
     val hasStatsPerm = BatteryInfoUtil.hasBatteryStatsPermission(context)
-    val isShellAvailable = com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
+    val isShellAvailable =
+        com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+            context
+        )
     if (!hasStatsPerm && batteryDetails.stateOfHealth == null && batteryDetails.cycleCount == null && android.os.Build.VERSION.SDK_INT >= 34 && isShellAvailable) {
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             Column(

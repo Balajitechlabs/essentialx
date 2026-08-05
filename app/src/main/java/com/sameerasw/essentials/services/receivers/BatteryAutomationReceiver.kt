@@ -13,11 +13,21 @@ class BatteryAutomationReceiver : BroadcastReceiver() {
         val action = intent.action ?: return
         val bm = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
         val level = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: -1
-        val isPlugged = action == Intent.ACTION_POWER_CONNECTED || (action == Intent.ACTION_BATTERY_CHANGED && intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0) > 0)
+        val isPlugged =
+            action == Intent.ACTION_POWER_CONNECTED || (action == Intent.ACTION_BATTERY_CHANGED && intent.getIntExtra(
+                BatteryManager.EXTRA_PLUGGED,
+                0
+            ) > 0)
 
         if (level >= 0) {
-            val force = action == Intent.ACTION_POWER_CONNECTED || action == Intent.ACTION_POWER_DISCONNECTED
-            com.sameerasw.essentials.utils.BatteryHistoryManager.recordPoint(context, level, isPlugged, forceRecord = force)
+            val force =
+                action == Intent.ACTION_POWER_CONNECTED || action == Intent.ACTION_POWER_DISCONNECTED
+            com.sameerasw.essentials.utils.BatteryHistoryManager.recordPoint(
+                context,
+                level,
+                isPlugged,
+                forceRecord = force
+            )
         }
 
         if (action == Intent.ACTION_POWER_DISCONNECTED) {

@@ -1464,48 +1464,48 @@
 
     <string name="label_advertise_is_enabled">Advertise Enabled</string>
     <string name="desc_advertise_is_enabled">Report to applications that battery saver is enabled.</string>
-    
+
     <string name="label_enable_datasaver">Data Saver</string>
     <string name="desc_enable_datasaver">Enable Data Saver to restrict background data usage.</string>
-    
+
     <string name="label_enable_night_mode">Force Dark/Night Mode</string>
     <string name="desc_enable_night_mode">Force dark theme when battery saver is activated.</string>
-    
+
     <string name="label_disable_launch_boost">Disable Launch Boost</string>
     <string name="desc_disable_launch_boost">Reduce CPU boosting during app startup to save power.</string>
-    
+
     <string name="label_disable_vibration">Disable Vibration</string>
     <string name="desc_disable_vibration">Disable haptic feedback and vibrations globally.</string>
-    
+
     <string name="label_disable_animation">Disable Animations</string>
     <string name="desc_disable_animation">Turn off window and system animations.</string>
-    
+
     <string name="label_defer_full_backup">Defer Full Backup</string>
     <string name="desc_defer_full_backup">Postpone full system backups until battery saver is turned off.</string>
-    
+
     <string name="label_defer_keyvalue_backup">Defer Key-Value Backup</string>
     <string name="desc_defer_keyvalue_backup">Postpone key-value backups.</string>
-    
+
     <string name="label_enable_firewall">Enable Firewall</string>
     <string name="desc_enable_firewall">Enable net firewall to restrict background networking.</string>
-    
+
     <string name="label_enable_brightness_adjustment">Enable Brightness Reduction</string>
     <string name="desc_enable_brightness_adjustment">Allow lowering the display brightness limit when saver is active.</string>
-    
+
     <string name="label_adjust_brightness_factor">Brightness Adjustment Factor</string>
-    
+
     <string name="label_force_all_apps_standby">Force Standby</string>
     <string name="desc_force_all_apps_standby">Put all apps into App Standby bucket when active.</string>
-    
+
     <string name="label_force_background_check">Force Background Check</string>
     <string name="desc_force_background_check">Enforce strict background service restrictions.</string>
-    
+
     <string name="label_disable_optional_sensors">Disable Optional Sensors</string>
     <string name="desc_disable_optional_sensors">Disable power-hungry optional sensors like proximity, gyro, etc.</string>
-    
+
     <string name="label_disable_aod">Disable Always-on Display</string>
     <string name="desc_disable_aod">Turn off Ambient / Always-on display.</string>
-    
+
     <string name="label_enable_quick_doze">Enable Quick Doze</string>
     <string name="desc_enable_quick_doze">Enter Doze sleep mode faster when the screen turns off.</string>
 
@@ -1542,7 +1542,6 @@
     <string name="label_snooze_option_4">Option 4</string>
     <string name="action_reset_snooze">Reset Snooze Options</string>
     <string name="msg_snooze_reset_success">Notification snooze options reset successfully</string>
-
 
 
     <string name="cat_interaction">Interaction</string>

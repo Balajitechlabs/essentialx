@@ -65,8 +65,12 @@ object BatteryInfoUtil {
         val intent = getBatteryIntent(context)
         val level = intent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
         val scale = intent?.getIntExtra(BatteryManager.EXTRA_SCALE, 100) ?: 100
-        val status = intent?.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN) ?: BatteryManager.BATTERY_STATUS_UNKNOWN
-        val health = intent?.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN) ?: BatteryManager.BATTERY_HEALTH_UNKNOWN
+        val status =
+            intent?.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN)
+                ?: BatteryManager.BATTERY_STATUS_UNKNOWN
+        val health =
+            intent?.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)
+                ?: BatteryManager.BATTERY_HEALTH_UNKNOWN
         val plugged = intent?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
         val voltage = intent?.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0) ?: 0
         val temp = intent?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) ?: 0
@@ -91,13 +95,16 @@ object BatteryInfoUtil {
 
         // BatteryManager Property queries
         val bm = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
-        val rawCurrentNow = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)?.takeIf { it != Int.MIN_VALUE }
+        val rawCurrentNow = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
+            ?.takeIf { it != Int.MIN_VALUE }
         val currentNowMa = rawCurrentNow?.let { it / 1000 }
 
-        val rawCurrentAvg = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE)?.takeIf { it != Int.MIN_VALUE }
+        val rawCurrentAvg = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_AVERAGE)
+            ?.takeIf { it != Int.MIN_VALUE }
         val currentAvgMa = rawCurrentAvg?.let { it / 1000 }
 
-        val rawEnergy = bm?.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)?.takeIf { it != Long.MIN_VALUE }
+        val rawEnergy = bm?.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)
+            ?.takeIf { it != Long.MIN_VALUE }
         val remainingEnergyMwh = rawEnergy?.let { it / 1_000_000 } // nWh to mWh
 
         val isPlugged = plugged > 0 || status == BatteryManager.BATTERY_STATUS_CHARGING
@@ -129,7 +136,8 @@ object BatteryInfoUtil {
             if (firstUse > 0 && firstUse != Long.MIN_VALUE) firstUseDate = firstUse
 
             try {
-                val getStringPropMethod = bm.javaClass.getMethod("getStringProperty", Int::class.javaPrimitiveType)
+                val getStringPropMethod =
+                    bm.javaClass.getMethod("getStringProperty", Int::class.javaPrimitiveType)
                 serialNum = getStringPropMethod.invoke(bm, 11) as? String
             } catch (e: Exception) {
             }
@@ -166,23 +174,29 @@ object BatteryInfoUtil {
     fun fetchAdvancedDetails(context: Context, basic: BatteryDetails): BatteryDetails {
         if (!ShellUtils.hasPermission(context)) return basic
 
-        var chargeFull: Long? = readSysfsLong(context, "/sys/class/power_supply/battery/charge_full")
-        var chargeFullDesign: Long? = readSysfsLong(context, "/sys/class/power_supply/battery/charge_full_design")
-        var currentNow: Long? = readSysfsLong(context, "/sys/class/power_supply/battery/current_now")
-        var voltageNow: Long? = readSysfsLong(context, "/sys/class/power_supply/battery/voltage_now")
+        var chargeFull: Long? =
+            readSysfsLong(context, "/sys/class/power_supply/battery/charge_full")
+        var chargeFullDesign: Long? =
+            readSysfsLong(context, "/sys/class/power_supply/battery/charge_full_design")
+        var currentNow: Long? =
+            readSysfsLong(context, "/sys/class/power_supply/battery/current_now")
+        var voltageNow: Long? =
+            readSysfsLong(context, "/sys/class/power_supply/battery/voltage_now")
 
         val dumpsysOutput = ShellUtils.runCommandWithOutput(context, "dumpsys battery")
         val dumpsysMap = parseDumpsysBattery(dumpsysOutput)
 
         // SAMSUNG SPECIFIC: mSavedBattery... fields
-        val samsungCycleCount = (dumpsysMap["mSavedBatteryUsage"]?.cleanNumericValue()?.toIntOrNull() 
-            ?: dumpsysMap["mUsage"]?.cleanNumericValue()?.toIntOrNull())?.let { 
-            if (it > 10000) it / 100 else it // Handle cumulative percentage vs cycles
-        } ?: dumpsysMap["mSavedBatteryCycle"]?.cleanNumericValue()?.toIntOrNull()
+        val samsungCycleCount =
+            (dumpsysMap["mSavedBatteryUsage"]?.cleanNumericValue()?.toIntOrNull()
+                ?: dumpsysMap["mUsage"]?.cleanNumericValue()?.toIntOrNull())?.let {
+                if (it > 10000) it / 100 else it // Handle cumulative percentage vs cycles
+            } ?: dumpsysMap["mSavedBatteryCycle"]?.cleanNumericValue()?.toIntOrNull()
             ?: dumpsysMap["mCycle"]?.cleanNumericValue()?.toIntOrNull()
             ?: dumpsysMap["CycleCount"]?.cleanNumericValue()?.toIntOrNull()
             ?: readSysfsLong(context, "/sys/class/power_supply/battery/cycle_count")?.toInt()
-            ?: readSysfsLong(context, "/efs/FactoryApp/batt_discharge_level")?.toInt()?.let { if (it > 0) it / 100 else null }
+            ?: readSysfsLong(context, "/efs/FactoryApp/batt_discharge_level")?.toInt()
+                ?.let { if (it > 0) it / 100 else null }
             ?: readSysfsLong(context, "/sys/class/power_supply/battery/battery_cycle")?.toInt()
 
         val samsungSoH = dumpsysMap["mSavedBatteryAsoc"]?.cleanNumericValue()?.toIntOrNull()
@@ -190,27 +204,36 @@ object BatteryInfoUtil {
             ?: readSysfsLong(context, "/sys/class/power_supply/battery/fg_asoc")?.toInt()
 
         if (chargeFull == null) {
-            dumpsysMap["mSavedBatteryMax"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()?.let { chargeFull = it * 1000 }
+            dumpsysMap["mSavedBatteryMax"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()
+                ?.let { chargeFull = it * 1000 }
         }
 
-        val chargeCounter = dumpsysMap["Charge counter"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()
-            ?: dumpsysMap["mSavedBattery"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()?.let { it * 1000 }
-            ?: readSysfsLong(context, "/sys/class/power_supply/battery/charge_counter")
+        val chargeCounter =
+            dumpsysMap["Charge counter"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()
+                ?: dumpsysMap["mSavedBattery"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()
+                    ?.let { it * 1000 }
+                ?: readSysfsLong(context, "/sys/class/power_supply/battery/charge_counter")
 
-        val maxChargingCurrent = dumpsysMap["Max charging current"]?.cleanNumericValue()?.toDoubleOrNull()?.toInt()
-        val maxChargingVoltage = dumpsysMap["Max charging voltage"]?.cleanNumericValue()?.toDoubleOrNull()?.toInt()
+        val maxChargingCurrent =
+            dumpsysMap["Max charging current"]?.cleanNumericValue()?.toDoubleOrNull()?.toInt()
+        val maxChargingVoltage =
+            dumpsysMap["Max charging voltage"]?.cleanNumericValue()?.toDoubleOrNull()?.toInt()
         val chargingState = dumpsysMap["Charging state"]?.cleanNumericValue()?.toIntOrNull()
         val chargingPolicy = dumpsysMap["Charging policy"]?.cleanNumericValue()?.toIntOrNull()
         val capacityLevel = dumpsysMap["Capacity level"]?.cleanNumericValue()?.toIntOrNull()
 
-        val samsungSerial = dumpsysMap["serial_number"] ?: dumpsysMap["mSerialNumber"] ?: dumpsysMap["Serial number"]
-        val samsungPartStatus = dumpsysMap["mSavedBatteryEfuse"]?.cleanNumericValue()?.toIntOrNull()?.let { if (it == 0) 1 else 2 }
+        val samsungSerial = dumpsysMap["serial_number"] ?: dumpsysMap["mSerialNumber"]
+        ?: dumpsysMap["Serial number"]
+        val samsungPartStatus = dumpsysMap["mSavedBatteryEfuse"]?.cleanNumericValue()?.toIntOrNull()
+            ?.let { if (it == 0) 1 else 2 }
             ?: dumpsysMap["Part status"]?.cleanNumericValue()?.toIntOrNull()
 
-        val powerProfileOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --power-profile")
+        val powerProfileOutput =
+            ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --power-profile")
         val powerProfileMap = parsePowerProfile(powerProfileOutput)
 
-        val settingsOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --settings")
+        val settingsOutput =
+            ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --settings")
         val enforceLevel = parseSettingsEnforceLevel(settingsOutput)
 
         return basic.copy(
@@ -274,7 +297,8 @@ object BatteryInfoUtil {
         val map = mutableMapOf<String, String>()
         output.lines().forEach { line ->
             val trimmed = line.trim()
-            val delimiter = if (trimmed.contains(":")) ":" else if (trimmed.contains("=")) "=" else null
+            val delimiter =
+                if (trimmed.contains(":")) ":" else if (trimmed.contains("=")) "=" else null
             if (delimiter != null) {
                 val parts = trimmed.split(delimiter, limit = 2)
                 if (parts.size == 2) {
@@ -298,7 +322,11 @@ object BatteryInfoUtil {
             return R.drawable.battery_android_frame_alert_24px
         }
         val isChargeLimitEnabled = try {
-            android.provider.Settings.Secure.getInt(context.contentResolver, "charge_optimization_mode", 0) == 1
+            android.provider.Settings.Secure.getInt(
+                context.contentResolver,
+                "charge_optimization_mode",
+                0
+            ) == 1
         } catch (e: Exception) {
             false
         }
@@ -393,7 +421,7 @@ object BatteryInfoUtil {
         val date = java.util.Date(epochSeconds * 1000)
         val sdf = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
         val formatted = sdf.format(date)
-        
+
         // Suspicious / sentinel check (e.g. 2020-12-01 default or Unix epoch 1970-01-01)
         val cal = java.util.Calendar.getInstance().apply { time = date }
         val year = cal.get(java.util.Calendar.YEAR)

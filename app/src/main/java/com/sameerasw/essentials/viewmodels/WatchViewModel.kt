@@ -36,7 +36,8 @@ class WatchViewModel : ViewModel() {
             connectedWatchName.value = nodes.firstOrNull()?.displayName
 
             // Wear app version is lower than required (or not yet reported)
-            isWearUpdateRequired.value = detected && storedVersion < com.sameerasw.essentials.BuildConfig.REQUIRED_WEAR_VERSION_CODE
+            isWearUpdateRequired.value =
+                detected && storedVersion < com.sameerasw.essentials.BuildConfig.REQUIRED_WEAR_VERSION_CODE
 
             if (detected) {
                 val messageClient = Wearable.getMessageClient(context)

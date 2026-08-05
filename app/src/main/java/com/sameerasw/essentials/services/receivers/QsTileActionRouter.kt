@@ -6,7 +6,9 @@ import android.content.Intent
 import android.util.Log
 import com.sameerasw.essentials.MainActivity
 import com.sameerasw.essentials.domain.controller.CaffeinateController
-import com.sameerasw.essentials.services.tiles.*
+import com.sameerasw.essentials.services.tiles.BaseTileService
+import com.sameerasw.essentials.services.tiles.CaffeinateTileService
+import com.sameerasw.essentials.services.tiles.FlashlightTileService
 import com.sameerasw.essentials.utils.HapticUtil
 
 class QsTileActionRouter : BroadcastReceiver() {
@@ -29,21 +31,26 @@ class QsTileActionRouter : BroadcastReceiver() {
                         CaffeinateController.toggle(context)
                     }
                 }
+
                 FlashlightTileService::class.java.name -> {
-                    val flashlightIntent = Intent(context, FlashlightActionReceiver::class.java).apply {
-                        action = FlashlightActionReceiver.ACTION_TOGGLE
-                    }
+                    val flashlightIntent =
+                        Intent(context, FlashlightActionReceiver::class.java).apply {
+                            action = FlashlightActionReceiver.ACTION_TOGGLE
+                        }
                     context.sendBroadcast(flashlightIntent)
                 }
+
                 else -> {
                     val clazz = Class.forName(serviceClassName)
                     if (BaseTileService::class.java.isAssignableFrom(clazz)) {
-                        val tileService = clazz.getDeclaredConstructor().newInstance() as BaseTileService
-                        
-                        val attachBaseContextMethod = android.content.ContextWrapper::class.java.getDeclaredMethod(
-                            "attachBaseContext",
-                            Context::class.java
-                        )
+                        val tileService =
+                            clazz.getDeclaredConstructor().newInstance() as BaseTileService
+
+                        val attachBaseContextMethod =
+                            android.content.ContextWrapper::class.java.getDeclaredMethod(
+                                "attachBaseContext",
+                                Context::class.java
+                            )
                         attachBaseContextMethod.isAccessible = true
                         attachBaseContextMethod.invoke(tileService, context)
 

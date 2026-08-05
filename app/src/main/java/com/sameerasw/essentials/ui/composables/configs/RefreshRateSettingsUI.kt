@@ -38,7 +38,8 @@ fun RefreshRateSettingsUI(
 ) {
     val context = LocalContext.current
     val view = LocalView.current
-    val isEnabled = if (viewModel.isRootEnabled.value) viewModel.isRootPermissionGranted.value else viewModel.isShizukuPermissionGranted.value
+    val isEnabled =
+        if (viewModel.isRootEnabled.value) viewModel.isRootPermissionGranted.value else viewModel.isShizukuPermissionGranted.value
     val isFixedMode = viewModel.refreshRateMode.value == RefreshRateUtils.MODE_FIXED
     val systemLabel = stringResource(R.string.refresh_rate_system_default)
 

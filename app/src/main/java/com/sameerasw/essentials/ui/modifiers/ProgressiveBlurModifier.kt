@@ -4,6 +4,7 @@ import android.graphics.RenderEffect
 import android.graphics.RuntimeShader
 import android.os.Build
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
@@ -12,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asComposeRenderEffect
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.remember
 import org.intellij.lang.annotations.Language
 
 enum class BlurDirection {
@@ -87,8 +87,10 @@ fun Modifier.progressiveBlur(
     val overlayColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.65f)
 
     val context = LocalContext.current
-    val isPowerSave = remember(context) { com.sameerasw.essentials.utils.DeviceUtils.isPowerSaveMode(context) }
-    val isSamsungOneUi7OrLess = remember { com.sameerasw.essentials.utils.DeviceUtils.isBlurProblematicDevice() }
+    val isPowerSave =
+        remember(context) { com.sameerasw.essentials.utils.DeviceUtils.isPowerSaveMode(context) }
+    val isSamsungOneUi7OrLess =
+        remember { com.sameerasw.essentials.utils.DeviceUtils.isBlurProblematicDevice() }
 
     val blurModifier =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && blurRadius > 0f && !isPowerSave && !isSamsungOneUi7OrLess) {

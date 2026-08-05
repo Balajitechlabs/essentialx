@@ -55,7 +55,8 @@ object ThermalUtil {
     fun getThermalInfo(context: Context): ThermalInfo? {
         if (!ShellUtils.hasPermission(context)) return null
 
-        val output = ShellUtils.runCommandWithOutput(context, "dumpsys thermalservice") ?: return null
+        val output =
+            ShellUtils.runCommandWithOutput(context, "dumpsys thermalservice") ?: return null
         return parseDumpsysThermalService(output)
     }
 
@@ -65,7 +66,8 @@ object ThermalUtil {
 
         // Format in dumpsys thermalservice:
         // Temperature{mValue=35.2, mType=3, mName=battery, mStatus=0}
-        val regex = Regex("""Temperature\{mValue=([0-9.]+),\s*mType=([0-9]+),\s*mName=([^,]+),\s*mStatus=([0-9]+)\}""")
+        val regex =
+            Regex("""Temperature\{mValue=([0-9.]+),\s*mType=([0-9]+),\s*mName=([^,]+),\s*mStatus=([0-9]+)\}""")
 
         output.lines().forEach { line ->
             regex.find(line)?.let { match ->

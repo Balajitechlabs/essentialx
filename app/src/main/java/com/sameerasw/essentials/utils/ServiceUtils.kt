@@ -3,18 +3,17 @@ package com.sameerasw.essentials.utils
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import com.sameerasw.essentials.data.repository.SettingsRepository
-import com.sameerasw.essentials.domain.diy.Automation
-import com.sameerasw.essentials.domain.diy.DIYRepository
-import com.sameerasw.essentials.services.AppDetectionService
-import com.sameerasw.essentials.services.BatteryNotificationService
-
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.domain.diy.Automation
+import com.sameerasw.essentials.domain.diy.DIYRepository
+import com.sameerasw.essentials.services.AppDetectionService
 import com.sameerasw.essentials.services.AppUpdateWorker
+import com.sameerasw.essentials.services.BatteryNotificationService
 import java.util.concurrent.TimeUnit
 
 object ServiceUtils {

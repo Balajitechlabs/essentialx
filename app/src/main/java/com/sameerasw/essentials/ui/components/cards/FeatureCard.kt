@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,15 +32,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.ui.graphics.toArgb
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
@@ -174,22 +174,25 @@ fun FeatureCard(
                             containerColor = MaterialTheme.colorScheme.error,
                             contentColor = MaterialTheme.colorScheme.onError
                         ) {
-                            val composition by com.airbnb.lottie.compose.rememberLottieComposition(com.airbnb.lottie.compose.LottieCompositionSpec.RawRes(R.raw.update_motion))
+                            val composition by com.airbnb.lottie.compose.rememberLottieComposition(
+                                com.airbnb.lottie.compose.LottieCompositionSpec.RawRes(R.raw.update_motion)
+                            )
                             val progress by com.airbnb.lottie.compose.animateLottieCompositionAsState(
                                 composition = composition,
                                 iterations = com.airbnb.lottie.compose.LottieConstants.IterateForever
                             )
                             val onErrorColor = MaterialTheme.colorScheme.onError
-                            val dynamicProperties = com.airbnb.lottie.compose.rememberLottieDynamicProperties(
-                                com.airbnb.lottie.compose.rememberLottieDynamicProperty(
-                                    property = com.airbnb.lottie.LottieProperty.COLOR_FILTER,
-                                    value = android.graphics.PorterDuffColorFilter(
-                                        onErrorColor.toArgb(),
-                                        android.graphics.PorterDuff.Mode.SRC_ATOP
-                                    ),
-                                    keyPath = arrayOf("**")
+                            val dynamicProperties =
+                                com.airbnb.lottie.compose.rememberLottieDynamicProperties(
+                                    com.airbnb.lottie.compose.rememberLottieDynamicProperty(
+                                        property = com.airbnb.lottie.LottieProperty.COLOR_FILTER,
+                                        value = android.graphics.PorterDuffColorFilter(
+                                            onErrorColor.toArgb(),
+                                            android.graphics.PorterDuff.Mode.SRC_ATOP
+                                        ),
+                                        keyPath = arrayOf("**")
+                                    )
                                 )
-                            )
 
                             com.airbnb.lottie.compose.LottieAnimation(
                                 composition = composition,

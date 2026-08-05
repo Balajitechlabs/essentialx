@@ -44,7 +44,12 @@ fun TranslatableText(
     val defaultText = stringResource(id = stringResId)
     val currentLocale = remember { context.resources.configuration.locales[0].language }
 
-    val displayText = remember(keyName, currentLocale, defaultText, TranslationManager.liveOverrides[Pair(keyName, currentLocale)]) {
+    val displayText = remember(
+        keyName,
+        currentLocale,
+        defaultText,
+        TranslationManager.liveOverrides[Pair(keyName, currentLocale)]
+    ) {
         TranslationManager.getOverriddenText(keyName, currentLocale, defaultText)
     }
 

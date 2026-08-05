@@ -13,7 +13,6 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.sameerasw.essentials.MainActivity
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.LocationReachedRepository
 import com.sameerasw.essentials.domain.model.LocationAlarm
@@ -351,7 +350,8 @@ class LocationReachedService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val mainIntent = Intent(this, com.sameerasw.essentials.ui.activities.TravelCompassActivity::class.java)
+        val mainIntent =
+            Intent(this, com.sameerasw.essentials.ui.activities.TravelCompassActivity::class.java)
         val mainPendingIntent = PendingIntent.getActivity(
             this,
             0,
