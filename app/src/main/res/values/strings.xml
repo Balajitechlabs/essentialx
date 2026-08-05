@@ -360,6 +360,10 @@
 
     <!-- Status Bar Settings -->
     <string name="stb_clock_seconds">Show Seconds in Clock</string>
+    <string name="stb_clock_position">Clock Position</string>
+    <string name="stb_clock_position_left">Left</string>
+    <string name="stb_clock_position_center">Center</string>
+    <string name="stb_clock_position_right">Right</string>
     <string name="stb_battery_percentage">Battery Percentage</string>
     <string name="stb_battery_percentage_always">Always</string>
     <string name="stb_battery_percentage_charging">Charging</string>

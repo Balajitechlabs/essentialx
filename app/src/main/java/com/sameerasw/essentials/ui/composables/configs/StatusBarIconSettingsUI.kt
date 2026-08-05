@@ -318,6 +318,49 @@ fun StatusBarIconSettingsUI(
                 modifier = Modifier.highlight(highlightSetting == "clock_seconds")
             )
 
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceBright,
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
+                    )
+                    .highlight(highlightSetting == "clock_position")
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, start = 20.dp, end = 16.dp, bottom = 2.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.stb_clock_position),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = if (isPermissionGranted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = 0.38f
+                        )
+                    )
+                }
+                SegmentedPicker(
+                    items = listOf(1, 2, 3),
+                    selectedItem = viewModel.clockPosition.value,
+                    onItemSelected = { pos ->
+                        viewModel.setClockPosition(pos, context)
+                    },
+                    labelProvider = { pos ->
+                        when (pos) {
+                            1 -> context.getString(R.string.stb_clock_position_left)
+                            2 -> context.getString(R.string.stb_clock_position_center)
+                            3 -> context.getString(R.string.stb_clock_position_right)
+                            else -> ""
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(if (!isPermissionGranted) Modifier.alpha(0.5f) else Modifier),
+                )
+            }
+
             IconToggleItem(
                 iconRes = R.drawable.rounded_security_24,
                 title = stringResource(R.string.stb_privacy_chip),
