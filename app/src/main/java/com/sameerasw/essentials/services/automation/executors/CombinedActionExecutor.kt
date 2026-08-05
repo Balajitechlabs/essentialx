@@ -260,6 +260,8 @@ object CombinedActionExecutor {
                                 ).show()
                             }
                         }
+
+                        else -> {}
                     }
                 }
 

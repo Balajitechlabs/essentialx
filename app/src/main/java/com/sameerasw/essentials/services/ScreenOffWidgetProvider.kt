@@ -188,6 +188,8 @@ class ScreenOffWidgetProvider : AppWidgetProvider() {
                         .show()
                 }
             }
+
+            else -> {}
         }
     }
 

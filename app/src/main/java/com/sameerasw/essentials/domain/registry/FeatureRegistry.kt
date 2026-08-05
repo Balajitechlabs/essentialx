@@ -825,7 +825,14 @@ object FeatureRegistry {
                     "Refresh Rate",
                     R.array.keywords_visual_style,
                     R.string.feat_qs_tiles_title
-                )
+                ),
+                SearchSetting(
+                    R.string.tile_lockdown_mode,
+                    R.string.tile_lockdown_mode_desc,
+                    "Lockdown",
+                    R.array.keywords_float_window,
+                    R.string.feat_qs_tiles_title
+                ),
             )
         ) {
             override fun isEnabled(viewModel: MainViewModel) = false
@@ -1461,6 +1468,28 @@ object FeatureRegistry {
             override fun isEnabled(viewModel: MainViewModel) = false
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
             override fun isDeviceSupported(context: Context) = DeviceUtils.isGoogleDevice()
-        }
+        },
+
+        object : Feature(
+            id = "Lockdown mode",
+            title = R.string.tile_lockdown_mode,
+            iconRes = R.drawable.rounded_lock_24,
+            category = R.string.cat_tools,
+            description = R.string.tile_lockdown_mode_desc,
+            aboutDescription = R.string.tile_lockdown_mode_about_desc,
+            permissionKeys = listOf("DEVICE_ADMIN"),
+            showToggle = true,
+            isVisibleInMain = false,
+            hasMoreSettings = false,
+            parentFeatureId = "Security",
+        ) {
+            override fun isEnabled(viewModel: MainViewModel): Boolean =
+                viewModel.isLockdownModeEnabled.value
+
+            override fun isToggleEnabled(viewModel: MainViewModel, context: Context): Boolean = true
+
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
+                viewModel.toggleLockdownMode()
+        },
     )
 }

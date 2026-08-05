@@ -294,6 +294,8 @@ class SettingsRepository(private val context: Context) {
         const val KEY_POCKET_MODE_LOCK_SCREEN_ONLY = "pocket_mode_lock_screen_only"
         const val KEY_KEEP_PREFS = "keep_prefs"
         const val KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING = "translation_mode_do_not_show_warning"
+
+        const val KEY_LOCKDOWN_MODE = "lockdown_mode"
     }
 
     fun isTranslationModeWarningSuppressed(): Boolean = getBoolean(KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING, false)
