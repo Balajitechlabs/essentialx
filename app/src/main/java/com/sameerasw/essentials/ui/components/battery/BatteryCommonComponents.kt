@@ -262,13 +262,17 @@ fun TopAppsBreakdownHeader(
 ) {
     if (usageApps.isEmpty()) return
 
-    val top7Apps = remember(usageApps) { usageApps.take(7) }
-    val remainingApps = remember(usageApps) { usageApps.drop(7) }
-    val otherMah = remember(remainingApps) { remainingApps.sumOf { it.powerMah } }
     val totalAllMah = remember(usageApps) { usageApps.sumOf { it.powerMah }.coerceAtLeast(0.0001) }
+    val majorApps = remember(usageApps, totalAllMah) {
+        usageApps.filter { (it.powerMah / totalAllMah) * 100.0 >= 2.5 }
+    }
+    val remainingApps = remember(usageApps, majorApps) {
+        usageApps.filterNot { majorApps.contains(it) }
+    }
+    val otherMah = remember(remainingApps) { remainingApps.sumOf { it.powerMah } }
 
     val hasOther = otherMah > 0.0001
-    val totalSegments = top7Apps.size + (if (hasOther) 1 else 0)
+    val totalSegments = majorApps.size + (if (hasOther) 1 else 0)
     val context = androidx.compose.ui.platform.LocalContext.current
 
     Column(
@@ -284,7 +288,7 @@ fun TopAppsBreakdownHeader(
                 .height(40.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            top7Apps.forEachIndexed { index, app ->
+            majorApps.forEachIndexed { index, app ->
                 val weight = ((app.powerMah / totalAllMah) * 100.0).toFloat().coerceAtLeast(1f)
                 var brandColor by remember(app.packageName) {
                     mutableStateOf<Color?>(null)
@@ -337,7 +341,7 @@ fun TopAppsBreakdownHeader(
 
             if (hasOther) {
                 val otherWeight = ((otherMah / totalAllMah) * 100.0).toFloat().coerceAtLeast(1f)
-                val otherShape = if (top7Apps.isEmpty()) CircleShape else ButtonGroupDefaults.connectedTrailingButtonShapes().shape
+                val otherShape = if (majorApps.isEmpty()) CircleShape else ButtonGroupDefaults.connectedTrailingButtonShapes().shape
                 Box(
                     modifier = Modifier
                         .weight(otherWeight)
@@ -467,11 +471,14 @@ fun BatteryDrainGraphCard(
 
     // format hours
     fun formatHoursRounded(hours: Double): String {
-        val rounded = (Math.round(hours * 4.0) / 4.0)
-        return if (rounded % 1.0 == 0.0) {
-            "${rounded.toInt()}h"
-        } else {
-            "$rounded" + "h"
+        val totalMinutes = Math.round(hours * 60.0).toInt()
+        if (totalMinutes <= 0) return "0m"
+        val h = totalMinutes / 60
+        val m = totalMinutes % 60
+        return when {
+            h > 0 && m > 0 -> "${h}h ${m}m"
+            h > 0 -> "${h}h"
+            else -> "${m}m"
         }
     }
 
@@ -492,18 +499,11 @@ fun BatteryDrainGraphCard(
         points
     }
 
-    val predictedDurationMs = remember(chargeTimeRemainingMs, avgCurrentMa, currentLevel) {
+    val predictedDurationMs = remember(chargeTimeRemainingMs) {
         if (chargeTimeRemainingMs != null && chargeTimeRemainingMs > 0) {
             chargeTimeRemainingMs
         } else {
-            val current = avgCurrentMa?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
-            if (current != null) {
-                val capacityMah = 4000.0
-                val diffPct = if (isPlugged) (100 - currentLevel) else currentLevel
-                if (diffPct > 0) {
-                    ((capacityMah * (diffPct / 100.0) / current) * 3600 * 1000).toLong()
-                } else null
-            } else null
+            null
         }
     }
 

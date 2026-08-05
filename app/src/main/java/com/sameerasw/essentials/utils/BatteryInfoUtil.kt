@@ -106,23 +106,8 @@ object BatteryInfoUtil {
         } else null
 
         val chargeTimeRemaining = if (isPlugged) {
-            computedChargeTime ?: run {
-                val current = (currentAvgMa ?: currentNowMa)?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
-                if (current != null && level < 100) {
-                    val remainingPct = 100 - level
-                    val capacityMah = 4000.0 
-                    val neededMah = capacityMah * (remainingPct / 100.0)
-                    (neededMah / current * 3600 * 1000).toLong()
-                } else null
-            }
-        } else {
-            val current = (currentAvgMa ?: currentNowMa)?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
-            if (current != null && level > 0) {
-                val capacityMah = 4000.0
-                val currentMah = capacityMah * (level / 100.0)
-                (currentMah / current * 3600 * 1000).toLong()
-            } else null
-        }
+            computedChargeTime
+        } else null
 
         val hasStatsPerm = hasBatteryStatsPermission(context)
 
