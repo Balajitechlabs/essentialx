@@ -297,7 +297,7 @@
     <string name="permission_missing">Permission missing</string>
     <string name="tile_lockdown_mode">Lockdown</string>
     <string name="tile_lockdown_mode_desc">Force require pin/pattern to unlock</string>
-    <string name="tile_lockdown_mode_about_desc">Lock your phone or Lockdown if lockdown mode is turned on.\n\nLockdown mode disables weak unlock methods like face/fingerprint and require pattern or pin securely to unlock your phone.\n\nBoth works with Shizuku and normal lock works with Accessibility too.</string>
+    <string name="tile_lockdown_mode_about_desc">Lock your phone or Lockdown if lockdown mode is turned on.\n\nLockdown mode disables weak unlock methods like face/fingerprint and require pattern or pin securely to unlock your phone.\n\nRequires device admin permission if using lockdown.</string>
 
 
     <!-- Screen Locked Security -->

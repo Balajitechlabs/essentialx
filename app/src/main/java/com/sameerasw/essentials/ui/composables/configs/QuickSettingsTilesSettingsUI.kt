@@ -352,7 +352,7 @@ fun QuickSettingsTilesSettingsUI(
             R.string.tile_lockdown_mode,
             R.drawable.rounded_lock_24,
             LockdownTileService::class.java,
-            listOf("ACCESSIBILITY", if (ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"),
+            listOf("ACCESSIBILITY", "DEVICE_ADMIN"),
             R.string.tile_lockdown_mode_about_desc,
             R.string.cat_privacy
         )
