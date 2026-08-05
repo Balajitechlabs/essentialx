@@ -54,9 +54,10 @@ object TranslationManager {
         if (resOrText is String && resOrText.isNotBlank()) {
             val trimmed = resOrText.trim()
 
-            session.edits.firstOrNull { it.newValue.trim() == trimmed || it.originalValue.trim() == trimmed }?.let {
-                return it.key
-            }
+            session.edits.firstOrNull { it.newValue.trim() == trimmed || it.originalValue.trim() == trimmed }
+                ?.let {
+                    return it.key
+                }
             liveOverrides.entries.firstOrNull { it.value.trim() == trimmed }?.let {
                 return it.key.first
             }
@@ -88,7 +89,10 @@ object TranslationManager {
             all.entries.firstOrNull { (_, map) ->
                 map.values.any { v ->
                     val cleanV = v.replace(Regex("%[0-9]*\\$?[a-zA-Z]"), "").trim()
-                    cleanV.length >= 3 && (trimmed.contains(cleanV, ignoreCase = true) || cleanV.contains(trimmed, ignoreCase = true))
+                    cleanV.length >= 3 && (trimmed.contains(
+                        cleanV,
+                        ignoreCase = true
+                    ) || cleanV.contains(trimmed, ignoreCase = true))
                 }
             }?.let { return it.key }
         }

@@ -15,7 +15,8 @@ import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 object DeviceLockUtils {
 
     fun performLockdownTileAction(context: Context, isLongPress: Boolean): Boolean {
-        val isLockdownEnabled = SettingsRepository(context).getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE, false)
+        val isLockdownEnabled =
+            SettingsRepository(context).getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE, false)
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
 
         val selectedScreenOffMethod = try {
@@ -58,9 +59,10 @@ object DeviceLockUtils {
                 if (ScreenOffAccessibilityService.instance != null) {
                     performAccessibilityLock(ScreenOffAccessibilityService.instance!!)
                 } else {
-                    val serviceIntent = Intent(context, ScreenOffAccessibilityService::class.java).apply {
-                        action = "LOCK_SCREEN"
-                    }
+                    val serviceIntent =
+                        Intent(context, ScreenOffAccessibilityService::class.java).apply {
+                            action = "LOCK_SCREEN"
+                        }
                     context.startService(serviceIntent)
                 }
                 true
@@ -75,7 +77,8 @@ object DeviceLockUtils {
                     ).show()
                     return false
                 }
-                val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+                val dpm =
+                    context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
                 dpm.lockNow()
                 true
             }

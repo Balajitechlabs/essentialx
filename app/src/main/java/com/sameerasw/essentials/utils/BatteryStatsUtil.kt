@@ -88,7 +88,17 @@ object BatteryStatsUtil {
                     val pkg = pm.getPackagesForUid(uid)?.firstOrNull()
                     val label = getSystemUidLabel(uid, pkg)
                     val drawable = pkg?.let { getAppIcon(pm, it) }
-                    list.add(BatteryUsageApp(uid, pkg, label, currentMah, currentFg, currentBg, drawable))
+                    list.add(
+                        BatteryUsageApp(
+                            uid,
+                            pkg,
+                            label,
+                            currentMah,
+                            currentFg,
+                            currentBg,
+                            drawable
+                        )
+                    )
                 }
                 val parts = trimmed.split(":")
                 currentUid = parts[0].removePrefix("UID ").trim().let { uStr ->
@@ -98,7 +108,8 @@ object BatteryStatsUtil {
                         uStr.toIntOrNull()
                     }
                 }
-                currentMah = parts.getOrNull(1)?.trim()?.split(" ")?.firstOrNull()?.toDoubleOrNull() ?: 0.0
+                currentMah =
+                    parts.getOrNull(1)?.trim()?.split(" ")?.firstOrNull()?.toDoubleOrNull() ?: 0.0
                 currentFg = 0L
                 currentBg = 0L
             } else if (currentUid != null && trimmed.startsWith("cpu=")) {
@@ -111,7 +122,17 @@ object BatteryStatsUtil {
             val pkg = pm.getPackagesForUid(lastUid)?.firstOrNull()
             val label = getSystemUidLabel(lastUid, pkg)
             val drawable = pkg?.let { getAppIcon(pm, it) }
-            list.add(BatteryUsageApp(lastUid, pkg, label, currentMah, currentFg, currentBg, drawable))
+            list.add(
+                BatteryUsageApp(
+                    lastUid,
+                    pkg,
+                    label,
+                    currentMah,
+                    currentFg,
+                    currentBg,
+                    drawable
+                )
+            )
         }
 
         return list.sortedByDescending { it.powerMah }

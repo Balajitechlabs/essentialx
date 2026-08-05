@@ -572,7 +572,10 @@ object FeatureRegistry {
             override fun isEnabled(viewModel: MainViewModel) = true
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
             override fun onClick(context: Context, viewModel: MainViewModel) {
-                val intent = Intent(context, com.sameerasw.essentials.FeatureSettingsActivity::class.java).apply {
+                val intent = Intent(
+                    context,
+                    com.sameerasw.essentials.FeatureSettingsActivity::class.java
+                ).apply {
                     putExtra("feature", "Power and Battery")
                 }
                 context.startActivity(intent)
@@ -594,7 +597,10 @@ object FeatureRegistry {
             override fun isEnabled(viewModel: MainViewModel) = true
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
             override fun onClick(context: Context, viewModel: MainViewModel) {
-                val intent = Intent(context, com.sameerasw.essentials.FeatureSettingsActivity::class.java).apply {
+                val intent = Intent(
+                    context,
+                    com.sameerasw.essentials.FeatureSettingsActivity::class.java
+                ).apply {
                     putExtra("feature", "Flashlight")
                 }
                 context.startActivity(intent)
@@ -648,7 +654,10 @@ object FeatureRegistry {
                 viewModel.setShowNotificationSnoozeEnabled(context, enabled)
 
             override fun onClick(context: Context, viewModel: MainViewModel) {
-                val intent = Intent(context, com.sameerasw.essentials.FeatureSettingsActivity::class.java).apply {
+                val intent = Intent(
+                    context,
+                    com.sameerasw.essentials.FeatureSettingsActivity::class.java
+                ).apply {
                     putExtra("feature", "Notification snoozing")
                 }
                 context.startActivity(intent)

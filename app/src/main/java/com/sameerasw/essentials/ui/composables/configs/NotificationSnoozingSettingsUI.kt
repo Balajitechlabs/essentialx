@@ -12,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -110,7 +109,11 @@ fun NotificationSnoozingSettingsUI(
                                 if (index < options.size) {
                                     options[index] = newVal.toInt()
                                 }
-                                viewModel.saveNotificationSnoozeOptions(context, snoozeDefault, options)
+                                viewModel.saveNotificationSnoozeOptions(
+                                    context,
+                                    snoozeDefault,
+                                    options
+                                )
                                 HapticUtil.performSliderHaptic(view)
                             },
                             valueRange = 10f..1440f,
@@ -130,7 +133,11 @@ fun NotificationSnoozingSettingsUI(
                     onClick = {
                         viewModel.resetNotificationSnoozeOptions(context)
                         HapticUtil.performUIHaptic(view)
-                        Toast.makeText(context, context.getString(R.string.msg_snooze_reset_success), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.msg_snooze_reset_success),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {

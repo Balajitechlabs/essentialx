@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -25,7 +23,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
@@ -62,7 +59,8 @@ fun TranslationBottomSheet(
 
     val sourceEnglish = translations["en"] ?: ""
     val originalTargetVal = translations[currentLocale] ?: ""
-    val currentDisplayVal = TranslationManager.getOverriddenText(stringKey, currentLocale, originalTargetVal)
+    val currentDisplayVal =
+        TranslationManager.getOverriddenText(stringKey, currentLocale, originalTargetVal)
 
     var inputText by remember { mutableStateOf(currentDisplayVal) }
 
@@ -131,7 +129,9 @@ fun TranslationBottomSheet(
                             OutlinedTextField(
                                 value = inputText,
                                 onValueChange = { inputText = it },
-                                modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 8.dp),
                                 placeholder = { Text("Enter translation in ${currentLocale.uppercase()}…") },
                                 singleLine = false,
                                 maxLines = 4,

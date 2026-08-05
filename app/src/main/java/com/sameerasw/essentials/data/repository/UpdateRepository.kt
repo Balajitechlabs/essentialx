@@ -18,7 +18,8 @@ class UpdateRepository {
     ): UpdateInfo? = withContext(Dispatchers.IO) {
         try {
             val autoUpdateHelper = AutoUpdateManagerHelper(context)
-            val updateFeatures = autoUpdateHelper.checkForUpdate("https://sameerasw.com/essentials-update.json")
+            val updateFeatures =
+                autoUpdateHelper.checkForUpdate("https://sameerasw.com/essentials-update.json")
 
             if (updateFeatures != null && updateFeatures.latestversion.isNotEmpty()) {
                 val latestVersion = updateFeatures.latestversion

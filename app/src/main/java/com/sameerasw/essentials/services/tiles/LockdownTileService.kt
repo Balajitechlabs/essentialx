@@ -28,7 +28,8 @@ class LockdownTileService : BaseTileService() {
     override fun hasFeaturePermission(): Boolean = true
 
     override fun getTileIcon(): Icon {
-        val iconRes = if (lockdownModeStatus()) R.drawable.rounded_shield_lock_24 else R.drawable.rounded_lock_24
+        val iconRes =
+            if (lockdownModeStatus()) R.drawable.rounded_shield_lock_24 else R.drawable.rounded_lock_24
         return Icon.createWithResource(this, iconRes)
     }
 

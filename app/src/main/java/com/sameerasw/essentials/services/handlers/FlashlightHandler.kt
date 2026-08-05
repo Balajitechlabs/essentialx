@@ -669,7 +669,8 @@ class FlashlightHandler(
             while (isTorchOn) {
                 kotlinx.coroutines.delay(120000L)
                 val prefs = service.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-                val isOverheatEnabled = prefs.getBoolean("flashlight_overheat_prevention_enabled", true)
+                val isOverheatEnabled =
+                    prefs.getBoolean("flashlight_overheat_prevention_enabled", true)
                 if (isOverheatEnabled && FlashlightUtil.isIntensitySupported(service, cameraId)) {
                     val currentLevel = FlashlightUtil.getCurrentLevel(service, cameraId)
                     val maxLevel = FlashlightUtil.getMaxLevel(service, cameraId)

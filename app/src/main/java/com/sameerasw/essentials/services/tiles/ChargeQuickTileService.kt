@@ -39,7 +39,7 @@ class ChargeQuickTileService : BaseTileService() {
     override fun onTileClick() {
         val adaptiveChargingEnabled = getSecureInt(ADAPTIVE_CHARGING_SETTING, 0) == 1
         val chargeOptimizationEnabled = getSecureInt(CHARGE_OPTIMIZATION_MODE, 0) == 1
-        
+
         val settingsRepository = com.sameerasw.essentials.data.repository.SettingsRepository(this)
         val enableAdaptive = settingsRepository.getBoolean("charge_opt_toggle_adaptive", true)
         val enableLimit = settingsRepository.getBoolean("charge_opt_toggle_limit", true)
@@ -73,10 +73,12 @@ class ChargeQuickTileService : BaseTileService() {
                 putSecureInt(CHARGE_OPTIMIZATION_MODE, 0)
                 putSecureInt(ADAPTIVE_CHARGING_SETTING, 0)
             }
+
             1 -> {
                 putSecureInt(CHARGE_OPTIMIZATION_MODE, 0)
                 putSecureInt(ADAPTIVE_CHARGING_SETTING, 1)
             }
+
             2 -> {
                 putSecureInt(CHARGE_OPTIMIZATION_MODE, 1)
                 putSecureInt(ADAPTIVE_CHARGING_SETTING, 0)

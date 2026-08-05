@@ -16,7 +16,10 @@ fun updateIconBlacklistSetting(
     blacklistNames: Set<String>
 ) {
     val repository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
-    val isEnabled = repository.getBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_STATUS_BAR_ICON_CONTROL_ENABLED, false)
+    val isEnabled = repository.getBoolean(
+        com.sameerasw.essentials.data.repository.SettingsRepository.KEY_STATUS_BAR_ICON_CONTROL_ENABLED,
+        false
+    )
     if (!isEnabled) return
 
     if (blacklistNames.isEmpty()) {

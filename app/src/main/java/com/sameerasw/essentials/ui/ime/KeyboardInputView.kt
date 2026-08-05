@@ -773,7 +773,8 @@ fun KeyboardInputView(
                                 functions.forEach { (iconRes, desc) ->
                                     customItem(
                                         buttonGroupContent = {
-                                            val fnInteraction = remember { MutableInteractionSource() }
+                                            val fnInteraction =
+                                                remember { MutableInteractionSource() }
                                             val isPressed by fnInteraction.collectIsPressedAsState()
                                             val animatedRadius by animateDpAsState(
                                                 targetValue = if (isPressed) 4.dp else keyRoundness,
@@ -1083,7 +1084,8 @@ fun KeyboardInputView(
                                                                 val accents =
                                                                     if (isAccentedCharactersEnabled) KeyAccentMap[char]
                                                                         ?: emptyList() else emptyList()
-                                                                val variants = mutableListOf<String>()
+                                                                val variants =
+                                                                    mutableListOf<String>()
                                                                 val xRatio = (index + 0.5f) / 10f
                                                                 var startIndex = 0
 
@@ -1101,12 +1103,20 @@ fun KeyboardInputView(
                                                                     startIndex = variants.size - 1
                                                                 } else {
                                                                     val half = accents.size / 2
-                                                                    variants.addAll(accents.take(half))
+                                                                    variants.addAll(
+                                                                        accents.take(
+                                                                            half
+                                                                        )
+                                                                    )
                                                                     if (secondary != null) variants.add(
                                                                         secondary
                                                                     )
                                                                     startIndex = variants.size - 1
-                                                                    variants.addAll(accents.drop(half))
+                                                                    variants.addAll(
+                                                                        accents.drop(
+                                                                            half
+                                                                        )
+                                                                    )
                                                                 }
 
 
@@ -1188,7 +1198,8 @@ fun KeyboardInputView(
                                                                     val accents =
                                                                         if (isAccentedCharactersEnabled) KeyAccentMap[char]
                                                                             ?: emptyList() else emptyList()
-                                                                    val variants = mutableListOf<String>()
+                                                                    val variants =
+                                                                        mutableListOf<String>()
                                                                     val xRatio =
                                                                         (index + 0.5f) / currentRow2.size.toFloat()
                                                                     var startIndex = 0
@@ -1204,24 +1215,37 @@ fun KeyboardInputView(
                                                                         if (secondary != null) variants.add(
                                                                             secondary
                                                                         )
-                                                                        startIndex = variants.size - 1
+                                                                        startIndex =
+                                                                            variants.size - 1
                                                                     } else {
                                                                         val half = accents.size / 2
-                                                                        variants.addAll(accents.take(half))
+                                                                        variants.addAll(
+                                                                            accents.take(
+                                                                                half
+                                                                            )
+                                                                        )
                                                                         if (secondary != null) variants.add(
                                                                             secondary
                                                                         )
-                                                                        startIndex = variants.size - 1
-                                                                        variants.addAll(accents.drop(half))
+                                                                        startIndex =
+                                                                            variants.size - 1
+                                                                        variants.addAll(
+                                                                            accents.drop(
+                                                                                half
+                                                                            )
+                                                                        )
                                                                     }
 
                                                                     if (variants.isNotEmpty()) {
                                                                         longPressKey = char
                                                                         longPressVariants = variants
-                                                                        initialAccentIndex = startIndex
-                                                                        selectedAccentIndex = startIndex
+                                                                        initialAccentIndex =
+                                                                            startIndex
+                                                                        selectedAccentIndex =
+                                                                            startIndex
                                                                         longPressXRatio = xRatio
-                                                                        longPressYRatio = 0.4f // Row 2
+                                                                        longPressYRatio =
+                                                                            0.4f // Row 2
                                                                     }
                                                                 }
                                                             },
@@ -1229,7 +1253,9 @@ fun KeyboardInputView(
                                                             interactionSource = row2Interaction,
                                                             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                                             contentColor = MaterialTheme.colorScheme.onSurface,
-                                                            shape = RoundedCornerShape(animatedRadius),
+                                                            shape = RoundedCornerShape(
+                                                                animatedRadius
+                                                            ),
                                                             modifier = Modifier
                                                                 .weight(1f)
                                                                 .fillMaxHeight()
@@ -1264,7 +1290,8 @@ fun KeyboardInputView(
                                     // Shift Key
                                     customItem(
                                         buttonGroupContent = {
-                                            val shiftInteraction = remember { MutableInteractionSource() }
+                                            val shiftInteraction =
+                                                remember { MutableInteractionSource() }
                                             val isPressed by shiftInteraction.collectIsPressedAsState()
 
                                             var shiftPressTime by remember {
@@ -1310,7 +1337,8 @@ fun KeyboardInputView(
                                                     performLightHaptic()
                                                     if (!isSymbols) {
                                                         shiftPressTime = System.currentTimeMillis()
-                                                        wasShiftOffAtDown = (shiftState == ShiftState.OFF)
+                                                        wasShiftOffAtDown =
+                                                            (shiftState == ShiftState.OFF)
                                                         isSelectionPerformed =
                                                             false // Reset selection tracker
                                                         if (wasShiftOffAtDown) {
@@ -1351,7 +1379,9 @@ fun KeyboardInputView(
                                                     contentDescription = "Shift",
                                                     modifier = Modifier.size(24.dp),
                                                     tint = if (isSymbols) {
-                                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                                        MaterialTheme.colorScheme.onSurface.copy(
+                                                            alpha = 0.3f
+                                                        )
                                                     } else if (shiftState != ShiftState.OFF) {
                                                         MaterialTheme.colorScheme.onPrimary
                                                     } else {
@@ -1392,7 +1422,8 @@ fun KeyboardInputView(
                                                                 val accents =
                                                                     if (isAccentedCharactersEnabled) KeyAccentMap[char]
                                                                         ?: emptyList() else emptyList()
-                                                                val variants = mutableListOf<String>()
+                                                                val variants =
+                                                                    mutableListOf<String>()
                                                                 val xRatio = (index + 2.0f) / 10.5f
                                                                 var startIndex = 0
 
@@ -1410,12 +1441,20 @@ fun KeyboardInputView(
                                                                     startIndex = variants.size - 1
                                                                 } else {
                                                                     val half = accents.size / 2
-                                                                    variants.addAll(accents.take(half))
+                                                                    variants.addAll(
+                                                                        accents.take(
+                                                                            half
+                                                                        )
+                                                                    )
                                                                     if (secondary != null) variants.add(
                                                                         secondary
                                                                     )
                                                                     startIndex = variants.size - 1
-                                                                    variants.addAll(accents.drop(half))
+                                                                    variants.addAll(
+                                                                        accents.drop(
+                                                                            half
+                                                                        )
+                                                                    )
                                                                 }
 
                                                                 if (variants.isNotEmpty()) {
@@ -1487,14 +1526,18 @@ fun KeyboardInputView(
                                                                 isDraggingDel = true
                                                             },
                                                             onDragEnd = { isDraggingDel = false },
-                                                            onDragCancel = { isDraggingDel = false },
+                                                            onDragCancel = {
+                                                                isDraggingDel = false
+                                                            },
                                                             onHorizontalDrag = { change, dragAmount ->
                                                                 change.consume()
                                                                 delAccumulatedDx += dragAmount
                                                                 // Moving left (negative dx) for delete
                                                                 if (delAccumulatedDx <= -delSweepThreshold) {
                                                                     val steps =
-                                                                        (kotlin.math.abs(delAccumulatedDx) / delSweepThreshold).toInt()
+                                                                        (kotlin.math.abs(
+                                                                            delAccumulatedDx
+                                                                        ) / delSweepThreshold).toInt()
                                                                     repeat(steps) {
                                                                         performLightHaptic()
                                                                         handleKeyPress(KeyEvent.KEYCODE_DEL)
@@ -1507,7 +1550,8 @@ fun KeyboardInputView(
                                                     .pointerInput(Unit) {
                                                         detectTapGestures(
                                                             onPress = { offset ->
-                                                                val press = PressInteraction.Press(offset)
+                                                                val press =
+                                                                    PressInteraction.Press(offset)
                                                                 performLightHaptic()
                                                                 scope.launch {
                                                                     backspaceInteraction.emit(
@@ -1660,7 +1704,8 @@ fun KeyboardInputView(
                                     // Comma Key
                                     customItem(
                                         buttonGroupContent = {
-                                            val commaInteraction = remember { MutableInteractionSource() }
+                                            val commaInteraction =
+                                                remember { MutableInteractionSource() }
                                             val isPressedComma by commaInteraction.collectIsPressedAsState()
                                             val animatedRadiusComma by animateDpAsState(
                                                 targetValue = if (isPressedComma) 4.dp else keyRoundness,
@@ -1691,7 +1736,8 @@ fun KeyboardInputView(
                                     // Space
                                     customItem(
                                         buttonGroupContent = {
-                                            val spaceInteraction = remember { MutableInteractionSource() }
+                                            val spaceInteraction =
+                                                remember { MutableInteractionSource() }
                                             val isPressedSpace by spaceInteraction.collectIsPressedAsState()
                                             val animatedRadiusSpace by animateDpAsState(
                                                 targetValue = if (isPressedSpace) 4.dp else keyRoundness,
@@ -1717,7 +1763,11 @@ fun KeyboardInputView(
                                                                 awaitFirstDown(requireUnconsumed = false)
                                                             val press =
                                                                 PressInteraction.Press(down.position)
-                                                            scope.launch { spaceInteraction.emit(press) }
+                                                            scope.launch {
+                                                                spaceInteraction.emit(
+                                                                    press
+                                                                )
+                                                            }
                                                             performLightHaptic()
 
                                                             var isDragStarted = false
@@ -1725,9 +1775,11 @@ fun KeyboardInputView(
                                                             var cursorAccumulator = 0f
 
                                                             // Increased slop for spacebar to prevent accidental cursor moves
-                                                            val customSlop = viewConfig.touchSlop * 2.5f
+                                                            val customSlop =
+                                                                viewConfig.touchSlop * 2.5f
 
-                                                            var upOrCancel: PointerInputChange? = null
+                                                            var upOrCancel: PointerInputChange? =
+                                                                null
 
                                                             while (true) {
                                                                 val event = awaitPointerEvent()
@@ -1748,7 +1800,10 @@ fun KeyboardInputView(
                                                                     val dxFromOrigin = totalDx
 
                                                                     if (!isDragStarted) {
-                                                                        if (kotlin.math.abs(dxFromOrigin) > customSlop) {
+                                                                        if (kotlin.math.abs(
+                                                                                dxFromOrigin
+                                                                            ) > customSlop
+                                                                        ) {
                                                                             isDragStarted = true
                                                                             onCursorDrag(true)
                                                                             cursorAccumulator = 0f
@@ -1799,7 +1854,9 @@ fun KeyboardInputView(
                                                                 handleType(" ")
                                                                 scope.launch {
                                                                     spaceInteraction.emit(
-                                                                        PressInteraction.Release(press)
+                                                                        PressInteraction.Release(
+                                                                            press
+                                                                        )
                                                                     )
                                                                 }
                                                             } else {
@@ -1808,7 +1865,9 @@ fun KeyboardInputView(
                                                                 }
                                                                 scope.launch {
                                                                     spaceInteraction.emit(
-                                                                        PressInteraction.Cancel(press)
+                                                                        PressInteraction.Cancel(
+                                                                            press
+                                                                        )
                                                                     )
                                                                 }
                                                             }
@@ -1826,7 +1885,8 @@ fun KeyboardInputView(
                                     // Dot Key
                                     customItem(
                                         buttonGroupContent = {
-                                            val dotInteraction = remember { MutableInteractionSource() }
+                                            val dotInteraction =
+                                                remember { MutableInteractionSource() }
                                             val isPressedDot by dotInteraction.collectIsPressedAsState()
                                             val animatedRadiusDot by animateDpAsState(
                                                 targetValue = if (isPressedDot) 4.dp else keyRoundness,
@@ -1857,7 +1917,8 @@ fun KeyboardInputView(
                                     // Return
                                     customItem(
                                         buttonGroupContent = {
-                                            val returnInteraction = remember { MutableInteractionSource() }
+                                            val returnInteraction =
+                                                remember { MutableInteractionSource() }
                                             val isPressedReturn by returnInteraction.collectIsPressedAsState()
                                             val animatedRadiusReturn by animateDpAsState(
                                                 targetValue = if (isPressedReturn) 4.dp else keyRoundness,

@@ -67,8 +67,8 @@ import com.sameerasw.essentials.services.tiles.NotificationLightingTileService
 import com.sameerasw.essentials.services.tiles.PrivateDnsTileService
 import com.sameerasw.essentials.services.tiles.PrivateNotificationsTileService
 import com.sameerasw.essentials.services.tiles.RefreshRateTileService
-import com.sameerasw.essentials.services.tiles.ScaleAnimationsTileService
 import com.sameerasw.essentials.services.tiles.RestartSystemUiTileService
+import com.sameerasw.essentials.services.tiles.ScaleAnimationsTileService
 import com.sameerasw.essentials.services.tiles.ScreenLockedSecurityTileService
 import com.sameerasw.essentials.services.tiles.SoundModeTileService
 import com.sameerasw.essentials.services.tiles.StayAwakeTileService

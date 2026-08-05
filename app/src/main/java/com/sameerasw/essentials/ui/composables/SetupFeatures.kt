@@ -203,7 +203,8 @@ fun SetupFeatures(
         )
     }
 
-    val watchViewModel: com.sameerasw.essentials.viewmodels.WatchViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val watchViewModel: com.sameerasw.essentials.viewmodels.WatchViewModel =
+        androidx.lifecycle.viewmodel.compose.viewModel()
     val isWearUpdateRequired = watchViewModel.isWearUpdateRequired.value
 
     LaunchedEffect(Unit) {

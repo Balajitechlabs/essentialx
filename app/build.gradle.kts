@@ -7,20 +7,20 @@ plugins {
 
 
 
-        kotlin {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_21)
-                freeCompilerArgs.add("-Xannotation-default-target=param-property")
-                optIn.addAll(
-                    "androidx.compose.material3.ExperimentalMaterial3Api",
-                    "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
-                    "androidx.compose.foundation.ExperimentalFoundationApi",
-                    "androidx.compose.ui.text.ExperimentalTextApi",
-                    "androidx.compose.foundation.ExperimentalFoundationApi",
-                    "androidx.compose.foundation.layout.ExperimentalLayoutApi"
-                )
-            }
-        }
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+        freeCompilerArgs.add("-Xannotation-default-target=param-property")
+        optIn.addAll(
+            "androidx.compose.material3.ExperimentalMaterial3Api",
+            "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi",
+            "androidx.compose.foundation.ExperimentalFoundationApi",
+            "androidx.compose.ui.text.ExperimentalTextApi",
+            "androidx.compose.foundation.ExperimentalFoundationApi",
+            "androidx.compose.foundation.layout.ExperimentalLayoutApi"
+        )
+    }
+}
 
 android {
     namespace = "com.sameerasw.essentials"
@@ -28,10 +28,58 @@ android {
 
     androidResources {
         localeFilters += listOf(
-            "en", "ach", "af", "ar", "bn", "bn-rBD", "ca", "cs", "da", "de", "el", "es", "fi", "fil", "fil-rPH",
-            "fr", "he", "hi", "hi-rIN", "hu", "id", "in", "in-rID", "it", "iw", "ja", "ko", "ml", "ml-rIN",
-            "ne", "ne-rNP", "nl", "no", "pl", "pt", "pt-rBR", "pt-rPT", "ro", "ru", "si", "sk", "sk-rSK",
-            "sr", "sv", "ta", "ta-rIN", "tr", "uk", "vi", "zh", "zh-rCN", "zh-rTW"
+            "en",
+            "ach",
+            "af",
+            "ar",
+            "bn",
+            "bn-rBD",
+            "ca",
+            "cs",
+            "da",
+            "de",
+            "el",
+            "es",
+            "fi",
+            "fil",
+            "fil-rPH",
+            "fr",
+            "he",
+            "hi",
+            "hi-rIN",
+            "hu",
+            "id",
+            "in",
+            "in-rID",
+            "it",
+            "iw",
+            "ja",
+            "ko",
+            "ml",
+            "ml-rIN",
+            "ne",
+            "ne-rNP",
+            "nl",
+            "no",
+            "pl",
+            "pt",
+            "pt-rBR",
+            "pt-rPT",
+            "ro",
+            "ru",
+            "si",
+            "sk",
+            "sk-rSK",
+            "sr",
+            "sv",
+            "ta",
+            "ta-rIN",
+            "tr",
+            "uk",
+            "vi",
+            "zh",
+            "zh-rCN",
+            "zh-rTW"
         )
     }
 

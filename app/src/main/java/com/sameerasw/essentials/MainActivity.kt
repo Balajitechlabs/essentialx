@@ -2,6 +2,8 @@ package com.sameerasw.essentials
 
 import android.animation.ObjectAnimator
 import android.content.Intent
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -25,25 +27,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.BlendMode
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
-import androidx.compose.ui.graphics.toArgb
-import com.airbnb.lottie.LottieProperty
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.LottieConstants
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.airbnb.lottie.compose.rememberLottieDynamicProperties
-import com.airbnb.lottie.compose.rememberLottieDynamicProperty
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Badge
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -60,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -69,6 +59,14 @@ import androidx.compose.ui.zIndex
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.airbnb.lottie.compose.rememberLottieDynamicProperties
+import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.DIYTabs
 import com.sameerasw.essentials.domain.registry.initPermissionRegistry
@@ -624,22 +622,26 @@ class MainActivity : AppCompatActivity() {
                                                     containerColor = MaterialTheme.colorScheme.error,
                                                     contentColor = MaterialTheme.colorScheme.onError
                                                 ) {
-                                                    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.update_motion))
+                                                    val composition by rememberLottieComposition(
+                                                        LottieCompositionSpec.RawRes(R.raw.update_motion)
+                                                    )
                                                     val progress by animateLottieCompositionAsState(
                                                         composition = composition,
                                                         iterations = LottieConstants.IterateForever
                                                     )
-                                                    val onErrorColor = MaterialTheme.colorScheme.onError
-                                                    val dynamicProperties = rememberLottieDynamicProperties(
-                                                        rememberLottieDynamicProperty(
-                                                            property = LottieProperty.COLOR_FILTER,
-                                                            value = PorterDuffColorFilter(
-                                                                onErrorColor.toArgb(),
-                                                                PorterDuff.Mode.SRC_ATOP
-                                                            ),
-                                                            keyPath = arrayOf("**")
+                                                    val onErrorColor =
+                                                        MaterialTheme.colorScheme.onError
+                                                    val dynamicProperties =
+                                                        rememberLottieDynamicProperties(
+                                                            rememberLottieDynamicProperty(
+                                                                property = LottieProperty.COLOR_FILTER,
+                                                                value = PorterDuffColorFilter(
+                                                                    onErrorColor.toArgb(),
+                                                                    PorterDuff.Mode.SRC_ATOP
+                                                                ),
+                                                                keyPath = arrayOf("**")
+                                                            )
                                                         )
-                                                    )
 
                                                     LottieAnimation(
                                                         composition = composition,

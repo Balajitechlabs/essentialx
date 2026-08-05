@@ -9,10 +9,7 @@ import android.os.Build
 import android.os.SystemClock
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.provider.Settings
-import android.view.KeyEvent
 import android.widget.RemoteViews
-import android.widget.Toast
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.ScreenOffMethod

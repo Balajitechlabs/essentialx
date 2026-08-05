@@ -101,9 +101,13 @@ class DailyWallpaperWorker(
             }
 
             if (!newWallpaperApplied && !force) {
-                val retryCount = settingsRepository.getInt(SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT, 0)
+                val retryCount =
+                    settingsRepository.getInt(SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT, 0)
                 if (retryCount < 2) {
-                    settingsRepository.putInt(SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT, retryCount + 1)
+                    settingsRepository.putInt(
+                        SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT,
+                        retryCount + 1
+                    )
                     val retryWork = androidx.work.OneTimeWorkRequestBuilder<DailyWallpaperWorker>()
                         .setInitialDelay(30, java.util.concurrent.TimeUnit.MINUTES)
                         .build()
@@ -112,10 +116,16 @@ class DailyWallpaperWorker(
                         androidx.work.ExistingWorkPolicy.REPLACE,
                         retryWork
                     )
-                    Log.d("DailyWallpaperWorker", "No new wallpaper found. Scheduled retry #${retryCount + 1} in 30 mins")
+                    Log.d(
+                        "DailyWallpaperWorker",
+                        "No new wallpaper found. Scheduled retry #${retryCount + 1} in 30 mins"
+                    )
                 } else {
                     settingsRepository.putInt(SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT, 0)
-                    Log.d("DailyWallpaperWorker", "Reached max retries (3 total checks). Waiting for next daily cycle.")
+                    Log.d(
+                        "DailyWallpaperWorker",
+                        "Reached max retries (3 total checks). Waiting for next daily cycle."
+                    )
                 }
             }
 

@@ -22,7 +22,6 @@ import com.sameerasw.essentials.translation.TranslationManager
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.utils.HapticUtil
-import kotlinx.coroutines.withTimeoutOrNull
 
 @Composable
 fun TranslatableCardContainer(

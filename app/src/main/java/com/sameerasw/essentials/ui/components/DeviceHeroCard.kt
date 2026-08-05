@@ -315,7 +315,10 @@ fun DeviceHeroCard(
         val targetSmKey = storageMemoryTranslationKey
         if (targetSmKey != null) {
             val resolvedSmKey = remember(targetSmKey) {
-                com.sameerasw.essentials.translation.TranslationManager.resolveKey(context, targetSmKey) ?: targetSmKey
+                com.sameerasw.essentials.translation.TranslationManager.resolveKey(
+                    context,
+                    targetSmKey
+                ) ?: targetSmKey
             }
             com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
                 stringKey = resolvedSmKey,

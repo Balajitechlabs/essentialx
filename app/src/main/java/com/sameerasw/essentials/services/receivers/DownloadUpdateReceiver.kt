@@ -26,7 +26,11 @@ class DownloadUpdateReceiver : BroadcastReceiver() {
                         apkUrl = downloadUrl,
                         apkName = "Essentials_$cleanVersion",
                         onProgressUpdate = { progress ->
-                            UpdateNotificationHelper.showDownloadProgressNotification(context, version, progress)
+                            UpdateNotificationHelper.showDownloadProgressNotification(
+                                context,
+                                version,
+                                progress
+                            )
                         }
                     )
                 } catch (e: Exception) {

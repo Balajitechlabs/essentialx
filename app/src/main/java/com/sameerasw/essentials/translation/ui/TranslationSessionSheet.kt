@@ -18,7 +18,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -64,7 +63,8 @@ fun TranslationSessionSheet(
     val gitHubRepository = remember { GitHubRepository() }
     val currentUser = remember { settingsRepository.getGitHubUser() }
 
-    val edits = remember { mutableStateListOf<TranslationEdit>().apply { addAll(TranslationManager.session.edits) } }
+    val edits =
+        remember { mutableStateListOf<TranslationEdit>().apply { addAll(TranslationManager.session.edits) } }
 
     var isSubmitting by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -134,8 +134,12 @@ fun TranslationSessionSheet(
                             errorMessage = null
                             scope.launch {
                                 val jsonPayload = TranslationManager.session.toJsonPayload()
-                                val commentBody = "Automated translation submission from Essentials app.\n\n```json\n$jsonPayload\n```"
-                                Log.d("TranslationSessionSheet", "Posting submission comment for user: ${currentUser.login}")
+                                val commentBody =
+                                    "Automated translation submission from Essentials app.\n\n```json\n$jsonPayload\n```"
+                                Log.d(
+                                    "TranslationSessionSheet",
+                                    "Posting submission comment for user: ${currentUser.login}"
+                                )
                                 val success = gitHubRepository.addDiscussionComment(
                                     token = token,
                                     owner = "sameerasw",
@@ -145,12 +149,19 @@ fun TranslationSessionSheet(
                                 )
                                 isSubmitting = false
                                 if (success) {
-                                    Log.d("TranslationSessionSheet", "Discussion comment posted successfully")
+                                    Log.d(
+                                        "TranslationSessionSheet",
+                                        "Discussion comment posted successfully"
+                                    )
                                     successSubmitted = true
                                     TranslationManager.discardSession()
                                 } else {
-                                    Log.e("TranslationSessionSheet", "Posting discussion comment failed")
-                                    errorMessage = context.getString(R.string.translation_submit_error)
+                                    Log.e(
+                                        "TranslationSessionSheet",
+                                        "Posting discussion comment failed"
+                                    )
+                                    errorMessage =
+                                        context.getString(R.string.translation_submit_error)
                                 }
                             }
                         },
@@ -158,7 +169,9 @@ fun TranslationSessionSheet(
                     ) {
                         if (isSubmitting) {
                             CircularProgressIndicator(
-                                modifier = Modifier.height(16.dp).width(16.dp),
+                                modifier = Modifier
+                                    .height(16.dp)
+                                    .width(16.dp),
                                 strokeWidth = 2.dp,
                                 color = MaterialTheme.colorScheme.onPrimary
                             )

@@ -43,8 +43,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.pager.HorizontalPager
-import kotlinx.coroutines.isActive
-
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -225,17 +223,20 @@ fun WallpaperScreen(
     LaunchedEffect(dailyWallpaperAutoUpdateTime) {
         while (true) {
             if (!dailyWallpaperAutoUpdateTime.isNullOrEmpty()) {
-                val prevTime = runCatching { LocalDateTime.parse(dailyWallpaperAutoUpdateTime) }.getOrNull()
+                val prevTime =
+                    runCatching { LocalDateTime.parse(dailyWallpaperAutoUpdateTime) }.getOrNull()
                 if (prevTime != null) {
                     val passedMinutes = Duration.between(prevTime, LocalDateTime.now()).toMinutes()
-                    val retryCount = repository.getInt(SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT, 0)
+                    val retryCount =
+                        repository.getInt(SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT, 0)
                     if (passedMinutes >= 0) {
                         if (retryCount in 1..2) {
                             val remainingMinutes = (30L - passedMinutes).coerceAtLeast(0L)
                             dailyWallpaperNextAutoUpdateTime = remainingMinutes / 60L
                         } else {
                             val cycleMinutes = passedMinutes % 1440L
-                            val remainingMinutes = if (cycleMinutes == 0L && passedMinutes > 0L) 0L else 1440L - cycleMinutes
+                            val remainingMinutes =
+                                if (cycleMinutes == 0L && passedMinutes > 0L) 0L else 1440L - cycleMinutes
                             dailyWallpaperNextAutoUpdateTime = remainingMinutes / 60L
                         }
                     } else {
@@ -515,49 +516,63 @@ fun WallpaperScreen(
                                     .padding(16.dp),
                                 verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Column(
+                                        verticalArrangement = Arrangement.spacedBy(2.dp)
                                     ) {
-                                        Column(
-                                            verticalArrangement = Arrangement.spacedBy(2.dp)
-                                        ) {
-                                            Text(
-                                                text = stringResource(R.string.label_wallpaper_auto_update),
-                                                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                                                color = MaterialTheme.colorScheme.onSurface
-                                            )
-                                            if (isAutoUpdateEnabled && !dailyWallpaperAutoUpdateTime.isNullOrEmpty()){
-                                                val timeText = if(isDailyWallpaperShowLastTime) {
-                                                    stringResource(R.string.label_wallpaper_last_checked, dailyWallpaperLastCheckedFormatted)
-                                                } else{
-                                                    val showTime = if(dailyWallpaperNextAutoUpdateTime > 0L) {
-                                                        stringResource(R.string.label_wallpaper_hours, dailyWallpaperNextAutoUpdateTime.toInt())
+                                        Text(
+                                            text = stringResource(R.string.label_wallpaper_auto_update),
+                                            style = MaterialTheme.typography.titleMedium.copy(
+                                                fontWeight = FontWeight.Bold
+                                            ),
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        if (isAutoUpdateEnabled && !dailyWallpaperAutoUpdateTime.isNullOrEmpty()) {
+                                            val timeText = if (isDailyWallpaperShowLastTime) {
+                                                stringResource(
+                                                    R.string.label_wallpaper_last_checked,
+                                                    dailyWallpaperLastCheckedFormatted
+                                                )
+                                            } else {
+                                                val showTime =
+                                                    if (dailyWallpaperNextAutoUpdateTime > 0L) {
+                                                        stringResource(
+                                                            R.string.label_wallpaper_hours,
+                                                            dailyWallpaperNextAutoUpdateTime.toInt()
+                                                        )
                                                     } else {
                                                         stringResource(R.string.label_wallpaper_a_few_minutes)
                                                     }
-                                                    stringResource(R.string.label_wallpaper_next_check, showTime)
-                                                }
-                                                Text(
-                                                    text = timeText,
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                    modifier = Modifier.clickable(enabled = true, onClick = {
+                                                stringResource(
+                                                    R.string.label_wallpaper_next_check,
+                                                    showTime
+                                                )
+                                            }
+                                            Text(
+                                                text = timeText,
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                modifier = Modifier.clickable(
+                                                    enabled = true,
+                                                    onClick = {
                                                         HapticUtil.performUIHaptic(view)
                                                         viewModel.setDailyWallpaperShowLastTime()
                                                     })
-                                                )
-                                            }
+                                            )
                                         }
-                                        Switch(
-                                            checked = isAutoUpdateEnabled,
-                                            onCheckedChange = { checked ->
-                                                HapticUtil.performUIHaptic(view)
-                                                viewModel.setDailyWallpaperAutoUpdate(checked, context)
-                                            }
-                                        )
                                     }
+                                    Switch(
+                                        checked = isAutoUpdateEnabled,
+                                        onCheckedChange = { checked ->
+                                            HapticUtil.performUIHaptic(view)
+                                            viewModel.setDailyWallpaperAutoUpdate(checked, context)
+                                        }
+                                    )
+                                }
 
                                 Row(
                                     modifier = Modifier

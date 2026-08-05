@@ -6,15 +6,12 @@ import android.content.Intent
 import android.hardware.camera2.CameraManager
 import android.media.AudioManager
 import android.os.Build
-import android.provider.Settings
 import android.view.KeyEvent
 import android.widget.Toast
 import com.sameerasw.essentials.domain.HapticFeedbackType
-import com.sameerasw.essentials.domain.ScreenOffMethod
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 import com.sameerasw.essentials.utils.DeviceLockUtils
-import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.performHapticFeedback
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper

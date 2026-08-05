@@ -29,7 +29,9 @@ fun TranslationFocusOutline(
         modifier = modifier
             .border(
                 width = borderWidth,
-                color = if (visible) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface.copy(alpha = 0f),
+                color = if (visible) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface.copy(
+                    alpha = 0f
+                ),
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(if (visible) 4.dp else 0.dp)

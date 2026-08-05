@@ -36,7 +36,12 @@ object BatteryHistoryManager {
         return filtered.sortedBy { it.timestamp }
     }
 
-    fun recordPoint(context: Context, level: Int, isPlugged: Boolean, forceRecord: Boolean = false) {
+    fun recordPoint(
+        context: Context,
+        level: Int,
+        isPlugged: Boolean,
+        forceRecord: Boolean = false
+    ) {
         val repo = SettingsRepository(context)
         val now = System.currentTimeMillis()
         val currentHistory = getHistory(context).toMutableList()

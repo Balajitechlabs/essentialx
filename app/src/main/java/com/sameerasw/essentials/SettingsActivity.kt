@@ -1,5 +1,6 @@
 package com.sameerasw.essentials
 
+
 import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -39,12 +40,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -53,6 +50,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -74,12 +72,17 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.app.ActivityCompat
 import com.sameerasw.essentials.domain.DIYTabs
 import com.sameerasw.essentials.domain.registry.FeatureRegistry
 import com.sameerasw.essentials.domain.registry.PermissionRegistry
+import com.sameerasw.essentials.translation.TranslationManager
+import com.sameerasw.essentials.translation.ui.TranslationSessionSheet
 import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.MadebySameeraswCard
 import com.sameerasw.essentials.ui.components.cards.FeatureCard
@@ -87,21 +90,14 @@ import com.sameerasw.essentials.ui.components.cards.IconToggleItem
 import com.sameerasw.essentials.ui.components.cards.PermissionCard
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.dialogs.AboutSection
-import com.sameerasw.essentials.translation.TranslationManager
-import com.sameerasw.essentials.translation.ui.TranslationBottomSheet
-import com.sameerasw.essentials.translation.ui.TranslationSessionSheet
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
-import com.sameerasw.essentials.ui.components.sheets.GitHubAuthSheet
-
-
-import com.sameerasw.essentials.viewmodels.GitHubAuthViewModel
 import com.sameerasw.essentials.ui.components.pickers.CrashReportingPicker
-
 import com.sameerasw.essentials.ui.components.pickers.DefaultTabPicker
 import com.sameerasw.essentials.ui.components.pickers.LanguagePicker
+import com.sameerasw.essentials.ui.components.sheets.GitHubAuthSheet
+import com.sameerasw.essentials.ui.components.sheets.ImportConfigConfirmationSheet
 import com.sameerasw.essentials.ui.components.sheets.InstructionsBottomSheet
 import com.sameerasw.essentials.ui.components.sheets.UnsupportedFeaturesConfirmationSheet
-import com.sameerasw.essentials.ui.components.sheets.ImportConfigConfirmationSheet
 import com.sameerasw.essentials.ui.components.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
@@ -110,6 +106,7 @@ import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUtils
+import com.sameerasw.essentials.viewmodels.GitHubAuthViewModel
 import com.sameerasw.essentials.viewmodels.MainViewModel
 import rikka.shizuku.Shizuku
 import java.text.SimpleDateFormat
@@ -281,7 +278,8 @@ fun SettingsContent(
     var showGitHubAuthSheet by remember { mutableStateOf(false) }
     var showTranslationWarningDialog by remember { mutableStateOf(false) }
     val gitHubAuthViewModel: GitHubAuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
-    val settingsRepo = remember { com.sameerasw.essentials.data.repository.SettingsRepository(context) }
+    val settingsRepo =
+        remember { com.sameerasw.essentials.data.repository.SettingsRepository(context) }
     var currentUser by remember { mutableStateOf(settingsRepo.getGitHubUser()) }
 
 
@@ -289,8 +287,11 @@ fun SettingsContent(
     val sessionEditsCount = TranslationManager.session.edits.size
 
 
-
-    var openTranslationPRs by remember { mutableStateOf<List<com.sameerasw.essentials.domain.model.github.GitHubPullRequest>>(emptyList()) }
+    var openTranslationPRs by remember {
+        mutableStateOf<List<com.sameerasw.essentials.domain.model.github.GitHubPullRequest>>(
+            emptyList()
+        )
+    }
     val gitHubRepo = remember { com.sameerasw.essentials.data.repository.GitHubRepository() }
 
     androidx.compose.runtime.LaunchedEffect(isTranslationModeActive, currentUser) {
@@ -308,8 +309,6 @@ fun SettingsContent(
             openTranslationPRs = emptyList()
         }
     }
-
-
 
 
     val onImportConfig: (Boolean) -> Unit = { keepPrefs ->
@@ -506,11 +505,15 @@ fun SettingsContent(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                val buttonText = if (isUpdateAvailable && !updateInfo?.versionName.isNullOrEmpty()) {
-                    stringResource(R.string.action_update_to_version, updateInfo?.versionName ?: "")
-                } else {
-                    stringResource(R.string.action_check_for_updates)
-                }
+                val buttonText =
+                    if (isUpdateAvailable && !updateInfo?.versionName.isNullOrEmpty()) {
+                        stringResource(
+                            R.string.action_update_to_version,
+                            updateInfo?.versionName ?: ""
+                        )
+                    } else {
+                        stringResource(R.string.action_check_for_updates)
+                    }
 
                 val buttonIconRes = R.drawable.rounded_mobile_arrow_down_24
 
@@ -776,7 +779,9 @@ fun SettingsContent(
             IconToggleItem(
                 iconRes = R.drawable.rounded_translate_24,
                 title = stringResource(R.string.settings_translate_mode),
-                description = if (isEnglishApp) "App language is English. Change app language to translate strings" else stringResource(R.string.settings_translate_mode_desc),
+                description = if (isEnglishApp) "App language is English. Change app language to translate strings" else stringResource(
+                    R.string.settings_translate_mode_desc
+                ),
                 isChecked = isTranslationModeActive && !isEnglishApp,
                 enabled = !isEnglishApp,
                 onCheckedChange = { enabled ->
@@ -799,7 +804,10 @@ fun SettingsContent(
             if (sessionEditsCount > 0) {
                 FeatureCard(
                     title = R.string.settings_translated_texts,
-                    description = stringResource(R.string.settings_translated_texts_desc, sessionEditsCount),
+                    description = stringResource(
+                        R.string.settings_translated_texts_desc,
+                        sessionEditsCount
+                    ),
                     isEnabled = true,
                     onToggle = {},
                     onClick = {
@@ -819,7 +827,8 @@ fun SettingsContent(
                     } catch (e: Exception) {
                         ""
                     }
-                    val subtitleText = if (dateFormatted.isNotBlank()) "PR #${pr.number} • Updated $dateFormatted" else "PR #${pr.number}"
+                    val subtitleText =
+                        if (dateFormatted.isNotBlank()) "PR #${pr.number} • Updated $dateFormatted" else "PR #${pr.number}"
 
                     FeatureCard(
                         title = "View existing PR",
@@ -828,7 +837,10 @@ fun SettingsContent(
                         onToggle = {},
                         onClick = {
                             HapticUtil.performUIHaptic(view)
-                            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(pr.htmlUrl))
+                            val intent = android.content.Intent(
+                                android.content.Intent.ACTION_VIEW,
+                                android.net.Uri.parse(pr.htmlUrl)
+                            )
 
                             context.startActivity(intent)
                         },

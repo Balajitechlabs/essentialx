@@ -1,9 +1,6 @@
 package com.sameerasw.essentials.translation
 
 import android.content.Context
-import com.sameerasw.essentials.translation.model.StringEntry
-import org.xmlpull.v1.XmlPullParser
-import java.io.InputStream
 
 object StringLoader {
     // Map of key -> Map<locale, value>
@@ -119,14 +116,14 @@ object StringLoader {
             val res = context.resources
             val localeCode = extractLocaleCode(dirName)
             val config = android.content.res.Configuration(res.configuration)
-            
+
             val localeParts = localeCode.split("-")
             val locale = if (localeParts.size > 1) {
                 java.util.Locale(localeParts[0], localeParts[1])
             } else {
                 java.util.Locale(localeParts[0])
             }
-            
+
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 config.setLocales(android.os.LocaleList(locale))
             } else {

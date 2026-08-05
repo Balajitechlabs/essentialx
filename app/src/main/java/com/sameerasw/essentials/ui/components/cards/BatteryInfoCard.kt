@@ -7,7 +7,6 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.sheets.BatteryDetailsBottomSheet
 import com.sameerasw.essentials.ui.theme.Shapes
-import com.sameerasw.essentials.utils.BatteryDetails
 import com.sameerasw.essentials.utils.BatteryInfoUtil
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.HapticUtil
@@ -175,7 +173,8 @@ fun BatteryInfoCard(
     val targetKey = translationSheetKey
     if (targetKey != null) {
         val resolvedKey = remember(targetKey) {
-            com.sameerasw.essentials.translation.TranslationManager.resolveKey(context, targetKey) ?: targetKey
+            com.sameerasw.essentials.translation.TranslationManager.resolveKey(context, targetKey)
+                ?: targetKey
         }
         com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
             stringKey = resolvedKey,

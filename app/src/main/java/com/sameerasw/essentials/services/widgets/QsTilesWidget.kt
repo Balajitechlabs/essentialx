@@ -52,15 +52,19 @@ class QsTilesWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
             GlanceTheme {
-                val prefs = androidx.glance.currentState<androidx.datastore.preferences.core.Preferences>()
-                val KEY_UPDATE = androidx.datastore.preferences.core.longPreferencesKey("qs_widget_last_update")
+                val prefs =
+                    androidx.glance.currentState<androidx.datastore.preferences.core.Preferences>()
+                val KEY_UPDATE =
+                    androidx.datastore.preferences.core.longPreferencesKey("qs_widget_last_update")
+
                 @Suppress("UNUSED_VARIABLE")
                 val lastUpdate = prefs[KEY_UPDATE] ?: 0L
 
                 val repository = SettingsRepository(context)
                 val pinnedClassNames = repository.getPinnedQsTiles()
 
-                val pinnedTiles = pinnedClassNames.mapNotNull { QsTileRegistry.getTileByClassName(it) }
+                val pinnedTiles =
+                    pinnedClassNames.mapNotNull { QsTileRegistry.getTileByClassName(it) }
                 val width = LocalSize.current.width
                 val height = LocalSize.current.height
 
@@ -135,7 +139,7 @@ class QsTilesWidget : GlanceAppWidget() {
                                                         val pastelColor =
                                                             ColorUtil.getPastelColorFor(
                                                                 resolvedTitle
-                                                             )
+                                                            )
                                                         val vibrantColor =
                                                             ColorUtil.getVibrantColorFor(
                                                                 resolvedTitle
@@ -190,11 +194,12 @@ class QsTilesWidget : GlanceAppWidget() {
                                                                     )
                                                                 )
 
-                                                            val activeIconRes = QsTileRegistry.getTileIcon(
-                                                                context,
-                                                                tile.serviceClass.name,
-                                                                tile.iconRes
-                                                            )
+                                                            val activeIconRes =
+                                                                QsTileRegistry.getTileIcon(
+                                                                    context,
+                                                                    tile.serviceClass.name,
+                                                                    tile.iconRes
+                                                                )
 
                                                             Row(
                                                                 modifier = cardModifier.padding(
@@ -236,10 +241,11 @@ class QsTilesWidget : GlanceAppWidget() {
                                                                     )
                                                                 )
 
-                                                                val subtitle = QsTileRegistry.getTileSubtitle(
-                                                                    context,
-                                                                    tile.serviceClass.name
-                                                                )
+                                                                val subtitle =
+                                                                    QsTileRegistry.getTileSubtitle(
+                                                                        context,
+                                                                        tile.serviceClass.name
+                                                                    )
 
                                                                 Column(
                                                                     modifier = GlanceModifier.defaultWeight(),

@@ -48,12 +48,16 @@ object LanguageUtils {
     data class Language(val code: String, val name: String, val nativeName: String)
 
     fun getLanguage(code: String): Language {
-        return languages.find { it.code == code || it.code.startsWith(code) || code.startsWith(it.code) } ?: run {
-            val parts = code.split("-", "_")
-            val loc = if (parts.size > 1) Locale(parts[0], parts[1].removePrefix("r")) else Locale(parts[0])
-            val name = loc.displayLanguage.ifBlank { code }
-            val nativeName = loc.getDisplayLanguage(loc).ifBlank { name }
-            Language(code, name, nativeName)
-        }
+        return languages.find { it.code == code || it.code.startsWith(code) || code.startsWith(it.code) }
+            ?: run {
+                val parts = code.split("-", "_")
+                val loc =
+                    if (parts.size > 1) Locale(parts[0], parts[1].removePrefix("r")) else Locale(
+                        parts[0]
+                    )
+                val name = loc.displayLanguage.ifBlank { code }
+                val nativeName = loc.getDisplayLanguage(loc).ifBlank { name }
+                Language(code, name, nativeName)
+            }
     }
 }

@@ -337,9 +337,6 @@ class MainViewModel : ViewModel() {
     val notificationSnoozeOptions = mutableStateOf<List<Int>>(listOf(15, 30, 60, 120))
 
 
-
-
-
     private var lastUpdateCheckTime: Long = 0
     lateinit var settingsRepository: SettingsRepository
     private lateinit var updateRepository: UpdateRepository
@@ -989,8 +986,10 @@ class MainViewModel : ViewModel() {
             schedulePeriodicWallpaperCheck(context)
         }
         schedulePeriodicAppUpdateCheck(context)
-        dailyWallpaperAutoUpdateTime.value = settingsRepository.getString(SettingsRepository.KEY_DAILY_WALLPAPER_AUTO_UPDATE_TIME)
-        isDailyWallpaperShowLastTime.value = settingsRepository.getBoolean(SettingsRepository.KEY_DAILY_WALLPAPER_SHOW_LAST_TIME)
+        dailyWallpaperAutoUpdateTime.value =
+            settingsRepository.getString(SettingsRepository.KEY_DAILY_WALLPAPER_AUTO_UPDATE_TIME)
+        isDailyWallpaperShowLastTime.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_DAILY_WALLPAPER_SHOW_LAST_TIME)
 
         if (isHideGestureBarEnabled.value) {
             applyHideGestureBar(context, true)
@@ -1423,7 +1422,10 @@ class MainViewModel : ViewModel() {
         isFlashlightPocketTurnOffEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_FLASHLIGHT_POCKET_TURN_OFF_ENABLED)
         isFlashlightOverheatEnabled.value =
-            settingsRepository.getBoolean(SettingsRepository.KEY_FLASHLIGHT_OVERHEAT_PREVENTION_ENABLED, true)
+            settingsRepository.getBoolean(
+                SettingsRepository.KEY_FLASHLIGHT_OVERHEAT_PREVENTION_ENABLED,
+                true
+            )
         isPitchBlackThemeEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_PITCH_BLACK_THEME_ENABLED)
         isEnableUnsupportedFeatures.value = settingsRepository.isEnableUnsupportedFeatures()
@@ -1609,7 +1611,8 @@ class MainViewModel : ViewModel() {
             startBatteryNotificationService(context)
         }
 
-        isLockdownModeEnabled.value = settingsRepository.getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE)
+        isLockdownModeEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE)
     }
 
     private fun startBatteryNotificationService(context: Context) {
@@ -1957,7 +1960,11 @@ class MainViewModel : ViewModel() {
                 } ?: "0.0"
 
                 val updateInfoResult =
-                    updateRepository.checkForUpdates(context, isPreReleaseCheckEnabled.value, currentVersion)
+                    updateRepository.checkForUpdates(
+                        context,
+                        isPreReleaseCheckEnabled.value,
+                        currentVersion
+                    )
 
                 if (updateInfoResult != null) {
                     updateInfo.value = updateInfoResult
@@ -4079,7 +4086,11 @@ class MainViewModel : ViewModel() {
         settingsRepository.exportConfigs(outputStream)
     }
 
-    fun importConfigs(context: Context, inputStream: java.io.InputStream, keepPrefs: Boolean): Boolean {
+    fun importConfigs(
+        context: Context,
+        inputStream: java.io.InputStream,
+        keepPrefs: Boolean
+    ): Boolean {
         val success = settingsRepository.importConfigs(inputStream, keepPrefs)
         if (success) {
             settingsRepository.syncSystemSettingsWithSaved()
@@ -4441,8 +4452,8 @@ class MainViewModel : ViewModel() {
             androidx.work.PeriodicWorkRequestBuilder<AppUpdateWorker>(
                 12, java.util.concurrent.TimeUnit.HOURS
             )
-            .setConstraints(constraints)
-            .build()
+                .setConstraints(constraints)
+                .build()
 
         androidx.work.WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "app_update_check_work",
@@ -4459,10 +4470,13 @@ class MainViewModel : ViewModel() {
     }
 
     private fun updateDailyWallpaperAutoUpdateTime(enabled: Boolean) {
-        if (enabled){
+        if (enabled) {
             val currentTime = LocalDateTime.now().toString()
             dailyWallpaperAutoUpdateTime.value = currentTime
-            settingsRepository.putString(SettingsRepository.KEY_DAILY_WALLPAPER_AUTO_UPDATE_TIME, currentTime)
+            settingsRepository.putString(
+                SettingsRepository.KEY_DAILY_WALLPAPER_AUTO_UPDATE_TIME,
+                currentTime
+            )
             settingsRepository.putInt(SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT, 0)
         } else {
             dailyWallpaperAutoUpdateTime.value = null
@@ -4473,7 +4487,8 @@ class MainViewModel : ViewModel() {
 
 
     fun loadBatterySaverConstants(context: Context) {
-        val constantsStr = Settings.Global.getString(context.contentResolver, "battery_saver_constants") ?: ""
+        val constantsStr =
+            Settings.Global.getString(context.contentResolver, "battery_saver_constants") ?: ""
         val map = mutableMapOf<String, String>()
         if (constantsStr.isNotEmpty()) {
             constantsStr.split(",").forEach { pair ->
@@ -4510,7 +4525,11 @@ class MainViewModel : ViewModel() {
     private fun saveBatterySaverConstants(context: Context, map: Map<String, String>) {
         val constantsStr = map.map { "${it.key}=${it.value}" }.joinToString(",")
         try {
-            Settings.Global.putString(context.contentResolver, "battery_saver_constants", constantsStr)
+            Settings.Global.putString(
+                context.contentResolver,
+                "battery_saver_constants",
+                constantsStr
+            )
             batterySaverConstants.value = map
         } catch (e: Exception) {
             e.printStackTrace()
@@ -4548,13 +4567,18 @@ class MainViewModel : ViewModel() {
     }
 
     fun syncShowNotificationSnooze(context: Context) {
-        val enabled = Settings.Secure.getInt(context.contentResolver, "show_notification_snooze", 0) == 1
+        val enabled =
+            Settings.Secure.getInt(context.contentResolver, "show_notification_snooze", 0) == 1
         isShowNotificationSnoozeEnabled.value = enabled
     }
 
     fun setShowNotificationSnoozeEnabled(context: Context, enabled: Boolean) {
         try {
-            Settings.Secure.putInt(context.contentResolver, "show_notification_snooze", if (enabled) 1 else 0)
+            Settings.Secure.putInt(
+                context.contentResolver,
+                "show_notification_snooze",
+                if (enabled) 1 else 0
+            )
             isShowNotificationSnoozeEnabled.value = enabled
         } catch (e: Exception) {
             e.printStackTrace()
@@ -4562,7 +4586,8 @@ class MainViewModel : ViewModel() {
     }
 
     fun loadNotificationSnoozeOptions(context: Context) {
-        val raw = Settings.Global.getString(context.contentResolver, "notification_snooze_options") ?: ""
+        val raw =
+            Settings.Global.getString(context.contentResolver, "notification_snooze_options") ?: ""
         var def = 60
         var opts = listOf(15, 30, 60, 120)
         if (raw.isNotEmpty()) {
@@ -4587,7 +4612,11 @@ class MainViewModel : ViewModel() {
     fun saveNotificationSnoozeOptions(context: Context, def: Int, opts: List<Int>) {
         val serialized = "default=$def,options_array=${opts.joinToString(":")}"
         try {
-            Settings.Global.putString(context.contentResolver, "notification_snooze_options", serialized)
+            Settings.Global.putString(
+                context.contentResolver,
+                "notification_snooze_options",
+                serialized
+            )
             notificationSnoozeDefault.intValue = def
             notificationSnoozeOptions.value = opts
         } catch (e: Exception) {
@@ -4612,7 +4641,10 @@ class MainViewModel : ViewModel() {
 
     val isLockdownModeEnabled = mutableStateOf(false)
     fun toggleLockdownMode() {
-        settingsRepository.putBoolean(SettingsRepository.KEY_LOCKDOWN_MODE, !isLockdownModeEnabled.value)
+        settingsRepository.putBoolean(
+            SettingsRepository.KEY_LOCKDOWN_MODE,
+            !isLockdownModeEnabled.value
+        )
         isLockdownModeEnabled.value = !isLockdownModeEnabled.value
     }
 }

@@ -39,7 +39,8 @@ class AppUpdateWorker(
                 false
             )
 
-            val updateInfo = updateRepository.checkForUpdates(context, isPreReleaseEnabled, currentVersion)
+            val updateInfo =
+                updateRepository.checkForUpdates(context, isPreReleaseEnabled, currentVersion)
 
             if (updateInfo != null && updateInfo.isUpdateAvailable) {
                 com.sameerasw.essentials.viewmodels.MainViewModel.cachedIsUpdateAvailable = true

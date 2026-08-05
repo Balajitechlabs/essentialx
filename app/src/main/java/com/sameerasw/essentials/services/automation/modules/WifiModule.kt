@@ -32,7 +32,10 @@ class WifiModule : AutomationModule {
             if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return
             val ssid = currentWifiSsid()
             if (ssid == null) {
-                Log.d(ID, "Wi-Fi capabilities changed but SSID unavailable (check location permission/services)")
+                Log.d(
+                    ID,
+                    "Wi-Fi capabilities changed but SSID unavailable (check location permission/services)"
+                )
                 return
             }
             if (activeNetworkSsids[network] == ssid) return

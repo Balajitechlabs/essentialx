@@ -71,10 +71,10 @@ import com.sameerasw.essentials.ui.composables.configs.LocationReachedSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.LockScreenClockSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.MapsPowerSavingSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NotificationLightingSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.PowerAndBatterySettingsUI
+import com.sameerasw.essentials.ui.composables.configs.NotificationSnoozingSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.OtherCustomizationsSettingsUI
-
 import com.sameerasw.essentials.ui.composables.configs.PocketModeSettingsUI
+import com.sameerasw.essentials.ui.composables.configs.PowerAndBatterySettingsUI
 import com.sameerasw.essentials.ui.composables.configs.QuickSettingsTilesSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.RefreshRateSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.RemoteLockSettingsUI
@@ -82,7 +82,6 @@ import com.sameerasw.essentials.ui.composables.configs.ScreenLockedSecuritySetti
 import com.sameerasw.essentials.ui.composables.configs.ScreenOffWidgetSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.ShutUpSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.SnoozeNotificationsSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.NotificationSnoozingSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.SoundModeTileSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.StatusBarIconSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.TextAnimationsSettingsUI
@@ -230,7 +229,12 @@ class FeatureSettingsActivity : AppCompatActivity() {
                         mutableStateOf(prefs.getBoolean("watch_sync_sound_mode_enabled", false))
                     }
                     var watchSyncLocationReachedEnabled by remember {
-                        mutableStateOf(prefs.getBoolean("watch_sync_location_reached_enabled", true))
+                        mutableStateOf(
+                            prefs.getBoolean(
+                                "watch_sync_location_reached_enabled",
+                                true
+                            )
+                        )
                     }
                     androidx.compose.runtime.DisposableEffect(prefs) {
                         val listener =
@@ -553,6 +557,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 "Screen refresh rate" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
                                                     context
                                                 )
+
                                                 "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
                                                 "Power and Battery" -> !isWriteSecureSettingsEnabled
                                                 "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
@@ -636,12 +641,12 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                     }
 
                                     "Statusbar icons" -> {
-                                         StatusBarIconSettingsUI(
-                                             viewModel = statusBarViewModel,
-                                             mainViewModel = viewModel,
-                                             modifier = Modifier.padding(top = 16.dp),
-                                             highlightSetting = highlightSetting
-                                         )
+                                        StatusBarIconSettingsUI(
+                                            viewModel = statusBarViewModel,
+                                            mainViewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting
+                                        )
                                     }
 
                                     "Caffeinate" -> {

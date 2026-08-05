@@ -62,7 +62,8 @@ fun DefaultTabPicker(
         }
     } else null
 
-    val optionTitleRes = options.map { if (it == DIYTabs.FREEZE) R.string.tab_freeze_title else it.title }
+    val optionTitleRes =
+        options.map { if (it == DIYTabs.FREEZE) R.string.tab_freeze_title else it.title }
 
     Column(
         modifier = modifier
