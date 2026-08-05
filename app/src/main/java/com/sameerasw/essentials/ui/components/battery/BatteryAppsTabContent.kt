@@ -78,13 +78,7 @@ fun BatteryAppsTabContent(
         val displayedApps = if (showAllApps) usageApps else usageApps.take(20)
         val totalMah = usageApps.sumOf { it.powerMah }.coerceAtLeast(0.0001)
 
-        BatteryDrainGraphCard(
-            currentLevel = currentLevel,
-            chargeTimeRemainingMs = chargeTimeRemainingMs,
-            avgCurrentMa = avgCurrentMa,
-            isPlugged = isPlugged,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
+
 
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             displayedApps.forEach { app ->
