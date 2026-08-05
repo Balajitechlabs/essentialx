@@ -31,6 +31,7 @@ object BatteryStatsUtil {
         if (res1 != null) {
             val repo = SettingsRepository(context)
             repo.putLong("last_battery_stats_reset_time", System.currentTimeMillis())
+            BatteryHistoryManager.clearHistory(context)
         }
         return res1 != null
     }

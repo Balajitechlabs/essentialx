@@ -742,7 +742,8 @@ class SettingsRepository(private val context: Context) {
                     if (key == KEY_GITHUB_ACCESS_TOKEN || key == KEY_GITHUB_WORKFLOW_TOKEN ||
                         key == KEY_SHIZUKU_AUTH_TOKEN || key.startsWith("mac_battery_") ||
                         key == "airsync_mac_connected" || key == KEY_SNOOZE_DISCOVERED_CHANNELS ||
-                        key == KEY_MAPS_DISCOVERED_CHANNELS || key == KEY_SHUT_UP_ORIGINAL_SETTINGS
+                        key == KEY_MAPS_DISCOVERED_CHANNELS || key == KEY_SHUT_UP_ORIGINAL_SETTINGS ||
+                        key == "battery_history_points"
                     ) {
                         return@forEach
                     }

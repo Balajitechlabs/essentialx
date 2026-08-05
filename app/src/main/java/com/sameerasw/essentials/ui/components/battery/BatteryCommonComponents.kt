@@ -475,17 +475,40 @@ fun BatteryDrainGraphCard(
         }
     }
 
-    //  prediction duration
-    val predictedDurationMs = remember(chargeTimeRemainingMs) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    val historyPoints = remember(currentLevel, isPlugged) {
+        val points = com.sameerasw.essentials.utils.BatteryHistoryManager.getHistory(context).toMutableList()
+        val now = System.currentTimeMillis()
+        if (points.isEmpty()) {
+            val repo = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+            val lastReset = repo.getLong("last_battery_stats_reset_time", now - 3600 * 1000L)
+            val startLevel = if (isPlugged) 0 else 100
+            points.add(com.sameerasw.essentials.utils.BatteryHistoryPoint(lastReset, startLevel, isPlugged))
+        }
+        if (points.last().level != currentLevel || points.last().isPlugged != isPlugged) {
+            points.add(com.sameerasw.essentials.utils.BatteryHistoryPoint(now, currentLevel, isPlugged))
+        }
+        points
+    }
+
+    val predictedDurationMs = remember(chargeTimeRemainingMs, avgCurrentMa, currentLevel) {
         if (chargeTimeRemainingMs != null && chargeTimeRemainingMs > 0) {
             chargeTimeRemainingMs
         } else {
-            null
+            val current = avgCurrentMa?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
+            if (current != null) {
+                val capacityMah = 4000.0
+                val diffPct = if (isPlugged) (100 - currentLevel) else currentLevel
+                if (diffPct > 0) {
+                    ((capacityMah * (diffPct / 100.0) / current) * 3600 * 1000).toLong()
+                } else null
+            } else null
         }
     }
 
-    val formattedToGo = remember(predictedDurationMs) {
-        if (predictedDurationMs != null) {
+    val formattedToGo = remember(predictedDurationMs, isPlugged) {
+        if (predictedDurationMs != null && predictedDurationMs > 0) {
             val hours = predictedDurationMs.toDouble() / (1000.0 * 3600.0)
             "${formatHoursRounded(hours)} to go"
         } else {
@@ -493,7 +516,6 @@ fun BatteryDrainGraphCard(
         }
     }
 
-    val context = androidx.compose.ui.platform.LocalContext.current
     val formattedAgo = remember(currentLevel) {
         val repo = com.sameerasw.essentials.data.repository.SettingsRepository(context)
         val lastResetTime = repo.getLong("last_battery_stats_reset_time", -1L)
@@ -528,7 +550,6 @@ Card(
         val lineY50 = padding + graphHeight / 2
         val lineY0 = padding + graphHeight
 
-        val strokeWidthPx = 2.dp.toPx()
         val gridColor = outlineVariant.copy(alpha = 0.4f)
 
         drawLine(
@@ -550,20 +571,43 @@ Card(
             strokeWidth = 1.dp.toPx()
         )
 
-        // Define points
         val midX = padding + graphWidth * 0.55f
-        val actualStartY = if (isPlugged) lineY0 else lineY100
-        val currentY = padding + graphHeight * (1f - currentLevel / 100f)
+        val firstTime = historyPoints.first().timestamp
+        val lastTime = historyPoints.last().timestamp
+        val totalTimeSpan = (lastTime - firstTime).coerceAtLeast(1L)
 
-        // drain / charge path
-        val actualPath = Path().apply {
-            moveTo(padding, actualStartY)
-            cubicTo(
-                padding + (midX - padding) * 0.5f, actualStartY,
-                padding + (midX - padding) * 0.5f, currentY,
-                midX, currentY
-            )
+        fun getX(ts: Long): Float {
+            val fraction = ((ts - firstTime).toDouble() / totalTimeSpan.toDouble()).toFloat()
+            return padding + fraction * (midX - padding)
         }
+
+        fun getY(lvl: Int): Float {
+            return padding + graphHeight * (1f - lvl / 100f)
+        }
+
+        val actualPath = Path()
+        val firstPoint = historyPoints.first()
+        actualPath.moveTo(getX(firstPoint.timestamp), getY(firstPoint.level))
+
+        for (i in 0 until historyPoints.size - 1) {
+            val p1 = historyPoints[i]
+            val p2 = historyPoints[i + 1]
+            val x1 = getX(p1.timestamp)
+            val y1 = getY(p1.level)
+            val x2 = getX(p2.timestamp)
+            val y2 = getY(p2.level)
+
+            if (p1.isPlugged != p2.isPlugged) {
+                actualPath.lineTo(x2, y1)
+                actualPath.lineTo(x2, y2)
+            } else {
+                val ctrlX1 = x1 + (x2 - x1) * 0.5f
+                val ctrlX2 = x1 + (x2 - x1) * 0.5f
+                actualPath.cubicTo(ctrlX1, y1, ctrlX2, y2, x2, y2)
+            }
+        }
+
+        val currentY = getY(currentLevel)
 
         // Fill area
         val fillPath = Path().apply {
@@ -612,7 +656,27 @@ Card(
             )
         }
 
-        //  current level
+        // charging state change dots
+        for (i in 0 until historyPoints.size - 1) {
+            val p1 = historyPoints[i]
+            val p2 = historyPoints[i + 1]
+            if (p1.isPlugged != p2.isPlugged) {
+                val x2 = getX(p2.timestamp)
+                val y2 = getY(p2.level)
+                drawCircle(
+                    color = surfaceColor,
+                    radius = 4.5.dp.toPx(),
+                    center = androidx.compose.ui.geometry.Offset(x2, y2)
+                )
+                drawCircle(
+                    color = primaryColor,
+                    radius = 3.dp.toPx(),
+                    center = androidx.compose.ui.geometry.Offset(x2, y2)
+                )
+            }
+        }
+
+        // current level indicator
         drawCircle(
             color = surfaceColor,
             radius = 6.dp.toPx(),

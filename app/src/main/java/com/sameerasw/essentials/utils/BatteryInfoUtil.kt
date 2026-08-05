@@ -100,9 +100,29 @@ object BatteryInfoUtil {
         val rawEnergy = bm?.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)?.takeIf { it != Long.MIN_VALUE }
         val remainingEnergyMwh = rawEnergy?.let { it / 1_000_000 } // nWh to mWh
 
-        val chargeTimeRemaining = if (android.os.Build.VERSION.SDK_INT >= 28) {
+        val isPlugged = plugged > 0 || status == BatteryManager.BATTERY_STATUS_CHARGING
+        val computedChargeTime = if (android.os.Build.VERSION.SDK_INT >= 28) {
             bm?.computeChargeTimeRemaining()?.takeIf { it >= 0 }
         } else null
+
+        val chargeTimeRemaining = if (isPlugged) {
+            computedChargeTime ?: run {
+                val current = (currentAvgMa ?: currentNowMa)?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
+                if (current != null && level < 100) {
+                    val remainingPct = 100 - level
+                    val capacityMah = 4000.0 
+                    val neededMah = capacityMah * (remainingPct / 100.0)
+                    (neededMah / current * 3600 * 1000).toLong()
+                } else null
+            }
+        } else {
+            val current = (currentAvgMa ?: currentNowMa)?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
+            if (current != null && level > 0) {
+                val capacityMah = 4000.0
+                val currentMah = capacityMah * (level / 100.0)
+                (currentMah / current * 3600 * 1000).toLong()
+            } else null
+        }
 
         val hasStatsPerm = hasBatteryStatsPermission(context)
 
