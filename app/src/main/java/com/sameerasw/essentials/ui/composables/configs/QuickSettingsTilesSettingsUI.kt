@@ -350,7 +350,7 @@ fun QuickSettingsTilesSettingsUI(
             isSupported = { _ -> DeviceUtils.isGoogleDevice() }
         ),
         QSTileInfo(
-            R.string.tile_lockdown_mode,
+            R.string.tile_lock,
             R.drawable.rounded_lock_24,
             LockdownTileService::class.java,
             listOf("ACCESSIBILITY", "DEVICE_ADMIN"),

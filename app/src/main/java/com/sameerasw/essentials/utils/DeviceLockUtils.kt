@@ -8,10 +8,33 @@ import android.os.Build
 import android.view.KeyEvent
 import android.widget.Toast
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.ScreenOffMethod
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 
 object DeviceLockUtils {
+
+    fun performLockdownTileAction(context: Context, isLongPress: Boolean): Boolean {
+        val isLockdownEnabled = SettingsRepository(context).getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE, false)
+        val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+
+        val selectedScreenOffMethod = try {
+            ScreenOffMethod.valueOf(
+                prefs.getString("screen_off_method", ScreenOffMethod.ACCESSIBILITY.name)
+                    ?: ScreenOffMethod.ACCESSIBILITY.name
+            )
+        } catch (e: Exception) {
+            ScreenOffMethod.ACCESSIBILITY
+        }
+
+        val methodToExecute = if (!isLongPress) {
+            if (isLockdownEnabled) ScreenOffMethod.DEVICE_ADMIN else selectedScreenOffMethod
+        } else {
+            if (isLockdownEnabled) selectedScreenOffMethod else ScreenOffMethod.DEVICE_ADMIN
+        }
+
+        return lockDevice(context, methodToExecute)
+    }
 
     fun lockDevice(context: Context, method: ScreenOffMethod): Boolean {
         return when (method) {

@@ -1180,11 +1180,14 @@
             android:name=".services.tiles.LockdownTileService"
             android:exported="true"
             android:icon="@drawable/rounded_lock_24"
-            android:label="@string/tile_lockdown_mode"
+            android:label="@string/tile_lock"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
+            <meta-data
+                android:name="android.service.quicksettings.ACTION_QS_TILE_PREFERENCES"
+                android:value="com.sameerasw.essentials.ui.activities.QSPreferencesActivity" />
             <meta-data
                 android:name="android.service.quicksettings.TILE_CATEGORY"
                 android:value="android.service.quicksettings.CATEGORY_UTILITIES" />
