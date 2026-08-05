@@ -118,7 +118,7 @@ object FlashlightUtil {
         )
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || DeviceUtils.isMediatekDevice()) {
             return safeSetTorchMode(cameraManager, cameraId, toLevel > 0)
         }
 

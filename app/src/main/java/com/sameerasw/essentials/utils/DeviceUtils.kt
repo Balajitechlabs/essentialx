@@ -32,16 +32,31 @@ data class DeviceInfo(
 )
 
 object DeviceUtils {
-    fun isGoogleDevice(): Boolean {
-        return Build.MANUFACTURER.equals("google", ignoreCase = true) ||
+    private val isGoogleDeviceLazy: Boolean by lazy {
+        Build.MANUFACTURER.equals("google", ignoreCase = true) ||
                 Build.BRAND.equals("google", ignoreCase = true) ||
                 Build.PRODUCT.contains("pixel", ignoreCase = true)
     }
 
-    fun isSamsungDevice(): Boolean {
-        return Build.MANUFACTURER.equals("samsung", ignoreCase = true) ||
+    private val isSamsungDeviceLazy: Boolean by lazy {
+        Build.MANUFACTURER.equals("samsung", ignoreCase = true) ||
                 Build.BRAND.equals("samsung", ignoreCase = true)
     }
+
+    private val isMediatekDeviceLazy: Boolean by lazy {
+        val hardware = Build.HARDWARE.lowercase()
+        val board = Build.BOARD.lowercase()
+        val brand = Build.BRAND.lowercase()
+        val manufacturer = Build.MANUFACTURER.lowercase()
+
+        hardware.contains("mt") || hardware.contains("mediatek") || hardware.contains("dimensity") ||
+                board.contains("mt") || board.contains("mediatek") || board.contains("dimensity") ||
+                brand.contains("mediatek") || manufacturer.contains("mediatek")
+    }
+
+    fun isGoogleDevice(): Boolean = isGoogleDeviceLazy
+    fun isSamsungDevice(): Boolean = isSamsungDeviceLazy
+    fun isMediatekDevice(): Boolean = isMediatekDeviceLazy
 
     fun getDeviceInfo(context: Context): DeviceInfo {
         val deviceName = try {
