@@ -13,6 +13,7 @@ import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.ScreenOffMethod
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
+import com.sameerasw.essentials.utils.DeviceLockUtils
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.performHapticFeedback
 import rikka.shizuku.ShizukuBinderWrapper
@@ -221,48 +222,7 @@ object CombinedActionExecutor {
                         performHapticFeedback(vibrator, action.haptic)
                     }
 
-                    when (action.method) {
-                        ScreenOffMethod.ACCESSIBILITY -> {
-                            val enabledServices = Settings.Secure.getString(
-                                context.contentResolver,
-                                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-                            )
-                            val hasAccess =
-                                enabledServices?.contains("com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService") == true
-                            if (hasAccess) {
-                                val serviceIntent = Intent(
-                                    context,
-                                    ScreenOffAccessibilityService::class.java
-                                ).apply {
-                                    this.action = "LOCK_SCREEN"
-                                }
-                                context.startService(serviceIntent)
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Missing Accessibility permission",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-
-                        ScreenOffMethod.INPUT -> {
-                            if (ShellUtils.hasPermission(context)) {
-                                ShellUtils.runCommand(
-                                    context,
-                                    "input keyevent ${KeyEvent.KEYCODE_POWER}"
-                                )
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Missing Shizuku/Root permission",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-
-                        else -> {}
-                    }
+                    DeviceLockUtils.lockDevice(context, action.method)
                 }
 
                 is Action.MediaPlayPause -> {

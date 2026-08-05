@@ -1946,6 +1946,10 @@
     <string name="translation_warning_point3_title">GitHub Pull Request</string>
     <string name="translation_warning_point3_desc">Submissions automatically create or update a dedicated pull request on GitHub under your account.</string>
     <string name="translation_warning_do_not_show">Do not show again</string>
+    <string name="msg_missing_accessibility_permission">Missing Accessibility permission!</string>
+    <string name="msg_device_admin_required_lockdown">Please enable Device Admin to lockdown this device.</string>
+    <string name="msg_shizuku_root_required_lock">Missing Shizuku or Root permission for Input method!</string>
+    <string name="msg_feature_not_supported">Feature not supported on your device!</string>
 </resources>
 
 
