@@ -141,6 +141,7 @@ class FlashlightHandler(
                 } else {
                     getCameraId()?.let { id ->
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                            !com.sameerasw.essentials.utils.DeviceUtils.isMediatekDevice() &&
                             FlashlightUtil.isIntensitySupported(service, id)
                         ) {
                             try {

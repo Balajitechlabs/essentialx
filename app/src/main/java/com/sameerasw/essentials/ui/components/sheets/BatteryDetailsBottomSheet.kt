@@ -223,6 +223,10 @@ fun BatteryDetailsBottomSheet(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
+            } else if (selectedTab == 1) {
+                com.sameerasw.essentials.ui.components.battery.TopAppsBreakdownHeader(
+                    usageApps = usageApps
+                )
             } else {
                 com.sameerasw.essentials.ui.components.battery.BatteryUsageBreakdownHeader(
                     appsPct = appsPct,
@@ -269,7 +273,11 @@ fun BatteryDetailsBottomSheet(
                     onToggleShowAll = { showAllApps = !showAllApps },
                     showPercentage = showPercentage,
                     onToggleUnit = { showPercentage = !showPercentage },
-                    view = view
+                    view = view,
+                    currentLevel = batteryDetails.level,
+                    chargeTimeRemainingMs = batteryDetails.chargeTimeRemainingMs,
+                    avgCurrentMa = batteryDetails.currentAvgMa,
+                    isPlugged = batteryDetails.plugged > 0
                 )
                 2 -> BatterySystemTabContent(
                     isLoadingAdvanced = isLoadingAdvanced,

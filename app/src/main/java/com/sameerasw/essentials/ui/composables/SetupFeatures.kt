@@ -1466,6 +1466,11 @@ private fun SearchResultsSection(
                                                     if (targetFeatureKey == "LiveWallpaper") "live" else "daily"
                                                 )
                                             }
+                                        } else if (targetFeatureKey == "App updates") {
+                                            Intent(
+                                                context,
+                                                com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java
+                                            )
                                         } else {
                                             Intent(
                                                 context,
@@ -1492,6 +1497,11 @@ private fun SearchResultsSection(
                                             if (result.featureKey == "LiveWallpaper") "live" else "daily"
                                         )
                                     }
+                                } else if (result.featureKey == "App updates") {
+                                    Intent(
+                                        context,
+                                        com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java
+                                    )
                                 } else {
                                     Intent(context, FeatureSettingsActivity::class.java).apply {
                                         putExtra("feature", result.featureKey)

@@ -355,10 +355,10 @@
     <string name="hide_notification_icons_desc">Скрыть все значки входящих уведомлений</string>
     <string name="feat_hide_gesture_bar_title">Скрыть панель жестов</string>
     <string name="feat_hide_gesture_bar_desc">При навигации жестами</string>
-    <string name="feat_hide_gesture_bar_on_launcher_title">Показывать на домашнем экране</string>
-    <string name="feat_hide_gesture_bar_on_launcher_desc">Динамически показывать панель жестов только при нахождении на домашнем экране</string>
-    <string name="feat_circle_to_search_gesture_title">Жест \"Обвести и найти\"</string>
-    <string name="feat_circle_to_search_gesture_desc">Зажмите нижнюю часть дисплея для вызова \"Обвести и найти\"</string>
+    <string name="feat_hide_gesture_bar_on_launcher_title">Показывать на главном экране</string>
+    <string name="feat_hide_gesture_bar_on_launcher_desc">Динамически показывать панель жестов только на главном экране</string>
+    <string name="feat_circle_to_search_gesture_title">Жест для \"Обвести и найти\"</string>
+    <string name="feat_circle_to_search_gesture_desc">Нажмите и удерживайте нижнюю часть экрана, чтобы активировать функцию \"Обвести и найти\"</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
     <string name="feat_other_customizations_title">Другие настройки</string>
@@ -1396,7 +1396,7 @@
     <string name="feat_shut_up_desc">Временно отключает определённые настройки</string>
     <string name="shut_up_description">Shut-Up! bypasses app restrictions and checks for developer options, accessibility and debugging by dynamically hiding them when you launch sensitive apps. \n\nUse the custom shortcuts to ensure settings are hidden before the app launches.</string>
     <string name="shut_up_select_apps_title">Выбрать приложения</string>
-    <string name="shut_up_select_apps_desc">Выбрать приложения для применения \"Тсс!\"</string>
+    <string name="shut_up_select_apps_desc">Выберите, на какие приложения будет действовать логика \"Тсс!\"</string>
     <string name="shut_up_settings_title">Shut-Up! Settings</string>
     <string name="shut_up_per_app_settings">Shut-Up! Features</string>
     <string name="shut_up_disable_dev_options">Disable Developer Options</string>
@@ -1404,8 +1404,8 @@
     <string name="shut_up_disable_wireless_debugging">Disable Wireless Debugging</string>
     <string name="shut_up_disable_accessibility">Disable Accessibility Services</string>
     <string name="shut_up_shortcut_created">Shortcut created for %s</string>
-    <string name="feat_disable_rotation_suggestion_title">Отключить предложение поворота</string>
-    <string name="feat_disable_rotation_suggestion_desc">Не показывать кнопку поворота при выключенном авто-повороте</string>
+    <string name="feat_disable_rotation_suggestion_title">Отключить кнопку поворота экрана</string>
+    <string name="feat_disable_rotation_suggestion_desc">Не показывать кнопку поворота экрана, когда автоповорот выключен</string>
     <string name="shut_up_toast_active">App got shut up</string>
     <string name="shut_up_toast_restored">Shut up features returned</string>
     <string name="shut_up_auto_archive_notif_title">Auto Freeze</string>
@@ -1477,10 +1477,10 @@
     <string name="feat_daily_wallpaper_desc">Отобранные обои на каждый день</string>
     <string name="settings_translate_mode">Режим перевода</string>
     <string name="settings_translate_mode_desc">Удерживайте палец на любом тексте, чтобы перевести его и помочь сообществу</string>
-    <string name="setting_enable_unsupported_features_title">Включить неподдерживаемые функции</string>
+    <string name="setting_enable_unsupported_features_title">Отображать неподдерживаемые функции</string>
     <string name="setting_enable_unsupported_features_desc">Показывать OEM-специфичные и избыточные функции, которые скрыты по умолчанию.</string>
-    <string name="settings_translated_texts">Переведено</string>
-    <string name="settings_translated_texts_desc">%d изменения(ий) в ожидании — нажмите, чтобы отправить или отменить </string>
+    <string name="settings_translated_texts">Переводы</string>
+    <string name="settings_translated_texts_desc">Внесено %d изменений – нажмите здесь, чтобы выложить или отменить их</string>
     <string name="shut_up_restore_delay_title">Задержка восстановления</string>
     <string name="label_snooze_option_1">Вариант 1</string>
     <string name="label_snooze_option_2">Вариант 2</string>
@@ -1519,9 +1519,11 @@
     <string name="desc_defer_keyvalue_backup">Отложить резервные копии \"ключ-значение\".</string>
     <string name="desc_low_power_trigger_level">для режима энергосбережения</string>
     <string name="label_low_power_trigger_level">Установить свой уровень включения</string>
-    <string name="setting_swipe_tabs_title">Перемещение между вкладками с помощью свайпов</string>
-    <string name="setting_swipe_tabs_desc">На домашнем экране</string>
+    <string name="setting_swipe_tabs_title">Проведите для смены вкладки</string>
+    <string name="setting_swipe_tabs_desc">На главном экране приложения</string>
     <string name="notification_lighting_sweep_select_shapes_title">Выбрать фигуры</string>
     <string name="notification_lighting_sweep_select_shapes_desc">Выберите, какие фигуры будут использоваться для анимации</string>
     <string name="flashlight_pulse_disable_on_dnd_title">Не использовать при включённом режиме \"Не беспокоить\"</string>
+    <string name="pocket_mode_lock_screen_only_title">Только экран блокировки</string>
+    <string name="pocket_mode_lock_screen_only_desc">Активировать режим \"В кармане\" только когда устройство заблокировано</string>
 </resources>

@@ -271,6 +271,8 @@ object FeatureRegistry {
         ) {
             override fun isEnabled(viewModel: MainViewModel) = true
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+
+            override fun isDeviceSupported(context: Context) = DeviceUtils.isGoogleDevice()
         },
         object : Feature(
             id = "Lock screen clock",
@@ -1345,7 +1347,7 @@ object FeatureRegistry {
                 context.startActivity(
                     Intent(
                         context,
-                        com.sameerasw.essentials.AppUpdatesActivity::class.java
+                        com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java
                     )
                 )
             }

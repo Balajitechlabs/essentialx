@@ -534,6 +534,36 @@
                 android:resource="@xml/favorites_widget_info" />
         </receiver>
 
+        <activity
+            android:name=".ui.activities.QsTilesWidgetConfigurationActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".services.widgets.QsTilesWidgetReceiver"
+            android:exported="true"
+            android:label="@string/qs_tiles_widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.intent.action.CONFIGURATION_CHANGED" />
+                <action android:name="com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/qs_tiles_widget_info" />
+        </receiver>
+
+        <receiver
+            android:name=".services.receivers.QsTileActionRouter"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.sameerasw.essentials.action.TRIGGER_QS_TILE" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".services.tiles.CaffeinateTileService"
             android:exported="true"
@@ -1011,6 +1041,16 @@
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".services.receivers.BatteryAutomationReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+                <action android:name="android.intent.action.BATTERY_CHANGED" />
             </intent-filter>
         </receiver>
 

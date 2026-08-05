@@ -83,6 +83,7 @@ class MainViewModel : ViewModel() {
     val isShizukuPermissionGranted = mutableStateOf(false)
     val isShizukuAvailable = mutableStateOf(false)
     val pinnedFeatureKeys = mutableStateOf<List<String>>(emptyList())
+    val pinnedQsTileKeys = mutableStateOf<List<String>>(emptyList())
     val isNotificationListenerEnabled = mutableStateOf(false)
     val isMapsPowerSavingEnabled = mutableStateOf(false)
     val isNotificationLightingEnabled = mutableStateOf(false)
@@ -1544,6 +1545,7 @@ class MainViewModel : ViewModel() {
         isPreReleaseCheckEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_CHECK_PRE_RELEASES_ENABLED)
         pinnedFeatureKeys.value = settingsRepository.getPinnedFeatures()
+        pinnedQsTileKeys.value = settingsRepository.getPinnedQsTiles()
         isLikeSongToastEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_LIKE_SONG_TOAST_ENABLED, true)
         isLikeSongAodOverlayEnabled.value = settingsRepository.getBoolean(
@@ -1694,6 +1696,24 @@ class MainViewModel : ViewModel() {
         appContext?.let { context ->
             com.sameerasw.essentials.utils.ShortcutUtil.updateLauncherDynamicShortcuts(context)
             val intent = Intent("com.sameerasw.essentials.action.FAVORITES_WIDGET_UPDATE").apply {
+                setPackage(context.packageName)
+            }
+            context.sendBroadcast(intent)
+        }
+    }
+
+    fun togglePinQsTile(serviceClassName: String) {
+        val current = pinnedQsTileKeys.value.toMutableList()
+        if (current.contains(serviceClassName)) {
+            current.remove(serviceClassName)
+        } else {
+            current.add(serviceClassName)
+        }
+        pinnedQsTileKeys.value = current
+        settingsRepository.savePinnedQsTiles(current)
+
+        appContext?.let { context ->
+            val intent = Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
                 setPackage(context.packageName)
             }
             context.sendBroadcast(intent)

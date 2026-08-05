@@ -188,6 +188,7 @@ class SettingsRepository(private val context: Context) {
         const val KEY_BATTERY_WIDGET_BACKGROUND_ENABLED = "battery_widget_background_enabled"
 
         const val KEY_PINNED_FEATURES = "pinned_features"
+        const val KEY_PINNED_QS_TILES = "pinned_qs_tiles"
         const val KEY_LIKE_SONG_TOAST_ENABLED = "like_song_toast_enabled"
         const val KEY_LIKE_SONG_AOD_OVERLAY_ENABLED = "like_song_aod_overlay_enabled"
         const val KEY_AMBIENT_MUSIC_GLANCE_ENABLED = "ambient_music_glance_enabled"
@@ -743,7 +744,8 @@ class SettingsRepository(private val context: Context) {
                     if (key == KEY_GITHUB_ACCESS_TOKEN || key == KEY_GITHUB_WORKFLOW_TOKEN ||
                         key == KEY_SHIZUKU_AUTH_TOKEN || key.startsWith("mac_battery_") ||
                         key == "airsync_mac_connected" || key == KEY_SNOOZE_DISCOVERED_CHANNELS ||
-                        key == KEY_MAPS_DISCOVERED_CHANNELS || key == KEY_SHUT_UP_ORIGINAL_SETTINGS
+                        key == KEY_MAPS_DISCOVERED_CHANNELS || key == KEY_SHUT_UP_ORIGINAL_SETTINGS ||
+                        key == "battery_history_points"
                     ) {
                         return@forEach
                     }
@@ -914,6 +916,22 @@ class SettingsRepository(private val context: Context) {
     fun savePinnedFeatures(features: List<String>) {
         val json = gson.toJson(features)
         putString(KEY_PINNED_FEATURES, json)
+    }
+
+    fun getPinnedQsTiles(): List<String> {
+        val json = prefs.getString(KEY_PINNED_QS_TILES, null)
+        return if (json != null) {
+            try {
+                gson.fromJson(json, Array<String>::class.java).toList()
+            } catch (e: Exception) {
+                emptyList()
+            }
+        } else emptyList()
+    }
+
+    fun savePinnedQsTiles(tiles: List<String>) {
+        val json = gson.toJson(tiles)
+        putString(KEY_PINNED_QS_TILES, json)
     }
 
     fun getRecentSearches(): List<com.sameerasw.essentials.domain.model.SearchableItem> {

@@ -24,6 +24,7 @@ class StatusBarIconViewModel : ViewModel() {
     val isSmartDataEnabled = mutableStateOf(false)
     val selectedNetworkTypes = mutableStateOf(setOf(NetworkType.NETWORK_4G, NetworkType.NETWORK_5G))
     val isClockSecondsEnabled = mutableStateOf(false)
+    val clockPosition = mutableStateOf(0)
     val batteryPercentageMode = mutableStateOf(0) // 0: Hide, 1: Always, 2: Charging
     val isPrivacyChipEnabled = mutableStateOf(true)
     val isWriteSettingsEnabled = mutableStateOf(false)
@@ -51,6 +52,7 @@ class StatusBarIconViewModel : ViewModel() {
         const val PREF_SMART_DATA_ENABLED = "smart_data_enabled"
         const val PREF_SELECTED_NETWORK_TYPES = "selected_network_types"
         const val PREF_BATTERY_PERCENT_MODE = "battery_percent_mode"
+        const val PREF_CLOCK_POSITION = "clock_position"
         const val PREF_HIDE_SYSTEM_ICONS = "hide_system_icons"
         const val PREF_HIDE_SYSTEM_ICONS_LOCKED_ONLY = "hide_system_icons_locked_only"
         const val PREF_HIDE_CLOCK = "hide_clock"
@@ -235,7 +237,21 @@ class StatusBarIconViewModel : ViewModel() {
     private fun updateIconBlacklist(context: Context) {
         if (!isWriteSecureSettingsEnabled.value) return
 
-        val blacklistNames = StatusBarIconRegistry.getBlacklistNames(getIconVisibilities())
+        val blacklistNames = StatusBarIconRegistry.getBlacklistNames(getIconVisibilities()).toMutableSet()
+        when (clockPosition.value) {
+            1 -> { 
+                blacklistNames.add("right_clock_position")
+                blacklistNames.add("middle_clock_position")
+            }
+            2 -> { 
+                blacklistNames.add("left_clock_position")
+                blacklistNames.add("right_clock_position")
+            }
+            3 -> {
+                blacklistNames.add("left_clock_position")
+                blacklistNames.add("middle_clock_position")
+            }
+        }
         updateIconBlacklistSetting(context, blacklistNames)
     }
 
@@ -322,6 +338,7 @@ class StatusBarIconViewModel : ViewModel() {
         setAdvancedFlagEnabled(context, PREF_HIDE_CLOCK, false)
         setAdvancedFlagEnabled(context, PREF_HIDE_NOTIFICATION_ICONS, false)
         setBatteryPercentageMode(0, context)
+        setClockPosition(0, context)
 
         // Build default visibility map
         val defaultVisibilities =
@@ -334,6 +351,7 @@ class StatusBarIconViewModel : ViewModel() {
     private fun loadStatusBarSettings(context: Context) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         batteryPercentageMode.value = prefs.getInt(PREF_BATTERY_PERCENT_MODE, 0)
+        clockPosition.value = prefs.getInt(PREF_CLOCK_POSITION, 0)
 
         // Load Clock Seconds
         isClockSecondsEnabled.value =
@@ -348,6 +366,14 @@ class StatusBarIconViewModel : ViewModel() {
                         "privacy_chip_2447_enabled",
                         1
                     ) == 1)
+    }
+
+    fun setClockPosition(position: Int, context: Context) {
+        clockPosition.value = position
+        context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
+            putInt(PREF_CLOCK_POSITION, position)
+        }
+        updateIconBlacklist(context)
     }
 
     fun setClockSecondsEnabled(enabled: Boolean, context: Context) {

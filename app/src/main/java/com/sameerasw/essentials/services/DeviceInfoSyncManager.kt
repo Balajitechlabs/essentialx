@@ -41,6 +41,11 @@ object DeviceInfoSyncManager {
                 maxTorchLevel = FlashlightUtil.getMaxLevel(context, cameraId)
                 isIntensitySupported = FlashlightUtil.isIntensitySupported(context, cameraId)
                 syncDeviceInfo(context)
+
+                val intent = Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
+                    setPackage(context.packageName)
+                }
+                context.sendBroadcast(intent)
             }
         }
 

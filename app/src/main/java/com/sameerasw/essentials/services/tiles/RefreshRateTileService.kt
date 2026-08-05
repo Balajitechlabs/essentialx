@@ -8,6 +8,7 @@ import androidx.annotation.RequiresApi
 import com.sameerasw.essentials.FeatureSettingsActivity
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.RefreshRateUtils
 import com.sameerasw.essentials.utils.ShellUtils
 
@@ -53,6 +54,8 @@ class RefreshRateTileService : BaseTileService() {
     override fun getTileLabel(): String = getString(R.string.tile_refresh_rate)
 
     override fun getTileSubtitle(): String = RefreshRateUtils.getDisplaySubtitle(this)
+
+    override fun isDeviceSupported(): Boolean = DeviceUtils.isGoogleDevice()
 
     override fun hasFeaturePermission(): Boolean = ShellUtils.hasPermission(this)
 

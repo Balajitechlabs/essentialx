@@ -74,9 +74,16 @@ object BatteryInfoUtil {
         val present = intent?.getBooleanExtra(BatteryManager.EXTRA_PRESENT, true) ?: true
 
         // Android 14+ public Extras
-        val cycleCount = if (android.os.Build.VERSION.SDK_INT >= 34) {
-            intent?.getIntExtra("android.os.extra.CYCLE_COUNT", -1)?.takeIf { it >= 0 }
+        var cycleCount = if (android.os.Build.VERSION.SDK_INT >= 34) {
+            intent?.getIntExtra("android.os.extra.CYCLE_COUNT", -1)?.takeIf { it > 0 }
         } else null
+
+        // Vendor-specific extras fallback for basic details
+        if (cycleCount == null) {
+            val vendorCycle = intent?.getIntExtra("cycle_count", -1)?.takeIf { it > 0 }
+                ?: intent?.getIntExtra("battery_cycle", -1)?.takeIf { it > 0 }
+            if (vendorCycle != null) cycleCount = vendorCycle
+        }
 
         val chargingStatusNew = if (android.os.Build.VERSION.SDK_INT >= 34) {
             intent?.getIntExtra("android.os.extra.CHARGING_STATUS", -1)?.takeIf { it >= 0 }
@@ -93,7 +100,14 @@ object BatteryInfoUtil {
         val rawEnergy = bm?.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)?.takeIf { it != Long.MIN_VALUE }
         val remainingEnergyMwh = rawEnergy?.let { it / 1_000_000 } // nWh to mWh
 
-        val chargeTimeRemaining = bm?.computeChargeTimeRemaining()?.takeIf { it >= 0 }
+        val isPlugged = plugged > 0 || status == BatteryManager.BATTERY_STATUS_CHARGING
+        val computedChargeTime = if (android.os.Build.VERSION.SDK_INT >= 28) {
+            bm?.computeChargeTimeRemaining()?.takeIf { it >= 0 }
+        } else null
+
+        val chargeTimeRemaining = if (isPlugged) {
+            computedChargeTime
+        } else null
 
         val hasStatsPerm = hasBatteryStatsPermission(context)
 
@@ -160,29 +174,44 @@ object BatteryInfoUtil {
         val dumpsysOutput = ShellUtils.runCommandWithOutput(context, "dumpsys battery")
         val dumpsysMap = parseDumpsysBattery(dumpsysOutput)
 
+        // SAMSUNG SPECIFIC: mSavedBattery... fields
+        val samsungCycleCount = (dumpsysMap["mSavedBatteryUsage"]?.cleanNumericValue()?.toIntOrNull() 
+            ?: dumpsysMap["mUsage"]?.cleanNumericValue()?.toIntOrNull())?.let { 
+            if (it > 10000) it / 100 else it // Handle cumulative percentage vs cycles
+        } ?: dumpsysMap["mSavedBatteryCycle"]?.cleanNumericValue()?.toIntOrNull()
+            ?: dumpsysMap["mCycle"]?.cleanNumericValue()?.toIntOrNull()
+            ?: dumpsysMap["CycleCount"]?.cleanNumericValue()?.toIntOrNull()
+            ?: readSysfsLong(context, "/sys/class/power_supply/battery/cycle_count")?.toInt()
+            ?: readSysfsLong(context, "/efs/FactoryApp/batt_discharge_level")?.toInt()?.let { if (it > 0) it / 100 else null }
+            ?: readSysfsLong(context, "/sys/class/power_supply/battery/battery_cycle")?.toInt()
+
+        val samsungSoH = dumpsysMap["mSavedBatteryAsoc"]?.cleanNumericValue()?.toIntOrNull()
+            ?: dumpsysMap["mAsoc"]?.cleanNumericValue()?.toIntOrNull()
+            ?: readSysfsLong(context, "/sys/class/power_supply/battery/fg_asoc")?.toInt()
+
         if (chargeFull == null) {
-            dumpsysMap["Charge counter"]?.toLongOrNull()?.let {
-                // dumpsys sometimes gives charge counter or max capacity
-            }
+            dumpsysMap["mSavedBatteryMax"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()?.let { chargeFull = it * 1000 }
         }
 
-        val chargeCounter = dumpsysMap["Charge counter"]?.toLongOrNull() ?: readSysfsLong(context, "/sys/class/power_supply/battery/charge_counter")
-        val maxChargingCurrent = dumpsysMap["Max charging current"]?.toIntOrNull()
-        val maxChargingVoltage = dumpsysMap["Max charging voltage"]?.toIntOrNull()
-        val chargingState = dumpsysMap["Charging state"]?.toIntOrNull()
-        val chargingPolicy = dumpsysMap["Charging policy"]?.toIntOrNull()
-        val capacityLevel = dumpsysMap["Capacity level"]?.toIntOrNull()
+        val chargeCounter = dumpsysMap["Charge counter"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()
+            ?: dumpsysMap["mSavedBattery"]?.cleanNumericValue()?.toDoubleOrNull()?.toLong()?.let { it * 1000 }
+            ?: readSysfsLong(context, "/sys/class/power_supply/battery/charge_counter")
 
-        val dumpsysSerial = dumpsysMap["Serial number"] ?: dumpsysMap["serial_number"] ?: dumpsysMap["Serial Number"]
-        val dumpsysPart = dumpsysMap["Part status"]?.toIntOrNull() ?: dumpsysMap["part_status"]?.toIntOrNull() ?: dumpsysMap["Part Status"]?.toIntOrNull()
+        val maxChargingCurrent = dumpsysMap["Max charging current"]?.cleanNumericValue()?.toDoubleOrNull()?.toInt()
+        val maxChargingVoltage = dumpsysMap["Max charging voltage"]?.cleanNumericValue()?.toDoubleOrNull()?.toInt()
+        val chargingState = dumpsysMap["Charging state"]?.cleanNumericValue()?.toIntOrNull()
+        val chargingPolicy = dumpsysMap["Charging policy"]?.cleanNumericValue()?.toIntOrNull()
+        val capacityLevel = dumpsysMap["Capacity level"]?.cleanNumericValue()?.toIntOrNull()
+
+        val samsungSerial = dumpsysMap["serial_number"] ?: dumpsysMap["mSerialNumber"] ?: dumpsysMap["Serial number"]
+        val samsungPartStatus = dumpsysMap["mSavedBatteryEfuse"]?.cleanNumericValue()?.toIntOrNull()?.let { if (it == 0) 1 else 2 }
+            ?: dumpsysMap["Part status"]?.cleanNumericValue()?.toIntOrNull()
 
         val powerProfileOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --power-profile")
         val powerProfileMap = parsePowerProfile(powerProfileOutput)
 
         val settingsOutput = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --settings")
         val enforceLevel = parseSettingsEnforceLevel(settingsOutput)
-
-        val thermalInfo = ThermalUtil.getThermalInfo(context)
 
         return basic.copy(
             chargeFull = chargeFull,
@@ -197,9 +226,11 @@ object BatteryInfoUtil {
             voltageNow = voltageNow,
             powerProfile = powerProfileMap.takeIf { it.isNotEmpty() },
             batteryChargingEnforceLevel = enforceLevel,
-            serialNumber = basic.serialNumber ?: dumpsysSerial,
-            partStatus = basic.partStatus ?: dumpsysPart,
-            thermalInfo = thermalInfo
+            cycleCount = samsungCycleCount?.takeIf { it > 0 } ?: basic.cycleCount,
+            stateOfHealth = samsungSoH?.takeIf { it > 0 } ?: basic.stateOfHealth,
+            serialNumber = samsungSerial ?: basic.serialNumber,
+            partStatus = samsungPartStatus ?: basic.partStatus,
+            thermalInfo = ThermalUtil.getThermalInfo(context)
         )
     }
 
@@ -231,7 +262,11 @@ object BatteryInfoUtil {
 
     private fun readSysfsLong(context: Context, path: String): Long? {
         val out = ShellUtils.runCommandWithOutput(context, "cat $path") ?: return null
-        return out.trim().toLongOrNull()
+        return out.trim().cleanNumericValue().toDoubleOrNull()?.toLong()
+    }
+
+    private fun String.cleanNumericValue(): String {
+        return this.filter { it.isDigit() || it == '-' || it == '.' }
     }
 
     private fun parseDumpsysBattery(output: String?): Map<String, String> {
@@ -239,8 +274,9 @@ object BatteryInfoUtil {
         val map = mutableMapOf<String, String>()
         output.lines().forEach { line ->
             val trimmed = line.trim()
-            if (trimmed.contains(":")) {
-                val parts = trimmed.split(":", limit = 2)
+            val delimiter = if (trimmed.contains(":")) ":" else if (trimmed.contains("=")) "=" else null
+            if (delimiter != null) {
+                val parts = trimmed.split(delimiter, limit = 2)
                 if (parts.size == 2) {
                     map[parts[0].trim()] = parts[1].trim()
                 }

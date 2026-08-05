@@ -294,7 +294,8 @@ fun QuickSettingsTilesSettingsUI(
             RefreshRateTileService::class.java,
             listOf("SHIZUKU"),
             R.string.about_desc_refresh_rate_tile,
-            R.string.cat_visuals
+            R.string.cat_visuals,
+            isSupported = { _ -> DeviceUtils.isGoogleDevice() }
         ),
         QSTileInfo(
             R.string.feat_maps_power_saving_title,
@@ -492,6 +493,9 @@ fun QuickSettingsTilesSettingsUI(
                                     it.contains(tile.serviceClass.name)
                         }
 
+                        val pinnedQsTiles by viewModel.pinnedQsTileKeys
+                        val isPinned = pinnedQsTiles.contains(tile.serviceClass.name)
+
                         QSTileCard(
                             tile = tile,
                             modifier = Modifier
@@ -504,6 +508,7 @@ fun QuickSettingsTilesSettingsUI(
                                 ),
                             isMissingPermissions = !allPermissionsGranted,
                             isAdded = isAdded,
+                            isPinned = isPinned,
                             onClick = {
                                 if (!allPermissionsGranted) {
                                     selectedTileForPermissions = tile
@@ -538,6 +543,9 @@ fun QuickSettingsTilesSettingsUI(
                                     }
                                 }
                             },
+                            onPinToggle = {
+                                viewModel.togglePinQsTile(tile.serviceClass.name)
+                            },
                             onHelpClick = if (tile.aboutDescription != null) {
                                 {
                                     selectedHelpTile = tile
@@ -561,6 +569,104 @@ fun QuickSettingsTilesSettingsUI(
             modifier = Modifier.padding(top = 8.dp)
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Favorites Widget Section
+        val pinnedQsTiles by viewModel.pinnedQsTileKeys
+        val pinnedTileInfos = remember(pinnedQsTiles, tiles) {
+            pinnedQsTiles.mapNotNull { className -> tiles.find { it.serviceClass.name == className } }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.padding(start = 12.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.rounded_widgets_24),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(26.dp)
+                )
+                Text(
+                    text = stringResource(R.string.qs_tiles_widget_name),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Text(
+                text = "Long press tiles to add",
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 12.dp)
+            )
+
+            if (pinnedTileInfos.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                        .padding(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.qs_tiles_widget_empty_state),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                pinnedTileInfos.chunked(2).forEach { rowTiles ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowTiles.forEach { tile ->
+                            val allPermissionsGranted = tile.permissionKeys.all { key ->
+                                PermissionUIHelper.getPermissionItem(
+                                    key,
+                                    context,
+                                    viewModel
+                                )?.isGranted == true
+                            }
+                            val addedTiles by viewModel.addedQSTiles
+                            val componentName = ComponentName(context, tile.serviceClass)
+                            val isAdded = addedTiles.any {
+                                it.contains(componentName.flattenToString()) ||
+                                        it.contains(componentName.flattenToShortString()) ||
+                                        it.contains(tile.serviceClass.name)
+                            }
+
+                            QSTileCard(
+                                tile = tile,
+                                modifier = Modifier.weight(1f),
+                                isMissingPermissions = !allPermissionsGranted,
+                                isAdded = isAdded,
+                                isPinned = true,
+                                onClick = {
+                                    viewModel.togglePinQsTile(tile.serviceClass.name)
+                                },
+                                onPinToggle = {
+                                    viewModel.togglePinQsTile(tile.serviceClass.name)
+                                }
+                            )
+                        }
+                        if (rowTiles.size < 2) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
     }
 }
@@ -570,8 +676,10 @@ fun QSTileCard(
     tile: QSTileInfo,
     isMissingPermissions: Boolean,
     isAdded: Boolean,
+    isPinned: Boolean = false,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    onPinToggle: (() -> Unit)? = null,
     onHelpClick: (() -> Unit)? = null
 ) {
     val view = LocalView.current
@@ -621,7 +729,7 @@ fun QSTileCard(
                     onClick()
                 },
                 onLongClick = {
-                    if (onHelpClick != null) {
+                    if (onHelpClick != null || onPinToggle != null) {
                         com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
                         showMenu = true
                     }
@@ -647,7 +755,7 @@ fun QSTileCard(
                 modifier = Modifier.padding(8.dp)
             )
 
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(tile.titleRes),
                     style = MaterialTheme.typography.titleMedium,
@@ -665,28 +773,65 @@ fun QSTileCard(
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
             }
+
+            if (isPinned) {
+                Icon(
+                    painter = painterResource(id = R.drawable.round_star_24),
+                    contentDescription = null,
+                    tint = contentColor,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .padding(top = 2.dp)
+                )
+            }
         }
 
-        if (onHelpClick != null) {
+        if (onHelpClick != null || onPinToggle != null) {
             com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu(
                 expanded = showMenu,
                 onDismissRequest = { showMenu = false }
             ) {
-                com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem(
-                    text = {
-                        Text(stringResource(R.string.action_what_is_this))
-                    },
-                    onClick = {
-                        showMenu = false
-                        onHelpClick()
-                    },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_help_24),
-                            contentDescription = null
-                        )
-                    }
-                )
+                if (onPinToggle != null) {
+                    com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem(
+                        text = {
+                            Text(
+                                if (isPinned) stringResource(R.string.action_unpin)
+                                else stringResource(R.string.action_pin)
+                            )
+                        },
+                        onClick = {
+                            showMenu = false
+                            onPinToggle()
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(
+                                    id = if (isPinned) R.drawable.rounded_bookmark_remove_24
+                                    else R.drawable.rounded_bookmark_24
+                                ),
+                                contentDescription = null
+                            )
+                        }
+                    )
+                }
+
+                if (onHelpClick != null) {
+                    com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem(
+                        text = {
+                            Text(stringResource(R.string.action_what_is_this))
+                        },
+                        onClick = {
+                            showMenu = false
+                            onHelpClick()
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.rounded_help_24),
+                                contentDescription = null
+                            )
+                        }
+                    )
+                }
             }
         }
     }
