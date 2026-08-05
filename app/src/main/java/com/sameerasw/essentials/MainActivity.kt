@@ -46,8 +46,6 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import androidx.compose.material3.Badge
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingToolbarDefaults
-import androidx.compose.material3.FloatingToolbarExitDirection.Companion.Bottom
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -365,8 +363,6 @@ class MainActivity : AppCompatActivity() {
                             pagerState.scrollToPage(0)
                         }
                     }
-                    val exitAlwaysScrollBehavior =
-                        FloatingToolbarDefaults.exitAlwaysScrollBehavior(exitDirection = Bottom)
 
                     if (showUpdateSheet) {
                         UpdateBottomSheet(
@@ -535,7 +531,6 @@ class MainActivity : AppCompatActivity() {
                                             hasBadge = false
                                         )
                                     },
-                                    scrollBehavior = exitAlwaysScrollBehavior,
                                     floatingActionButton = {
                                         Box { // Menu anchor
                                             FloatingActionButton(
