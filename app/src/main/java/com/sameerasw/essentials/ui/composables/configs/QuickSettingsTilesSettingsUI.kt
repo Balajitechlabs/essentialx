@@ -293,7 +293,8 @@ fun QuickSettingsTilesSettingsUI(
             RefreshRateTileService::class.java,
             listOf("SHIZUKU"),
             R.string.about_desc_refresh_rate_tile,
-            R.string.cat_visuals
+            R.string.cat_visuals,
+            isSupported = { _ -> DeviceUtils.isGoogleDevice() }
         ),
         QSTileInfo(
             R.string.feat_maps_power_saving_title,

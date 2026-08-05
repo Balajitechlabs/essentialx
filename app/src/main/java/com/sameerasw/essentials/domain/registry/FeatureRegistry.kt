@@ -271,6 +271,8 @@ object FeatureRegistry {
         ) {
             override fun isEnabled(viewModel: MainViewModel) = true
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+
+            override fun isDeviceSupported(context: Context) = DeviceUtils.isGoogleDevice()
         },
         object : Feature(
             id = "Lock screen clock",
