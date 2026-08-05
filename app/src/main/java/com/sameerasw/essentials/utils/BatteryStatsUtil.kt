@@ -48,13 +48,45 @@ object BatteryStatsUtil {
         var currentFg = 0L
         var currentBg = 0L
 
+        fun getSystemUidLabel(uid: Int, pkg: String?): String {
+            return when (uid) {
+                -5 -> "Tethering & Hotspot"
+                0 -> "Root / Kernel"
+                1001 -> "Telephony"
+                1003 -> "Graphics / GPU"
+                1010 -> "Wi-Fi"
+                1013 -> "Media Server"
+                1017 -> "Keystore"
+                1019 -> "DRM"
+                1020 -> "Multicast DNS"
+                1021 -> "GPS"
+                1036 -> "Log Daemon"
+                1040 -> "Media Extractor"
+                1041 -> "Audio Server"
+                1046 -> "Media Codec"
+                1047 -> "Camera Server"
+                1053 -> "WebView Zygote"
+                1058 -> "Crash Dumps"
+                1064 -> "Hardware Security"
+                1066 -> "Stats Daemon"
+                1067 -> "Incident Daemon"
+                1069 -> "Low Memory Killer"
+                1072 -> "GPU Service"
+                1080 -> "Context Hub"
+                1082 -> "ART Service"
+                1083 -> "UWB Subsystem"
+                1092 -> "PRNG Seeder"
+                else -> pkg?.let { getAppName(pm, it) } ?: "System ($uid)"
+            }
+        }
+
         output.lines().forEach { line ->
             val trimmed = line.trim()
             if (trimmed.startsWith("UID ")) {
                 val uid = currentUid
                 if (uid != null && currentMah > 0.0001) {
                     val pkg = pm.getPackagesForUid(uid)?.firstOrNull()
-                    val label = pkg?.let { getAppName(pm, it) } ?: "UID $uid"
+                    val label = getSystemUidLabel(uid, pkg)
                     val drawable = pkg?.let { getAppIcon(pm, it) }
                     list.add(BatteryUsageApp(uid, pkg, label, currentMah, currentFg, currentBg, drawable))
                 }
@@ -77,7 +109,7 @@ object BatteryStatsUtil {
         val lastUid = currentUid
         if (lastUid != null && currentMah > 0.0001) {
             val pkg = pm.getPackagesForUid(lastUid)?.firstOrNull()
-            val label = pkg?.let { getAppName(pm, it) } ?: "UID $lastUid"
+            val label = getSystemUidLabel(lastUid, pkg)
             val drawable = pkg?.let { getAppIcon(pm, it) }
             list.add(BatteryUsageApp(lastUid, pkg, label, currentMah, currentFg, currentBg, drawable))
         }
