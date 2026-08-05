@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.graphics.drawable.toBitmap
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonGroupDefaults
@@ -36,6 +39,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.foundation.Canvas
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,6 +56,8 @@ import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.HapticUtil
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.material3.Card
+import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -246,6 +257,104 @@ fun BatteryLoadingIndicatorCard() {
 }
 
 @Composable
+fun TopAppsBreakdownHeader(
+    usageApps: List<com.sameerasw.essentials.utils.BatteryUsageApp>
+) {
+    if (usageApps.isEmpty()) return
+
+    val totalAllMah = remember(usageApps) { usageApps.sumOf { it.powerMah }.coerceAtLeast(0.0001) }
+    val majorApps = remember(usageApps, totalAllMah) {
+        usageApps.filter { (it.powerMah / totalAllMah) * 100.0 >= 2.5 }
+    }
+    val remainingApps = remember(usageApps, majorApps) {
+        usageApps.filterNot { majorApps.contains(it) }
+    }
+    val otherMah = remember(remainingApps) { remainingApps.sumOf { it.powerMah } }
+
+    val hasOther = otherMah > 0.0001
+    val totalSegments = majorApps.size + (if (hasOther) 1 else 0)
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(88.dp)
+            .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            majorApps.forEachIndexed { index, app ->
+                val weight = ((app.powerMah / totalAllMah) * 100.0).toFloat().coerceAtLeast(1f)
+                var brandColor by remember(app.packageName) {
+                    mutableStateOf<Color?>(null)
+                }
+
+                androidx.compose.runtime.LaunchedEffect(app.packageName) {
+                    if (app.packageName != null) {
+                        com.sameerasw.essentials.utils.AppUtil.getAppBrandColor(context, app.packageName) { argb ->
+                            if (argb != android.graphics.Color.TRANSPARENT && argb != android.graphics.Color.GRAY) {
+                                brandColor = Color(argb)
+                            }
+                        }
+                    }
+                }
+
+                val barColor = brandColor ?: MaterialTheme.colorScheme.primaryContainer
+
+                val shape = when {
+                    totalSegments == 1 -> CircleShape
+                    index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes().shape
+                    index == totalSegments - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes().shape
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes().shape
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(weight)
+                        .fillMaxHeight()
+                        .clip(shape)
+                        .background(barColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (app.icon != null) {
+                        val bitmap = remember(app.icon) { app.icon.toBitmap(48, 48).asImageBitmap() }
+                        Image(
+                            bitmap = bitmap,
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_info_24),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+                }
+            }
+
+            if (hasOther) {
+                val otherWeight = ((otherMah / totalAllMah) * 100.0).toFloat().coerceAtLeast(1f)
+                val otherShape = if (majorApps.isEmpty()) CircleShape else ButtonGroupDefaults.connectedTrailingButtonShapes().shape
+                Box(
+                    modifier = Modifier
+                        .weight(otherWeight)
+                        .fillMaxHeight()
+                        .clip(otherShape)
+                        .background(MaterialTheme.colorScheme.outlineVariant)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun BatteryUsageBreakdownHeader(
     appsPct: Float,
     systemPct: Float,
@@ -345,3 +454,4 @@ private fun BreakdownLegendItem(
         color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
     )
 }
+

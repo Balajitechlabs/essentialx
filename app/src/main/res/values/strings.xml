@@ -1,4 +1,5 @@
 <resources>
+    <string name="label_app_info">App Info</string>
     <string name="label_customization">Customization</string>
     <string name="label_beta">BETA</string>
     <string name="shut_up_attempt_shizuku_restart">Attempt Shizuku restart</string>
@@ -356,9 +357,17 @@
     <string name="icon_samsung_smart">Samsung Smart Features</string>
     <string name="icon_samsung_services">Samsung Services</string>
     <string name="icon_ethernet">Ethernet</string>
+    <string name="icon_network_speed">Network Speed</string>
+    <string name="icon_glove_mode">Glove Mode</string>
+    <string name="icon_frame_rate">Refresh Rate / Frame Rate</string>
+    <string name="icon_no_sim">No SIM</string>
 
     <!-- Status Bar Settings -->
     <string name="stb_clock_seconds">Show Seconds in Clock</string>
+    <string name="stb_clock_position">Clock Position</string>
+    <string name="stb_clock_position_left">Left</string>
+    <string name="stb_clock_position_center">Center</string>
+    <string name="stb_clock_position_right">Right</string>
     <string name="stb_battery_percentage">Battery Percentage</string>
     <string name="stb_battery_percentage_always">Always</string>
     <string name="stb_battery_percentage_charging">Charging</string>
@@ -1702,7 +1711,17 @@
     <string name="label_thermal_status_critical">Critical Throttling</string>
     <string name="label_thermal_status_emergency">Emergency Throttling</string>
     <string name="label_thermal_status_shutdown">Shutdown Imminent</string>
-    <string name="action_charging_qs_tile_options">Charging mode QS tile options</string>
+    <string name="action_charging_qs_tile_options">Options</string>
+    <string name="action_reset_battery_stats">Reset stats</string>
+    <string name="label_reset_battery_stats_title">Reset Battery Statistics</string>
+    <string name="label_reset_battery_stats_desc">Resets system battery statistics (dumpsys batterystats --reset). This clears historical battery usage and app drain data so it starts tracking fresh from the current charge.</string>
+    <string name="label_auto_reset_battery_stats_title">Auto reset</string>
+    <string name="label_auto_reset_battery_stats_desc">Automatically reset battery statistics when the device is unplugged above 90% charge.</string>
+    <string name="label_battery_graph_title">Battery Drain &amp; Prediction</string>
+    <string name="label_battery_graph_actual">Actual drain</string>
+    <string name="label_battery_graph_predicted">Predicted</string>
+    <string name="label_battery_graph_remaining">%s to go</string>
+    <string name="label_battery_graph_ago">%s ago</string>
     <string name="action_show_wakeups">CPU wakeup history</string>
     <string name="action_hide_wakeups">Hide CPU wakeups</string>
     <string name="label_screen_on_drain">Screen On Drain</string>
@@ -1838,6 +1857,9 @@
     <string name="favorites_widget_name">Favorite Features</string>
     <string name="favorites_widget_description">View and launch your favorite features at a glance.</string>
     <string name="favorites_widget_empty_state">No favorite features pinned yet. Open the app to pin some!</string>
+    <string name="qs_tiles_widget_name">Favorite Tiles</string>
+    <string name="qs_tiles_widget_description">Trigger your favorite Quick Settings tiles directly from your home screen.</string>
+    <string name="qs_tiles_widget_empty_state">No favorite tiles pinned yet. Open the app to pin some!</string>
     <!-- External Control Permission -->
     <string name="perm_external_control_label">control Essentials features</string>
     <string name="perm_external_control_desc">read, update and control Essentials features and settings</string>

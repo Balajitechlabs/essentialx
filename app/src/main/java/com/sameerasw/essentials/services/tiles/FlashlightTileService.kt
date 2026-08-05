@@ -19,6 +19,11 @@ class FlashlightTileService : BaseTileService() {
             super.onTorchModeChanged(cameraId, enabled)
             isTorchOn = enabled
             updateTile()
+
+            val intent = Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
+                setPackage(packageName)
+            }
+            sendBroadcast(intent)
         }
     }
 

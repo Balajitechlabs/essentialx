@@ -161,6 +161,10 @@ class ShutUpShortcutActivity : ComponentActivity() {
                 )
             }
 
+            if (config.disableUsbDebugging || config.disableWirelessDebugging) {
+                com.sameerasw.essentials.utils.ShizukuUtils.stopShizuku(this@ShutUpShortcutActivity)
+            }
+
             // Always explicitly disable USB debugging if requested, even if dev options were already disabled
             // as some apps check this specific setting directly.
             if (config.disableUsbDebugging) {

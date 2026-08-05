@@ -100,8 +100,13 @@ object BatteryInfoUtil {
         val rawEnergy = bm?.getLongProperty(BatteryManager.BATTERY_PROPERTY_ENERGY_COUNTER)?.takeIf { it != Long.MIN_VALUE }
         val remainingEnergyMwh = rawEnergy?.let { it / 1_000_000 } // nWh to mWh
 
-        val chargeTimeRemaining = if (android.os.Build.VERSION.SDK_INT >= 28) {
+        val isPlugged = plugged > 0 || status == BatteryManager.BATTERY_STATUS_CHARGING
+        val computedChargeTime = if (android.os.Build.VERSION.SDK_INT >= 28) {
             bm?.computeChargeTimeRemaining()?.takeIf { it >= 0 }
+        } else null
+
+        val chargeTimeRemaining = if (isPlugged) {
+            computedChargeTime
         } else null
 
         val hasStatsPerm = hasBatteryStatsPermission(context)

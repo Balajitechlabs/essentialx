@@ -42,18 +42,30 @@ class ColorPickerTileService : BaseTileService() {
                     intent,
                     PendingIntent.FLAG_IMMUTABLE
                 )
-                startActivityAndCollapse(pendingIntent)
+                try {
+                    startActivityAndCollapse(pendingIntent)
+                } catch (e: Exception) {
+                    startActivity(intent)
+                }
             } else {
-                @Suppress("DEPRECATION")
-                startActivityAndCollapse(intent)
+                try {
+                    @Suppress("DEPRECATION")
+                    startActivityAndCollapse(intent)
+                } catch (e: Exception) {
+                    startActivity(intent)
+                }
             }
         } catch (e: Exception) {
-            Handler(Looper.getMainLooper()).post {
-                Toast.makeText(
-                    applicationContext,
-                    getString(R.string.toast_eyedropper_failed),
-                    Toast.LENGTH_SHORT
-                ).show()
+            try {
+                startActivity(intent)
+            } catch (ex: Exception) {
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(
+                        applicationContext,
+                        getString(R.string.toast_eyedropper_failed),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }

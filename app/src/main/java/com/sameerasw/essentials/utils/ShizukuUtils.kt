@@ -121,4 +121,16 @@ object ShizukuUtils {
             null
         }
     }
+
+    fun stopShizuku(context: android.content.Context) {
+        try {
+            val intent = android.content.Intent("moe.shizuku.privileged.api.STOP").apply {
+                `package` = "moe.shizuku.privileged.api"
+                addFlags(android.content.Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+            }
+            context.sendBroadcast(intent)
+        } catch (e: Exception) {
+            android.util.Log.e("ShizukuUtils", "Failed to stop Shizuku", e)
+        }
+    }
 }
