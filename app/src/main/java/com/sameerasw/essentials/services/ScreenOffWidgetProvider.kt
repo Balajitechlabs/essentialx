@@ -16,8 +16,7 @@ import android.widget.Toast
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.ScreenOffMethod
-import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
-import com.sameerasw.essentials.utils.ShellUtils
+import com.sameerasw.essentials.utils.DeviceLockUtils
 import com.sameerasw.essentials.utils.performHapticFeedback
 
 class ScreenOffWidgetProvider : AppWidgetProvider() {
@@ -156,46 +155,6 @@ class ScreenOffWidgetProvider : AppWidgetProvider() {
             performHapticFeedback(vibrator, hapticFeedbackType)
         }
 
-        when (selectedScreenOffMethod) {
-            ScreenOffMethod.ACCESSIBILITY -> {
-                if (isAccessibilityEnabled(context)) {
-                    val serviceIntent =
-                        Intent(context, ScreenOffAccessibilityService::class.java).apply {
-                            action = "LOCK_SCREEN"
-                        }
-                    context.startService(serviceIntent)
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Missing Accessibility permission, Check the app",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
-            }
-
-            ScreenOffMethod.INPUT -> {
-                if (ShellUtils.hasPermission(context)) {
-                    // Simulate power button press using input keyevent
-                    // Requires root or Shizuku, which ShellUtils handles
-                    ShellUtils.runCommand(context, "input keyevent ${KeyEvent.KEYCODE_POWER}")
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Missing Shizuku/Root permission for Input method, Check the app",
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
-                }
-            }
-        }
-    }
-
-    private fun isAccessibilityEnabled(context: Context): Boolean {
-        val enabledServices = Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        )
-        return enabledServices?.contains("com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService") == true
+        DeviceLockUtils.lockDevice(context, selectedScreenOffMethod)
     }
 }

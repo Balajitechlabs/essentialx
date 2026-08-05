@@ -8,6 +8,7 @@ import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import com.sameerasw.essentials.FeatureSettingsActivity
+import com.sameerasw.essentials.utils.DeviceLockUtils
 
 class QSPreferencesActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +24,11 @@ class QSPreferencesActivity : ComponentActivity() {
         Log.d("QSPreferences", "Received long-press for: ${componentName?.className}")
 
         if (componentName != null) {
+            if (componentName.className == "com.sameerasw.essentials.services.tiles.LockdownTileService") {
+                DeviceLockUtils.performLockdownTileAction(this, isLongPress = true)
+                finish()
+                return
+            }
             // Special case for Sound Mode to open the system volume panel
             if (componentName.className == "com.sameerasw.essentials.services.tiles.SoundModeTileService") {
                 val volumeIntent = Intent("android.settings.panel.action.VOLUME").apply {

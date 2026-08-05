@@ -14,6 +14,8 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
 
+import com.sameerasw.essentials.utils.DeviceLockUtils
+
 class AodForceTurnOffHandler(private val service: AccessibilityService) {
 
     private var windowManager: WindowManager? = null
@@ -104,9 +106,7 @@ class AodForceTurnOffHandler(private val service: AccessibilityService) {
     }
 
     private fun lockScreen() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN)
-        }
+        DeviceLockUtils.performAccessibilityLock(service)
     }
 
     fun removeOverlay() {

@@ -5,6 +5,10 @@ import androidx.core.content.edit
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 
+import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.domain.ScreenOffMethod
+import com.sameerasw.essentials.utils.DeviceLockUtils
+
 class EssentialsWearableListenerService : WearableListenerService() {
     companion object {
         private const val TAG = "EssentialsWearableListener"
@@ -55,33 +59,13 @@ class EssentialsWearableListenerService : WearableListenerService() {
             }
 
             "/lock_device" -> {
-                val repository = com.sameerasw.essentials.data.repository.SettingsRepository(this)
+                val repository = SettingsRepository(this)
                 val mode = repository.getInt(
-                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_REMOTE_LOCK_MODE,
+                    SettingsRepository.KEY_REMOTE_LOCK_MODE,
                     0
                 )
-
-                if (mode == 1) {
-                    // Device Admin Lock
-                    val dpm =
-                        getSystemService(DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager
-                    val adminComponent = android.content.ComponentName(
-                        this,
-                        com.sameerasw.essentials.services.receivers.SecurityDeviceAdminReceiver::class.java
-                    )
-                    if (dpm.isAdminActive(adminComponent)) {
-                        dpm.lockNow()
-                    }
-                } else {
-                    // Accessibility Lock
-                    val intent = android.content.Intent(
-                        this,
-                        com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService::class.java
-                    ).apply {
-                        action = "LOCK_SCREEN"
-                    }
-                    startService(intent)
-                }
+                val method = if (mode == 1) ScreenOffMethod.DEVICE_ADMIN else ScreenOffMethod.ACCESSIBILITY
+                DeviceLockUtils.lockDevice(this, method)
             }
 
             "/toggle_flashlight_pulse" -> {

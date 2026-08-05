@@ -296,6 +296,9 @@
     <string name="charge_opt_long_press_title">Toggle Options</string>
     <string name="charge_opt_long_press_desc">Choose which charging modes to switch between when tapping the Quick Settings tile.</string>
     <string name="permission_missing">Permission missing</string>
+    <string name="tile_lockdown_mode">Lockdown</string>
+    <string name="tile_lockdown_mode_desc">Screen off QS tile</string>
+    <string name="tile_lockdown_mode_about_desc">Lock your phone or Lockdown if lockdown mode is turned on.\n\nLockdown mode disables weak unlock methods like face/fingerprint and require pattern or pin securely to unlock your phone.\n\nRequires device admin permission if using lockdown.</string>
 
 
     <!-- Screen Locked Security -->
@@ -1231,7 +1234,7 @@
     <string name="instruction_step_perms_3">2. Open the 3-dot menu and select \'Allow restricted settings\'. You may have to authenticate with biometrics. Once done, Try to grant the permission again.</string>
 
     <string name="instruction_section_shizuku_title">Shizuku</string>
-    <string name="instruction_section_shizuku_desc">Shizuku is a powerful tool that allows apps to use system APIs directly with ADB or root permissions. It is required for features like Maps min mode, App Freezer. And willa ssist granting some permissions such as WRITE_SECURE_SETTINGS. \n\nBut the Play Store version of Shizuku might be outdated and will probably be unusable on recent Android versions so in that case, please get the latest version from the github or an up-to-date fork of it.</string>
+    <string name="instruction_section_shizuku_desc">Shizuku is a powerful tool that allows apps to use system APIs directly with ADB or root permissions. It is required for features like Maps min mode, App Freezer. And will assist with granting some permissions such as WRITE_SECURE_SETTINGS. \n\nBut the Play Store version of Shizuku might be outdated and will probably be unusable on recent Android versions so in that case, please get the latest version from the github or an up-to-date fork of it.</string>
 
     <string name="instruction_section_maps_title">Maps power saving mode</string>
     <string name="instruction_section_maps_desc">This feature automatically triggers Google Maps power saving mode on supported Android devices. A community member discovered that it is still usable by launching the maps minMode activity with root privileges. \n\nAnd then, I had it automated with Tasker to automatically trigger when the screen turns off during a navigation session and then was able to achieve the same with just runtime Shizuku permissions. \n\nIt is intended to overlay the navigation experience, so you may see an occasional message about landscape mode not being supported. That is not avoidable by the app and you can ignore it.</string>
@@ -1856,10 +1859,10 @@
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
     <string name="favorites_widget_name">Favorite Features</string>
     <string name="favorites_widget_description">View and launch your favorite features at a glance.</string>
-    <string name="favorites_widget_empty_state">No favorite features pinned yet. Open the app to pin some!</string>
+    <string name="favorites_widget_empty_state">No favorite features pinned yet. Long press a feature to pin!!</string>
     <string name="qs_tiles_widget_name">Favorite Tiles</string>
     <string name="qs_tiles_widget_description">Trigger your favorite Quick Settings tiles directly from your home screen.</string>
-    <string name="qs_tiles_widget_empty_state">No favorite tiles pinned yet. Open the app to pin some!</string>
+    <string name="qs_tiles_widget_empty_state">No favorite tiles pinned yet. No tiles pinned yet. Long press to pin some!!</string>
     <!-- External Control Permission -->
     <string name="perm_external_control_label">control Essentials features</string>
     <string name="perm_external_control_desc">read, update and control Essentials features and settings</string>
@@ -1943,6 +1946,12 @@
     <string name="translation_warning_point3_title">GitHub Pull Request</string>
     <string name="translation_warning_point3_desc">Submissions automatically create or update a dedicated pull request on GitHub under your account.</string>
     <string name="translation_warning_do_not_show">Do not show again</string>
+    <string name="msg_missing_accessibility_permission">Missing Accessibility permission!</string>
+    <string name="msg_device_admin_required_lockdown">Please enable Device Admin to lockdown this device.</string>
+    <string name="msg_shizuku_root_required_lock">Missing Shizuku or Root permission for Input method!</string>
+    <string name="msg_feature_not_supported">Feature not supported on your device!</string>
+    <string name="tile_lock">Lock</string>
+    <string name="tile_device">Device</string>
 </resources>
 
 
