@@ -2,5 +2,6 @@ package com.sameerasw.essentials.domain
 
 enum class ScreenOffMethod {
     ACCESSIBILITY,
-    INPUT
+    INPUT,
+    DEVICE_ADMIN
 }
