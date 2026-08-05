@@ -357,6 +357,10 @@
     <string name="icon_samsung_smart">Samsung Smart Features</string>
     <string name="icon_samsung_services">Samsung Services</string>
     <string name="icon_ethernet">Ethernet</string>
+    <string name="icon_network_speed">Network Speed</string>
+    <string name="icon_glove_mode">Glove Mode</string>
+    <string name="icon_frame_rate">Refresh Rate / Frame Rate</string>
+    <string name="icon_no_sim">No SIM</string>
 
     <!-- Status Bar Settings -->
     <string name="stb_clock_seconds">Show Seconds in Clock</string>

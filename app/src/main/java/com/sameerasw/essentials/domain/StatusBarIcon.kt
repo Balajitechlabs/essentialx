@@ -155,7 +155,7 @@ object StatusBarIconRegistry {
         StatusBarIcon(
             id = "headset",
             displayNameRes = R.string.icon_headset,
-            blacklistNames = listOf("headset", "earphone"),
+            blacklistNames = listOf("headset", "earphone", "headset_system"),
             defaultVisible = false,
             categoryRes = CAT_AUDIO_MEDIA,
             iconRes = R.drawable.rounded_headset_mic_24
@@ -179,7 +179,7 @@ object StatusBarIconRegistry {
         StatusBarIcon(
             id = "clock",
             displayNameRes = R.string.icon_clock,
-            blacklistNames = listOf("clock"),
+            blacklistNames = listOf("clock", "clock_meridiem"),
             categoryRes = CAT_SYSTEM_STATUS,
             iconRes = R.drawable.rounded_nest_clock_farsight_analog_24
         ),
@@ -269,6 +269,13 @@ object StatusBarIconRegistry {
             categoryRes = CAT_SYSTEM_STATUS,
             iconRes = R.drawable.rounded_security_24
         ),
+        StatusBarIcon(
+            id = "network_speed",
+            displayNameRes = R.string.icon_network_speed,
+            blacklistNames = listOf("network_speed"),
+            categoryRes = CAT_SYSTEM_STATUS,
+            iconRes = null
+        ),
 
         // --- OEM Specific ---
         StatusBarIcon(
@@ -282,7 +289,6 @@ object StatusBarIconRegistry {
             id = "samsung_smart",
             displayNameRes = R.string.icon_samsung_smart,
             blacklistNames = listOf(
-                "glove",
                 "gesture",
                 "smart_scroll",
                 "face",
@@ -291,6 +297,27 @@ object StatusBarIconRegistry {
             ),
             categoryRes = CAT_OEM_SPECIFIC,
             iconRes = R.drawable.rounded_fiber_smart_record_24
+        ),
+        StatusBarIcon(
+            id = "glove_mode",
+            displayNameRes = R.string.icon_glove_mode,
+            blacklistNames = listOf("glove_mode", "glove"),
+            categoryRes = CAT_OEM_SPECIFIC,
+            iconRes = null
+        ),
+        StatusBarIcon(
+            id = "frame_rate",
+            displayNameRes = R.string.icon_frame_rate,
+            blacklistNames = listOf("frame_rate_mode"),
+            categoryRes = CAT_OEM_SPECIFIC,
+            iconRes = null
+        ),
+        StatusBarIcon(
+            id = "no_sim",
+            displayNameRes = R.string.icon_no_sim,
+            blacklistNames = listOf("nosim"),
+            categoryRes = CAT_PHONE_NETWORK,
+            iconRes = null
         ),
         StatusBarIcon(
             id = "samsung_services",
