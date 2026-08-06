@@ -172,11 +172,24 @@ fun GenAIFloatingPill(
                             )
                         }
 
-                        val triggerOrStateTitle = suggestion.triggerType
-                            ?: suggestion.stateType
-                            ?: suggestion.title.ifEmpty { suggestion.type }
+                        val triggerOrStateTitle = when {
+                            suggestion.type.equals("APP", ignoreCase = true) -> {
+                                val appsCount = suggestion.selectedApps.size
+                                if (appsCount > 0) "Apps ($appsCount selected)" else "App Automation"
+                            }
+                            suggestion.triggerType == "Schedule" && suggestion.hour != null -> {
+                                String.format("Schedule (%02d:%02d)", suggestion.hour, suggestion.minute ?: 0)
+                            }
+                            suggestion.stateType == "TimePeriod" && suggestion.hour != null && suggestion.endHour != null -> {
+                                String.format("Time Period (%02d:%02d - %02d:%02d)", suggestion.hour, suggestion.minute ?: 0, suggestion.endHour, suggestion.endMinute ?: 0)
+                            }
+                            else -> suggestion.triggerType
+                                ?: suggestion.stateType
+                                ?: suggestion.title.ifEmpty { suggestion.type }
+                        }
 
                         val iconRes = when {
+                            suggestion.type.equals("APP", ignoreCase = true) -> R.drawable.rounded_apps_24
                             suggestion.triggerType != null -> R.drawable.rounded_bolt_24
                             suggestion.stateType != null -> R.drawable.rounded_toggle_on_24
                             else -> R.drawable.rounded_apps_24
@@ -262,6 +275,23 @@ fun GenAIFloatingPill(
                                         else -> R.drawable.rounded_play_arrow_24
                                     }
 
+                                    val actionDetail = when (actionName) {
+                                        "FreezeTag" -> {
+                                            val mode = suggestion.freezeTagMode ?: "Freeze"
+                                            val tags = suggestion.freezeTagIds.joinToString()
+                                            if (tags.isNotBlank()) "$mode ($tags)" else mode
+                                        }
+                                        "SoundMode" -> suggestion.soundMode ?: "SOUND"
+                                        "SometimesEssentials" -> {
+                                            val details = mutableListOf<String>()
+                                            if (suggestion.lockScreenClockStyle != null) details.add("Clock: ${suggestion.lockScreenClockStyle}")
+                                            if (suggestion.alwaysOnDisplayMode != null) details.add("AOD: ${suggestion.alwaysOnDisplayMode}")
+                                            if (suggestion.essentialsOnDisplayMode != null) details.add("EOD: ${suggestion.essentialsOnDisplayMode}")
+                                            if (details.isNotEmpty()) details.joinToString(" • ") else null
+                                        }
+                                        else -> null
+                                    }
+
                                     Surface(
                                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.18f),
                                         shape = RoundedCornerShape(16.dp),
@@ -278,14 +308,25 @@ fun GenAIFloatingPill(
                                                 tint = MaterialTheme.colorScheme.onPrimary
                                             )
                                             Spacer(modifier = Modifier.width(12.dp))
-                                            Text(
-                                                text = actionName,
-                                                style = MaterialTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = MaterialTheme.colorScheme.onPrimary,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis
-                                            )
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(
+                                                    text = actionName,
+                                                    style = MaterialTheme.typography.titleMedium,
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    color = MaterialTheme.colorScheme.onPrimary,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                                if (actionDetail != null) {
+                                                    Text(
+                                                        text = actionDetail,
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
                                 }

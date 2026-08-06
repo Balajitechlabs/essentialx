@@ -7,6 +7,7 @@ import com.google.mlkit.genai.common.FeatureStatus
 import com.google.mlkit.genai.prompt.Generation
 import com.google.mlkit.genai.prompt.TextPart
 import com.google.mlkit.genai.prompt.generateContentRequest
+import com.sameerasw.essentials.data.repository.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -25,11 +26,13 @@ object GenAIAutomationService {
         }
     }
 
-    suspend fun suggestAutomation(userPrompt: String): Result<AutomationSuggestion> = withContext(Dispatchers.IO) {
+    suspend fun suggestAutomation(
+        userPrompt: String,
+        context: Context? = null
+    ): Result<AutomationSuggestion> = withContext(Dispatchers.IO) {
         try {
             val generativeModel = Generation.getClient()
             when (generativeModel.checkStatus()) {
-
                 FeatureStatus.UNAVAILABLE -> {
                     return@withContext Result.failure(IllegalStateException("GenAI feature is UNAVAILABLE on this device"))
                 }
@@ -57,6 +60,16 @@ object GenAIAutomationService {
                 }
             }
 
+            // Gather context data if available
+            val availableTagsInfo = if (context != null) {
+                val repository = SettingsRepository(context)
+                val tags = repository.getFreezeTags()
+                if (tags.isNotEmpty()) {
+                    "Available freeze app tags on device: " + tags.joinToString { "${it.name} (id: ${it.id})" }
+                } else {
+                    "Available freeze app tags: None created yet."
+                }
+            } else ""
 
             val systemInstructionText = """
                 You are an automation assistant for the Essentials Android app.
@@ -67,10 +80,42 @@ object GenAIAutomationService {
                   "triggerType": "ScreenOff" or "ScreenOn" or "DeviceUnlock" or "ChargerConnected" or "ChargerDisconnected" or "Schedule" or "BluetoothConnected" or "BluetoothDisconnected" or "WifiConnected" or "WifiDisconnected",
                   "stateType": "Charging" or "ScreenOn" or "TimePeriod",
                   "actionTypes": ["HapticVibration", "ShowNotification", "RemoveNotification", "TurnOnFlashlight", "TurnOffFlashlight", "ToggleFlashlight", "DimWallpaper", "DeviceEffects", "SoundMode", "TurnOnLowPower", "TurnOffLowPower", "ScreenOff", "MediaPlayPause", "MediaNext", "MediaPrevious", "AIAssistant", "TakeScreenshot", "ToggleMediaVolume", "LikeCurrentSong", "CircleToSearch", "PinApp", "SometimesEssentials", "FreezeTag"],
-                  "explanation": "Brief 1-2 sentence description of what this automation does"
+                  "explanation": "Brief 1-2 sentence description of what this automation does",
+                  "hour": null or integer (0-23 for Schedule trigger or start time of TimePeriod state),
+                  "minute": null or integer (0-59 for Schedule trigger or start time of TimePeriod state),
+                  "endHour": null or integer (0-23 for end time of TimePeriod state),
+                  "endMinute": null or integer (0-59 for end time of TimePeriod state),
+                  "soundMode": null or "SOUND" or "VIBRATE" or "SILENT" (used for SoundMode action, distinguish VIBRATE mode from HapticVibration action),
+                  "freezeTagMode": null or "Freeze" or "Unfreeze" (used for FreezeTag action),
+                  "freezeTagIds": array of tag IDs or names (used for FreezeTag action),
+                  "lockScreenClockStyle": null or "DEFAULT" or "METRO" or "EXPRESSIVE" or "PRIDE" or "MONOSPACE" or "BUBBLE" (used when configuring lock screen clock in SometimesEssentials),
+                  "alwaysOnDisplayMode": null or "Off" or "Dynamic" or "On" (used for SometimesEssentials action),
+                  "essentialsOnDisplayMode": null or "Off" or "On" or "Docked" (used for SometimesEssentials action),
+                  "flashlightPulseEnabled": null or boolean (used for SometimesEssentials action),
+                  "notificationLightingEnabled": null or boolean (used for SometimesEssentials action),
+                  "dimWallpaperAmount": null or float 0.0 to 1.0 (used for DimWallpaper action),
+                  "selectedApps": array of package names (e.g. ["com.instagram.android"] when user specifies apps for APP type automation)
                 }
 
-                When user mentions freezing or unfreezing apps, background apps, or apps with tags, map it to action "FreezeTag".
+                Rules:
+                1. "type" MUST be:
+                   - "TRIGGER" if event-driven (e.g. "when screen turns off", "when charger connected", "at 8:30 AM", "when wifi connected").
+                   - "STATE" if condition-based (e.g. "while charging", "while screen is on", "between 10 PM and 7 AM").
+                   - "APP" if triggered by opening/closing specific apps (e.g. "when Instagram or YouTube is opened").
+                2. Do NOT confuse "SoundMode" action with "HapticVibration" action:
+                   - "HapticVibration" = trigger a quick tactile vibration.
+                   - "SoundMode" = change device ringer/sound mode ("SOUND", "VIBRATE", or "SILENT").
+                3. For exact time schedules (e.g. "at 8:30 AM", "at 22:15"):
+                   - Set type="TRIGGER", triggerType="Schedule", hour=8, minute=30.
+                4. For time periods (e.g. "from 10 PM to 7 AM", "between 13:00 and 15:00"):
+                   - Set type="STATE", stateType="TimePeriod", hour=22, minute=0, endHour=7, endMinute=0.
+                5. For freezing/unfreezing apps or app tags:
+                   - Use action "FreezeTag".
+                   - Set freezeTagMode="Freeze" or "Unfreeze".
+                   - Set freezeTagIds with matching tag IDs/names from available tags: $availableTagsInfo.
+                6. For deep settings like Metro lock screen clock, AOD mode, or flashlight pulse:
+                   - Use action "SometimesEssentials".
+                   - Set lockScreenClockStyle="METRO", "EXPRESSIVE", etc.
 
                 Respond ONLY with valid raw JSON without any markdown formatting or code blocks.
             """.trimIndent()
@@ -88,7 +133,6 @@ object GenAIAutomationService {
             val response = generativeModel.generateContent(request)
             val candidateText = response.candidates.firstOrNull()?.text ?: ""
 
-            // Clean up possible markdown code fences from the output
             val jsonText = candidateText
                 .replace("```json", "")
                 .replace("```", "")
@@ -111,4 +155,3 @@ object GenAIAutomationService {
         }
     }
 }
-

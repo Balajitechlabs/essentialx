@@ -193,7 +193,7 @@ fun DIYScreen(
             val currentSuggestion = (genAIState as? com.sameerasw.essentials.viewmodels.GenAIState.Success)?.suggestion
             com.sameerasw.essentials.ui.components.genai.GenAIFloatingPill(
                 onSend = { prompt ->
-                    viewModel.requestGenAISuggestion(prompt)
+                    viewModel.requestGenAISuggestion(prompt, context)
                 },
                 onDismiss = {
                     showGenAIPill = false
