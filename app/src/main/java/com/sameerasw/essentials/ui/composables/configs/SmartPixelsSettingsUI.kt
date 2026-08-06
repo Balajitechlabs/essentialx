@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -47,16 +51,23 @@ fun SmartPixelsSettingsUI(
             )
         }
 
+        var sliderValue by remember(viewModel.smartPixelsIntensity.floatValue) {
+            mutableStateOf(viewModel.smartPixelsIntensity.floatValue)
+        }
+
         RoundedCardContainer(
             spacing = 2.dp,
             cornerRadius = 24.dp
         ) {
             ConfigSliderItem(
                 title = stringResource(R.string.smart_pixels_intensity_title),
-                value = viewModel.smartPixelsIntensity.floatValue,
+                value = sliderValue,
                 onValueChange = { value ->
+                    sliderValue = value
+                },
+                onValueChangeFinished = {
                     HapticUtil.performUIHaptic(view)
-                    viewModel.setSmartPixelsIntensity(context, value)
+                    viewModel.setSmartPixelsIntensity(context, sliderValue)
                 },
                 valueRange = 10f..90f,
                 increment = 5f,

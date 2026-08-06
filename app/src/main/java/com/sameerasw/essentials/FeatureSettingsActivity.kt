@@ -535,7 +535,8 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             ),
                                             listOf(
                                                 "Caffeinate",
-                                                "Dynamic night light"
+                                                "Dynamic night light",
+                                                "Smart pixels"
                                             ),
                                             listOf(
                                                 "Other customizations"
