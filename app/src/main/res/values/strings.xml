@@ -162,6 +162,7 @@
     <string name="action_unfreeze_all">Unfreeze all apps</string>
     <string name="action_export_freeze">Export frozen apps list</string>
     <string name="action_import_freeze">Import frozen apps list</string>
+    <string name="filter_all">All</string>
     <string name="freeze_tags_section_title">Tags</string>
     <string name="freeze_tags_empty">No tags created yet</string>
     <string name="action_add_tag">Add tag</string>

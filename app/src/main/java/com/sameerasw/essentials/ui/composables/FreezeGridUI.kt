@@ -121,15 +121,27 @@ fun FreezeGridUI(
     val focusManager = LocalFocusManager.current
     var isFocused by remember { mutableStateOf(false) }
 
-    val filteredApps = remember(pickedApps, searchQuery) {
-        if (searchQuery.isBlank()) {
-            pickedApps
-        } else {
-            pickedApps.filter { app ->
+    val freezeTags by viewModel.freezeTags
+    val freezeAppTagMap by viewModel.freezeAppTagMap
+
+    var selectedTagId by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val filteredApps = remember(pickedApps, searchQuery, selectedTagId, freezeAppTagMap) {
+        var list = pickedApps
+        val filterTagId = selectedTagId
+        if (!filterTagId.isNullOrEmpty()) {
+            list = list.filter { app ->
+                val assignedTagIds = freezeAppTagMap[app.packageName] ?: emptyList()
+                assignedTagIds.contains(filterTagId)
+            }
+        }
+        if (searchQuery.isNotBlank()) {
+            list = list.filter { app ->
                 app.appName.contains(searchQuery, ignoreCase = true) ||
                         app.packageName.contains(searchQuery, ignoreCase = true)
             }
         }
+        list
     }
 
     val bestMatch = remember(searchQuery, filteredApps) {
@@ -163,8 +175,6 @@ fun FreezeGridUI(
     }
 
     var appForTagAssignment by remember { mutableStateOf<NotificationApp?>(null) }
-    val freezeTags by viewModel.freezeTags
-    val freezeAppTagMap by viewModel.freezeAppTagMap
 
     Box(modifier = modifier.fillMaxSize()) {
         if (isPickedAppsLoading && pickedApps.isEmpty()) {
@@ -300,6 +310,60 @@ fun FreezeGridUI(
                         }
                     )
                 )
+
+                if (freezeTags.isNotEmpty()) {
+                    androidx.compose.foundation.lazy.LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        item {
+                            androidx.compose.material3.FilterChip(
+                                selected = selectedTagId == null,
+                                onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    selectedTagId = null
+                                },
+                                label = { Text(stringResource(R.string.filter_all)) }
+                            )
+                        }
+                        items(freezeTags.size) { index ->
+                            val tag = freezeTags[index]
+                            val isSelected = selectedTagId == tag.id
+                            val color = try {
+                                Color(android.graphics.Color.parseColor(tag.colorHex))
+                            } catch (e: Exception) {
+                                MaterialTheme.colorScheme.primary
+                            }
+                            val iconResId = context.resources.getIdentifier(
+                                tag.iconName,
+                                "drawable",
+                                context.packageName
+                            )
+
+                            androidx.compose.material3.FilterChip(
+                                selected = isSelected,
+                                onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    selectedTagId = if (isSelected) null else tag.id
+                                },
+                                label = { Text(tag.name) },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(
+                                            id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
+                                        ),
+                                        contentDescription = null,
+                                        tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else color,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -510,12 +574,23 @@ fun FreezeGridUI(
                                         val neverAutoFreezeTagIds = freezeTags.filter { it.neverAutoFreeze }.map { it.id }.toSet()
                                         val isLockedByTag = appTagIds.any { neverAutoFreezeTagIds.contains(it) }
 
+                                        val tagColor = appTagIds.firstOrNull()?.let { firstTagId ->
+                                            freezeTags.find { it.id == firstTagId }?.colorHex?.let { colorHex ->
+                                                try {
+                                                    Color(android.graphics.Color.parseColor(colorHex))
+                                                } catch (e: Exception) {
+                                                    null
+                                                }
+                                            }
+                                        }
+
                                         Box(modifier = Modifier.weight(1f)) {
                                             AppGridItem(
                                                 app = app,
                                                 isFrozen = frozenStates[app.packageName] ?: false,
                                                 isAutoFreezeEnabled = app.isEnabled,
                                                 isLockedByTag = isLockedByTag,
+                                                tagColor = tagColor,
                                                 isHighlighted = (app == bestMatch && searchQuery.isNotEmpty()),
                                                 menuState = menuState,
                                                 onClick = {
@@ -601,6 +676,7 @@ fun AppGridItem(
     isFrozen: Boolean,
     isAutoFreezeEnabled: Boolean,
     isLockedByTag: Boolean = false,
+    tagColor: Color? = null,
     isHighlighted: Boolean = false,
     menuState: com.sameerasw.essentials.ui.state.MenuStateManager,
     onClick: () -> Unit,
@@ -649,7 +725,7 @@ fun AppGridItem(
 
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceBright,
+        color = tagColor?.copy(alpha = 0.25f) ?: MaterialTheme.colorScheme.surfaceBright,
         border = if (isHighlighted) BorderStroke(2.dp, borderColor) else null,
         modifier = Modifier
             .fillMaxWidth()
