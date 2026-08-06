@@ -442,17 +442,17 @@
     <string name="feat_always_on_display_title">Zawsze na wyświetlaczu</string>
     <string name="feat_always_on_display_desc">Pokazuj godzinę i informacje, gdy ekran jest wyłączony</string>
     <string name="feat_calendar_sync_title">Synchronizacja kalendarza</string>
-    <string name="feat_calendar_sync_desc">Sync your phone calendar to your watch</string>
-    <string name="feat_lock_from_watch_title">Lock from Watch</string>
-    <string name="feat_lock_from_watch_desc">Lock your phone remotely</string>
+    <string name="feat_calendar_sync_desc">Synchronizuj kalendarz z telefonu z zegarkiem </string>
+    <string name="feat_lock_from_watch_title">Zablokuj z poziomu zegarka </string>
+    <string name="feat_lock_from_watch_desc">Zablokuj swoi telefon z poziomu zegarka </string>
     <string name="remote_lock_mode_title">Lock Mode</string>
-    <string name="remote_lock_mode_screen_off">Screen off</string>
-    <string name="remote_lock_mode_lock">Lock</string>
+    <string name="remote_lock_mode_screen_off">Wyłączenie ekranu </string>
+    <string name="remote_lock_mode_lock">Zablokuj </string>
     <string name="remote_lock_mode_admin_note">Using device admin lock will disable biometrics</string>
     <string name="watch_connected_status">Connected</string>
     <string name="watch_unknown_name">Unknown Watch</string>
-    <string name="watermark_style_overlay">Narzuta</string>
-    <string name="watermark_style_frame">Rama</string>
+    <string name="watermark_style_overlay">Nakładka </string>
+    <string name="watermark_style_frame">Ramka </string>
     <string name="watermark_show_brand">Marka urządzenia</string>
     <string name="watermark_show_exif">Dane EXIF</string>
     <string name="watermark_pick_image">Wybierz obraz</string>
@@ -460,11 +460,11 @@
     <string name="action_share">Udział</string>
     <string name="watermark_exif_settings">Ustawienia EXIF-a</string>
     <string name="watermark_exif_focal_length">Ogniskowa</string>
-    <string name="watermark_exif_aperture">Otwór</string>
+    <string name="watermark_exif_aperture">Przysłona </string>
     <string name="watermark_exif_iso">ISO</string>
     <string name="watermark_exif_shutter_speed">Szybkość migawki</string>
     <string name="watermark_exif_date">Data i godzina</string>
-    <string name="watermark_move_to_top">Przejdź na górę</string>
+    <string name="watermark_move_to_top">Przesuń na górę </string>
     <string name="watermark_left_align">Wyrównaj do lewej</string>
     <string name="watermark_text_size_brand">Rozmiar marki</string>
     <string name="watermark_text_size_data">Rozmiar danych</string>
@@ -474,7 +474,7 @@
     <string name="watermark_custom_text_hint">Wpisz swój tekst...</string>
     <string name="watermark_spacing">Rozstaw</string>
     <string name="watermark_border_width">Szerokość obramowania</string>
-    <string name="watermark_border_corners">Okrągłe rogi</string>
+    <string name="watermark_border_corners">Zaokrąglone brzegi </string>
     <string name="watermark_color_section">Kolor</string>
     <string name="watermark_logo_section">Logo</string>
     <string name="watermark_logo_show">Pokaż logo</string>
@@ -1108,7 +1108,7 @@
     <string name="bug_report_email_subject">Raport o błędach Essentials</string>
     <string name="bug_report_send_via">Wyślij przez</string>
     <!-- Location Reached -->
-    <string name="feat_location_reached_title">Czy już tam jesteśmy?</string>
+    <string name="feat_location_reached_title">Czy już dotarliśmy? </string>
     <string name="feat_location_reached_desc">Alerty dotyczące miejsc docelowych w pobliżu</string>
     <string name="location_reached_how_to">Otwórz Mapy Google, wybierz lokalizację i udostępnij ją w Essentials.</string>
     <string name="location_reached_radius_title">Promień alertu: %d m</string>
@@ -1454,4 +1454,14 @@
     <string name="whats_new_specs_desc">Inaccurate GSMArena-powered specifications have been removed to keep device insights clean, fast, and completely reliable.</string>
     <string name="whats_new_apps_title">App Updates Migrated</string>
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
+    <string name="feat_daily_wallpaper_title">Tapeta </string>
+    <string name="feat_daily_wallpaper_desc">Codziennie wybierane tapety </string>
+    <string name="feat_sync_location_reached_title">Synchronizuj status \"Czy już dotarliśmy?\" </string>
+    <string name="feat_sync_sound_mode_title">Synchronizuj tryb dźwięku </string>
+    <string name="feat_sync_sound_mode_desc">Automatycznie synchronizuj z zegarkiem </string>
+    <string name="feat_watch_wireless_debugging_title">Debugowanie bezprzewodowe </string>
+    <string name="feat_watch_wireless_debugging_desc">Włącz zdalnie </string>
+    <string name="feat_watch_controls_title">Dostosuj </string>
+    <string name="feat_pocket_mode_title">Tryb kieszeniowy </string>
+    <string name="feat_pocket_mode_desc">Zapobiegaj przypadkowym dotknięciom w kieszeni </string>
 </resources>
