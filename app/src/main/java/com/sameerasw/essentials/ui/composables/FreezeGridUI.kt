@@ -58,6 +58,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.toArgb
+import com.sameerasw.essentials.utils.ColorUtil
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -319,16 +321,6 @@ fun FreezeGridUI(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        item {
-                            androidx.compose.material3.FilterChip(
-                                selected = selectedTagId == null,
-                                onClick = {
-                                    HapticUtil.performVirtualKeyHaptic(view)
-                                    selectedTagId = null
-                                },
-                                label = { Text(stringResource(R.string.filter_all)) }
-                            )
-                        }
                         items(freezeTags.size) { index ->
                             val tag = freezeTags[index]
                             val isSelected = selectedTagId == tag.id
@@ -351,14 +343,22 @@ fun FreezeGridUI(
                                 },
                                 label = { Text(tag.name) },
                                 leadingIcon = {
-                                    Icon(
-                                        painter = painterResource(
-                                            id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
-                                        ),
-                                        contentDescription = null,
-                                        tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else color,
-                                        modifier = Modifier.size(18.dp)
-                                    )
+                                    if (isSelected) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.rounded_check_24),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(androidx.compose.material3.FilterChipDefaults.IconSize)
+                                        )
+                                    } else {
+                                        Icon(
+                                            painter = painterResource(
+                                                id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
+                                            ),
+                                            contentDescription = null,
+                                            tint = color,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
                                 }
                             )
                         }
@@ -723,9 +723,16 @@ fun AppGridItem(
         label = "borderColorAnimation"
     )
 
+    val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+    val containerColor = remember(tagColor, isDarkTheme) {
+        if (tagColor == null) null
+        else if (isDarkTheme) tagColor.copy(alpha = 0.25f)
+        else ColorUtil.getVibrantColorFor(tagColor.toArgb()).copy(alpha = 0.15f)
+    }
+
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = tagColor?.copy(alpha = 0.25f) ?: MaterialTheme.colorScheme.surfaceBright,
+        color = containerColor ?: MaterialTheme.colorScheme.surfaceBright,
         border = if (isHighlighted) BorderStroke(2.dp, borderColor) else null,
         modifier = Modifier
             .fillMaxWidth()
