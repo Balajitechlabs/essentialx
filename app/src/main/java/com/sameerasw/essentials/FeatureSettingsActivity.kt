@@ -70,6 +70,7 @@ import com.sameerasw.essentials.ui.composables.configs.LiveWallpaperSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.LocationReachedSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.LockScreenClockSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.MapsPowerSavingSettingsUI
+import com.sameerasw.essentials.ui.composables.configs.NavigationSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NetworksSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NotificationLightingSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NotificationSnoozingSettingsUI
@@ -863,6 +864,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                     "LiveWallpaper" -> {
                                         LiveWallpaperSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting
+                                        )
+                                    }
+
+                                    "Navigation" -> {
+                                        NavigationSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightSetting = highlightSetting

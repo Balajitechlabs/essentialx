@@ -1228,12 +1228,48 @@ fun SetupFeatures(
             } else if (!isFocused) {
                 val topLevelFeatures =
                     allFeatures.filter { it.parentFeatureId == null && it.isVisibleInMain }
-                if (topLevelFeatures.isNotEmpty()) {
+                val featureMap = topLevelFeatures.associateBy { it.id }
+
+                val sectionFeatureIdsList = listOf(
+                    listOf(
+                        "Notifications",
+                        "Sound",
+                        "Display",
+                        "Maps power saving mode",
+                        "Daily Wallpaper",
+                        "Widgets"
+                    ),
+                    listOf(
+                        "Input",
+                        "Power and battery",
+                        "Quick settings tiles",
+                        "Watch"
+                    ),
+                    listOf(
+                        "Security",
+                        "Networks"
+                    ),
+                    listOf(
+                        "Location reached",
+                        "Watermark"
+                    )
+                )
+
+                val assignedIds = sectionFeatureIdsList.flatten().toSet()
+                val unassignedFeatures = topLevelFeatures.filter { it.id !in assignedIds }
+
+                val sections = sectionFeatureIdsList.map { ids ->
+                    ids.mapNotNull { featureMap[it] }
+                }.filter { it.isNotEmpty() } + if (unassignedFeatures.isNotEmpty()) listOf(unassignedFeatures) else emptyList()
+
+                sections.forEachIndexed { sectionIndex, sectionFeatures ->
                     item {
                         RoundedCardContainer(
-                            modifier = Modifier.padding(horizontal = 16.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 12.dp),
                         ) {
-                            topLevelFeatures.forEachIndexed { index, feature ->
+                            sectionFeatures.forEach { feature ->
                                 FeatureCard(
                                     title = feature.title,
                                     isEnabled = feature.isEnabled(viewModel),

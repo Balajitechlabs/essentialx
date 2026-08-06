@@ -189,6 +189,18 @@ object FeatureRegistry {
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
         object : Feature(
+            id = "Navigation",
+            title = R.string.cat_navigation,
+            iconRes = R.drawable.rounded_bottom_navigation_24,
+            category = R.string.cat_interface,
+            description = R.string.feat_other_customizations_desc,
+            showToggle = false,
+            parentFeatureId = "Display"
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = true
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+        },
+        object : Feature(
             id = "Essentials On Display",
             title = R.string.feat_essentials_on_display_title,
             iconRes = R.drawable.rounded_music_video_24,
