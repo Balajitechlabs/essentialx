@@ -145,8 +145,8 @@
     <string name="action_import_freeze">导入冻结应用列表</string>
     <string name="freeze_pick_apps_title">选择要冻结的应用</string>
     <string name="freeze_pick_apps_desc">选择哪些应用可以被冻结</string>
-    <string name="freeze_show_in_launcher_title">Show in launcher</string>
-    <string name="freeze_show_in_launcher_desc">Add a launcher shortcut for easier access</string>
+    <string name="freeze_show_in_launcher_title">在桌面显示</string>
+    <string name="freeze_show_in_launcher_desc">添加桌面快捷方式，方便快速访问。</string>
     <string name="settings_section_automation">自动化</string>
     <string name="freeze_when_locked_title">锁定时冻结</string>
     <string name="freeze_delay_title">冻结延迟</string>
@@ -356,9 +356,9 @@
     <string name="feat_hide_gesture_bar_desc">在手势导航中</string>
     <string name="feat_hide_gesture_bar_on_launcher_title">只在主屏幕上显示</string>
     <string name="feat_hide_gesture_bar_on_launcher_desc">仅在主屏幕上动态显示手势栏</string>
-    <string name="feat_circle_to_search_gesture_desc">Long-press the bottom area to trigger Circle to Search</string>
-    <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
-    <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
+    <string name="feat_circle_to_search_gesture_desc">长按底部区域即可触发画圈搜索</string>
+    <string name="feat_circle_to_search_gesture_height_title">手势区域高度</string>
+    <string name="feat_circle_to_search_gesture_height_desc">调整底部触摸区域的高度</string>
     <string name="feat_other_customizations_title">其他自定义设置</string>
     <string name="feat_other_customizations_desc">其他系统调整和修改</string>
     <string name="status_bar_icons_disclaimer">请注意，这些选项的实现可能取决于设备制造商OEM，某些选项可能根本无法使用。</string>
@@ -1530,4 +1530,7 @@
     <string name="desc_low_power_trigger_level">用于省电</string>
     <string name="settings_translated_texts">已翻译</string>
     <string name="about_desc_safe_volume">欧洲法规要求智能手机在音量超过特定级别（85分贝）时发出警告。此​​警告必须在每次重启后或连续播放音乐20小时后显示一次。使用此开关可永久禁用它。</string>
+    <string name="feat_circle_to_search_gesture_title">画圈搜索手势</string>
+    <string name="feat_lock_from_watch_title">通过手表锁定</string>
+    <string name="settings_translated_texts_desc">有 %d 项编辑待处理 — 点击提交或放弃</string>
 </resources>
