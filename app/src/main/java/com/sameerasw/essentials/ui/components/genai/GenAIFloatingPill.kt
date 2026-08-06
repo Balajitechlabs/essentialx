@@ -2,6 +2,16 @@ package com.sameerasw.essentials.ui.components.genai
 
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,9 +24,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -43,6 +54,7 @@ import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.utils.HapticUtil
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun GenAIFloatingPill(
     onSend: (String) -> Unit,
@@ -53,6 +65,18 @@ fun GenAIFloatingPill(
     val view = LocalView.current
     var promptText by remember { mutableStateOf("") }
     val isPromptValid = promptText.isNotBlank()
+
+    val pulseDuration = if (isLoading) 500 else 1750
+    val infiniteTransition = rememberInfiniteTransition(label = "blurPulse")
+    val animatedBlurRadius by infiniteTransition.animateFloat(
+        initialValue = 20f,
+        targetValue = 80f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = pulseDuration),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "blurRadius"
+    )
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -89,7 +113,7 @@ fun GenAIFloatingPill(
                 modifier = Modifier
                     .matchParentSize()
                     .progressiveBlur(
-                        blurRadius = 60f,
+                        blurRadius = animatedBlurRadius,
                         height = 150f,
                         direction = BlurDirection.TOP,
                         showGradientOverlay = false
@@ -125,46 +149,50 @@ fun GenAIFloatingPill(
                         disabledBorderColor = Color.Transparent,
                         focusedTextColor = MaterialTheme.colorScheme.onPrimary,
                         unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        focusedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                        unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                        disabledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f),
+                        disabledTextColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledPlaceholderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
                         cursorColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(
-                    onClick = {
-                        if (isPromptValid && !isLoading) {
-                            HapticUtil.performVirtualKeyHaptic(view)
-                            onSend(promptText.trim())
-                        }
-                    },
-                    enabled = isPromptValid && !isLoading,
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (isPromptValid) MaterialTheme.colorScheme.onPrimary
-                            else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f)
-                        )
+                AnimatedVisibility(
+                    visible = isPromptValid || isLoading,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
                 ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    } else {
-                        Icon(
-                            painter = painterResource(R.drawable.rounded_send_24),
-                            contentDescription = stringResource(R.string.diy_genai_describe_send),
-                            modifier = Modifier.size(20.dp),
-                            tint = if (isPromptValid) MaterialTheme.colorScheme.primary
-                                   else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.4f)
-                        )
+                    Row {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(
+                            onClick = {
+                                if (isPromptValid && !isLoading) {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    onSend(promptText.trim())
+                                }
+                            },
+                            enabled = isPromptValid && !isLoading,
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.onPrimary)
+                        ) {
+                            if (isLoading) {
+                                LoadingIndicator(
+                                    modifier = Modifier.size(48.dp),
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(R.drawable.rounded_arrow_upward_24),
+                                    contentDescription = stringResource(R.string.diy_genai_describe_send),
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
                     }
                 }
             }
