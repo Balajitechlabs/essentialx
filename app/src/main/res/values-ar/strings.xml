@@ -70,7 +70,7 @@
     <string name="essentials_on_display_docked_mode_desc">Keep the overlay visible indefinitely while music is playing on AOD</string>
     <string name="essentials_on_display_respect_notifications_title">Respect new notifications</string>
     <string name="essentials_on_display_respect_notifications_desc">Briefly disable for new notifications</string>
-    <string name="essentials_on_display_random_shapes_title">Random shapes</string>
+    <string name="essentials_on_display_random_shapes_title">أشكال عشوائية</string>
     <string name="essentials_on_display_random_shapes_desc">Use various Material 3 shapes for the album art</string>
     <string name="essentials_on_display_album_art_title">Album art</string>
     <string name="essentials_on_display_clock_title">Clock</string>
@@ -182,7 +182,7 @@
     <string name="settings_section_style">الشكل</string>
     <string name="notification_lighting_stroke_adjustment_section">ضبط الشوط</string>
     <string name="notification_lighting_corner_radius_title">شعاع الزاوية</string>
-    <string name="notification_lighting_stroke_thickness_title">سمك السكتة الدماغية</string>
+    <string name="notification_lighting_stroke_thickness_title">سمك الإضاءة</string>
     <string name="notification_lighting_glow_adjustment_section">تعديل الوهج</string>
     <string name="notification_lighting_glow_spread_title">انتشار الوهج</string>
     <string name="notification_lighting_placement_section">التنسيب</string>
@@ -205,7 +205,7 @@
     <string name="settings_section_ambient_display">العرض المحيطي</string>
     <string name="ambient_display_title">العرض المحيطي</string>
     <string name="ambient_display_hint">مناسب إذا كنت لا تستخدم AOD.</string>
-    <string name="ambient_display_desc">استيقظ الشاشة وإظهار الإضاءة</string>
+    <string name="ambient_display_desc">إيقاظ الشاشة وإظهار الإضاءة</string>
     <string name="ambient_show_lock_screen_title">إظهار شاشة القفل</string>
     <string name="ambient_show_lock_screen_desc">لا يوجد تراكب أسود</string>
     <!-- Tiles -->
@@ -276,7 +276,7 @@
     <string name="warning_title">⚠️ تحذير</string>
     <string name="screen_locked_security_auth_enable">قم بالمصادقة لتمكين أمان قفل الشاشة</string>
     <string name="screen_locked_security_auth_disable">المصادقة لتعطيل أمان قفل الشاشة</string>
-    <string name="screen_locked_security_desc">Disable quick setting tiles when the device is locked</string>
+    <string name="screen_locked_security_desc">قم بتعطيل البلاطات السريعة عندما يكون الجهاز مقفلاً</string>
     <string name="search_disable_qs_locked_title">Disable QS Locked</string>
     <string name="search_disable_qs_locked_desc">Prevent expanding Quick Settings when device is locked</string>
     <!-- Sound Mode -->
@@ -396,11 +396,11 @@
     <string name="feat_maps_power_saving_title">وضع توفير الطاقة للخرائط</string>
     <string name="feat_maps_power_saving_desc">لأي جهاز أندرويد</string>
     <string name="feat_notification_lighting_title">إضاءة الإشعارات</string>
-    <string name="feat_notification_lighting_desc">تضيء للإخطارات</string>
-    <string name="feat_flashlight_pulse_desc">نبض المصباح للإخطارات</string>
+    <string name="feat_notification_lighting_desc">إظهار إضاءة عند تلقى إشعار</string>
+    <string name="feat_flashlight_pulse_desc">نبض المصباح عند تلقى الإشعارات</string>
     <string name="feat_sound_mode_tile_title">بلاط وضع الصوت</string>
     <string name="feat_call_vibrations_title">اهتزازات المكالمة</string>
-    <string name="feat_call_vibrations_desc">اهتزاز لإجراءات المكالمة</string>
+    <string name="feat_call_vibrations_desc">اهتزازات لإجرائات المكالمة</string>
     <string name="show_bluetooth_devices">إظهار أجهزة البلوتوث</string>
     <string name="show_bluetooth_devices_summary">عرض مستوى البطارية لأجهزة Bluetooth المتصلة</string>
     <string name="limit_max_devices">الحد الأقصى للأجهزة</string>
@@ -416,7 +416,7 @@
     <string name="diy_editor_edit_title">تحرير الأتمنة</string>
     <string name="feat_link_actions_title">إجراءات الارتباط</string>
     <string name="feat_link_actions_desc">التعامل مع الروابط مع تطبيقات متعددة</string>
-    <string name="feat_snooze_notifications_title">تأجيل إخطارات النظام</string>
+    <string name="feat_snooze_notifications_title">تأجيل إشعارات النظام</string>
     <string name="feat_snooze_notifications_desc">تأجيل الإشعارات المستمرة</string>
     <string name="feat_qs_tiles_title">بلاط الإعدادات السريعة QS</string>
     <string name="feat_qs_tiles_desc">عرض الكل</string>
@@ -761,7 +761,9 @@
     <string name="about_desc_watermark">أضف تسمية توضيحية مخصصة/علامة مائية إلى صورك باستخدام بيانات EXIF ​​ومعلومات الجهاز. \n\nشارك صورة مباشرة من تطبيق آخر إلى Essentials لإضافة علامة مائية بسهولة.</string>
     <string name="about_desc_calendar_sync">قم بمزامنة جميع جداول التقويم القادمة الخاصة بك بغض النظر عن القيود المفروضة على حسابات Google وعدم السماح بإضافتها إلى أجهزة WearOS بسبب سياسات العمل أو المدرسة.  \n\nتأكد من تثبيت التطبيق المصاحب لـ wearOS Essentials لعرض الجدول في التطبيق وكذلك في مربع أو تعقيد.</string>
     <string name="about_desc_app_updates">تتبع تحديثات تطبيقاتك المثبتة. \n\nاحصل على إشعارات بشأن التحديثات المتاحة، واعرض سجلات التغيير وقم بتثبيتها بسهولة بنقرة واحدة.</string>
-    <string name="about_desc_call_vibrations">أضف تعليقات اهتزازية إلى مكالماتك. \n\n اهتز عند اتصال مكالمة أو قطعها أو قبولها، مما يمنحك تأكيدًا عن طريق الاهتزاز دون النظر إلى الشاشة.</string>
+    <string name="about_desc_call_vibrations">أضف تعليقات اهتزازية إلى مكالماتك. 
+
+ يهتز عند إتصال مكالمة أو قطعها أو قبولها، مما يمنحك تأكيدًا عن طريق الاهتزاز دون النظر إلى الشاشة.</string>
     <string name="about_desc_sound_mode_tile">قم بالتبديل بسرعة بين أوضاع الصوت والاهتزاز والصمت. \n\n بلاط مناسب لتغيير وضع الرنين الخاص بك دون استخدام أزرار الصوت أو الإعدادات. يمكنك إعادة ترتيب الأوضاع أو تعطيل أي منها إذا لم تكن هناك حاجة إليها لتخصيص تبديل التجانب لسلوك الدورة.</string>
     <string name="about_desc_ui_blur">يمكنك بسهولة تبديل تأثير عمق التمويه على مستوى النظام عبر نظام التشغيل.</string>
     <string name="about_desc_bubbles">تمكين أو تعطيل فقاعات الإشعارات العائمة. \n\n قم بتبديل الإعداد على مستوى النظام لفقاعات المحادثة بسرعة.</string>
@@ -1173,7 +1175,7 @@
     <string name="download_airsync">تحميل تطبيق AirSync</string>
     <string name="download_airsync_summary">مطلوب لمزامنة بطارية Mac</string>
     <string name="feat_battery_notification_title">إشعار البطارية</string>
-    <string name="feat_battery_notification_desc">إشعار حالة البطارية المستمرة</string>
+    <string name="feat_battery_notification_desc">إشعار مستمر لحالة البطارية</string>
     <string name="battery_notification_hint">يعرض هذا الإشعار مستويات شحن بطارية جهاز Mac وأجهزة Bluetooth المتصلة. يمكنك تحديد الأجهزة التي ترغب في عرضها من خلال إعدادات أداة البطارية.</string>
     <string name="about_desc_battery_notification">قم بتكرار تجربة أداة البطارية في مركز الإشعارات الخاص بك. سيعرض مستويات البطارية لجميع أجهزتك المتصلة في إشعار واحد مستمر، ويتم تحديثه في الوقت الفعلي. يتضمن ذلك جهاز Mac الخاص بك (عبر AirSync) وملحقات Bluetooth.</string>
     <string name="battery_notification_channel_name">إشعار حالة البطارية</string>
@@ -1454,4 +1456,53 @@
     <string name="whats_new_specs_desc">Inaccurate GSMArena-powered specifications have been removed to keep device insights clean, fast, and completely reliable.</string>
     <string name="whats_new_apps_title">App Updates Migrated</string>
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
+    <string name="feat_safe_volume_title">تعطيل تحذير مستوى الصوت الآمن</string>
+    <string name="feat_safe_volume_desc">السماح بالصوت العالي</string>
+    <string name="about_desc_safe_volume">تتطلب اللوائح الأوروبية من الهواتف الذكية التحذير عند تجاوز مستويات صوت معينة (85 ديسيبل). يجب عرض هذا التحذير مرة واحدة بعد كل إعادة تشغيل أو بعد 20 ساعة من تشغيل الموسيقى المستمر. استخدم هذا المفتاح لتعطيله بشكل دائم.</string>
+    <string name="tile_lockdown_mode">الإغلاق</string>
+    <string name="tile_lockdown_mode_desc">إغلاق الشاشة (بلاطة QS) </string>
+    <string name="notification_lighting_sweep_select_shapes_title">أختر أشكال</string>
+    <string name="notification_lighting_sweep_select_shapes_desc">اختر الأشكال الذي تريد إستخدامها في الرسوم المتحركة</string>
+    <string name="feat_notification_snoozing_desc">إعادة جدولة الإشعارات</string>
+    <string name="feat_notification_snoozing_title">غفوة للإشعارات</string>
+    <string name="about_desc_notification_snoozing">تفعيل زر تأجيل الإشعارات في الإشعارات، وقم بضبط خيارات الفاصل الزمني المخصص ومدة الإشعار الافتراضية لتأجيل الإشعارات للعرض لاحقا.</string>
+    <string name="feat_power_battery_title">الطاقة والبطارية</string>
+    <string name="feat_power_battery_desc">تكوين سياسات توفير الطاقة</string>
+    <string name="label_low_power_trigger_level">تخصيص مستوى الزناد</string>
+    <string name="desc_low_power_trigger_level">لوضع توفير الطاقة</string>
+    <string name="desc_advertise_is_enabled">أبلغ التطبيقات بأن ميزة توفير البطارية مفعلة.</string>
+    <string name="label_advertise_is_enabled">تفعيل إعلان التطبيقات</string>
+    <string name="label_enable_firewall">تفعيل جدار الحماية</string>
+    <string name="desc_enable_firewall">تفعيل جدار الحماية الشبكي لتقييد شبكات الخلفية.</string>
+    <string name="desc_force_all_apps_standby">ضع جميع التطبيقات في دلو الاستعداد عندما تكون نشطة.</string>
+    <string name="label_force_all_apps_standby">فرض وضع الإستعداد</string>
+    <string name="label_force_background_check">فرض فحص الخلفية</string>
+    <string name="desc_force_background_check">فرض قيود صارمة على خدمة الخلفية.</string>
+    <string name="label_enable_brightness_adjustment">تمكين تقليل السطوع</string>
+    <string name="desc_enable_brightness_adjustment">السماح بخفض حد سطوع الشاشة عندما يكون توفير البطارية نشطا.</string>
+    <string name="label_adjust_brightness_factor">عامل ضبط السطوع</string>
+    <string name="label_disable_animation">تعطيل الرسوم المتحركة</string>
+    <string name="desc_disable_animation">أوقف الرسوم المتحركة للنوافذ والنظام.</string>
+    <string name="label_disable_aod">تعطيل Always-on Display</string>
+    <string name="desc_disable_aod">أوقف تشغيل الشاشة المحيطة / Always-on display.</string>
+    <string name="label_enable_night_mode">فرض الوضع الداكن/الليلي</string>
+    <string name="desc_enable_night_mode">قم بفرض الوضع الداكن عند تفعيل ميزة توفير البطارية.</string>
+    <string name="label_disable_launch_boost">تعطيل تعزيز الإطلاق</string>
+    <string name="desc_disable_launch_boost">قلل من تعزيز المعالج أثناء تشغيل التطبيق لتوفير الطاقة.</string>
+    <string name="label_enable_quick_doze">تمكين Quick Doze</string>
+    <string name="desc_enable_quick_doze">تدخل وضع السكون في Doze أسرع عندما تنطفئ الشاشة.</string>
+    <string name="label_disable_optional_sensors">تعطيل المستشعرات الاختيارية</string>
+    <string name="desc_disable_optional_sensors">عطل المستشعرات الاختيارية التي تستهلك الطاقة مثل القرب، الجيروسكوب، وغيرها.</string>
+    <string name="desc_enable_datasaver">تفعيل وضع توفير البيانات لتقييد استخدام البيانات في الخلفية.</string>
+    <string name="desc_defer_full_backup">تأجيل النسخ الاحتياطي الكامل للنظام حتى يتم إيقاف توفير البطارية.</string>
+    <string name="label_defer_full_backup">تأجيل النسخ الاحتياطي الكامل</string>
+    <string name="label_defer_keyvalue_backup">تأجيل النسخ الاحتياطي لقيمة المفتاح</string>
+    <string name="desc_defer_keyvalue_backup">تأجيل النسخ الاحتياطي لقيمة المفتاح.</string>
+    <string name="label_disable_vibration">تعطيل الأهتزاز</string>
+    <string name="desc_disable_vibration">قم بتعطيل التعليقات اللمسية والاهتزازات بشكل عام. </string>
+    <string name="label_soundtrigger_mode">وضع الزناد للتعليقات الصوتية</string>
+    <string name="desc_soundtrigger_mode">تقييد اكتشاف الكلمات الساخنة للمساعد (مثل \"OK Google\").</string>
+    <string name="label_location_mode">وضع GPS / الموقع</string>
+    <string name="desc_location_mode">قم بتقييد طلبات الموقع أثناء تفعيل نظام توفير البطارية.</string>
+    <string name="about_desc_power_battery">قم بضبط سياسة الثوابت الداخلية لتوفير البطارية في أندرويد. خصص سلوك مثل حد السطوع، تقليل الموقع، تبديل الاهتزاز، تأجيلات التزامن في الخلفية، وحالات المستشعر عند تفعيل توفير البطارية.</string>
 </resources>
