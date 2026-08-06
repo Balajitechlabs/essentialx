@@ -153,7 +153,9 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                     changeAlwaysOnDisplay = suggestion.alwaysOnDisplayMode != null,
                     alwaysOnDisplayMode = suggestion.alwaysOnDisplayMode ?: "On",
                     changeLockScreenClock = suggestion.lockScreenClockStyle != null,
-                    lockScreenClockStyle = suggestion.lockScreenClockStyle ?: "DEFAULT"
+                    lockScreenClockStyle = suggestion.lockScreenClockStyle ?: "DEFAULT",
+                    changeSmartPixels = suggestion.smartPixelsEnabled != null,
+                    smartPixelsEnabled = suggestion.smartPixelsEnabled ?: true
                 )
                 "FreezeTag" -> Action.FreezeTag(
                     mode = suggestion.freezeTagMode ?: "Freeze",

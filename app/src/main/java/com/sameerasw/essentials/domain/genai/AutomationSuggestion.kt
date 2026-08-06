@@ -90,6 +90,9 @@ data class AutomationSuggestion(
     @Guide(description = "Whether to enable notification lighting in SometimesEssentials action")
     val notificationLightingEnabled: Boolean? = null,
 
+    @Guide(description = "Whether to enable Smart Pixels in SometimesEssentials action")
+    val smartPixelsEnabled: Boolean? = null,
+
     @Guide(description = "Dim wallpaper amount (0.0 to 1.0) for DimWallpaper action")
     val dimWallpaperAmount: Float? = null
 )
