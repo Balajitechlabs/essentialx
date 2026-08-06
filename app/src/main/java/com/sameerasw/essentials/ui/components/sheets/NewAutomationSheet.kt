@@ -17,7 +17,13 @@ import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,9 +43,26 @@ import com.sameerasw.essentials.utils.HapticUtil
 @Composable
 fun NewAutomationSheet(
     onDismiss: () -> Unit,
-    onOptionSelected: (Automation.Type) -> Unit
+    onOptionSelected: (Automation.Type) -> Unit,
+    onAIDescribeRequested: ((String) -> Unit)? = null,
+    isGenAILoading: Boolean = false
 ) {
     val context = LocalContext.current
+    val view = LocalView.current
+    var aiPromptText by remember { mutableStateOf("") }
+
+    val isGenAIEnabled = remember(context) {
+        SettingsRepository(context).getBoolean(SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED, false)
+    }
+    var isGenAISupported by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (isGenAIEnabled) {
+            isGenAISupported = com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
+        }
+    }
+
+
     val isPixelSearchbarEnabled = remember(context) {
         SettingsRepository(context).getBoolean(SettingsRepository.KEY_PIXEL_SEARCHBAR, false)
     }
@@ -89,7 +112,67 @@ fun NewAutomationSheet(
                 }
             }
 
+            if (isGenAIEnabled && isGenAISupported && onAIDescribeRequested != null) {
+                Surface(
+                    color = MaterialTheme.colorScheme.surfaceBright,
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        androidx.compose.material3.OutlinedTextField(
+                            value = aiPromptText,
+                            onValueChange = { aiPromptText = it },
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.diy_genai_describe_placeholder),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
+                            singleLine = true,
+                            enabled = !isGenAILoading,
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        val isPromptValid = aiPromptText.isNotBlank()
+                        androidx.compose.material3.IconButton(
+                            onClick = {
+                                if (isPromptValid && !isGenAILoading) {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    onAIDescribeRequested(aiPromptText.trim())
+                                }
+                            },
+                            enabled = isPromptValid && !isGenAILoading
+                        ) {
+                            if (isGenAILoading) {
+                                androidx.compose.material3.CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Icon(
+                                    painter = painterResource(R.drawable.rounded_send_24),
+                                    contentDescription = stringResource(R.string.diy_genai_describe_send),
+                                    tint = if (isPromptValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                )
+                            }
+                        }
+
+                    }
+                }
+            }
+
             RoundedCardContainer {
+
                 // Trigger Option
                 AutomationTypeOption(
                     title = stringResource(R.string.diy_create_trigger_title),

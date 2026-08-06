@@ -169,13 +169,42 @@ fun DIYScreen(
         }
     }
 
+    val genAIState by viewModel.genAIState.collectAsState()
+
     if (showNewAutomationSheet) {
         NewAutomationSheet(
             onDismiss = onDismissNewAutomationSheet,
             onOptionSelected = { type ->
                 onDismissNewAutomationSheet()
                 context.startActivity(AutomationEditorActivity.createIntent(context, type))
-            }
+            },
+            onAIDescribeRequested = { prompt ->
+                viewModel.requestGenAISuggestion(prompt)
+            },
+            isGenAILoading = genAIState is com.sameerasw.essentials.viewmodels.GenAIState.Loading
         )
     }
+
+    when (val state = genAIState) {
+        is com.sameerasw.essentials.viewmodels.GenAIState.Success -> {
+            com.sameerasw.essentials.ui.components.sheets.GenAIAutomationPreviewSheet(
+                suggestion = state.suggestion,
+                onConfirm = { suggestion ->
+                    viewModel.confirmGenAISuggestion(suggestion)
+                    onDismissNewAutomationSheet()
+                },
+                onDismiss = {
+                    viewModel.dismissGenAISuggestion()
+                }
+            )
+        }
+        is com.sameerasw.essentials.viewmodels.GenAIState.Error -> {
+            androidx.compose.runtime.LaunchedEffect(state) {
+                android.widget.Toast.makeText(context, state.message, android.widget.Toast.LENGTH_LONG).show()
+                viewModel.dismissGenAISuggestion()
+            }
+        }
+        else -> {}
+    }
 }
+

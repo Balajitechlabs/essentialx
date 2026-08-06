@@ -262,6 +262,13 @@ fun SettingsContent(
     val updateInfo by viewModel.updateInfo
     val isUpdateAvailable by viewModel.isUpdateAvailable
     val isAutoUpdateEnabled by viewModel.isAutoUpdateEnabled
+    val isGenAIAutomationEnabled by viewModel.isGenAIAutomationEnabled
+    var isGenAISupported by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        isGenAISupported = com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
+    }
+
     val isUpdateNotificationEnabled by viewModel.isUpdateNotificationEnabled
     val isPreReleaseCheckEnabled by viewModel.isPreReleaseCheckEnabled
     val isRootEnabled by viewModel.isRootEnabled
@@ -462,6 +469,26 @@ fun SettingsContent(
                     .height(72.dp)
             )
         }
+
+        if (isGenAISupported) {
+            Text(
+                text = stringResource(R.string.label_ai_features),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            RoundedCardContainer {
+                IconToggleItem(
+                    iconRes = R.drawable.rounded_auto_awesome_24,
+                    title = stringResource(R.string.settings_genai_automation_title),
+                    description = stringResource(R.string.settings_genai_automation_desc),
+                    isChecked = isGenAIAutomationEnabled,
+                    onCheckedChange = { viewModel.setGenAIAutomationEnabled(it, context) }
+                )
+            }
+        }
+
 
         // Updates Section
         Text(
