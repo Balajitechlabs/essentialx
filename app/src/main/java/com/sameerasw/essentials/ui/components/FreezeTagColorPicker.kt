@@ -48,12 +48,14 @@ fun FreezeTagColorPicker(
 
         HorizontalMultiBrowseCarousel(
             state = carouselState,
-            preferredItemWidth = 56.dp,
+            preferredItemWidth = 64.dp,
+            minSmallItemWidth = 24.dp,
+            maxSmallItemWidth = 36.dp,
             itemSpacing = 6.dp,
             contentPadding = PaddingValues(horizontal = 0.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .height(64.dp)
         ) { index ->
             val colorHex = PRESET_PASTEL_COLORS[index]
             val isSelected = colorHex.equals(selectedColorHex, ignoreCase = true)
