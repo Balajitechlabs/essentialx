@@ -1037,6 +1037,41 @@ object FeatureRegistry {
         },
 
         object : Feature(
+            id = "Smart pixels",
+            title = R.string.feat_smart_pixels_title,
+            iconRes = R.drawable.rounded_grain_24,
+            category = R.string.cat_display,
+            description = R.string.feat_smart_pixels_desc,
+            aboutDescription = R.string.about_desc_smart_pixels,
+            permissionKeys = listOf("ACCESSIBILITY"),
+            searchableSettings = listOf(
+                SearchSetting(
+                    R.string.search_smart_pixels_enable_title,
+                    R.string.search_smart_pixels_enable_desc,
+                    "smart_pixels_enable_toggle",
+                    R.array.keywords_switch_master
+                ),
+                SearchSetting(
+                    R.string.search_smart_pixels_intensity_title,
+                    R.string.search_smart_pixels_intensity_desc,
+                    "smart_pixels_intensity_slider"
+                )
+            ),
+            showToggle = true,
+            hasMoreSettings = true,
+            parentFeatureId = "Display"
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.isSmartPixelsEnabled.value
+
+            override fun isToggleEnabled(viewModel: MainViewModel, context: Context) =
+                viewModel.isAccessibilityEnabled.value
+
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
+                viewModel.setSmartPixelsEnabled(context, enabled)
+        },
+
+        object : Feature(
             id = "LiveWallpaper",
             title = R.string.feat_live_wallpaper_title,
             iconRes = R.drawable.rounded_slow_motion_video_24,

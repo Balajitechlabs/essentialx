@@ -106,6 +106,8 @@ class MainViewModel : ViewModel() {
     val volumeDownActionOn = mutableStateOf("None")
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
+    val isSmartPixelsEnabled = mutableStateOf(false)
+    val smartPixelsIntensity = mutableFloatStateOf(50f)
     val snoozeChannels =
         mutableStateOf<List<com.sameerasw.essentials.domain.model.SnoozeChannel>>(emptyList())
     val mapsChannels =
@@ -448,6 +450,10 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_DYNAMIC_NIGHT_LIGHT_ENABLED -> isDynamicNightLightEnabled.value =
                         settingsRepository.getBoolean(key)
+                    SettingsRepository.KEY_SMART_PIXELS_ENABLED -> isSmartPixelsEnabled.value =
+                        settingsRepository.getBoolean(key)
+                    SettingsRepository.KEY_SMART_PIXELS_INTENSITY -> smartPixelsIntensity.floatValue =
+                        settingsRepository.getFloat(key, 50f)
 
                     SettingsRepository.KEY_SCREEN_LOCKED_SECURITY_ENABLED -> isScreenLockedSecurityEnabled.value =
                         settingsRepository.getBoolean(key)
@@ -1476,6 +1482,10 @@ class MainViewModel : ViewModel() {
 
         isDynamicNightLightEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_DYNAMIC_NIGHT_LIGHT_ENABLED)
+        isSmartPixelsEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED)
+        smartPixelsIntensity.floatValue =
+            settingsRepository.getFloat(SettingsRepository.KEY_SMART_PIXELS_INTENSITY, 50f)
         loadSnoozeChannels(context)
         loadMapsChannels(context)
         isSnoozeHeadsUpEnabled.value =
@@ -2953,6 +2963,16 @@ class MainViewModel : ViewModel() {
         isDynamicNightLightEnabled.value = enabled
         settingsRepository.putBoolean(SettingsRepository.KEY_DYNAMIC_NIGHT_LIGHT_ENABLED, enabled)
         updateAppDetectionService(context)
+    }
+
+    fun setSmartPixelsEnabled(context: Context, enabled: Boolean) {
+        isSmartPixelsEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED, enabled)
+    }
+
+    fun setSmartPixelsIntensity(context: Context, intensity: Float) {
+        smartPixelsIntensity.floatValue = intensity
+        settingsRepository.putFloat(SettingsRepository.KEY_SMART_PIXELS_INTENSITY, intensity)
     }
 
     fun setAppLockEnabled(enabled: Boolean, context: Context) {

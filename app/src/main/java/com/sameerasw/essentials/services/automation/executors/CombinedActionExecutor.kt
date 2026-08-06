@@ -345,6 +345,10 @@ object CombinedActionExecutor {
                         repository.setBatteryNotificationEnabled(action.batteryNotificationEnabled)
                     }
 
+                    if (action.changeSmartPixels) {
+                        repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_SMART_PIXELS_ENABLED, action.smartPixelsEnabled)
+                    }
+
                     if (action.changeEssentialsOnDisplay) {
                         when (action.essentialsOnDisplayMode) {
                             "Off" -> {

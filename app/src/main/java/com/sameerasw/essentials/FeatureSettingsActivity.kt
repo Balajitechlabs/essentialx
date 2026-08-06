@@ -800,6 +800,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         )
                                     }
 
+                                    "Smart pixels" -> {
+                                        com.sameerasw.essentials.ui.composables.configs.SmartPixelsSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting
+                                        )
+                                    }
+
                                     "Snooze system notifications" -> {
                                         SnoozeNotificationsSettingsUI(
                                             viewModel = viewModel,

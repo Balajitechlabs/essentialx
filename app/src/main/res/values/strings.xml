@@ -1290,6 +1290,17 @@
 
     <string name="about_desc_power_battery">Fine-tune Android\'s internal Battery Saver constants policy. Customize behavior such as brightness limit, location throttling, vibration toggle, background sync deferrals, and sensor states when battery saver is turned on.</string>
 
+    <!-- Smart Pixels -->
+    <string name="feat_smart_pixels_title">Smart pixels</string>
+    <string name="feat_smart_pixels_desc">Black out pixels to save power</string>
+    <string name="about_desc_smart_pixels">Overlay a customizable checkered pattern of blacked-out pixels across the screen using accessibility service to save display power on OLED screens.</string>
+    <string name="smart_pixels_enable_title">Enable smart pixels</string>
+    <string name="smart_pixels_intensity_title">Intensity</string>
+    <string name="search_smart_pixels_enable_title">Enable smart pixels</string>
+    <string name="search_smart_pixels_enable_desc">Black out pixels to save power</string>
+    <string name="search_smart_pixels_intensity_title">Smart pixels intensity</string>
+    <string name="search_smart_pixels_intensity_desc">Adjust pattern density of blacked out pixels</string>
+
 
     <string name="instruction_section_lighting_title">Notification lighting does not work</string>
     <string name="instruction_section_lighting_desc">It depends on the OEM. Some like OneUI does not seem to allow overlays above the AOD preventing the lighting effects being shown. In this case, try the ambient display as a workaround. </string>

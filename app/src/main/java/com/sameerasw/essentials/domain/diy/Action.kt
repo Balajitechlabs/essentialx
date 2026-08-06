@@ -205,7 +205,9 @@ sealed interface Action {
         @SerializedName("changeLockScreenClock") val changeLockScreenClock: Boolean = false,
         @SerializedName("lockScreenClockStyle") val lockScreenClockStyle: String = "DEFAULT",
         @SerializedName("changeSyncSoundModeWatch") val changeSyncSoundModeWatch: Boolean = false,
-        @SerializedName("syncSoundModeWatchEnabled") val syncSoundModeWatchEnabled: Boolean = true
+        @SerializedName("syncSoundModeWatchEnabled") val syncSoundModeWatchEnabled: Boolean = true,
+        @SerializedName("changeSmartPixels") val changeSmartPixels: Boolean = false,
+        @SerializedName("smartPixelsEnabled") val smartPixelsEnabled: Boolean = true
     ) : Action {
         override val title: Int get() = R.string.diy_action_sometimes_essentials
         override val icon: Int get() = R.drawable.rounded_settings_24
@@ -215,6 +217,9 @@ sealed interface Action {
                 val perms = mutableListOf<String>()
                 if (changeNotificationLighting || changeEssentialsOnDisplay || changeAlwaysOnDisplay || changeLockScreenClock || changeGloveMode) {
                     perms.add("write_secure_settings")
+                }
+                if (changeSmartPixels) {
+                    perms.add("accessibility")
                 }
                 return perms
             }
