@@ -141,6 +141,26 @@ fun HelpAndGuidesContent() {
             description = stringResource(R.string.instruction_section_safe_volume_desc)
         ),
         InstructionSection(
+            title = stringResource(R.string.instruction_section_genai_title),
+            iconRes = R.drawable.rounded_auto_awesome_24,
+            description = stringResource(R.string.instruction_section_genai_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_freezetags_title),
+            iconRes = R.drawable.rounded_bookmark_24,
+            description = stringResource(R.string.instruction_section_freezetags_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_diy_title),
+            iconRes = R.drawable.rounded_settings_24,
+            description = stringResource(R.string.instruction_section_diy_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_qstiles_title),
+            iconRes = R.drawable.rounded_widgets_24,
+            description = stringResource(R.string.instruction_section_qstiles_desc)
+        ),
+        InstructionSection(
             title = stringResource(R.string.instruction_section_about_title),
             iconRes = R.drawable.ic_stat_name,
             description = stringResource(R.string.instruction_section_about_desc)
