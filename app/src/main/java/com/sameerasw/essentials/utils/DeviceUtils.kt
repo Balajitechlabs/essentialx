@@ -43,20 +43,33 @@ object DeviceUtils {
                 Build.BRAND.equals("samsung", ignoreCase = true)
     }
 
+    private val isTclDeviceLazy: Boolean by lazy {
+        Build.MANUFACTURER.equals("tcl", ignoreCase = true) ||
+                Build.BRAND.equals("tcl", ignoreCase = true) ||
+                Build.PRODUCT.contains("tcl", ignoreCase = true)
+    }
+
     private val isMediatekDeviceLazy: Boolean by lazy {
         val hardware = Build.HARDWARE.lowercase()
         val board = Build.BOARD.lowercase()
         val brand = Build.BRAND.lowercase()
         val manufacturer = Build.MANUFACTURER.lowercase()
+        val socManufacturer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Build.SOC_MANUFACTURER.lowercase()
+        } else {
+            ""
+        }
 
         hardware.contains("mt") || hardware.contains("mediatek") || hardware.contains("dimensity") ||
                 board.contains("mt") || board.contains("mediatek") || board.contains("dimensity") ||
-                brand.contains("mediatek") || manufacturer.contains("mediatek")
+                brand.contains("mediatek") || manufacturer.contains("mediatek") ||
+                socManufacturer.contains("mediatek") || socManufacturer.contains("mtk")
     }
 
     fun isGoogleDevice(): Boolean = isGoogleDeviceLazy
     fun isSamsungDevice(): Boolean = isSamsungDeviceLazy
     fun isMediatekDevice(): Boolean = isMediatekDeviceLazy
+    fun isTclDevice(): Boolean = isTclDeviceLazy
 
     fun getDeviceInfo(context: Context): DeviceInfo {
         val deviceName = try {
