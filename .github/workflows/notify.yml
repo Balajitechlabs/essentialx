@@ -48,19 +48,7 @@ jobs:
             fi
             
             export RAW_BODY
-            CLEAN_BODY=$(python3 -c '
-import os, re, html
-
-raw = os.environ.get("RAW_BODY", "")
-text = re.sub(r"<img\b[^>]*\/?>", "", raw, flags=re.IGNORECASE)
-text = re.sub(r"</?(?:p|div|span|align)\b[^>]*>", "", text, flags=re.IGNORECASE)
-text = re.sub(r"!\[.*?\]\(.*?\)", "", text)
-text = re.sub(r"^#+\s*", "", text, flags=re.MULTILINE)
-text = re.sub(r"^\*\s+", "- ", text, flags=re.MULTILINE)
-text = re.sub(r"\n\s*\n\s*\n+", "\n\n", text).strip()
-text = html.escape(text)
-print(text[:3000])
-')
+            CLEAN_BODY=$(python3 -c "import os, re, html; raw = os.environ.get('RAW_BODY', ''); text = re.sub(r'<img\b[^>]*\/?>', '', raw, flags=re.IGNORECASE); text = re.sub(r'</?(?:p|div|span|align)\b[^>]*>', '', text, flags=re.IGNORECASE); text = re.sub(r'!\[.*?\]\(.*?\)', '', text); text = re.sub(r'^#+\s*', '', text, flags=re.MULTILINE); text = re.sub(r'^\*\s+', '- ', text, flags=re.MULTILINE); text = re.sub(r'\n\s*\n\s*\n+', '\n\n', text).strip(); text = html.escape(text); print(text[:3000])")
 
             {
               echo "full_message<<EOF"
