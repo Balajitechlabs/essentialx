@@ -162,6 +162,10 @@ fun FreezeGridUI(
         }
     }
 
+    var appForTagAssignment by remember { mutableStateOf<NotificationApp?>(null) }
+    val freezeTags by viewModel.freezeTags
+    val freezeAppTagMap by viewModel.freezeAppTagMap
+
     Box(modifier = modifier.fillMaxSize()) {
         if (isPickedAppsLoading && pickedApps.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -502,11 +506,16 @@ fun FreezeGridUI(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     rowApps.forEach { app ->
+                                        val appTagIds = freezeAppTagMap[app.packageName] ?: emptyList()
+                                        val neverAutoFreezeTagIds = freezeTags.filter { it.neverAutoFreeze }.map { it.id }.toSet()
+                                        val isLockedByTag = appTagIds.any { neverAutoFreezeTagIds.contains(it) }
+
                                         Box(modifier = Modifier.weight(1f)) {
                                             AppGridItem(
                                                 app = app,
                                                 isFrozen = frozenStates[app.packageName] ?: false,
                                                 isAutoFreezeEnabled = app.isEnabled,
+                                                isLockedByTag = isLockedByTag,
                                                 isHighlighted = (app == bestMatch && searchQuery.isNotEmpty()),
                                                 menuState = menuState,
                                                 onClick = {
@@ -545,6 +554,9 @@ fun FreezeGridUI(
                                                         isAutoFreeze
                                                     )
                                                 },
+                                                onAssignTags = {
+                                                    appForTagAssignment = app
+                                                },
                                                 onRemove = {
                                                     viewModel.updateFreezeAppEnabled(
                                                         context,
@@ -567,6 +579,18 @@ fun FreezeGridUI(
                 Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
             }
         }
+
+        appForTagAssignment?.let { targetApp ->
+            com.sameerasw.essentials.ui.components.sheets.AssignTagsSheet(
+                appName = targetApp.appName,
+                availableTags = freezeTags,
+                assignedTagIds = freezeAppTagMap[targetApp.packageName] ?: emptyList(),
+                onDismissRequest = { appForTagAssignment = null },
+                onSave = { selectedTagIds ->
+                    viewModel.setAppTags(context, targetApp.packageName, selectedTagIds)
+                }
+            )
+        }
     }
 }
 
@@ -576,11 +600,13 @@ fun AppGridItem(
     app: NotificationApp,
     isFrozen: Boolean,
     isAutoFreezeEnabled: Boolean,
+    isLockedByTag: Boolean = false,
     isHighlighted: Boolean = false,
     menuState: com.sameerasw.essentials.ui.state.MenuStateManager,
     onClick: () -> Unit,
     onToggleFreeze: () -> Unit,
     onToggleAutoFreeze: (Boolean) -> Unit,
+    onAssignTags: () -> Unit,
     onRemove: () -> Unit
 ) {
     val view = LocalView.current
@@ -668,7 +694,7 @@ fun AppGridItem(
                     horizontalArrangement = Arrangement.spacedBy((-4).dp)
                 ) {
                     // Auto-freeze Exclusion Badge (Lock)
-                    if (!isAutoFreezeEnabled) {
+                    if (!isAutoFreezeEnabled || isLockedByTag) {
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
@@ -723,11 +749,12 @@ fun AppGridItem(
                 SegmentedDropdownMenuItem(
                     text = {
                         Text(
-                            if (isAutoFreezeEnabled) stringResource(R.string.action_lock_auto_freeze) else stringResource(
+                            if (isAutoFreezeEnabled && !isLockedByTag) stringResource(R.string.action_lock_auto_freeze) else stringResource(
                                 R.string.action_unlock_auto_freeze
                             )
                         )
                     },
+                    enabled = !isLockedByTag,
                     onClick = {
                         showMenu = false
                         onToggleAutoFreeze(!isAutoFreezeEnabled)
@@ -735,6 +762,22 @@ fun AppGridItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_lock_clock_24),
+                            contentDescription = null
+                        )
+                    }
+                )
+
+                SegmentedDropdownMenuItem(
+                    text = {
+                        Text(stringResource(R.string.action_assign_tags))
+                    },
+                    onClick = {
+                        showMenu = false
+                        onAssignTags()
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_interests_24),
                             contentDescription = null
                         )
                     }

@@ -247,6 +247,8 @@ class MainViewModel : ViewModel() {
     val isFreezeDontFreezeActiveAppsEnabled = mutableStateOf(false)
     val freezeMode = mutableIntStateOf(0)
     val isFreezeShowInLauncherEnabled = mutableStateOf(true)
+    val freezeTags = mutableStateOf<List<com.sameerasw.essentials.domain.model.AppTag>>(emptyList())
+    val freezeAppTagMap = mutableStateOf<Map<String, List<String>>>(emptyMap())
 
     // Search state
     val searchQuery = mutableStateOf("")
@@ -1608,6 +1610,8 @@ class MainViewModel : ViewModel() {
         freezeAutoExcludedApps.value = settingsRepository.getFreezeAutoExcludedApps()
         isFreezeShowInLauncherEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_FREEZE_SHOW_IN_LAUNCHER, true)
+        freezeTags.value = settingsRepository.getFreezeTags()
+        freezeAppTagMap.value = settingsRepository.getFreezeAppTagMap()
 
         // Sync PackageManager component enabled state on startup
         val showLauncher = isFreezeShowInLauncherEnabled.value
@@ -4133,6 +4137,64 @@ class MainViewModel : ViewModel() {
         refreshFreezePickedApps(context, silent = true)
     }
 
+    private fun syncNeverAutoFreezeApps(context: Context) {
+        val neverAutoFreezeTagIds = freezeTags.value.filter { it.neverAutoFreeze }.map { it.id }.toSet()
+        if (neverAutoFreezeTagIds.isEmpty()) return
+
+        val currentExcluded = freezeAutoExcludedApps.value.toMutableSet()
+        var changed = false
+        freezeAppTagMap.value.forEach { (pkg, tagIds) ->
+            if (tagIds.any { neverAutoFreezeTagIds.contains(it) }) {
+                if (currentExcluded.add(pkg)) {
+                    changed = true
+                }
+            }
+        }
+        if (changed) {
+            freezeAutoExcludedApps.value = currentExcluded
+            settingsRepository.saveFreezeAutoExcludedApps(currentExcluded)
+            refreshFreezePickedApps(context, silent = true)
+        }
+    }
+
+    fun addFreezeTag(context: Context, tag: com.sameerasw.essentials.domain.model.AppTag) {
+        val updated = freezeTags.value + tag
+        freezeTags.value = updated
+        settingsRepository.saveFreezeTags(updated)
+        syncNeverAutoFreezeApps(context)
+    }
+
+    fun updateFreezeTag(context: Context, tag: com.sameerasw.essentials.domain.model.AppTag) {
+        val updated = freezeTags.value.map { if (it.id == tag.id) tag else it }
+        freezeTags.value = updated
+        settingsRepository.saveFreezeTags(updated)
+        syncNeverAutoFreezeApps(context)
+    }
+
+    fun deleteFreezeTag(context: Context, tagId: String) {
+        val updatedTags = freezeTags.value.filter { it.id != tagId }
+        freezeTags.value = updatedTags
+        settingsRepository.saveFreezeTags(updatedTags)
+
+        val updatedMap = freezeAppTagMap.value.mapValues { (_, tagIds) ->
+            tagIds.filter { it != tagId }
+        }.filterValues { it.isNotEmpty() }
+        freezeAppTagMap.value = updatedMap
+        settingsRepository.saveFreezeAppTagMap(updatedMap)
+    }
+
+    fun setAppTags(context: Context, packageName: String, tagIds: List<String>) {
+        val currentMap = freezeAppTagMap.value.toMutableMap()
+        if (tagIds.isEmpty()) {
+            currentMap.remove(packageName)
+        } else {
+            currentMap[packageName] = tagIds
+        }
+        freezeAppTagMap.value = currentMap
+        settingsRepository.saveFreezeAppTagMap(currentMap)
+        syncNeverAutoFreezeApps(context)
+    }
+
     fun refreshFreezePickedApps(context: Context, silent: Boolean = false) {
         viewModelScope.launch {
             if (!silent) isFreezePickedAppsLoading.value = true
@@ -4439,11 +4501,20 @@ class MainViewModel : ViewModel() {
         return success
     }
 
+    data class FreezeBackupData(
+        val apps: List<AppSelection>,
+        val tags: List<com.sameerasw.essentials.domain.model.AppTag> = emptyList(),
+        val appTagMap: Map<String, List<String>> = emptyMap()
+    )
+
     fun exportFreezeApps(outputStream: java.io.OutputStream) {
         try {
             val apps = settingsRepository.loadFreezeSelectedApps()
+            val tags = settingsRepository.getFreezeTags()
+            val appTagMap = settingsRepository.getFreezeAppTagMap()
+            val backupData = FreezeBackupData(apps = apps, tags = tags, appTagMap = appTagMap)
             val gson = com.google.gson.Gson()
-            val json = gson.toJson(apps)
+            val json = gson.toJson(backupData)
             outputStream.write(json.toByteArray())
             outputStream.flush()
         } catch (e: Exception) {
@@ -4460,11 +4531,26 @@ class MainViewModel : ViewModel() {
         return try {
             val json = inputStream.bufferedReader().use { it.readText() }
             val gson = com.google.gson.Gson()
-            val apps = gson.fromJson(json, Array<AppSelection>::class.java).toList()
+
+            var importedApps: List<AppSelection> = emptyList()
+            var importedTags: List<com.sameerasw.essentials.domain.model.AppTag> = emptyList()
+            var importedMap: Map<String, List<String>> = emptyMap()
+
+            // Gracefully handle legacy backup (JSON Array of AppSelection) vs new backup (FreezeBackupData object)
+            if (json.trim().startsWith("[")) {
+                importedApps = gson.fromJson(json, Array<AppSelection>::class.java).toList()
+            } else {
+                val backupData = gson.fromJson(json, FreezeBackupData::class.java)
+                if (backupData != null) {
+                    importedApps = backupData.apps ?: emptyList()
+                    importedTags = backupData.tags ?: emptyList()
+                    importedMap = backupData.appTagMap ?: emptyMap()
+                }
+            }
 
             // Filter out non-installed apps
             val pm = context.packageManager
-            val installedApps = apps.filter { app ->
+            val installedApps = importedApps.filter { app ->
                 try {
                     pm.getPackageInfo(app.packageName, 0)
                     true
@@ -4474,6 +4560,31 @@ class MainViewModel : ViewModel() {
             }
 
             settingsRepository.saveFreezeSelectedApps(installedApps)
+
+            if (importedTags.isNotEmpty()) {
+                val currentTags = settingsRepository.getFreezeTags().toMutableList()
+                importedTags.forEach { importedTag ->
+                    if (currentTags.none { it.id == importedTag.id }) {
+                        currentTags.add(importedTag)
+                    }
+                }
+                freezeTags.value = currentTags
+                settingsRepository.saveFreezeTags(currentTags)
+            }
+
+            if (importedMap.isNotEmpty()) {
+                val installedPkgs = installedApps.map { it.packageName }.toSet()
+                val currentMap = settingsRepository.getFreezeAppTagMap().toMutableMap()
+                importedMap.forEach { (pkg, tagIds) ->
+                    if (installedPkgs.contains(pkg)) {
+                        currentMap[pkg] = tagIds
+                    }
+                }
+                freezeAppTagMap.value = currentMap
+                settingsRepository.saveFreezeAppTagMap(currentMap)
+                syncNeverAutoFreezeApps(context)
+            }
+
             refreshFreezePickedApps(context, silent = true)
             true
         } catch (e: Exception) {

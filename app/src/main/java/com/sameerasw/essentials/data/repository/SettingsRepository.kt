@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.model.AppSelection
+import com.sameerasw.essentials.domain.model.AppTag
+import com.google.gson.reflect.TypeToken
 import com.sameerasw.essentials.domain.model.DnsPreset
 import com.sameerasw.essentials.domain.model.NotificationLightingColorMode
 import com.sameerasw.essentials.domain.model.NotificationLightingSide
@@ -153,6 +155,8 @@ class SettingsRepository(private val context: Context) {
         const val KEY_FREEZE_DONT_FREEZE_ACTIVE_APPS = "freeze_dont_freeze_active_apps"
         const val KEY_FREEZE_MODE = "freeze_mode"
         const val KEY_FREEZE_SHOW_IN_LAUNCHER = "freeze_show_in_launcher"
+        const val KEY_FREEZE_TAGS = "freeze_tags"
+        const val KEY_FREEZE_APP_TAG_MAP = "freeze_app_tag_map"
 
         const val KEY_DEVELOPER_MODE_ENABLED = "developer_mode_enabled"
         const val KEY_HAPTIC_FEEDBACK_TYPE = "haptic_feedback_type"
@@ -450,6 +454,36 @@ class SettingsRepository(private val context: Context) {
     fun saveFreezeAutoExcludedApps(apps: Set<String>) {
         val json = gson.toJson(apps)
         putString(KEY_FREEZE_AUTO_EXCLUDED_APPS, json)
+    }
+
+    fun getFreezeTags(): List<AppTag> {
+        val json = prefs.getString(KEY_FREEZE_TAGS, null) ?: return emptyList()
+        return try {
+            val type = object : TypeToken<List<AppTag>>() {}.type
+            gson.fromJson(json, type) ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    fun saveFreezeTags(tags: List<AppTag>) {
+        val json = gson.toJson(tags)
+        putString(KEY_FREEZE_TAGS, json)
+    }
+
+    fun getFreezeAppTagMap(): Map<String, List<String>> {
+        val json = prefs.getString(KEY_FREEZE_APP_TAG_MAP, null) ?: return emptyMap()
+        return try {
+            val type = object : TypeToken<Map<String, List<String>>>() {}.type
+            gson.fromJson(json, type) ?: emptyMap()
+        } catch (e: Exception) {
+            emptyMap()
+        }
+    }
+
+    fun saveFreezeAppTagMap(map: Map<String, List<String>>) {
+        val json = gson.toJson(map)
+        putString(KEY_FREEZE_APP_TAG_MAP, json)
     }
 
     fun getFreezeMode(): Int = getInt(KEY_FREEZE_MODE, 0)
