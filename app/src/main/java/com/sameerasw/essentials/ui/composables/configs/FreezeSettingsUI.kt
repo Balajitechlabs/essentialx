@@ -495,11 +495,12 @@ fun FreezeSettingsUI(
 
                     androidx.compose.material3.ListItem(
                         leadingContent = {
+                            val richColor = androidx.compose.runtime.remember(color) { com.sameerasw.essentials.utils.ColorUtil.toRichColor(color) }
                             Box(
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(color.copy(alpha = 0.2f)),
+                                    .background(richColor.copy(alpha = 0.2f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -507,7 +508,7 @@ fun FreezeSettingsUI(
                                         id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
                                     ),
                                     contentDescription = null,
-                                    tint = color,
+                                    tint = richColor,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }

@@ -335,6 +335,8 @@ fun FreezeGridUI(
                                 context.packageName
                             )
 
+                            val richColor = remember(color) { ColorUtil.toRichColor(color) }
+
                             androidx.compose.material3.FilterChip(
                                 selected = isSelected,
                                 onClick = {
@@ -342,6 +344,7 @@ fun FreezeGridUI(
                                     selectedTagId = if (isSelected) null else tag.id
                                 },
                                 label = { Text(tag.name) },
+                                shape = if (isSelected) CircleShape else androidx.compose.material3.FilterChipDefaults.shape,
                                 leadingIcon = {
                                     if (isSelected) {
                                         Icon(
@@ -355,7 +358,7 @@ fun FreezeGridUI(
                                                 id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
                                             ),
                                             contentDescription = null,
-                                            tint = color,
+                                            tint = richColor,
                                             modifier = Modifier.size(18.dp)
                                         )
                                     }
@@ -726,8 +729,11 @@ fun AppGridItem(
     val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
     val containerColor = remember(tagColor, isDarkTheme) {
         if (tagColor == null) null
-        else if (isDarkTheme) tagColor.copy(alpha = 0.25f)
-        else ColorUtil.getVibrantColorFor(tagColor.toArgb()).copy(alpha = 0.15f)
+        else {
+            val rich = ColorUtil.toRichColor(tagColor)
+            if (isDarkTheme) rich.copy(alpha = 0.35f)
+            else rich.copy(alpha = 0.2f)
+        }
     }
 
     Surface(

@@ -101,11 +101,12 @@ fun AssignTagsSheet(
 
                         androidx.compose.material3.ListItem(
                             leadingContent = {
+                                val richColor = remember(color) { com.sameerasw.essentials.utils.ColorUtil.toRichColor(color) }
                                 Box(
                                     modifier = Modifier
                                         .size(32.dp)
                                         .clip(CircleShape)
-                                        .background(color.copy(alpha = 0.2f)),
+                                        .background(richColor.copy(alpha = 0.2f)),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
@@ -113,7 +114,7 @@ fun AssignTagsSheet(
                                             id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
                                         ),
                                         contentDescription = null,
-                                        tint = color,
+                                        tint = richColor,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
