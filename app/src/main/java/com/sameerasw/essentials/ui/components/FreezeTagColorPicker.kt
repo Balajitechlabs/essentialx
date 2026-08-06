@@ -19,45 +19,28 @@ import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.components.sheets.PRESET_PASTEL_COLORS
 import com.sameerasw.essentials.utils.HapticUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FreezeTagIconPicker(
-    selectedIconName: String,
-    onIconSelected: (String) -> Unit,
+fun FreezeTagColorPicker(
+    selectedColorHex: String,
+    onColorSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val icons = listOf(
-        "rounded_interests_24",
-        "rounded_work_24",
-        "rounded_school_24",
-        "rounded_camera_24",
-        "rounded_favorite_24",
-        "rounded_shopping_cart_24",
-        "rounded_music_note_24",
-        "rounded_apartment_24",
-        "rounded_beach_access_24",
-        "rounded_local_pizza_24",
-        "rounded_train_24",
-        "rounded_directions_bus_24",
-        "rounded_flight_24",
-        "rounded_directions_boat_24"
-    )
-
-    val carouselState = rememberCarouselState { icons.size }
-    val context = LocalContext.current
+    val carouselState = rememberCarouselState { PRESET_PASTEL_COLORS.size }
     val view = LocalView.current
 
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
-            text = stringResource(R.string.freeze_tag_icon_picker_label),
+            text = stringResource(R.string.freeze_tag_color_picker_label),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -72,31 +55,33 @@ fun FreezeTagIconPicker(
                 .fillMaxWidth()
                 .height(56.dp)
         ) { index ->
-            val iconName = icons[index]
-            val isSelected = iconName == selectedIconName
-            val iconResId = context.resources.getIdentifier(iconName, "drawable", context.packageName)
+            val colorHex = PRESET_PASTEL_COLORS[index]
+            val isSelected = colorHex.equals(selectedColorHex, ignoreCase = true)
+            val parsedColor = try {
+                Color(android.graphics.Color.parseColor(colorHex))
+            } catch (e: Exception) {
+                MaterialTheme.colorScheme.primary
+            }
 
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .maskClip(MaterialTheme.shapes.medium)
-                    .background(
-                        if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                        else MaterialTheme.colorScheme.surfaceContainerHigh
-                    )
+                    .background(parsedColor)
                     .clickable {
                         HapticUtil.performVirtualKeyHaptic(view)
-                        onIconSelected(iconName)
+                        onColorSelected(colorHex)
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24),
-                    contentDescription = null,
-                    tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(24.dp)
-                )
+                if (isSelected) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_check_24),
+                        contentDescription = null,
+                        tint = Color.Black.copy(alpha = 0.7f),
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }

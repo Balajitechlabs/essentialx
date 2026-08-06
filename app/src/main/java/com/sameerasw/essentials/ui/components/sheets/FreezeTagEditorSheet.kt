@@ -125,79 +125,60 @@ fun FreezeTagEditorSheet(
 
             RoundedCardContainer(spacing = 2.dp) {
                 // Name
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    placeholder = { Text(stringResource(R.string.freeze_tag_name_hint)) },
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceBright
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = MaterialTheme.shapes.extraSmall
+                        )
+                        .padding(12.dp)
+                ) {
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        placeholder = { Text(stringResource(R.string.freeze_tag_name_hint)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true,
+                        shape = MaterialTheme.shapes.medium,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                        )
                     )
-                )
+                }
 
                 // Color Picker
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceBright)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = MaterialTheme.shapes.extraSmall
+                        )
                         .padding(16.dp)
                 ) {
-                    Text(
-                        text = stringResource(R.string.freeze_tag_color_picker_label),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                    com.sameerasw.essentials.ui.components.FreezeTagColorPicker(
+                        selectedColorHex = selectedColorHex,
+                        onColorSelected = { selectedColorHex = it }
                     )
-
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        items(PRESET_PASTEL_COLORS) { colorHex ->
-                            val parsedColor = try {
-                                Color(android.graphics.Color.parseColor(colorHex))
-                            } catch (e: Exception) {
-                                MaterialTheme.colorScheme.primary
-                            }
-                            val isSelected = colorHex.equals(selectedColorHex, ignoreCase = true)
-
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(parsedColor)
-                                    .clickable {
-                                        HapticUtil.performVirtualKeyHaptic(view)
-                                        selectedColorHex = colorHex
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (isSelected) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(12.dp)
-                                            .clip(CircleShape)
-                                            .background(Color.Black.copy(alpha = 0.5f))
-                                    )
-                                }
-                            }
-                        }
-                    }
                 }
 
                 // Icon Picker
-                FreezeTagIconPicker(
-                    selectedIconName = selectedIconName,
-                    onIconSelected = { selectedIconName = it },
+                Box(
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surfaceBright)
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = MaterialTheme.shapes.extraSmall
+                        )
                         .padding(16.dp)
-                )
+                ) {
+                    FreezeTagIconPicker(
+                        selectedIconName = selectedIconName,
+                        onIconSelected = { selectedIconName = it }
+                    )
+                }
 
                 // Never auto freeze
                 IconToggleItem(

@@ -494,23 +494,6 @@ fun FreezeSettingsUI(
                     )
 
                     androidx.compose.material3.ListItem(
-                        headlineContent = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = tag.name,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                                if (tag.neverAutoFreeze) {
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.rounded_lock_clock_24),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                        tint = MaterialTheme.colorScheme.error
-                                    )
-                                }
-                            }
-                        },
                         leadingContent = {
                             Box(
                                 modifier = Modifier
@@ -546,8 +529,27 @@ fun FreezeSettingsUI(
                         },
                         colors = androidx.compose.material3.ListItemDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.surfaceBright
-                        )
-                    )
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(MaterialTheme.shapes.extraSmall)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = tag.name,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            if (tag.neverAutoFreeze) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_lock_clock_24),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }

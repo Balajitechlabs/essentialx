@@ -99,13 +99,7 @@ fun AssignTagsSheet(
                             context.packageName
                         )
 
-                        ListItem(
-                            headlineContent = {
-                                Text(
-                                    text = tag.name,
-                                    style = MaterialTheme.typography.bodyLarge
-                                )
-                            },
+                        androidx.compose.material3.ListItem(
                             leadingContent = {
                                 Box(
                                     modifier = Modifier
@@ -142,6 +136,7 @@ fun AssignTagsSheet(
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .clip(MaterialTheme.shapes.extraSmall)
                                 .clickable {
                                     HapticUtil.performVirtualKeyHaptic(view)
                                     selectedIds = if (isChecked) {
@@ -150,7 +145,12 @@ fun AssignTagsSheet(
                                         selectedIds + tag.id
                                     }
                                 }
-                        )
+                        ) {
+                            Text(
+                                text = tag.name,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
                     }
                 }
             }
