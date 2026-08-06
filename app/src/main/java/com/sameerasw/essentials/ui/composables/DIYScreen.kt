@@ -15,7 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -44,6 +48,9 @@ fun DIYScreen(
     val context = LocalContext.current
     val automations by viewModel.automations.collectAsState()
     val focusManager = LocalFocusManager.current
+
+    var showGenAIPill by remember { mutableStateOf(false) }
+    val genAIState by viewModel.genAIState.collectAsState()
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -167,44 +174,59 @@ fun DIYScreen(
                 }
             }
         }
-    }
 
-    val genAIState by viewModel.genAIState.collectAsState()
-
-    if (showNewAutomationSheet) {
-        NewAutomationSheet(
-            onDismiss = onDismissNewAutomationSheet,
-            onOptionSelected = { type ->
-                onDismissNewAutomationSheet()
-                context.startActivity(AutomationEditorActivity.createIntent(context, type))
-            },
-            onAIDescribeRequested = { prompt ->
-                viewModel.requestGenAISuggestion(prompt)
-            },
-            isGenAILoading = genAIState is com.sameerasw.essentials.viewmodels.GenAIState.Loading
-        )
-    }
-
-    when (val state = genAIState) {
-        is com.sameerasw.essentials.viewmodels.GenAIState.Success -> {
-            com.sameerasw.essentials.ui.components.sheets.GenAIAutomationPreviewSheet(
-                suggestion = state.suggestion,
-                onConfirm = { suggestion ->
-                    viewModel.confirmGenAISuggestion(suggestion)
+        if (showNewAutomationSheet) {
+            NewAutomationSheet(
+                onDismiss = onDismissNewAutomationSheet,
+                onOptionSelected = { type ->
                     onDismissNewAutomationSheet()
+                    context.startActivity(AutomationEditorActivity.createIntent(context, type))
                 },
-                onDismiss = {
-                    viewModel.dismissGenAISuggestion()
-                }
+                onAIDescribeRequested = {
+                    showGenAIPill = true
+                },
+                isGenAILoading = genAIState is com.sameerasw.essentials.viewmodels.GenAIState.Loading
             )
         }
-        is com.sameerasw.essentials.viewmodels.GenAIState.Error -> {
-            androidx.compose.runtime.LaunchedEffect(state) {
-                android.widget.Toast.makeText(context, state.message, android.widget.Toast.LENGTH_LONG).show()
-                viewModel.dismissGenAISuggestion()
-            }
+
+        if (showGenAIPill && genAIState !is com.sameerasw.essentials.viewmodels.GenAIState.Success) {
+            com.sameerasw.essentials.ui.components.genai.GenAIFloatingPill(
+                onSend = { prompt ->
+                    viewModel.requestGenAISuggestion(prompt)
+                },
+                onDismiss = {
+                    showGenAIPill = false
+                    viewModel.dismissGenAISuggestion()
+                },
+                isLoading = genAIState is com.sameerasw.essentials.viewmodels.GenAIState.Loading,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
         }
-        else -> {}
+
+        when (val state = genAIState) {
+            is com.sameerasw.essentials.viewmodels.GenAIState.Success -> {
+                com.sameerasw.essentials.ui.components.sheets.GenAIAutomationPreviewSheet(
+                    suggestion = state.suggestion,
+                    onConfirm = { suggestion ->
+                        viewModel.confirmGenAISuggestion(suggestion)
+                        showGenAIPill = false
+                    },
+                    onDismiss = {
+                        viewModel.dismissGenAISuggestion()
+                        showGenAIPill = false
+                    }
+                )
+            }
+            is com.sameerasw.essentials.viewmodels.GenAIState.Error -> {
+                androidx.compose.runtime.LaunchedEffect(state) {
+                    android.widget.Toast.makeText(context, state.message, android.widget.Toast.LENGTH_LONG).show()
+                    viewModel.dismissGenAISuggestion()
+                }
+            }
+            else -> {}
+        }
     }
 }
+
+
 

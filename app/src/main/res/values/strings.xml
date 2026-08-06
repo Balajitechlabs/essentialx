@@ -1,5 +1,8 @@
 <resources>
+    <string name="diy_genai_lazy_title">I’m lazy, Do it for me</string>
     <string name="settings_genai_automation_title">Enable GenAI use</string>
+
+
     <string name="settings_genai_automation_desc">Use on-device Gemini Nano to help create automations from descriptions</string>
     <string name="diy_genai_describe_placeholder">Describe the automation you want…</string>
     <string name="diy_genai_describe_send">Send</string>

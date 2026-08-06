@@ -113,63 +113,28 @@ fun NewAutomationSheet(
             }
 
             if (isGenAIEnabled && isGenAISupported && onAIDescribeRequested != null) {
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceBright,
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
+                RoundedCardContainer(
+                    modifier = Modifier.padding(bottom = 16.dp)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        androidx.compose.material3.OutlinedTextField(
-                            value = aiPromptText,
-                            onValueChange = { aiPromptText = it },
-                            placeholder = {
-                                Text(
-                                    text = stringResource(R.string.diy_genai_describe_placeholder),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            },
-                            singleLine = true,
-                            enabled = !isGenAILoading,
-                            shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.weight(1f)
-                        )
-
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        val isPromptValid = aiPromptText.isNotBlank()
-                        androidx.compose.material3.IconButton(
-                            onClick = {
-                                if (isPromptValid && !isGenAILoading) {
-                                    HapticUtil.performVirtualKeyHaptic(view)
-                                    onAIDescribeRequested(aiPromptText.trim())
-                                }
-                            },
-                            enabled = isPromptValid && !isGenAILoading
-                        ) {
-                            if (isGenAILoading) {
-                                androidx.compose.material3.CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
-                                Icon(
-                                    painter = painterResource(R.drawable.rounded_send_24),
-                                    contentDescription = stringResource(R.string.diy_genai_describe_send),
-                                    tint = if (isPromptValid) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                )
-                            }
+                    com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+                        iconRes = R.drawable.rounded_auto_awesome_24,
+                        title = stringResource(R.string.diy_genai_lazy_title),
+                        showToggle = false,
+                        onClick = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onDismiss()
+                            onAIDescribeRequested("")
+                        },
+                        onCheckedChange = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onDismiss()
+                            onAIDescribeRequested("")
                         }
-
-                    }
+                    )
                 }
             }
+
+
 
             RoundedCardContainer {
 
