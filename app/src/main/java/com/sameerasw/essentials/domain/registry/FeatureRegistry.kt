@@ -195,7 +195,8 @@ object FeatureRegistry {
             category = R.string.cat_interface,
             description = R.string.feat_other_customizations_desc,
             showToggle = false,
-            parentFeatureId = "Display"
+            parentFeatureId = "Display",
+            animationRes = R.raw.navigation_animation
         ) {
             override fun isEnabled(viewModel: MainViewModel) = true
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
