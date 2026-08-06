@@ -156,16 +156,6 @@ fun HelpAndGuidesContent() {
             description = stringResource(R.string.instruction_section_diy_desc)
         ),
         InstructionSection(
-            title = stringResource(R.string.instruction_section_qstiles_title),
-            iconRes = R.drawable.rounded_widgets_24,
-            description = stringResource(R.string.instruction_section_qstiles_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_applock_title),
-            iconRes = R.drawable.rounded_lock_24,
-            description = stringResource(R.string.instruction_section_applock_desc)
-        ),
-        InstructionSection(
             title = stringResource(R.string.instruction_section_searchbar_title),
             iconRes = R.drawable.rounded_search_24,
             description = stringResource(R.string.instruction_section_searchbar_desc)
