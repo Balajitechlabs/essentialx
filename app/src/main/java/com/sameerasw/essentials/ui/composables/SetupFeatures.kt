@@ -80,7 +80,9 @@ import com.sameerasw.essentials.domain.registry.FeatureRegistry
 import com.sameerasw.essentials.domain.registry.PermissionRegistry
 import com.sameerasw.essentials.ui.activities.YourAndroidActivity
 import com.sameerasw.essentials.ui.components.FavoriteCarousel
+import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
 import com.sameerasw.essentials.ui.components.cards.FeatureCard
+import com.sameerasw.essentials.ui.components.cards.IconToggleItem
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.sheets.PermissionItem
 import com.sameerasw.essentials.ui.components.sheets.PermissionsBottomSheet
@@ -843,6 +845,14 @@ fun SetupFeatures(
         }
     }
 
+    var showInstructionsSheet by rememberSaveable { mutableStateOf(false) }
+
+    if (showInstructionsSheet) {
+        com.sameerasw.essentials.ui.components.sheets.InstructionsBottomSheet(
+            onDismissRequest = { showInstructionsSheet = false }
+        )
+    }
+
     if (showHelpSheet && selectedHelpFeature != null) {
         com.sameerasw.essentials.ui.components.sheets.FeatureHelpBottomSheet(
             onDismissRequest = {
@@ -1322,6 +1332,21 @@ fun SetupFeatures(
                             }
                         }
                     }
+                }
+
+                item {
+                    ListExpandToggleButton(
+                        isExpanded = false,
+                        onToggle = {
+                            showInstructionsSheet = true
+                        },
+                        title = R.string.label_help_guide,
+                        description = R.string.label_help_guide,
+                        iconRes = R.drawable.rounded_help_24,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 16.dp, bottom = 12.dp)
+                    )
                 }
             }
         }
