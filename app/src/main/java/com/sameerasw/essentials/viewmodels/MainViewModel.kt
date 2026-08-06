@@ -248,6 +248,7 @@ class MainViewModel : ViewModel() {
     val isFreezeShowInLauncherEnabled = mutableStateOf(true)
     val freezeTags = mutableStateOf<List<com.sameerasw.essentials.domain.model.AppTag>>(emptyList())
     val freezeAppTagMap = mutableStateOf<Map<String, List<String>>>(emptyMap())
+    val isFreezeTagColorCodedEnabled = mutableStateOf(false)
 
     // Search state
     val searchQuery = mutableStateOf("")
@@ -1611,6 +1612,8 @@ class MainViewModel : ViewModel() {
             settingsRepository.getBoolean(SettingsRepository.KEY_FREEZE_SHOW_IN_LAUNCHER, true)
         freezeTags.value = settingsRepository.getFreezeTags()
         freezeAppTagMap.value = settingsRepository.getFreezeAppTagMap()
+        isFreezeTagColorCodedEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_FREEZE_TAG_COLOR_CODED_ENABLED, false)
 
         // Sync PackageManager component enabled state on startup
         val showLauncher = isFreezeShowInLauncherEnabled.value
@@ -4192,6 +4195,11 @@ class MainViewModel : ViewModel() {
         freezeAppTagMap.value = currentMap
         settingsRepository.saveFreezeAppTagMap(currentMap)
         syncNeverAutoFreezeApps(context)
+    }
+
+    fun setFreezeTagColorCoded(enabled: Boolean) {
+        isFreezeTagColorCodedEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_FREEZE_TAG_COLOR_CODED_ENABLED, enabled)
     }
 
     fun refreshFreezePickedApps(context: Context, silent: Boolean = false) {

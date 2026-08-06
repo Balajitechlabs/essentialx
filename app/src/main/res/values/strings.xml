@@ -165,6 +165,8 @@
     <string name="filter_all">All</string>
     <string name="freeze_tags_section_title">Tags</string>
     <string name="freeze_tags_empty">No tags created yet</string>
+    <string name="freeze_tag_color_coded_title">Tag color coded</string>
+    <string name="freeze_tag_color_coded_desc">Show tag colors in app grid</string>
     <string name="action_add_tag">Add tag</string>
     <string name="freeze_tag_name_hint">Tag name</string>
     <string name="freeze_tag_never_auto_freeze_title">Never auto freeze</string>

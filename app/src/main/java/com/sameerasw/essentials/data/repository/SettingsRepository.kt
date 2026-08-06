@@ -157,6 +157,7 @@ class SettingsRepository(private val context: Context) {
         const val KEY_FREEZE_SHOW_IN_LAUNCHER = "freeze_show_in_launcher"
         const val KEY_FREEZE_TAGS = "freeze_tags"
         const val KEY_FREEZE_APP_TAG_MAP = "freeze_app_tag_map"
+        const val KEY_FREEZE_TAG_COLOR_CODED_ENABLED = "freeze_tag_color_coded_enabled"
 
         const val KEY_DEVELOPER_MODE_ENABLED = "developer_mode_enabled"
         const val KEY_HAPTIC_FEEDBACK_TYPE = "haptic_feedback_type"
