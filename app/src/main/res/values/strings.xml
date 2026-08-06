@@ -1315,6 +1315,18 @@
     <string name="instruction_section_qstiles_title">Quick Settings Tiles &amp; In-App Tile Manager</string>
     <string name="instruction_section_qstiles_desc">Essentials provides an array of custom Quick Settings tiles for quick system controls.\n\n• Tile Manager: Access the Quick Settings Tiles UI inside the app to configure and test all available tiles in one place.\n• System Shade: Drag Essentials tiles (App Freezing, Flashlight Pulse, Sound Mode, Lock Screen Security, etc.) into your system QS panel for instant access.</string>
 
+    <string name="instruction_section_applock_title">App Lock &amp; Biometric Security</string>
+    <string name="instruction_section_applock_desc">Secure individual applications with biometric authentication.\n\n• Setup: Choose which apps require authentication when opened.\n• Biometric Classes: Uses Android Strong Class biometric authentication (Fingerprint, Face Unlock on supported devices, PIN, or Pattern).\n• Screen Off Lock: Once unlocked, apps stay accessible until the screen turns off or device locks.</string>
+
+    <string name="instruction_section_searchbar_title">Pixel Searchbar Widget &amp; Customization</string>
+    <string name="instruction_section_searchbar_desc">Transform your home screen with a customizable Pixel-style Glance widget.\n\n• Modes: Switch between At a Glance info, Weather, Now Playing Music Artwork &amp; Info, or Scraped Widget contents.\n• Interactive Actions: Configure single tap or long press actions to launch Google Lens, Search, Voice Assistant, or custom action shortcuts.</string>
+
+    <string name="instruction_section_callvibes_title">Call Vibrations &amp; Haptics</string>
+    <string name="instruction_section_callvibes_desc">Add haptic feedback during phone call events.\n\n• Call Answered: Provides a subtle tactile vibration as soon as the recipient picks up the call.\n• Call Disconnected: Provides feedback when a call ends.\n• Permissions: Requires Notification Listener and Phone State permissions to monitor call states.</string>
+
+    <string name="instruction_section_backup_title">Backup &amp; Restore Configurations</string>
+    <string name="instruction_section_backup_desc">Safeguard and transfer your custom setup across devices.\n\n• Export Config: Generate a JSON backup of your DIY Automations, App Tags, Tile configurations, and custom preferences.\n• Import Config: Easily restore your saved setup file without re-configuring individual settings.</string>
+
     <!-- Bug Reporting -->
     <string name="toast_bug_report_copied">Bug report copied to clipboard</string>
     <string name="bug_report_title">Bug report</string>

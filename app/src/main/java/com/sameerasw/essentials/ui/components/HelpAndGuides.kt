@@ -161,6 +161,26 @@ fun HelpAndGuidesContent() {
             description = stringResource(R.string.instruction_section_qstiles_desc)
         ),
         InstructionSection(
+            title = stringResource(R.string.instruction_section_applock_title),
+            iconRes = R.drawable.rounded_lock_24,
+            description = stringResource(R.string.instruction_section_applock_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_searchbar_title),
+            iconRes = R.drawable.rounded_search_24,
+            description = stringResource(R.string.instruction_section_searchbar_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_callvibes_title),
+            iconRes = R.drawable.rounded_mobile_vibrate_24,
+            description = stringResource(R.string.instruction_section_callvibes_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_backup_title),
+            iconRes = R.drawable.rounded_save_24,
+            description = stringResource(R.string.instruction_section_backup_desc)
+        ),
+        InstructionSection(
             title = stringResource(R.string.instruction_section_about_title),
             iconRes = R.drawable.ic_stat_name,
             description = stringResource(R.string.instruction_section_about_desc)
