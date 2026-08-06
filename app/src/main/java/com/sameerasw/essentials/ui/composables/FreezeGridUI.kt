@@ -538,6 +538,13 @@ fun FreezeGridUI(
                                                         }
                                                     }
                                                 },
+                                                onToggleAutoFreeze = { isAutoFreeze ->
+                                                    viewModel.updateFreezeAppAutoFreeze(
+                                                        context,
+                                                        app.packageName,
+                                                        isAutoFreeze
+                                                    )
+                                                },
                                                 onRemove = {
                                                     viewModel.updateFreezeAppEnabled(
                                                         context,
@@ -573,6 +580,7 @@ fun AppGridItem(
     menuState: com.sameerasw.essentials.ui.state.MenuStateManager,
     onClick: () -> Unit,
     onToggleFreeze: () -> Unit,
+    onToggleAutoFreeze: (Boolean) -> Unit,
     onRemove: () -> Unit
 ) {
     val view = LocalView.current
@@ -707,6 +715,26 @@ fun AppGridItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = if (isFrozen) R.drawable.rounded_mode_cool_off_24 else R.drawable.rounded_mode_cool_24),
+                            contentDescription = null
+                        )
+                    }
+                )
+
+                SegmentedDropdownMenuItem(
+                    text = {
+                        Text(
+                            if (isAutoFreezeEnabled) stringResource(R.string.action_lock_auto_freeze) else stringResource(
+                                R.string.action_unlock_auto_freeze
+                            )
+                        )
+                    },
+                    onClick = {
+                        showMenu = false
+                        onToggleAutoFreeze(!isAutoFreezeEnabled)
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_lock_clock_24),
                             contentDescription = null
                         )
                     }

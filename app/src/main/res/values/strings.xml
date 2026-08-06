@@ -148,6 +148,8 @@
     <string name="action_remove">Remove</string>
     <string name="action_create_shortcut">Create shortcut</string>
     <string name="action_app_info">App info</string>
+    <string name="action_lock_auto_freeze">Never auto freeze</string>
+    <string name="action_unlock_auto_freeze">Allow auto freeze</string>
     <string name="freeze_mode_description_freeze_title">What is Freeze?</string>
     <string name="freeze_mode_description_freeze_body">App freezing disables the app\'s launch activity which removes it from the app list and updates. It will prevent the app from starting at all until it\'s unfrozen which saves resources but you will need to unfreeze from here or manually re-enable.</string>
     <string name="freeze_mode_description_freeze_warning">DO NOT FREEZE COMMUNICATION APPS</string>
