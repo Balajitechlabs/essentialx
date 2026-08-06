@@ -518,33 +518,101 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 viewModel.isEnableUnsupportedFeatures.value
                             ).filter { it.parentFeatureId == featureId }
                             if (children.isNotEmpty() && featureId != "Networks") {
-                                val sectionChildLists = if (featureId == "Display") {
+                                val sectionChildLists = run {
                                     val childMap = children.associateBy { it.id }
-                                    val definedSections = listOf(
-                                        listOf(
-                                            "Essentials On Display",
-                                            "Always on Display",
-                                            "Statusbar icons",
-                                            "Lock screen clock"
-                                        ),
-                                        listOf(
-                                            "Text and animations",
-                                            "Screen refresh rate",
-                                            "Navigation"
-                                        ),
-                                        listOf(
-                                            "Caffeinate",
-                                            "Dynamic night light"
-                                        ),
-                                        listOf(
-                                            "Other customizations"
+                                    val definedSections = when (featureId) {
+                                        "Display" -> listOf(
+                                            listOf(
+                                                "Essentials On Display",
+                                                "Always on Display",
+                                                "Statusbar icons",
+                                                "Lock screen clock"
+                                            ),
+                                            listOf(
+                                                "Text and animations",
+                                                "Screen refresh rate",
+                                                "Navigation"
+                                            ),
+                                            listOf(
+                                                "Caffeinate",
+                                                "Dynamic night light"
+                                            ),
+                                            listOf(
+                                                "Other customizations"
+                                            )
                                         )
-                                    )
-                                    val assignedIds = definedSections.flatten().toSet()
-                                    val unassigned = children.filter { it.id !in assignedIds }
-                                    definedSections.map { ids -> ids.mapNotNull { childMap[it] } }.filter { it.isNotEmpty() } + if (unassigned.isNotEmpty()) listOf(unassigned) else emptyList()
-                                } else {
-                                    listOf(children)
+                                        "Notifications" -> listOf(
+                                            listOf(
+                                                "Notification lighting",
+                                                "Flashlight pulse"
+                                            ),
+                                            listOf(
+                                                "Notification snoozing",
+                                                "Snooze system notifications"
+                                            )
+                                        )
+                                        "Widgets" -> listOf(
+                                            listOf(
+                                                "Pixel Searchbar"
+                                            ),
+                                            listOf(
+                                                "Screen off widget",
+                                                "Batteries"
+                                            )
+                                        )
+                                        "Input" -> listOf(
+                                            listOf(
+                                                "Button remap",
+                                                "Flashlight"
+                                            ),
+                                            listOf(
+                                                "Link actions",
+                                                "System Keyboard"
+                                            )
+                                        )
+                                        "Power and battery" -> listOf(
+                                            listOf(
+                                                "Power and Battery",
+                                                "Standby apps"
+                                            ),
+                                            listOf(
+                                                "Battery notification"
+                                            )
+                                        )
+                                        "Watch" -> listOf(
+                                            listOf(
+                                                "Watch Controls",
+                                                "Lock from Watch"
+                                            ),
+                                            listOf(
+                                                "Calendar Sync",
+                                                "Sync sound mode",
+                                                "Sync location reached status"
+                                            ),
+                                            listOf(
+                                                "Watch Wireless Debugging"
+                                            )
+                                        )
+                                        "Security" -> listOf(
+                                            listOf(
+                                                "Screen locked security",
+                                                "App lock",
+                                                "Shut-Up!"
+                                            ),
+                                            listOf(
+                                                "Lockdown mode"
+                                            )
+                                        )
+                                        else -> null
+                                    }
+
+                                    if (definedSections != null) {
+                                        val assignedIds = definedSections.flatten().toSet()
+                                        val unassigned = children.filter { it.id !in assignedIds }
+                                        definedSections.map { ids -> ids.mapNotNull { childMap[it] } }.filter { it.isNotEmpty() } + if (unassigned.isNotEmpty()) listOf(unassigned) else emptyList()
+                                    } else {
+                                        listOf(children)
+                                    }
                                 }
 
                                 sectionChildLists.forEach { sectionChildren ->

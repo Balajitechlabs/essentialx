@@ -1586,7 +1586,7 @@ object FeatureRegistry {
             aboutDescription = R.string.tile_lockdown_mode_about_desc,
             permissionKeys = listOf("DEVICE_ADMIN"),
             showToggle = true,
-            isVisibleInMain = false,
+            isVisibleInMain = true,
             hasMoreSettings = false,
             parentFeatureId = "Security",
         ) {
