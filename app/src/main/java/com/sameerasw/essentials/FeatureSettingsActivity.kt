@@ -70,6 +70,7 @@ import com.sameerasw.essentials.ui.composables.configs.LiveWallpaperSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.LocationReachedSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.LockScreenClockSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.MapsPowerSavingSettingsUI
+import com.sameerasw.essentials.ui.composables.configs.NetworksSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NotificationLightingSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NotificationSnoozingSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.OtherCustomizationsSettingsUI
@@ -83,6 +84,7 @@ import com.sameerasw.essentials.ui.composables.configs.ScreenOffWidgetSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.ShutUpSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.SnoozeNotificationsSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.SoundModeTileSettingsUI
+import com.sameerasw.essentials.ui.composables.configs.StandbyAppsSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.StatusBarIconSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.TextAnimationsSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.WatchControlsSettingsUI
@@ -337,6 +339,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                             "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
                             "Power and Battery" -> !isWriteSecureSettingsEnabled
+                            "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
                             else -> false
                         }
                         if (hasMissingPermissions) {
@@ -513,7 +516,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 context,
                                 viewModel.isEnableUnsupportedFeatures.value
                             ).filter { it.parentFeatureId == featureId }
-                            if (children.isNotEmpty()) {
+                            if (children.isNotEmpty() && featureId != "Networks") {
                                 RoundedCardContainer(
                                     modifier = Modifier
                                         .padding(horizontal = 16.dp)
@@ -560,6 +563,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                                 "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
                                                 "Power and Battery" -> !isWriteSecureSettingsEnabled
+                                                "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
                                                 "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
                                                 "Notification snoozing" -> !isWriteSecureSettingsEnabled
                                                 else -> false
@@ -894,6 +898,21 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightSetting = highlightSetting
+                                        )
+                                    }
+
+                                    "Networks" -> {
+                                        NetworksSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting
+                                        )
+                                    }
+
+                                    "Standby apps" -> {
+                                        StandbyAppsSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp)
                                         )
                                     }
                                 }

@@ -30,6 +30,11 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.tile_developer_options)
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.tile_charge_optimization)
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_lock_screen_clock_title)
+    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_allow_overlays_in_settings_title)
+    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_networks_title)
+    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_network_download_rate_limit_title)
+    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_mobile_data_always_on_title)
+    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_wireless_display_certification_title)
 
     // Shizuku permission
     PermissionRegistry.register("SHIZUKU", R.string.feat_freeze_title)
@@ -37,6 +42,10 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("SHIZUKU", R.string.feat_screen_locked_security_title)
     PermissionRegistry.register("SHIZUKU", R.string.feat_screen_refresh_rate_title)
     PermissionRegistry.register("SHIZUKU", R.string.tile_refresh_rate)
+    PermissionRegistry.register("SHIZUKU", R.string.feat_prefer_gpu_composing_title)
+    PermissionRegistry.register("SHIZUKU", R.string.feat_networks_title)
+    PermissionRegistry.register("SHIZUKU", R.string.feat_transparent_navigation_bar_title)
+    PermissionRegistry.register("SHIZUKU", R.string.feat_standby_apps_title)
     PermissionRegistry.register("USAGE_STATS", R.string.feat_freeze_title)
     PermissionRegistry.register("USAGE_STATS", R.string.feat_app_lock_title)
     PermissionRegistry.register("USAGE_STATS", R.string.feat_dynamic_night_light_title)
@@ -46,7 +55,11 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("ROOT", R.string.feat_maps_power_saving_title)
     PermissionRegistry.register("ROOT", R.string.feat_freeze_title)
     PermissionRegistry.register("ROOT", R.string.feat_button_remap_title)
+    PermissionRegistry.register("ROOT", R.string.feat_prefer_gpu_composing_title)
+    PermissionRegistry.register("ROOT", R.string.feat_transparent_navigation_bar_title)
+    PermissionRegistry.register("ROOT", R.string.feat_standby_apps_title)
     PermissionRegistry.register("ROOT", R.string.feat_screen_locked_security_title)
+    PermissionRegistry.register("ROOT", R.string.feat_prefer_gpu_composing_title)
 
     // Notification listener permission
     PermissionRegistry.register("NOTIFICATION_LISTENER", R.string.feat_maps_power_saving_title)

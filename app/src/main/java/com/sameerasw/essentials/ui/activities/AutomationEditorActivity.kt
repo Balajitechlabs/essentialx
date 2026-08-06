@@ -229,6 +229,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showScreenOffSettings by remember { mutableStateOf(false) }
                 var showDeviceEffectsSettings by remember { mutableStateOf(false) }
                 var showSoundModeSettings by remember { mutableStateOf(false) }
+                var showSometimesEssentialsSettings by remember { mutableStateOf(false) }
                 var showTimeSettings by remember { mutableStateOf(false) }
                 var showBluetoothSettings by remember { mutableStateOf(false) }
                 var showWifiSettings by remember { mutableStateOf(false) }
@@ -643,6 +644,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 Action.DimWallpaper(),
                                                 Action.ScreenOff(),
                                                 Action.SoundMode(),
+                                                Action.SometimesEssentials(),
                                                 Action.TurnOnLowPower,
                                                 Action.TurnOffLowPower,
                                                 Action.MediaPlayPause,
@@ -737,6 +739,8 @@ class AutomationEditorActivity : ComponentActivity() {
                                                             showDeviceEffectsSettings = true
                                                         } else if (resolvedAction is Action.SoundMode) {
                                                             showSoundModeSettings = true
+                                                        } else if (resolvedAction is Action.SometimesEssentials) {
+                                                            showSometimesEssentialsSettings = true
                                                         }
                                                     }
                                                 )
@@ -874,6 +878,27 @@ class AutomationEditorActivity : ComponentActivity() {
                                 onDismiss = { showSoundModeSettings = false },
                                 onSave = { newAction ->
                                     showSoundModeSettings = false
+                                    when (automationType) {
+                                        Automation.Type.TRIGGER -> selectedAction = newAction
+                                        Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction =
+                                            newAction
+
+                                        Automation.Type.STATE, Automation.Type.APP -> {
+                                            if (selectedActionTab == 0) selectedInAction = newAction
+                                            else selectedOutAction = newAction
+                                        }
+                                    }
+                                    configAction = null
+                                }
+                            )
+                        }
+
+                        if (showSometimesEssentialsSettings && configAction is Action.SometimesEssentials) {
+                            com.sameerasw.essentials.ui.components.sheets.SometimesEssentialsSettingsSheet(
+                                initialAction = configAction as Action.SometimesEssentials,
+                                onDismiss = { showSometimesEssentialsSettings = false },
+                                onSave = { newAction ->
+                                    showSometimesEssentialsSettings = false
                                     when (automationType) {
                                         Automation.Type.TRIGGER -> selectedAction = newAction
                                         Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction =

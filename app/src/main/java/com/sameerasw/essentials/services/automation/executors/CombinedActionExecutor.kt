@@ -330,6 +330,93 @@ object CombinedActionExecutor {
                     com.sameerasw.essentials.utils.OmniTriggerUtil.trigger(context)
                 }
 
+                is Action.SometimesEssentials -> {
+                    val repository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+
+                    if (action.changeNotificationLighting) {
+                        repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_EDGE_LIGHTING_ENABLED, action.notificationLightingEnabled)
+                    }
+
+                    if (action.changeFlashlightPulse) {
+                        repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_FLASHLIGHT_PULSE_ENABLED, action.flashlightPulseEnabled)
+                    }
+
+                    if (action.changeBatteryNotification) {
+                        repository.setBatteryNotificationEnabled(action.batteryNotificationEnabled)
+                    }
+
+                    if (action.changeEssentialsOnDisplay) {
+                        when (action.essentialsOnDisplayMode) {
+                            "Off" -> {
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED, false)
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE, false)
+                            }
+                            "On" -> {
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED, true)
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE, false)
+                            }
+                            "Docked" -> {
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED, true)
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE, true)
+                            }
+                        }
+                    }
+
+                    if (action.changeAlwaysOnDisplay) {
+                        when (action.alwaysOnDisplayMode) {
+                            "Off" -> {
+                                repository.setAodEnabled(false)
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED, false)
+                            }
+                            "On" -> {
+                                repository.setAodEnabled(true)
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED, false)
+                            }
+                            "Dynamic" -> {
+                                repository.setAodEnabled(true)
+                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED, true)
+                            }
+                        }
+                    }
+
+                    if (action.changeGloveMode) {
+                        val newMode = if (action.gloveModeEnabled) "glove" else "default"
+                        val currentMode = repository.getScaleAnimationsMode()
+                        if (currentMode != newMode) {
+                            val profile = repository.getScaleAnimationsProfile(newMode)
+                            repository.setScaleAnimationsMode(newMode)
+                            repository.setFontScale(profile.fontScale)
+                            repository.setFontWeight(profile.fontWeight)
+                            repository.setAnimationScale(android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, profile.animatorDurationScale)
+                            repository.setAnimationScale(android.provider.Settings.Global.TRANSITION_ANIMATION_SCALE, profile.transitionAnimationScale)
+                            repository.setAnimationScale(android.provider.Settings.Global.WINDOW_ANIMATION_SCALE, profile.windowAnimationScale)
+                            repository.setSmallestWidth(profile.smallestWidth)
+                            repository.setTouchSensitivityEnabled(profile.touchSensitivityEnabled)
+                            repository.setAutoRotateEnabled(profile.autoRotateEnabled)
+                            repository.setScreenTimeout(profile.screenTimeout)
+                        }
+                    }
+
+                    if (action.changeLockScreenClock) {
+                        val key = "lock_screen_custom_clock_face"
+                        val value = "{\"clockId\":\"${action.lockScreenClockStyle}\"}"
+                        val success = try {
+                            android.provider.Settings.Secure.putString(context.contentResolver, key, value)
+                        } catch (e: Exception) {
+                            false
+                        }
+                        if (!success) {
+                            val command = "settings put secure $key $value"
+                            com.sameerasw.essentials.utils.ShellUtils.runCommand(context, command)
+                        }
+                    }
+
+                    if (action.changeSyncSoundModeWatch) {
+                        val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                        prefs.edit().putBoolean("watch_sync_sound_mode_enabled", action.syncSoundModeWatchEnabled).apply()
+                    }
+                }
+
                 is Action.PinApp -> {
                     try {
                         val useActivityTask = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q

@@ -156,6 +156,17 @@ object FeatureRegistry {
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
         object : Feature(
+            id = "Power and battery",
+            title = R.string.feat_power_battery_title,
+            iconRes = R.drawable.rounded_battery_charging_60_24,
+            category = R.string.cat_system,
+            description = R.string.feat_power_battery_desc,
+            showToggle = false
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = true
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+        },
+        object : Feature(
             id = "Widgets",
             title = R.string.feat_widgets_title,
             iconRes = R.drawable.rounded_widgets_24,
@@ -289,6 +300,62 @@ object FeatureRegistry {
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
             override fun isDeviceSupported(context: Context) = DeviceUtils.isGoogleDevice()
         },
+        object : Feature(
+            id = "Networks",
+            title = R.string.feat_networks_title,
+            iconRes = R.drawable.rounded_cell_wifi_24,
+            category = R.string.cat_connectivity,
+            description = R.string.feat_networks_desc,
+            aboutDescription = R.string.about_desc_networks,
+            showToggle = false,
+            hasMoreSettings = true
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = true
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+        },
+
+        object : Feature(
+            id = "Network download rate limit",
+            title = R.string.feat_network_download_rate_limit_title,
+            iconRes = R.drawable.rounded_cell_wifi_24,
+            category = R.string.cat_connectivity,
+            description = R.string.feat_network_download_rate_limit_desc,
+            permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
+            parentFeatureId = "Networks",
+            showToggle = false
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = viewModel.networkDownloadRateLimit.intValue != -1
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+        },
+
+        object : Feature(
+            id = "Mobile data always on",
+            title = R.string.feat_mobile_data_always_on_title,
+            iconRes = R.drawable.rounded_mobile_24,
+            category = R.string.cat_connectivity,
+            description = R.string.feat_mobile_data_always_on_desc,
+            permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
+            parentFeatureId = "Networks"
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = viewModel.isMobileDataAlwaysOnEnabled.value
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
+                viewModel.setMobileDataAlwaysOnEnabled(enabled, context)
+        },
+
+        object : Feature(
+            id = "Wireless display certification",
+            title = R.string.feat_wireless_display_certification_title,
+            iconRes = R.drawable.rounded_cast_24,
+            category = R.string.cat_connectivity,
+            description = R.string.feat_wireless_display_certification_desc,
+            permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
+            parentFeatureId = "Networks"
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = viewModel.isWirelessDisplayCertificationEnabled.value
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
+                viewModel.setWirelessDisplayCertificationEnabled(enabled, context)
+        },
+
         object : Feature(
             id = "Watch",
             title = R.string.feat_watch_title,
@@ -558,12 +625,12 @@ object FeatureRegistry {
 
         object : Feature(
             id = "Power and Battery",
-            title = R.string.feat_power_battery_title,
+            title = R.string.feat_power_saving_title,
             iconRes = R.drawable.rounded_battery_charging_60_24,
-            category = R.string.cat_interaction,
-            description = R.string.feat_power_battery_desc,
+            category = R.string.cat_system,
+            description = R.string.feat_power_saving_desc,
             aboutDescription = R.string.about_desc_power_battery,
-            parentFeatureId = "Input",
+            parentFeatureId = "Power and battery",
             showToggle = false,
             hasMoreSettings = true,
             permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
@@ -605,6 +672,22 @@ object FeatureRegistry {
                 }
                 context.startActivity(intent)
             }
+        },
+
+        object : Feature(
+            id = "Standby apps",
+            title = R.string.feat_standby_apps_title,
+            iconRes = R.drawable.rounded_app_registration_24,
+            category = R.string.cat_system,
+            description = R.string.feat_standby_apps_desc,
+            aboutDescription = R.string.about_desc_standby_apps,
+            permissionKeys = listOf("SHIZUKU"),
+            parentFeatureId = "Power and battery",
+            showToggle = false,
+            hasMoreSettings = true
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = true
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
 
         object : Feature(
@@ -673,7 +756,7 @@ object FeatureRegistry {
             aboutDescription = R.string.about_desc_battery_notification,
             permissionKeys = listOf("POST_NOTIFICATIONS", "BLUETOOTH_CONNECT", "BLUETOOTH_SCAN"),
             showToggle = true,
-            parentFeatureId = "Notifications"
+            parentFeatureId = "Power and battery"
         ) {
             override fun isEnabled(viewModel: MainViewModel) =
                 viewModel.isBatteryNotificationEnabled.value
@@ -961,6 +1044,7 @@ object FeatureRegistry {
             iconRes = R.drawable.rounded_home_24,
             category = R.string.cat_display,
             description = R.string.feat_other_customizations_desc,
+            aboutDescription = R.string.about_desc_other_customizations,
             showToggle = false,
             hasMoreSettings = true,
             parentFeatureId = "Display"
@@ -968,6 +1052,8 @@ object FeatureRegistry {
             override fun isEnabled(viewModel: MainViewModel) = true
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
+
+
 
         object : Feature(
             id = "Screen locked security",

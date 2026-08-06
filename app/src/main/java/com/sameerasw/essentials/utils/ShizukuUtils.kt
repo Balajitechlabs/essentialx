@@ -123,9 +123,16 @@ object ShizukuUtils {
     }
 
     fun stopShizuku(context: android.content.Context) {
+        val settingsRepository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+        val token = settingsRepository.getShizukuAuthToken()
+        if (token.isEmpty()) {
+            android.util.Log.w("ShizukuUtils", "Shizuku auth token is missing, cannot stop Shizuku")
+            return
+        }
         try {
             val intent = android.content.Intent("moe.shizuku.privileged.api.STOP").apply {
                 `package` = "moe.shizuku.privileged.api"
+                putExtra("auth", token)
                 addFlags(android.content.Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
             }
             context.sendBroadcast(intent)

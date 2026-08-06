@@ -38,6 +38,7 @@ import com.sameerasw.essentials.data.repository.UpdateRepository
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.MapsState
 import com.sameerasw.essentials.domain.model.AppSelection
+import com.sameerasw.essentials.domain.model.AppStandbyInfo
 import com.sameerasw.essentials.domain.model.DnsPreset
 import com.sameerasw.essentials.domain.model.NotificationApp
 import com.sameerasw.essentials.domain.model.NotificationLightingColorMode
@@ -61,6 +62,7 @@ import com.sameerasw.essentials.utils.RefreshRateUtils
 import com.sameerasw.essentials.utils.RootUtils
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.ShizukuUtils
+import com.sameerasw.essentials.utils.SurfaceFlingerControl
 import com.sameerasw.essentials.utils.UpdateNotificationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -154,6 +156,14 @@ class MainViewModel : ViewModel() {
     val circleToSearchGestureHeight = mutableFloatStateOf(48f)
     val isCircleToSearchPreviewEnabled = mutableStateOf(false)
     val isDisableRotationSuggestionEnabled = mutableStateOf(false)
+    val isAllowOverlaysInSettingsEnabled = mutableStateOf(false)
+    val networkDownloadRateLimit = mutableIntStateOf(-1)
+    val isMobileDataAlwaysOnEnabled = mutableStateOf(false)
+    val isWirelessDisplayCertificationEnabled = mutableStateOf(false)
+    val isTransparentNavigationBarEnabled = mutableStateOf(false)
+    val isPreferGpuComposingEnabled = mutableStateOf(false)
+    val standbyAppsList = mutableStateOf<List<AppStandbyInfo>>(emptyList())
+    val isStandbyAppsLoading = mutableStateOf(false)
     val isPixelSearchbarEnabled = mutableStateOf(false)
     val pixelSearchbarType = mutableStateOf("empty")
     val pixelSearchbarDateFormat = mutableStateOf("EEEE, MMMM d")
@@ -236,6 +246,8 @@ class MainViewModel : ViewModel() {
     val isFreezeDontFreezeActiveAppsEnabled = mutableStateOf(false)
     val freezeMode = mutableIntStateOf(0)
     val isFreezeShowInLauncherEnabled = mutableStateOf(true)
+    val freezeTags = mutableStateOf<List<com.sameerasw.essentials.domain.model.AppTag>>(emptyList())
+    val freezeAppTagMap = mutableStateOf<Map<String, List<String>>>(emptyMap())
 
     // Search state
     val searchQuery = mutableStateOf("")
@@ -765,6 +777,72 @@ class MainViewModel : ViewModel() {
                         }
                     }
 
+                    SettingsRepository.KEY_ALLOW_OVERLAYS_IN_SETTINGS -> {
+                        isAllowOverlaysInSettingsEnabled.value =
+                            settingsRepository.getBoolean(key)
+                        appContext?.let {
+                            applyAllowOverlaysInSettings(
+                                it,
+                                isAllowOverlaysInSettingsEnabled.value
+                            )
+                        }
+                    }
+
+                    SettingsRepository.KEY_NETWORK_DOWNLOAD_RATE_LIMIT -> {
+                        networkDownloadRateLimit.intValue =
+                            settingsRepository.getInt(key, -1)
+                        appContext?.let {
+                            applyNetworkDownloadRateLimit(
+                                it,
+                                networkDownloadRateLimit.intValue
+                            )
+                        }
+                    }
+
+                    SettingsRepository.KEY_MOBILE_DATA_ALWAYS_ON -> {
+                        isMobileDataAlwaysOnEnabled.value =
+                            settingsRepository.getBoolean(key)
+                        appContext?.let {
+                            applyMobileDataAlwaysOn(
+                                it,
+                                isMobileDataAlwaysOnEnabled.value
+                            )
+                        }
+                    }
+
+                    SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION -> {
+                        isWirelessDisplayCertificationEnabled.value =
+                            settingsRepository.getBoolean(key)
+                        appContext?.let {
+                            applyWirelessDisplayCertification(
+                                it,
+                                isWirelessDisplayCertificationEnabled.value
+                            )
+                        }
+                    }
+
+                    SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR -> {
+                        isTransparentNavigationBarEnabled.value =
+                            settingsRepository.getBoolean(key)
+                        appContext?.let {
+                            applyTransparentNavigationBar(
+                                it,
+                                isTransparentNavigationBarEnabled.value
+                            )
+                        }
+                    }
+
+                    SettingsRepository.KEY_PREFER_GPU_COMPOSING -> {
+                        isPreferGpuComposingEnabled.value =
+                            settingsRepository.getBoolean(key)
+                        appContext?.let {
+                            applyPreferGpuComposing(
+                                it,
+                                isPreferGpuComposingEnabled.value
+                            )
+                        }
+                    }
+
                     SettingsRepository.KEY_PIXEL_SEARCHBAR -> {
                         isPixelSearchbarEnabled.value =
                             settingsRepository.getBoolean(key)
@@ -940,6 +1018,18 @@ class MainViewModel : ViewModel() {
             settingsRepository.getEdgeLightingSweepSelectedShapes()
         isDisableRotationSuggestionEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_DISABLE_ROTATION_SUGGESTION, false)
+        isAllowOverlaysInSettingsEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_ALLOW_OVERLAYS_IN_SETTINGS, false)
+        networkDownloadRateLimit.intValue =
+            settingsRepository.getInt(SettingsRepository.KEY_NETWORK_DOWNLOAD_RATE_LIMIT, -1)
+        isMobileDataAlwaysOnEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_MOBILE_DATA_ALWAYS_ON, false)
+        isWirelessDisplayCertificationEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION, false)
+        isTransparentNavigationBarEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR, false)
+        isPreferGpuComposingEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_PREFER_GPU_COMPOSING, false)
         isPixelSearchbarEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_PIXEL_SEARCHBAR, false)
         pixelSearchbarType.value =
@@ -1519,6 +1609,8 @@ class MainViewModel : ViewModel() {
         freezeAutoExcludedApps.value = settingsRepository.getFreezeAutoExcludedApps()
         isFreezeShowInLauncherEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_FREEZE_SHOW_IN_LAUNCHER, true)
+        freezeTags.value = settingsRepository.getFreezeTags()
+        freezeAppTagMap.value = settingsRepository.getFreezeAppTagMap()
 
         // Sync PackageManager component enabled state on startup
         val showLauncher = isFreezeShowInLauncherEnabled.value
@@ -2128,6 +2220,255 @@ class MainViewModel : ViewModel() {
         isDisableRotationSuggestionEnabled.value = enabled
         settingsRepository.putBoolean(SettingsRepository.KEY_DISABLE_ROTATION_SUGGESTION, enabled)
         applyDisableRotationSuggestion(context, enabled)
+    }
+
+    fun setAllowOverlaysInSettingsEnabled(enabled: Boolean, context: Context) {
+        isAllowOverlaysInSettingsEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_ALLOW_OVERLAYS_IN_SETTINGS, enabled)
+        applyAllowOverlaysInSettings(context, enabled)
+    }
+
+    fun refreshAllowOverlaysInSettingsState(context: Context) {
+        try {
+            val currentVal = Settings.Secure.getInt(context.contentResolver, "secure_overlay_settings", 0) == 1
+            isAllowOverlaysInSettingsEnabled.value = currentVal
+            settingsRepository.putBoolean(SettingsRepository.KEY_ALLOW_OVERLAYS_IN_SETTINGS, currentVal)
+        } catch (e: Exception) {
+            // Secure setting not accessible without permission
+        }
+    }
+
+    private fun applyAllowOverlaysInSettings(context: Context, enabled: Boolean) {
+        val value = if (enabled) 1 else 0
+        val key = "secure_overlay_settings"
+        var success = false
+
+        if (PermissionUtils.canWriteSecureSettings(context)) {
+            try {
+                success = Settings.Secure.putInt(context.contentResolver, key, value)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        if (!success) {
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                ShellUtils.runCommand(context, "settings put secure $key $value")
+            }
+        }
+    }
+
+    fun setNetworkDownloadRateLimit(limit: Int, context: Context) {
+        networkDownloadRateLimit.intValue = limit
+        settingsRepository.putInt(SettingsRepository.KEY_NETWORK_DOWNLOAD_RATE_LIMIT, limit)
+        applyNetworkDownloadRateLimit(context, limit)
+    }
+
+    fun setMobileDataAlwaysOnEnabled(enabled: Boolean, context: Context) {
+        isMobileDataAlwaysOnEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_MOBILE_DATA_ALWAYS_ON, enabled)
+        applyMobileDataAlwaysOn(context, enabled)
+    }
+
+    fun setWirelessDisplayCertificationEnabled(enabled: Boolean, context: Context) {
+        isWirelessDisplayCertificationEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION, enabled)
+        applyWirelessDisplayCertification(context, enabled)
+    }
+
+    fun refreshNetworksState(context: Context) {
+        try {
+            val liveRateLimit = Settings.Global.getInt(context.contentResolver, "ingress_rate_limit_bytes_per_second", -1)
+            networkDownloadRateLimit.intValue = liveRateLimit
+            settingsRepository.putInt(SettingsRepository.KEY_NETWORK_DOWNLOAD_RATE_LIMIT, liveRateLimit)
+        } catch (e: Exception) {
+            // Permission restricted
+        }
+
+        try {
+            val liveMobileData = Settings.Global.getInt(context.contentResolver, "mobile_data_always_on", 0) == 1
+            isMobileDataAlwaysOnEnabled.value = liveMobileData
+            settingsRepository.putBoolean(SettingsRepository.KEY_MOBILE_DATA_ALWAYS_ON, liveMobileData)
+        } catch (e: Exception) {
+            // Permission restricted
+        }
+
+        try {
+            val liveWirelessDisplay = Settings.Global.getInt(context.contentResolver, "wifi_display_certification_on", 0) == 1
+            isWirelessDisplayCertificationEnabled.value = liveWirelessDisplay
+            settingsRepository.putBoolean(SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION, liveWirelessDisplay)
+        } catch (e: Exception) {
+            // Permission restricted
+        }
+    }
+
+    private fun applyNetworkDownloadRateLimit(context: Context, limit: Int) {
+        val key = "ingress_rate_limit_bytes_per_second"
+        var success = false
+        if (PermissionUtils.canWriteSecureSettings(context)) {
+            try {
+                success = Settings.Global.putInt(context.contentResolver, key, limit)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        if (!success) {
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                ShellUtils.runCommand(context, "settings put global $key $limit")
+            }
+        }
+    }
+
+    private fun applyMobileDataAlwaysOn(context: Context, enabled: Boolean) {
+        val value = if (enabled) 1 else 0
+        val key = "mobile_data_always_on"
+        var success = false
+        if (PermissionUtils.canWriteSecureSettings(context)) {
+            try {
+                success = Settings.Global.putInt(context.contentResolver, key, value)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        if (!success) {
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                ShellUtils.runCommand(context, "settings put global $key $value")
+            }
+        }
+    }
+
+    private fun applyWirelessDisplayCertification(context: Context, enabled: Boolean) {
+        val value = if (enabled) 1 else 0
+        val key = "wifi_display_certification_on"
+        var success = false
+        if (PermissionUtils.canWriteSecureSettings(context)) {
+            try {
+                success = Settings.Global.putInt(context.contentResolver, key, value)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+        if (!success) {
+            viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                ShellUtils.runCommand(context, "settings put global $key $value")
+            }
+        }
+    }
+
+    fun setTransparentNavigationBarEnabled(enabled: Boolean, context: Context) {
+        isTransparentNavigationBarEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR, enabled)
+        applyTransparentNavigationBar(context, enabled)
+    }
+
+    fun refreshTransparentNavigationBarState(context: Context) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val pkg = "com.android.internal.systemui.navbar.transparent"
+            val output = ShellUtils.runCommandWithOutput(context, "cmd overlay list")
+            if (output != null) {
+                val isEnabled = output.lines().any { line ->
+                    line.contains("[x]") && line.contains(pkg)
+                }
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    isTransparentNavigationBarEnabled.value = isEnabled
+                    settingsRepository.putBoolean(SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR, isEnabled)
+                }
+            }
+        }
+    }
+
+    private fun applyTransparentNavigationBar(context: Context, enabled: Boolean) {
+        val pkg = "com.android.internal.systemui.navbar.transparent"
+        val action = if (enabled) "enable" else "disable"
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            ShellUtils.runCommand(context, "cmd overlay $action --user current $pkg")
+        }
+    }
+
+    fun loadStandbyApps(context: Context) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            isStandbyAppsLoading.value = true
+            val pm = context.packageManager
+            val intent = Intent(Intent.ACTION_MAIN).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
+            val apps = pm.queryIntentActivities(intent, 0)
+
+            val appList = apps.mapNotNull { resolveInfo ->
+                val pkg = resolveInfo.activityInfo.packageName
+                if (pkg == context.packageName) return@mapNotNull null
+
+                val label = resolveInfo.loadLabel(pm).toString()
+                val icon = resolveInfo.loadIcon(pm)
+
+                var bucket = 10
+                val output = ShellUtils.runCommandWithOutput(context, "am get-standby-bucket $pkg")
+                if (output != null) {
+                    val text = output.lowercase().trim()
+                    bucket = when {
+                        text.contains("restricted") || text.contains("45") -> 45
+                        text.contains("rare") || text.contains("40") -> 40
+                        text.contains("frequent") || text.contains("30") -> 30
+                        text.contains("working") || text.contains("20") -> 20
+                        text.contains("active") || text.contains("10") -> 10
+                        else -> 10
+                    }
+                }
+
+                AppStandbyInfo(pkg, label, icon, bucket)
+            }.sortedBy { it.label.lowercase() }
+
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                standbyAppsList.value = appList
+                isStandbyAppsLoading.value = false
+            }
+        }
+    }
+
+    fun setAppStandbyBucket(packageName: String, targetBucket: Int, context: Context) {
+        val currentList = standbyAppsList.value
+        val updatedList = currentList.map { app ->
+            if (app.packageName == packageName) {
+                app.copy(bucket = targetBucket)
+            } else app
+        }
+        standbyAppsList.value = updatedList
+
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val bucketName = when (targetBucket) {
+                10 -> "active"
+                20 -> "working_set"
+                30 -> "frequent"
+                40 -> "rare"
+                45 -> "restricted"
+                else -> "active"
+            }
+            ShellUtils.runCommand(context, "am set-standby-bucket $packageName $bucketName")
+        }
+    }
+
+    fun setPreferGpuComposingEnabled(enabled: Boolean, context: Context) {
+        isPreferGpuComposingEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_PREFER_GPU_COMPOSING, enabled)
+        applyPreferGpuComposing(context, enabled)
+    }
+
+    fun refreshPreferGpuComposingState(context: Context) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val isShellGranted = (isShizukuAvailable.value && isShizukuPermissionGranted.value) ||
+                    (isRootAvailable.value && isRootPermissionGranted.value)
+            if (isShellGranted) {
+                val isRoot = isRootAvailable.value && isRootPermissionGranted.value
+                val liveValue = SurfaceFlingerControl.isHwOverlaysDisabled(context, isRoot)
+                isPreferGpuComposingEnabled.value = liveValue
+                settingsRepository.putBoolean(SettingsRepository.KEY_PREFER_GPU_COMPOSING, liveValue)
+            }
+        }
+    }
+
+    private fun applyPreferGpuComposing(context: Context, enabled: Boolean) {
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val isRoot = isRootAvailable.value && isRootPermissionGranted.value
+            SurfaceFlingerControl.setDisableHwOverlays(enabled, isRoot)
+        }
     }
 
     private fun applyDisableRotationSuggestion(context: Context, enabled: Boolean) {
@@ -3795,6 +4136,64 @@ class MainViewModel : ViewModel() {
         refreshFreezePickedApps(context, silent = true)
     }
 
+    private fun syncNeverAutoFreezeApps(context: Context) {
+        val neverAutoFreezeTagIds = freezeTags.value.filter { it.neverAutoFreeze }.map { it.id }.toSet()
+        if (neverAutoFreezeTagIds.isEmpty()) return
+
+        val currentExcluded = freezeAutoExcludedApps.value.toMutableSet()
+        var changed = false
+        freezeAppTagMap.value.forEach { (pkg, tagIds) ->
+            if (tagIds.any { neverAutoFreezeTagIds.contains(it) }) {
+                if (currentExcluded.add(pkg)) {
+                    changed = true
+                }
+            }
+        }
+        if (changed) {
+            freezeAutoExcludedApps.value = currentExcluded
+            settingsRepository.saveFreezeAutoExcludedApps(currentExcluded)
+            refreshFreezePickedApps(context, silent = true)
+        }
+    }
+
+    fun addFreezeTag(context: Context, tag: com.sameerasw.essentials.domain.model.AppTag) {
+        val updated = freezeTags.value + tag
+        freezeTags.value = updated
+        settingsRepository.saveFreezeTags(updated)
+        syncNeverAutoFreezeApps(context)
+    }
+
+    fun updateFreezeTag(context: Context, tag: com.sameerasw.essentials.domain.model.AppTag) {
+        val updated = freezeTags.value.map { if (it.id == tag.id) tag else it }
+        freezeTags.value = updated
+        settingsRepository.saveFreezeTags(updated)
+        syncNeverAutoFreezeApps(context)
+    }
+
+    fun deleteFreezeTag(context: Context, tagId: String) {
+        val updatedTags = freezeTags.value.filter { it.id != tagId }
+        freezeTags.value = updatedTags
+        settingsRepository.saveFreezeTags(updatedTags)
+
+        val updatedMap = freezeAppTagMap.value.mapValues { (_, tagIds) ->
+            tagIds.filter { it != tagId }
+        }.filterValues { it.isNotEmpty() }
+        freezeAppTagMap.value = updatedMap
+        settingsRepository.saveFreezeAppTagMap(updatedMap)
+    }
+
+    fun setAppTags(context: Context, packageName: String, tagIds: List<String>) {
+        val currentMap = freezeAppTagMap.value.toMutableMap()
+        if (tagIds.isEmpty()) {
+            currentMap.remove(packageName)
+        } else {
+            currentMap[packageName] = tagIds
+        }
+        freezeAppTagMap.value = currentMap
+        settingsRepository.saveFreezeAppTagMap(currentMap)
+        syncNeverAutoFreezeApps(context)
+    }
+
     fun refreshFreezePickedApps(context: Context, silent: Boolean = false) {
         viewModelScope.launch {
             if (!silent) isFreezePickedAppsLoading.value = true
@@ -4101,11 +4500,20 @@ class MainViewModel : ViewModel() {
         return success
     }
 
+    data class FreezeBackupData(
+        val apps: List<AppSelection>,
+        val tags: List<com.sameerasw.essentials.domain.model.AppTag> = emptyList(),
+        val appTagMap: Map<String, List<String>> = emptyMap()
+    )
+
     fun exportFreezeApps(outputStream: java.io.OutputStream) {
         try {
             val apps = settingsRepository.loadFreezeSelectedApps()
+            val tags = settingsRepository.getFreezeTags()
+            val appTagMap = settingsRepository.getFreezeAppTagMap()
+            val backupData = FreezeBackupData(apps = apps, tags = tags, appTagMap = appTagMap)
             val gson = com.google.gson.Gson()
-            val json = gson.toJson(apps)
+            val json = gson.toJson(backupData)
             outputStream.write(json.toByteArray())
             outputStream.flush()
         } catch (e: Exception) {
@@ -4122,11 +4530,26 @@ class MainViewModel : ViewModel() {
         return try {
             val json = inputStream.bufferedReader().use { it.readText() }
             val gson = com.google.gson.Gson()
-            val apps = gson.fromJson(json, Array<AppSelection>::class.java).toList()
+
+            var importedApps: List<AppSelection> = emptyList()
+            var importedTags: List<com.sameerasw.essentials.domain.model.AppTag> = emptyList()
+            var importedMap: Map<String, List<String>> = emptyMap()
+
+            // Gracefully handle legacy backup (JSON Array of AppSelection) vs new backup (FreezeBackupData object)
+            if (json.trim().startsWith("[")) {
+                importedApps = gson.fromJson(json, Array<AppSelection>::class.java).toList()
+            } else {
+                val backupData = gson.fromJson(json, FreezeBackupData::class.java)
+                if (backupData != null) {
+                    importedApps = backupData.apps ?: emptyList()
+                    importedTags = backupData.tags ?: emptyList()
+                    importedMap = backupData.appTagMap ?: emptyMap()
+                }
+            }
 
             // Filter out non-installed apps
             val pm = context.packageManager
-            val installedApps = apps.filter { app ->
+            val installedApps = importedApps.filter { app ->
                 try {
                     pm.getPackageInfo(app.packageName, 0)
                     true
@@ -4136,6 +4559,31 @@ class MainViewModel : ViewModel() {
             }
 
             settingsRepository.saveFreezeSelectedApps(installedApps)
+
+            if (importedTags.isNotEmpty()) {
+                val currentTags = settingsRepository.getFreezeTags().toMutableList()
+                importedTags.forEach { importedTag ->
+                    if (currentTags.none { it.id == importedTag.id }) {
+                        currentTags.add(importedTag)
+                    }
+                }
+                freezeTags.value = currentTags
+                settingsRepository.saveFreezeTags(currentTags)
+            }
+
+            if (importedMap.isNotEmpty()) {
+                val installedPkgs = installedApps.map { it.packageName }.toSet()
+                val currentMap = settingsRepository.getFreezeAppTagMap().toMutableMap()
+                importedMap.forEach { (pkg, tagIds) ->
+                    if (installedPkgs.contains(pkg)) {
+                        currentMap[pkg] = tagIds
+                    }
+                }
+                freezeAppTagMap.value = currentMap
+                settingsRepository.saveFreezeAppTagMap(currentMap)
+                syncNeverAutoFreezeApps(context)
+            }
+
             refreshFreezePickedApps(context, silent = true)
             true
         } catch (e: Exception) {

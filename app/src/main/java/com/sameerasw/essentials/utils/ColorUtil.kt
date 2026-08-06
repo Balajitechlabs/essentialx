@@ -21,20 +21,28 @@ object ColorUtil {
     }
 
     /**
-     * Takes a pastel color and returns a more saturated,
+     * Takes a pastel color and returns a richer, darker, highly saturated
+     * version suitable for text, icons, and filter chips in all themes.
+     */
+    fun toRichColor(color: Color): Color {
+        val hsv = FloatArray(3)
+        android.graphics.Color.colorToHSV(color.toArgb(), hsv)
+
+        // Boost saturation for vividness
+        hsv[1] = (hsv[1] * 2.5f).coerceIn(0.6f, 1f)
+
+        // Darken tone for contrast
+        hsv[2] = (hsv[2] * 0.65f).coerceIn(0.2f, 0.75f)
+
+        return Color(android.graphics.Color.HSVToColor(hsv))
+    }
+
+    /**
+     * Takes a key and returns a more saturated,
      * vibrant version suitable for icons/text.
      */
     fun getVibrantColorFor(key: Any): Color {
         val baseColor = getPastelColorFor(key)
-        val hsv = FloatArray(3)
-        android.graphics.Color.colorToHSV(baseColor.toArgb(), hsv)
-
-        // Increase Saturation: Pastels are usually ~0.3, we want ~0.7 to 0.8
-        hsv[1] = (hsv[1] * 5f).coerceIn(0f, 5f)
-
-        // Lower Value slightly: Makes the color "richer" and better for contrast
-        hsv[2] = (hsv[2] * 0.7f).coerceIn(0f, 1f)
-
-        return Color(android.graphics.Color.HSVToColor(hsv))
+        return toRichColor(baseColor)
     }
 }

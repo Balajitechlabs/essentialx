@@ -3,8 +3,6 @@ package com.sameerasw.essentials.ui.composables
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -33,8 +31,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -70,7 +66,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -78,16 +73,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.NotificationApp
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.ui.state.LocalMenuStateManager
+import com.sameerasw.essentials.utils.ColorUtil
 import com.sameerasw.essentials.utils.FreezeManager
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.ShortcutUtil
@@ -121,15 +115,27 @@ fun FreezeGridUI(
     val focusManager = LocalFocusManager.current
     var isFocused by remember { mutableStateOf(false) }
 
-    val filteredApps = remember(pickedApps, searchQuery) {
-        if (searchQuery.isBlank()) {
-            pickedApps
-        } else {
-            pickedApps.filter { app ->
+    val freezeTags by viewModel.freezeTags
+    val freezeAppTagMap by viewModel.freezeAppTagMap
+
+    var selectedTagId by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val filteredApps = remember(pickedApps, searchQuery, selectedTagId, freezeAppTagMap) {
+        var list = pickedApps
+        val filterTagId = selectedTagId
+        if (!filterTagId.isNullOrEmpty()) {
+            list = list.filter { app ->
+                val assignedTagIds = freezeAppTagMap[app.packageName] ?: emptyList()
+                assignedTagIds.contains(filterTagId)
+            }
+        }
+        if (searchQuery.isNotBlank()) {
+            list = list.filter { app ->
                 app.appName.contains(searchQuery, ignoreCase = true) ||
                         app.packageName.contains(searchQuery, ignoreCase = true)
             }
         }
+        list
     }
 
     val bestMatch = remember(searchQuery, filteredApps) {
@@ -161,6 +167,8 @@ fun FreezeGridUI(
             }
         }
     }
+
+    var appForTagAssignment by remember { mutableStateOf<NotificationApp?>(null) }
 
     Box(modifier = modifier.fillMaxSize()) {
         if (isPickedAppsLoading && pickedApps.isEmpty()) {
@@ -201,38 +209,7 @@ fun FreezeGridUI(
                 }
             }
         } else {
-            val isShizukuAvailable by viewModel.isShizukuAvailable
-            val isShizukuPermissionGranted by viewModel.isShizukuPermissionGranted
-            var isMenuExpanded by remember { mutableStateOf(false) }
             val scrollState = androidx.compose.foundation.rememberScrollState()
-
-            val exportLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.CreateDocument("application/json")
-            ) { uri ->
-                uri?.let {
-                    try {
-                        context.contentResolver.openOutputStream(it)?.use { stream ->
-                            viewModel.exportFreezeApps(stream)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-
-            val importLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.OpenDocument()
-            ) { uri ->
-                uri?.let {
-                    try {
-                        context.contentResolver.openInputStream(it)?.use { stream ->
-                            viewModel.importFreezeApps(context, stream)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
 
             Column(
                 modifier = Modifier
@@ -297,168 +274,62 @@ fun FreezeGridUI(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                RoundedCardContainer(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp),
-                ) {
-                    Row(
+                if (freezeTags.isNotEmpty()) {
+                    androidx.compose.foundation.lazy.LazyRow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceBright,
-                                shape = MaterialTheme.shapes.extraSmall
-                            )
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Freeze Button
-                        Button(
-                            onClick = {
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                viewModel.freezeAllAuto(context)
-                            },
-                            modifier = Modifier.weight(1f),
-                            enabled = isShizukuAvailable && isShizukuPermissionGranted,
-                            shape = ButtonDefaults.shape
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_mode_cool_24),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(Modifier.size(8.dp))
-                            Text(
-                                stringResource(R.string.action_freeze),
-                                fontSize = dimensionResource(R.dimen.font_small).value.sp
-                            )
-                        }
-
-                        Spacer(Modifier.size(ButtonGroupDefaults.ConnectedSpaceBetween))
-
-                        // Unfreeze Button
-                        Button(
-                            onClick = {
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                viewModel.unfreezeAllAuto(context)
-                            },
-                            modifier = Modifier.weight(1f),
-                            enabled = isShizukuAvailable && isShizukuPermissionGranted,
-                            shape = ButtonDefaults.shape
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_mode_cool_off_24),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(Modifier.size(8.dp))
-                            Text(
-                                stringResource(R.string.action_unfreeze),
-                                fontSize = dimensionResource(R.dimen.font_small).value.sp
-                            )
-                        }
-
-                        // More Menu Button
-                        IconButton(
-                            onClick = {
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                isMenuExpanded = true
-                            },
-                            enabled = isShizukuAvailable && isShizukuPermissionGranted,
-                            modifier = Modifier.size(dimensionResource(R.dimen.button_normal))
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_more_vert_24),
-                                contentDescription = stringResource(R.string.content_desc_more_options)
-                            )
-
-                            SegmentedDropdownMenu(
-                                expanded = isMenuExpanded,
-                                onDismissRequest = { isMenuExpanded = false }
-                            ) {
-                                SegmentedDropdownMenuItem(
-                                    text = { Text(stringResource(R.string.action_freeze_all)) },
-                                    onClick = {
-                                        HapticUtil.performVirtualKeyHaptic(view)
-                                        viewModel.freezeAllManual(context)
-                                        isMenuExpanded = false
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.rounded_mode_cool_24),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    }
-                                )
-                                SegmentedDropdownMenuItem(
-                                    text = { Text(stringResource(R.string.action_unfreeze_all)) },
-                                    onClick = {
-                                        HapticUtil.performVirtualKeyHaptic(view)
-                                        viewModel.unfreezeAllManual(context)
-                                        isMenuExpanded = false
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.rounded_mode_cool_off_24),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    }
-                                )
-                                SegmentedDropdownMenuItem(
-                                    text = { Text(stringResource(R.string.action_export_freeze)) },
-                                    onClick = {
-                                        HapticUtil.performVirtualKeyHaptic(view)
-                                        exportLauncher.launch("freeze_apps_backup.json")
-                                        isMenuExpanded = false
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.rounded_arrow_warm_up_24),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    }
-                                )
-                                SegmentedDropdownMenuItem(
-                                    text = { Text(stringResource(R.string.action_import_freeze)) },
-                                    onClick = {
-                                        HapticUtil.performVirtualKeyHaptic(view)
-                                        importLauncher.launch(arrayOf("application/json"))
-                                        isMenuExpanded = false
-                                    },
-                                    leadingIcon = {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.rounded_arrow_cool_down_24),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    }
-                                )
-                                onSettingsClick?.let { onSettings ->
-                                    SegmentedDropdownMenuItem(
-                                        text = { Text(stringResource(R.string.label_settings)) },
-                                        onClick = {
-                                            HapticUtil.performVirtualKeyHaptic(view)
-                                            onSettings()
-                                            isMenuExpanded = false
-                                        },
-                                        leadingIcon = {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.rounded_settings_heart_24),
-                                                contentDescription = null,
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                        }
-                                    )
-                                }
+                        items(freezeTags.size) { index ->
+                            val tag = freezeTags[index]
+                            val isSelected = selectedTagId == tag.id
+                            val color = try {
+                                Color(android.graphics.Color.parseColor(tag.colorHex))
+                            } catch (e: Exception) {
+                                MaterialTheme.colorScheme.primary
                             }
+                            val iconResId = context.resources.getIdentifier(
+                                tag.iconName,
+                                "drawable",
+                                context.packageName
+                            )
+
+                            val richColor = remember(color) { ColorUtil.toRichColor(color) }
+
+                            androidx.compose.material3.FilterChip(
+                                selected = isSelected,
+                                onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    selectedTagId = if (isSelected) null else tag.id
+                                },
+                                label = { Text(tag.name) },
+                                shape = if (isSelected) CircleShape else androidx.compose.material3.FilterChipDefaults.shape,
+                                leadingIcon = {
+                                    if (isSelected) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.rounded_check_24),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(androidx.compose.material3.FilterChipDefaults.IconSize)
+                                        )
+                                    } else {
+                                        Icon(
+                                            painter = painterResource(
+                                                id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
+                                            ),
+                                            contentDescription = null,
+                                            tint = richColor,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                }
+                            )
                         }
                     }
                 }
+
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -502,11 +373,27 @@ fun FreezeGridUI(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     rowApps.forEach { app ->
+                                        val appTagIds = freezeAppTagMap[app.packageName] ?: emptyList()
+                                        val neverAutoFreezeTagIds = freezeTags.filter { it.neverAutoFreeze }.map { it.id }.toSet()
+                                        val isLockedByTag = appTagIds.any { neverAutoFreezeTagIds.contains(it) }
+
+                                        val tagColor = appTagIds.firstOrNull()?.let { firstTagId ->
+                                            freezeTags.find { it.id == firstTagId }?.colorHex?.let { colorHex ->
+                                                try {
+                                                    Color(android.graphics.Color.parseColor(colorHex))
+                                                } catch (e: Exception) {
+                                                    null
+                                                }
+                                            }
+                                        }
+
                                         Box(modifier = Modifier.weight(1f)) {
                                             AppGridItem(
                                                 app = app,
                                                 isFrozen = frozenStates[app.packageName] ?: false,
                                                 isAutoFreezeEnabled = app.isEnabled,
+                                                isLockedByTag = isLockedByTag,
+                                                tagColor = tagColor,
                                                 isHighlighted = (app == bestMatch && searchQuery.isNotEmpty()),
                                                 menuState = menuState,
                                                 onClick = {
@@ -538,6 +425,16 @@ fun FreezeGridUI(
                                                         }
                                                     }
                                                 },
+                                                onToggleAutoFreeze = { isAutoFreeze ->
+                                                    viewModel.updateFreezeAppAutoFreeze(
+                                                        context,
+                                                        app.packageName,
+                                                        isAutoFreeze
+                                                    )
+                                                },
+                                                onAssignTags = {
+                                                    appForTagAssignment = app
+                                                },
                                                 onRemove = {
                                                     viewModel.updateFreezeAppEnabled(
                                                         context,
@@ -560,6 +457,18 @@ fun FreezeGridUI(
                 Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding()))
             }
         }
+
+        appForTagAssignment?.let { targetApp ->
+            com.sameerasw.essentials.ui.components.sheets.AssignTagsSheet(
+                appName = targetApp.appName,
+                availableTags = freezeTags,
+                assignedTagIds = freezeAppTagMap[targetApp.packageName] ?: emptyList(),
+                onDismissRequest = { appForTagAssignment = null },
+                onSave = { selectedTagIds ->
+                    viewModel.setAppTags(context, targetApp.packageName, selectedTagIds)
+                }
+            )
+        }
     }
 }
 
@@ -569,10 +478,14 @@ fun AppGridItem(
     app: NotificationApp,
     isFrozen: Boolean,
     isAutoFreezeEnabled: Boolean,
+    isLockedByTag: Boolean = false,
+    tagColor: Color? = null,
     isHighlighted: Boolean = false,
     menuState: com.sameerasw.essentials.ui.state.MenuStateManager,
     onClick: () -> Unit,
     onToggleFreeze: () -> Unit,
+    onToggleAutoFreeze: (Boolean) -> Unit,
+    onAssignTags: () -> Unit,
     onRemove: () -> Unit
 ) {
     val view = LocalView.current
@@ -613,9 +526,19 @@ fun AppGridItem(
         label = "borderColorAnimation"
     )
 
+    val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+    val containerColor = remember(tagColor, isDarkTheme) {
+        if (tagColor == null) null
+        else {
+            val rich = ColorUtil.toRichColor(tagColor)
+            if (isDarkTheme) rich.copy(alpha = 0.35f)
+            else rich.copy(alpha = 0.2f)
+        }
+    }
+
     Surface(
         shape = RoundedCornerShape(16.dp),
-        color = MaterialTheme.colorScheme.surfaceBright,
+        color = containerColor ?: MaterialTheme.colorScheme.surfaceBright,
         border = if (isHighlighted) BorderStroke(2.dp, borderColor) else null,
         modifier = Modifier
             .fillMaxWidth()
@@ -660,7 +583,7 @@ fun AppGridItem(
                     horizontalArrangement = Arrangement.spacedBy((-4).dp)
                 ) {
                     // Auto-freeze Exclusion Badge (Lock)
-                    if (!isAutoFreezeEnabled) {
+                    if (!isAutoFreezeEnabled || isLockedByTag) {
                         Box(
                             modifier = Modifier
                                 .size(20.dp)
@@ -707,6 +630,43 @@ fun AppGridItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = if (isFrozen) R.drawable.rounded_mode_cool_off_24 else R.drawable.rounded_mode_cool_24),
+                            contentDescription = null
+                        )
+                    }
+                )
+
+                SegmentedDropdownMenuItem(
+                    text = {
+                        Text(
+                            if (isAutoFreezeEnabled && !isLockedByTag) stringResource(R.string.action_lock_auto_freeze) else stringResource(
+                                R.string.action_unlock_auto_freeze
+                            )
+                        )
+                    },
+                    enabled = !isLockedByTag,
+                    onClick = {
+                        showMenu = false
+                        onToggleAutoFreeze(!isAutoFreezeEnabled)
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_lock_clock_24),
+                            contentDescription = null
+                        )
+                    }
+                )
+
+                SegmentedDropdownMenuItem(
+                    text = {
+                        Text(stringResource(R.string.action_assign_tags))
+                    },
+                    onClick = {
+                        showMenu = false
+                        onAssignTags()
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_interests_24),
                             contentDescription = null
                         )
                     }

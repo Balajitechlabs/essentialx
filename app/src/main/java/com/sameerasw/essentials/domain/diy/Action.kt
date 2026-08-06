@@ -187,4 +187,36 @@ sealed interface Action {
         override val icon: Int = R.drawable.rounded_shield_lock_24
         override val permissions: List<String> = listOf("shizuku", "root")
     }
+
+    @Keep
+    data class SometimesEssentials(
+        @SerializedName("changeNotificationLighting") val changeNotificationLighting: Boolean = false,
+        @SerializedName("notificationLightingEnabled") val notificationLightingEnabled: Boolean = true,
+        @SerializedName("changeFlashlightPulse") val changeFlashlightPulse: Boolean = false,
+        @SerializedName("flashlightPulseEnabled") val flashlightPulseEnabled: Boolean = true,
+        @SerializedName("changeBatteryNotification") val changeBatteryNotification: Boolean = false,
+        @SerializedName("batteryNotificationEnabled") val batteryNotificationEnabled: Boolean = true,
+        @SerializedName("changeEssentialsOnDisplay") val changeEssentialsOnDisplay: Boolean = false,
+        @SerializedName("essentialsOnDisplayMode") val essentialsOnDisplayMode: String = "On", // "Off", "On", "Docked"
+        @SerializedName("changeAlwaysOnDisplay") val changeAlwaysOnDisplay: Boolean = false,
+        @SerializedName("alwaysOnDisplayMode") val alwaysOnDisplayMode: String = "On", // "Off", "Dynamic", "On"
+        @SerializedName("changeGloveMode") val changeGloveMode: Boolean = false,
+        @SerializedName("gloveModeEnabled") val gloveModeEnabled: Boolean = true,
+        @SerializedName("changeLockScreenClock") val changeLockScreenClock: Boolean = false,
+        @SerializedName("lockScreenClockStyle") val lockScreenClockStyle: String = "DEFAULT",
+        @SerializedName("changeSyncSoundModeWatch") val changeSyncSoundModeWatch: Boolean = false,
+        @SerializedName("syncSoundModeWatchEnabled") val syncSoundModeWatchEnabled: Boolean = true
+    ) : Action {
+        override val title: Int get() = R.string.diy_action_sometimes_essentials
+        override val icon: Int get() = R.drawable.rounded_settings_24
+        override val isConfigurable: Boolean = true
+        override val permissions: List<String>
+            get() {
+                val perms = mutableListOf<String>()
+                if (changeNotificationLighting || changeEssentialsOnDisplay || changeAlwaysOnDisplay || changeLockScreenClock || changeGloveMode) {
+                    perms.add("write_secure_settings")
+                }
+                return perms
+            }
+    }
 }

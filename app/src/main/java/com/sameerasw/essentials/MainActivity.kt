@@ -37,7 +37,9 @@ import androidx.compose.material3.Badge
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +56,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.core.animation.doOnEnd
@@ -72,6 +75,8 @@ import com.sameerasw.essentials.domain.DIYTabs
 import com.sameerasw.essentials.domain.registry.initPermissionRegistry
 import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.ToolbarItem
+import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
+import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.ui.components.sheets.AddRepoBottomSheet
 import com.sameerasw.essentials.ui.components.sheets.GitHubAuthSheet
 import com.sameerasw.essentials.ui.components.sheets.InstructionsBottomSheet
@@ -511,151 +516,255 @@ class MainActivity : AppCompatActivity() {
                                     ?: DIYTabs.ESSENTIALS
                                 }
 
-                                EssentialsFloatingToolbar(
-                                    modifier = Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .zIndex(1f),
-                                    selectedIndex = pagerState.currentPage,
-                                    items = tabs.mapIndexed { index, tab ->
-                                        ToolbarItem(
-                                            iconRes = tab.iconRes,
-                                            labelRes = tab.title,
-                                            onClick = {
-                                                HapticUtil.performUIHaptic(view)
-                                                scope.launch {
-                                                    pagerState.animateScrollToPage(index)
-                                                }
-                                            },
-                                            hasBadge = false
-                                        )
-                                    },
-                                    floatingActionButton = {
-                                        Box { // Menu anchor
-                                            FloatingActionButton(
-                                                onClick = {
-                                                    HapticUtil.performVirtualKeyHaptic(view)
-                                                    when (currentTab) {
-                                                        DIYTabs.ESSENTIALS -> {
-                                                            startActivity(
-                                                                Intent(
-                                                                    context,
-                                                                    SettingsActivity::class.java
-                                                                )
-                                                            )
-                                                        }
+                                 EssentialsFloatingToolbar(
+                                     modifier = Modifier
+                                         .align(Alignment.BottomCenter)
+                                         .zIndex(1f),
+                                     selectedIndex = pagerState.currentPage,
+                                     items = tabs.mapIndexed { index, tab ->
+                                         ToolbarItem(
+                                             iconRes = tab.iconRes,
+                                             labelRes = tab.title,
+                                             onClick = {
+                                                 HapticUtil.performUIHaptic(view)
+                                                 scope.launch {
+                                                     pagerState.animateScrollToPage(index)
+                                                 }
+                                             },
+                                             hasBadge = false
+                                         )
+                                     },
+                                     floatingActionButton = {
+                                         var isFreezeMenuExpanded by remember { mutableStateOf(false) }
 
-                                                        DIYTabs.FREEZE -> {
-                                                            startActivity(
-                                                                Intent(
-                                                                    context,
-                                                                    FeatureSettingsActivity::class.java
-                                                                ).apply {
-                                                                    putExtra("feature", "Freeze")
-                                                                })
-                                                        }
+                                         Box { // Menu anchor
+                                             FloatingActionButton(
+                                                 onClick = {
+                                                     HapticUtil.performVirtualKeyHaptic(view)
+                                                     when (currentTab) {
+                                                         DIYTabs.ESSENTIALS -> {
+                                                             startActivity(
+                                                                 Intent(
+                                                                     context,
+                                                                     SettingsActivity::class.java
+                                                                 )
+                                                             )
+                                                         }
 
-                                                        DIYTabs.DIY -> {
-                                                            showNewAutomationSheet = true
-                                                        }
-                                                    }
-                                                },
-                                                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                                shape = MaterialTheme.shapes.large,
-                                                elevation = androidx.compose.material3.FloatingActionButtonDefaults.elevation(
-                                                    0.dp,
-                                                    0.dp,
-                                                    0.dp,
-                                                    0.dp
-                                                )
-                                            ) {
-                                                when (currentTab) {
-                                                    DIYTabs.ESSENTIALS -> {
-                                                        Icon(
-                                                            painter = painterResource(id = R.drawable.rounded_settings_heart_24),
-                                                            contentDescription = stringResource(R.string.content_desc_settings)
-                                                        )
-                                                    }
+                                                         DIYTabs.FREEZE -> {
+                                                             isFreezeMenuExpanded = !isFreezeMenuExpanded
+                                                         }
 
-                                                    DIYTabs.FREEZE -> {
-                                                        Icon(
-                                                            painter = painterResource(id = R.drawable.rounded_settings_heart_24),
-                                                            contentDescription = stringResource(R.string.content_desc_settings)
-                                                        )
-                                                    }
+                                                         DIYTabs.DIY -> {
+                                                             showNewAutomationSheet = true
+                                                         }
+                                                     }
+                                                 },
+                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                 shape = MaterialTheme.shapes.large,
+                                                 elevation = androidx.compose.material3.FloatingActionButtonDefaults.elevation(
+                                                     0.dp,
+                                                     0.dp,
+                                                     0.dp,
+                                                     0.dp
+                                                 )
+                                             ) {
+                                                 when (currentTab) {
+                                                     DIYTabs.ESSENTIALS -> {
+                                                         Icon(
+                                                             painter = painterResource(id = R.drawable.rounded_settings_heart_24),
+                                                             contentDescription = stringResource(R.string.content_desc_settings)
+                                                         )
+                                                     }
 
-                                                    DIYTabs.DIY -> {
-                                                        Icon(
-                                                            painter = painterResource(id = R.drawable.rounded_add_24),
-                                                            contentDescription = stringResource(R.string.diy_editor_new_title)
-                                                        )
-                                                    }
+                                                     DIYTabs.FREEZE -> {
+                                                         Icon(
+                                                             painter = painterResource(id = if (isFreezeMenuExpanded) R.drawable.rounded_close_24 else R.drawable.rounded_more_vert_24),
+                                                             contentDescription = stringResource(R.string.content_desc_more_options)
+                                                         )
+                                                     }
 
-                                                }
-                                            }
+                                                     DIYTabs.DIY -> {
+                                                         Icon(
+                                                             painter = painterResource(id = R.drawable.rounded_add_24),
+                                                             contentDescription = stringResource(R.string.diy_editor_new_title)
+                                                         )
+                                                     }
 
-                                            val isTranslationModeActive by com.sameerasw.essentials.translation.TranslationManager.isTranslationModeEnabled
+                                                 }
+                                             }
 
-                                            if (isTranslationModeActive && (currentTab == DIYTabs.ESSENTIALS || currentTab == DIYTabs.FREEZE)) {
-                                                Badge(
-                                                    modifier = Modifier
-                                                        .align(Alignment.TopEnd)
-                                                        .offset(x = 6.dp, y = (-6).dp)
-                                                        .size(28.dp),
-                                                    containerColor = MaterialTheme.colorScheme.tertiary,
-                                                    contentColor = MaterialTheme.colorScheme.onTertiary
-                                                ) {
-                                                    Icon(
-                                                        painter = painterResource(id = R.drawable.rounded_translate_24),
-                                                        contentDescription = "Translation Mode Active",
-                                                        modifier = Modifier
-                                                            .fillMaxSize()
-                                                            .padding(4.dp)
-                                                    )
-                                                }
-                                            } else if (isUpdateAvailable && (currentTab == DIYTabs.ESSENTIALS || currentTab == DIYTabs.FREEZE)) {
-                                                Badge(
-                                                    modifier = Modifier
-                                                        .align(Alignment.TopEnd)
-                                                        .offset(x = 6.dp, y = (-6).dp)
-                                                        .size(28.dp),
-                                                    containerColor = MaterialTheme.colorScheme.error,
-                                                    contentColor = MaterialTheme.colorScheme.onError
-                                                ) {
-                                                    val composition by rememberLottieComposition(
-                                                        LottieCompositionSpec.RawRes(R.raw.update_motion)
-                                                    )
-                                                    val progress by animateLottieCompositionAsState(
-                                                        composition = composition,
-                                                        iterations = LottieConstants.IterateForever
-                                                    )
-                                                    val onErrorColor =
-                                                        MaterialTheme.colorScheme.onError
-                                                    val dynamicProperties =
-                                                        rememberLottieDynamicProperties(
-                                                            rememberLottieDynamicProperty(
-                                                                property = LottieProperty.COLOR_FILTER,
-                                                                value = PorterDuffColorFilter(
-                                                                    onErrorColor.toArgb(),
-                                                                    PorterDuff.Mode.SRC_ATOP
-                                                                ),
-                                                                keyPath = arrayOf("**")
-                                                            )
-                                                        )
+                                             if (currentTab == DIYTabs.FREEZE) {
+                                                 SegmentedDropdownMenu(
+                                                     expanded = isFreezeMenuExpanded,
+                                                     onDismissRequest = { isFreezeMenuExpanded = false },
+                                                     offset = DpOffset(0.dp, (-8).dp)
+                                                 ) {
+                                                     val fabColors = MenuDefaults.itemColors(
+                                                         textColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                         leadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                                         trailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                                     )
+                                                     val itemBg = MaterialTheme.colorScheme.primaryContainer
 
-                                                    LottieAnimation(
-                                                        composition = composition,
-                                                        progress = { progress },
-                                                        dynamicProperties = dynamicProperties,
-                                                        modifier = Modifier
-                                                            .fillMaxSize()
-                                                            .padding(2.dp)
-                                                    )
-                                                }
-                                            }
-                                        }
-                                    }
-                                )
+                                                     SegmentedDropdownMenuItem(
+                                                         text = { Text(stringResource(R.string.action_freeze)) },
+                                                         onClick = {
+                                                             HapticUtil.performVirtualKeyHaptic(view)
+                                                             isFreezeMenuExpanded = false
+                                                             viewModel.freezeAllAuto(context)
+                                                         },
+                                                         itemContainerColor = itemBg,
+                                                         colors = fabColors,
+                                                         leadingIcon = {
+                                                             Icon(
+                                                                 painter = painterResource(id = R.drawable.rounded_mode_cool_24),
+                                                                 contentDescription = null,
+                                                                 modifier = Modifier.size(18.dp)
+                                                             )
+                                                         }
+                                                     )
+                                                     SegmentedDropdownMenuItem(
+                                                         text = { Text(stringResource(R.string.action_unfreeze)) },
+                                                         onClick = {
+                                                             HapticUtil.performVirtualKeyHaptic(view)
+                                                             isFreezeMenuExpanded = false
+                                                             viewModel.unfreezeAllAuto(context)
+                                                         },
+                                                         itemContainerColor = itemBg,
+                                                         colors = fabColors,
+                                                         leadingIcon = {
+                                                             Icon(
+                                                                 painter = painterResource(id = R.drawable.rounded_mode_cool_off_24),
+                                                                 contentDescription = null,
+                                                                 modifier = Modifier.size(18.dp)
+                                                             )
+                                                         }
+                                                     )
+                                                     SegmentedDropdownMenuItem(
+                                                         text = { Text(stringResource(R.string.action_freeze_all)) },
+                                                         onClick = {
+                                                             HapticUtil.performVirtualKeyHaptic(view)
+                                                             isFreezeMenuExpanded = false
+                                                             viewModel.freezeAllManual(context)
+                                                         },
+                                                         itemContainerColor = itemBg,
+                                                         colors = fabColors,
+                                                         leadingIcon = {
+                                                             Icon(
+                                                                 painter = painterResource(id = R.drawable.rounded_mode_cool_24),
+                                                                 contentDescription = null,
+                                                                 modifier = Modifier.size(18.dp)
+                                                             )
+                                                         }
+                                                     )
+                                                     SegmentedDropdownMenuItem(
+                                                         text = { Text(stringResource(R.string.action_unfreeze_all)) },
+                                                         onClick = {
+                                                             HapticUtil.performVirtualKeyHaptic(view)
+                                                             isFreezeMenuExpanded = false
+                                                             viewModel.unfreezeAllManual(context)
+                                                         },
+                                                         itemContainerColor = itemBg,
+                                                         colors = fabColors,
+                                                         leadingIcon = {
+                                                             Icon(
+                                                                 painter = painterResource(id = R.drawable.rounded_mode_cool_off_24),
+                                                                 contentDescription = null,
+                                                                 modifier = Modifier.size(18.dp)
+                                                             )
+                                                         }
+                                                     )
+                                                     SegmentedDropdownMenuItem(
+                                                         text = { Text(stringResource(R.string.label_settings)) },
+                                                         onClick = {
+                                                             HapticUtil.performVirtualKeyHaptic(view)
+                                                             isFreezeMenuExpanded = false
+                                                             startActivity(
+                                                                 Intent(
+                                                                     context,
+                                                                     FeatureSettingsActivity::class.java
+                                                                 ).apply {
+                                                                     putExtra("feature", "Freeze")
+                                                                 }
+                                                             )
+                                                         },
+                                                         itemContainerColor = itemBg,
+                                                         colors = fabColors,
+                                                         leadingIcon = {
+                                                             Icon(
+                                                                 painter = painterResource(id = R.drawable.rounded_settings_24),
+                                                                 contentDescription = null,
+                                                                 modifier = Modifier.size(18.dp)
+                                                             )
+                                                         }
+                                                     )
+                                                 }
+                                             }
+
+                                             val isTranslationModeActive by com.sameerasw.essentials.translation.TranslationManager.isTranslationModeEnabled
+
+                                             if (isTranslationModeActive && (currentTab == DIYTabs.ESSENTIALS || currentTab == DIYTabs.FREEZE)) {
+                                                 Badge(
+                                                     modifier = Modifier
+                                                         .align(Alignment.TopEnd)
+                                                         .offset(x = 6.dp, y = (-6).dp)
+                                                         .size(28.dp),
+                                                     containerColor = MaterialTheme.colorScheme.tertiary,
+                                                     contentColor = MaterialTheme.colorScheme.onTertiary
+                                                 ) {
+                                                     Icon(
+                                                         painter = painterResource(id = R.drawable.rounded_translate_24),
+                                                         contentDescription = "Translation Mode Active",
+                                                         modifier = Modifier
+                                                             .fillMaxSize()
+                                                             .padding(4.dp)
+                                                     )
+                                                 }
+                                             } else if (isUpdateAvailable && (currentTab == DIYTabs.ESSENTIALS || currentTab == DIYTabs.FREEZE)) {
+                                                 Badge(
+                                                     modifier = Modifier
+                                                         .align(Alignment.TopEnd)
+                                                         .offset(x = 6.dp, y = (-6).dp)
+                                                         .size(28.dp),
+                                                     containerColor = MaterialTheme.colorScheme.error,
+                                                     contentColor = MaterialTheme.colorScheme.onError
+                                                 ) {
+                                                     val composition by rememberLottieComposition(
+                                                         LottieCompositionSpec.RawRes(R.raw.update_motion)
+                                                     )
+                                                     val progress by animateLottieCompositionAsState(
+                                                         composition = composition,
+                                                         iterations = LottieConstants.IterateForever
+                                                     )
+                                                     val onErrorColor =
+                                                         MaterialTheme.colorScheme.onError
+                                                     val dynamicProperties =
+                                                         rememberLottieDynamicProperties(
+                                                             rememberLottieDynamicProperty(
+                                                                 property = LottieProperty.COLOR_FILTER,
+                                                                 value = PorterDuffColorFilter(
+                                                                     onErrorColor.toArgb(),
+                                                                     PorterDuff.Mode.SRC_ATOP
+                                                                 ),
+                                                                 keyPath = arrayOf("**")
+                                                             )
+                                                         )
+
+                                                     LottieAnimation(
+                                                         composition = composition,
+                                                         progress = { progress },
+                                                         dynamicProperties = dynamicProperties,
+                                                         modifier = Modifier
+                                                             .fillMaxSize()
+                                                             .padding(2.dp)
+                                                     )
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 )
 
                                 HorizontalPager(
                                     state = pagerState,

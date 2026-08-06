@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -36,12 +37,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sameerasw.essentials.R
@@ -78,6 +81,9 @@ fun FreezeSettingsUI(
     val isShizukuAvailable by viewModel.isShizukuAvailable
     val isShizukuPermissionGranted by viewModel.isShizukuPermissionGranted
     val pickedApps by viewModel.freezePickedApps
+
+    var tagToEdit by remember { mutableStateOf<com.sameerasw.essentials.domain.model.AppTag?>(null) }
+    var isTagEditorSheetOpen by remember { mutableStateOf(false) }
 
     var isMenuExpanded by remember { mutableStateOf(false) }
 
@@ -439,6 +445,117 @@ fun FreezeSettingsUI(
             }
         }
 
+        // Tags
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, top = 24.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.freeze_tags_section_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Button(
+                onClick = {
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    tagToEdit = null
+                    isTagEditorSheetOpen = true
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.rounded_add_24),
+                    contentDescription = stringResource(R.string.action_add_tag)
+                )
+            }
+        }
+
+        val tags by viewModel.freezeTags
+        RoundedCardContainer(spacing = 2.dp) {
+            if (tags.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.freeze_tags_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(16.dp)
+                )
+            } else {
+                tags.forEach { tag ->
+                    val color = try {
+                        androidx.compose.ui.graphics.Color(android.graphics.Color.parseColor(tag.colorHex))
+                    } catch (e: Exception) {
+                        MaterialTheme.colorScheme.primary
+                    }
+                    val iconResId = context.resources.getIdentifier(
+                        tag.iconName,
+                        "drawable",
+                        context.packageName
+                    )
+
+                    androidx.compose.material3.ListItem(
+                        leadingContent = {
+                            val richColor = androidx.compose.runtime.remember(color) { com.sameerasw.essentials.utils.ColorUtil.toRichColor(color) }
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(richColor.copy(alpha = 0.2f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(
+                                        id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
+                                    ),
+                                    contentDescription = null,
+                                    tint = richColor,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        },
+                        trailingContent = {
+                            IconButton(
+                                onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    tagToEdit = tag
+                                    isTagEditorSheetOpen = true
+                                }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_edit_24),
+                                    contentDescription = stringResource(R.string.action_update_tag),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        },
+                        colors = androidx.compose.material3.ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surfaceBright
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(MaterialTheme.shapes.extraSmall)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = tag.name,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            if (tag.neverAutoFreeze) {
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_lock_clock_24),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         Text(
             text = stringResource(R.string.settings_section_automation),
             style = MaterialTheme.typography.titleMedium,
@@ -576,17 +693,43 @@ fun FreezeSettingsUI(
             RoundedCardContainer(
                 modifier = Modifier.fillMaxWidth()
             ) {
+                val appTagMap by viewModel.freezeAppTagMap
+                val neverAutoFreezeTagIds = tags.filter { it.neverAutoFreeze }.map { it.id }.toSet()
+
                 sortedApps.forEach { app ->
+                    val appTagIds = appTagMap[app.packageName] ?: emptyList()
+                    val isLockedByTag = appTagIds.any { neverAutoFreezeTagIds.contains(it) }
+
                     AppToggleItem(
                         icon = app.icon,
                         title = app.appName,
-                        isChecked = app.isEnabled,
+                        isChecked = app.isEnabled && !isLockedByTag,
+                        enabled = !isLockedByTag,
                         onCheckedChange = { isChecked ->
-                            viewModel.updateFreezeAppAutoFreeze(context, app.packageName, isChecked)
+                            if (!isLockedByTag) {
+                                viewModel.updateFreezeAppAutoFreeze(context, app.packageName, isChecked)
+                            }
                         }
                     )
                 }
             }
+        }
+
+        if (isTagEditorSheetOpen) {
+            com.sameerasw.essentials.ui.components.sheets.FreezeTagEditorSheet(
+                tagToEdit = tagToEdit,
+                onDismissRequest = { isTagEditorSheetOpen = false },
+                onSave = { tag ->
+                    if (tagToEdit == null) {
+                        viewModel.addFreezeTag(context, tag)
+                    } else {
+                        viewModel.updateFreezeTag(context, tag)
+                    }
+                },
+                onDelete = { tagId ->
+                    viewModel.deleteFreezeTag(context, tagId)
+                }
+            )
         }
 
         Text(
@@ -602,6 +745,67 @@ fun FreezeSettingsUI(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+
+        // Import & Export Buttons
+        RoundedCardContainer(
+            modifier = Modifier.fillMaxWidth(),
+            spacing = 2.dp,
+            cornerRadius = 24.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceBright,
+                        shape = MaterialTheme.shapes.extraSmall
+                    )
+                    .padding(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        exportLauncher.launch("freeze_apps_backup.json")
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_arrow_warm_up_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.action_export_freeze),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(Modifier.size(ButtonGroupDefaults.ConnectedSpaceBetween))
+
+                Button(
+                    onClick = {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        importLauncher.launch(arrayOf("application/json"))
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_arrow_cool_down_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.action_import_freeze),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
 
         if (isAppSelectionSheetOpen) {
             AppSelectionSheet(
