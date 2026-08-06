@@ -47,12 +47,20 @@ jobs:
               URL="$RELEASE_URL"
             fi
             
-            CLEAN_BODY=$(echo "$RAW_BODY" | \
-              sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' | \
-              sed 's/^\* / - /g' | \
-              sed 's/!\[.*\](.*)//g' | \
-              sed 's/^#* //g' | \
-              head -c 3000)
+            export RAW_BODY
+            CLEAN_BODY=$(python3 -c '
+import os, re, html
+
+raw = os.environ.get("RAW_BODY", "")
+text = re.sub(r"<img\b[^>]*\/?>", "", raw, flags=re.IGNORECASE)
+text = re.sub(r"</?(?:p|div|span|align)\b[^>]*>", "", text, flags=re.IGNORECASE)
+text = re.sub(r"!\[.*?\]\(.*?\)", "", text)
+text = re.sub(r"^#+\s*", "", text, flags=re.MULTILINE)
+text = re.sub(r"^\*\s+", "- ", text, flags=re.MULTILINE)
+text = re.sub(r"\n\s*\n\s*\n+", "\n\n", text).strip()
+text = html.escape(text)
+print(text[:3000])
+')
 
             {
               echo "full_message<<EOF"
