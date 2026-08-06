@@ -70,6 +70,7 @@ import com.sameerasw.essentials.ui.composables.configs.LiveWallpaperSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.LocationReachedSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.LockScreenClockSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.MapsPowerSavingSettingsUI
+import com.sameerasw.essentials.ui.composables.configs.NavigationSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NetworksSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NotificationLightingSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.NotificationSnoozingSettingsUI
@@ -517,113 +518,213 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 viewModel.isEnableUnsupportedFeatures.value
                             ).filter { it.parentFeatureId == featureId }
                             if (children.isNotEmpty() && featureId != "Networks") {
-                                RoundedCardContainer(
-                                    modifier = Modifier
-                                        .padding(horizontal = 16.dp)
-                                        .padding(top = 16.dp)
-                                ) {
-                                    children.forEachIndexed { index, child ->
-                                        val permissionAwareToggle: (Boolean) -> Unit = { enabled ->
-                                            val missingPermission = when (child.id) {
-                                                "Screen off widget" -> !isAccessibilityEnabled
-                                                "Statusbar icons" -> !isWriteSecureSettingsEnabled
-                                                "Notification lighting" -> !isOverlayPermissionGranted || !isNotificationLightingAccessibilityEnabled || !isNotificationListenerEnabled
-                                                "Button remap" -> !isAccessibilityEnabled
-                                                "Dynamic night light" -> (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) || !isWriteSecureSettingsEnabled
-                                                "Snooze system notifications" -> !isNotificationListenerEnabled
-                                                "Screen locked security" -> !isAccessibilityEnabled || !isWriteSecureSettingsEnabled || !viewModel.isDeviceAdminEnabled.value
-                                                "App lock" -> !isAccessibilityEnabled || (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else false)
-                                                "Freeze" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                    context
-                                                )
-
-                                                "Essentials On Display" -> !isAccessibilityEnabled || !isNotificationListenerEnabled
-                                                "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
-                                                "Calendar Sync" -> androidx.core.content.ContextCompat.checkSelfPermission(
-                                                    context,
-                                                    android.Manifest.permission.READ_CALENDAR
-                                                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-
-                                                "Batteries" -> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && androidx.core.content.ContextCompat.checkSelfPermission(
-                                                    context,
-                                                    android.Manifest.permission.BLUETOOTH_CONNECT
-                                                ) != android.content.pm.PackageManager.PERMISSION_GRANTED)
-
-                                                "Maps power saving mode" -> !isNotificationListenerEnabled || !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                    context
-                                                )
-
-                                                "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
-                                                "Battery notification" -> !viewModel.isPostNotificationsEnabled.value || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !viewModel.isBluetoothPermissionGranted.value)
-                                                "Text and animations" -> !viewModel.isWriteSettingsEnabled.value || !isWriteSecureSettingsEnabled
-                                                "Lock screen clock" -> !isWriteSecureSettingsEnabled
-                                                "Screen refresh rate" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                    context
-                                                )
-
-                                                "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
-                                                "Power and Battery" -> !isWriteSecureSettingsEnabled
-                                                "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
-                                                "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
-                                                "Notification snoozing" -> !isWriteSecureSettingsEnabled
-                                                else -> false
-                                            }
-
-                                            if (missingPermission) {
-                                                childFeatureForPermissions = child.id
-                                                showPermissionSheet = true
-                                            } else {
-                                                BiometricSecurityHelper.runWithAuth(
-                                                    activity = this@FeatureSettingsActivity,
-                                                    feature = child,
-                                                    isToggle = true,
-                                                    action = {
-                                                        child.onToggle(viewModel, context, enabled)
-                                                    }
-                                                )
-                                            }
-                                        }
-
-                                        FeatureCard(
-                                            modifier = Modifier.highlight(highlightSetting == child.id),
-                                            title = child.title,
-                                            description = child.description,
-                                            iconRes = child.iconRes,
-                                            isEnabled = when (child.id) {
-                                                "Watch Wireless Debugging" -> watchAdbWifiEnabled
-                                                "Sync sound mode" -> watchSyncSoundModeEnabled
-                                                "Sync location reached status" -> watchSyncLocationReachedEnabled
-                                                else -> child.isEnabled(viewModel)
-                                            },
-                                            isToggleEnabled = child.isToggleEnabled(
-                                                viewModel,
-                                                context
+                                val sectionChildLists = run {
+                                    val childMap = children.associateBy { it.id }
+                                    val definedSections = when (featureId) {
+                                        "Display" -> listOf(
+                                            listOf(
+                                                "Essentials On Display",
+                                                "Always on Display",
+                                                "Statusbar icons",
+                                                "Lock screen clock"
                                             ),
-                                            showToggle = child.showToggle,
-                                            onDisabledToggleClick = { permissionAwareToggle(true) },
-                                            hasMoreSettings = child.hasMoreSettings,
-                                            isBeta = child.isBeta,
-                                            onToggle = permissionAwareToggle,
-                                            onClick = {
-                                                if (child.hasMoreSettings) {
+                                            listOf(
+                                                "Text and animations",
+                                                "Screen refresh rate",
+                                                "Navigation"
+                                            ),
+                                            listOf(
+                                                "Caffeinate",
+                                                "Dynamic night light",
+                                                "Smart pixels"
+                                            ),
+                                            listOf(
+                                                "Other customizations"
+                                            )
+                                        )
+                                        "Notifications" -> listOf(
+                                            listOf(
+                                                "Notification lighting",
+                                                "Flashlight pulse"
+                                            ),
+                                            listOf(
+                                                "Notification snoozing",
+                                                "Snooze system notifications"
+                                            )
+                                        )
+                                        "Widgets" -> listOf(
+                                            listOf(
+                                                "Pixel Searchbar"
+                                            ),
+                                            listOf(
+                                                "Screen off widget",
+                                                "Batteries"
+                                            )
+                                        )
+                                        "Input" -> listOf(
+                                            listOf(
+                                                "Button remap",
+                                                "Flashlight"
+                                            ),
+                                            listOf(
+                                                "Link actions",
+                                                "System Keyboard"
+                                            )
+                                        )
+                                        "Power and battery" -> listOf(
+                                            listOf(
+                                                "Power and Battery",
+                                                "Standby apps"
+                                            ),
+                                            listOf(
+                                                "Battery notification"
+                                            )
+                                        )
+                                        "Watch" -> listOf(
+                                            listOf(
+                                                "Watch Controls",
+                                                "Lock from Watch"
+                                            ),
+                                            listOf(
+                                                "Calendar Sync",
+                                                "Sync sound mode",
+                                                "Sync location reached status"
+                                            ),
+                                            listOf(
+                                                "Watch Wireless Debugging"
+                                            )
+                                        )
+                                        "Security" -> listOf(
+                                            listOf(
+                                                "Screen locked security",
+                                                "App lock",
+                                                "Shut-Up!"
+                                            ),
+                                            listOf(
+                                                "Lockdown mode"
+                                            )
+                                        )
+                                        else -> null
+                                    }
+
+                                    if (definedSections != null) {
+                                        val assignedIds = definedSections.flatten().toSet()
+                                        val unassigned = children.filter { it.id !in assignedIds }
+                                        definedSections.map { ids -> ids.mapNotNull { childMap[it] } }.filter { it.isNotEmpty() } + if (unassigned.isNotEmpty()) listOf(unassigned) else emptyList()
+                                    } else {
+                                        listOf(children)
+                                    }
+                                }
+
+                                sectionChildLists.forEach { sectionChildren ->
+                                    RoundedCardContainer(
+                                        modifier = Modifier
+                                            .padding(horizontal = 16.dp)
+                                            .padding(top = 16.dp)
+                                    ) {
+                                        sectionChildren.forEach { child ->
+                                            val permissionAwareToggle: (Boolean) -> Unit = { enabled ->
+                                                val missingPermission = when (child.id) {
+                                                    "Screen off widget" -> !isAccessibilityEnabled
+                                                    "Statusbar icons" -> !isWriteSecureSettingsEnabled
+                                                    "Notification lighting" -> !isOverlayPermissionGranted || !isNotificationLightingAccessibilityEnabled || !isNotificationListenerEnabled
+                                                    "Button remap" -> !isAccessibilityEnabled
+                                                    "Dynamic night light" -> (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) || !isWriteSecureSettingsEnabled
+                                                    "Snooze system notifications" -> !isNotificationListenerEnabled
+                                                    "Screen locked security" -> !isAccessibilityEnabled || !isWriteSecureSettingsEnabled || !viewModel.isDeviceAdminEnabled.value
+                                                    "App lock" -> !isAccessibilityEnabled || (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else false)
+                                                    "Freeze" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                        context
+                                                    )
+
+                                                    "Essentials On Display" -> !isAccessibilityEnabled || !isNotificationListenerEnabled
+                                                    "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
+                                                    "Calendar Sync" -> androidx.core.content.ContextCompat.checkSelfPermission(
+                                                        context,
+                                                        android.Manifest.permission.READ_CALENDAR
+                                                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+
+                                                    "Batteries" -> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && androidx.core.content.ContextCompat.checkSelfPermission(
+                                                        context,
+                                                        android.Manifest.permission.BLUETOOTH_CONNECT
+                                                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED)
+
+                                                    "Maps power saving mode" -> !isNotificationListenerEnabled || !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                        context
+                                                    )
+
+                                                    "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
+                                                    "Battery notification" -> !viewModel.isPostNotificationsEnabled.value || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !viewModel.isBluetoothPermissionGranted.value)
+                                                    "Text and animations" -> !viewModel.isWriteSettingsEnabled.value || !isWriteSecureSettingsEnabled
+                                                    "Lock screen clock" -> !isWriteSecureSettingsEnabled
+                                                    "Screen refresh rate" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                        context
+                                                    )
+
+                                                    "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
+                                                    "Power and Battery" -> !isWriteSecureSettingsEnabled
+                                                    "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
+                                                    "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
+                                                    "Notification snoozing" -> !isWriteSecureSettingsEnabled
+                                                    else -> false
+                                                }
+
+                                                if (missingPermission) {
+                                                    childFeatureForPermissions = child.id
+                                                    showPermissionSheet = true
+                                                } else {
                                                     BiometricSecurityHelper.runWithAuth(
                                                         activity = this@FeatureSettingsActivity,
                                                         feature = child,
+                                                        isToggle = true,
                                                         action = {
-                                                            child.onClick(context, viewModel)
+                                                            child.onToggle(viewModel, context, enabled)
                                                         }
                                                     )
                                                 }
-                                            },
-                                            isPinned = pinnedFeatureKeys.contains(child.id),
-                                            onPinToggle = { viewModel.togglePinFeature(child.id) },
-                                            onHelpClick = if (child.aboutDescription != null) {
-                                                {
-                                                    selectedHelpFeature = child
-                                                    showHelpSheet = true
-                                                }
-                                            } else null
-                                        )
+                                            }
+
+                                            FeatureCard(
+                                                modifier = Modifier.highlight(highlightSetting == child.id),
+                                                title = child.title,
+                                                description = child.description,
+                                                iconRes = child.iconRes,
+                                                isEnabled = when (child.id) {
+                                                    "Watch Wireless Debugging" -> watchAdbWifiEnabled
+                                                    "Sync sound mode" -> watchSyncSoundModeEnabled
+                                                    "Sync location reached status" -> watchSyncLocationReachedEnabled
+                                                    else -> child.isEnabled(viewModel)
+                                                },
+                                                isToggleEnabled = child.isToggleEnabled(
+                                                    viewModel,
+                                                    context
+                                                ),
+                                                showToggle = child.showToggle,
+                                                onDisabledToggleClick = { permissionAwareToggle(true) },
+                                                hasMoreSettings = child.hasMoreSettings,
+                                                isBeta = child.isBeta,
+                                                onToggle = permissionAwareToggle,
+                                                onClick = {
+                                                    if (child.hasMoreSettings) {
+                                                        BiometricSecurityHelper.runWithAuth(
+                                                            activity = this@FeatureSettingsActivity,
+                                                            feature = child,
+                                                            action = {
+                                                                child.onClick(context, viewModel)
+                                                            }
+                                                        )
+                                                    }
+                                                },
+                                                isPinned = pinnedFeatureKeys.contains(child.id),
+                                                onPinToggle = { viewModel.togglePinFeature(child.id) },
+                                                onHelpClick = if (child.aboutDescription != null) {
+                                                    {
+                                                        selectedHelpFeature = child
+                                                        showHelpSheet = true
+                                                    }
+                                                } else null
+                                            )
+                                        }
                                     }
                                 }
                             } else {
@@ -694,6 +795,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                     "Dynamic night light" -> {
                                         DynamicNightLightSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting
+                                        )
+                                    }
+
+                                    "Smart pixels" -> {
+                                        com.sameerasw.essentials.ui.composables.configs.SmartPixelsSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightSetting = highlightSetting
@@ -863,6 +972,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                     "LiveWallpaper" -> {
                                         LiveWallpaperSettingsUI(
+                                            viewModel = viewModel,
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            highlightSetting = highlightSetting
+                                        )
+                                    }
+
+                                    "Navigation" -> {
+                                        NavigationSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightSetting = highlightSetting

@@ -554,6 +554,22 @@ fun FreezeSettingsUI(
                     }
                 }
             }
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_palette_24,
+                title = stringResource(R.string.freeze_tag_color_coded_title),
+                description = stringResource(R.string.freeze_tag_color_coded_desc),
+                isChecked = viewModel.isFreezeTagColorCodedEnabled.value,
+                onCheckedChange = { isChecked ->
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    viewModel.setFreezeTagColorCoded(isChecked)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .highlight(
+                        enabled = highlightKey == "freeze_tag_color_coded_enabled"
+                    )
+            )
         }
 
         Text(

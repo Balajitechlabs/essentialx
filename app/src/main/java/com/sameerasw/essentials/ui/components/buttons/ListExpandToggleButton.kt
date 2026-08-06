@@ -43,7 +43,8 @@ fun ListExpandToggleButton(
     title: Any = R.string.action_show_top_apps,
     description: Any? = R.string.action_show_all,
     expandedText: String? = null,
-    collapsedText: String? = null
+    collapsedText: String? = null,
+    iconRes: Int? = null
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val view = LocalView.current
@@ -95,12 +96,15 @@ fun ListExpandToggleButton(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.rounded_keyboard_arrow_down_24),
+                painter = painterResource(id = iconRes ?: R.drawable.rounded_keyboard_arrow_down_24),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .size(22.dp)
-                    .graphicsLayer { rotationZ = rotationDegree }
+                    .then(
+                        if (iconRes == null) Modifier.graphicsLayer { rotationZ = rotationDegree }
+                        else Modifier
+                    )
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(

@@ -398,7 +398,7 @@
     <string name="cat_visuals">Hình ảnh</string>
     <string name="cat_system">Hệ thống</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Không có kết quả cho \"%1$s\"</string>
     <string name="search_results_title">Kết quả tìm kiếm</string>
     <string name="requires_following_permissions">%1$s yêu cầu các quyền sau</string>

@@ -57,6 +57,18 @@ fun DynamicNightLightSettingsUI(
                 },
                 modifier = Modifier.highlight(highlightSetting == "dynamic_night_light_toggle")
             )
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_grain_24,
+                title = stringResource(R.string.feat_smart_pixels_title),
+                description = stringResource(R.string.feat_smart_pixels_desc),
+                isChecked = viewModel.isSmartPixelsEnabled.value,
+                onCheckedChange = { checked ->
+                    HapticUtil.performUIHaptic(view)
+                    viewModel.setSmartPixelsEnabled(context, checked)
+                },
+                modifier = Modifier.highlight(highlightSetting == "smart_pixels_enable_toggle")
+            )
         }
 
         Text(

@@ -382,7 +382,7 @@
     <string name="cat_visuals">Οπτικά</string>
     <string name="cat_system">Σύστημα</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Δεν υπάρχουν αποτελέσματα για \"%1$s\"</string>
     <string name="search_results_title">Αποτελέσματα αναζήτησης</string>
     <string name="requires_following_permissions">%1$s απαιτεί τα ακόλουθα δικαιώματα</string>

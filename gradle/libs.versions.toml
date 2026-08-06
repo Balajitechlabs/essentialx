@@ -10,6 +10,9 @@ glanceMaterial3 = "1.3.0-alpha02"
 gsonVersion = "2.14.0"
 jsoup = "1.22.2"
 kotlin = "2.4.10"
+ksp = "2.3.10"
+mlkitGenaiPrompt = "1.0.0-beta2"
+mlkitGenaiSchemaCompiler = "1.0.0-alpha1"
 coreKtx = "1.19.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -43,9 +46,12 @@ sentry = "8.50.1"
 graphicsShapes = "1.1.0"
 media3 = "1.10.1"
 wearRemoteInteractions = "1.2.0"
+genaiSchema = "1.0.0-alpha1"
 
 
 [libraries]
+mlkit-genai-prompt = { module = "com.google.mlkit:genai-prompt", version.ref = "mlkitGenaiPrompt" }
+mlkit-genai-schema-compiler = { module = "com.google.mlkit:genai-schema-compiler", version.ref = "mlkitGenaiSchemaCompiler" }
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-compose-material3-v150alpha24 = { module = "androidx.compose.material3:material3", version.ref = "material3Version" }
@@ -99,8 +105,11 @@ androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplaye
 androidx-media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3" }
 androidx-wear-remote-interactions = { group = "androidx.wear", name = "wear-remote-interactions", version.ref = "wearRemoteInteractions" }
 symspellkt = { module = "com.darkrockstudios:symspellkt", version.ref = "symspellkt" }
+genai-schema = { group = "com.google.mlkit", name = "genai-schema", version.ref = "genaiSchema" }
 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+

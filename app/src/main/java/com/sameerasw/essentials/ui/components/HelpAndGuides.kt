@@ -141,6 +141,41 @@ fun HelpAndGuidesContent() {
             description = stringResource(R.string.instruction_section_safe_volume_desc)
         ),
         InstructionSection(
+            title = stringResource(R.string.instruction_section_genai_title),
+            iconRes = R.drawable.rounded_auto_awesome_24,
+            description = stringResource(R.string.instruction_section_genai_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_freezetags_title),
+            iconRes = R.drawable.rounded_bookmark_24,
+            description = stringResource(R.string.instruction_section_freezetags_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_diy_title),
+            iconRes = R.drawable.rounded_settings_24,
+            description = stringResource(R.string.instruction_section_diy_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_searchbar_title),
+            iconRes = R.drawable.rounded_search_24,
+            description = stringResource(R.string.instruction_section_searchbar_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_callvibes_title),
+            iconRes = R.drawable.rounded_mobile_vibrate_24,
+            description = stringResource(R.string.instruction_section_callvibes_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_backup_title),
+            iconRes = R.drawable.rounded_save_24,
+            description = stringResource(R.string.instruction_section_backup_desc)
+        ),
+        InstructionSection(
+            title = stringResource(R.string.instruction_section_pocketmode_title),
+            iconRes = R.drawable.rounded_mobile_off_24,
+            description = stringResource(R.string.instruction_section_pocketmode_desc)
+        ),
+        InstructionSection(
             title = stringResource(R.string.instruction_section_about_title),
             iconRes = R.drawable.ic_stat_name,
             description = stringResource(R.string.instruction_section_about_desc)

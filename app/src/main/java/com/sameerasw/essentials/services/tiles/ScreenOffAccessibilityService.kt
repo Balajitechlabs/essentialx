@@ -56,6 +56,7 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
     private lateinit var omniGestureOverlayHandler: OmniGestureOverlayHandler
     private lateinit var statusBarIconHandler: StatusBarIconHandler
     private lateinit var pocketModeHandler: PocketModeHandler
+    private lateinit var smartPixelsHandler: com.sameerasw.essentials.services.handlers.SmartPixelsHandler
 
     private var lightSensor: Sensor? = null
     private var lightSensorLux: Float = 100f
@@ -200,6 +201,8 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
                 updatePocketModeSensors()
             } else if (key == "pocket_mode_excluded_apps") {
                 updatePocketModeExcludedAppsSet()
+            } else if (key == SettingsRepository.KEY_SMART_PIXELS_ENABLED || key == SettingsRepository.KEY_SMART_PIXELS_INTENSITY) {
+                smartPixelsHandler.updateState()
             }
         }
 
@@ -217,9 +220,11 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
         omniGestureOverlayHandler = OmniGestureOverlayHandler(this)
         statusBarIconHandler = StatusBarIconHandler(this)
         pocketModeHandler = PocketModeHandler(this)
+        smartPixelsHandler = com.sameerasw.essentials.services.handlers.SmartPixelsHandler(this)
 
         flashlightHandler.register()
         statusBarIconHandler.register()
+        smartPixelsHandler.init()
 
         // Screen Receiver
         screenReceiver = object : BroadcastReceiver() {
@@ -356,6 +361,7 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
         aodForceTurnOffHandler.removeOverlay()
         pocketModeHandler.removeOverlay()
         omniGestureOverlayHandler.removeOverlay()
+        smartPixelsHandler.destroy()
         statusBarIconHandler.unregister()
         stopInputEventListener()
         cancelPocketFlashlightTurnOff()

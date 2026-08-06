@@ -67,6 +67,9 @@ fun SometimesEssentialsSettingsSheet(
     var changeSyncSoundModeWatch by remember { mutableStateOf(initialAction.changeSyncSoundModeWatch) }
     var syncSoundModeWatchEnabled by remember { mutableStateOf(initialAction.syncSoundModeWatchEnabled) }
 
+    var changeSmartPixels by remember { mutableStateOf(initialAction.changeSmartPixels) }
+    var smartPixelsEnabled by remember { mutableStateOf(initialAction.smartPixelsEnabled) }
+
     val clockOptions = remember {
         listOf(
             "DEFAULT" to R.string.lock_screen_clock_default,
@@ -234,6 +237,21 @@ fun SometimesEssentialsSettingsSheet(
                             syncSoundModeWatchEnabled = it
                         }
                     )
+
+                    FeatureToggleRow(
+                        title = stringResource(R.string.feat_smart_pixels_title),
+                        iconRes = R.drawable.rounded_grain_24,
+                        isChecked = changeSmartPixels,
+                        onCheckedChange = {
+                            HapticUtil.performUIHaptic(view)
+                            changeSmartPixels = it
+                        },
+                        switchValue = smartPixelsEnabled,
+                        onSwitchChange = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            smartPixelsEnabled = it
+                        }
+                    )
                 }
             }
 
@@ -261,7 +279,9 @@ fun SometimesEssentialsSettingsSheet(
                                 changeLockScreenClock = changeLockScreenClock,
                                 lockScreenClockStyle = lockScreenClockStyle,
                                 changeSyncSoundModeWatch = changeSyncSoundModeWatch,
-                                syncSoundModeWatchEnabled = syncSoundModeWatchEnabled
+                                syncSoundModeWatchEnabled = syncSoundModeWatchEnabled,
+                                changeSmartPixels = changeSmartPixels,
+                                smartPixelsEnabled = smartPixelsEnabled
                             )
                         )
                     },

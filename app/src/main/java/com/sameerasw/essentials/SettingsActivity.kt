@@ -262,6 +262,13 @@ fun SettingsContent(
     val updateInfo by viewModel.updateInfo
     val isUpdateAvailable by viewModel.isUpdateAvailable
     val isAutoUpdateEnabled by viewModel.isAutoUpdateEnabled
+    val isGenAIAutomationEnabled by viewModel.isGenAIAutomationEnabled
+    var isGenAISupported by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        isGenAISupported = com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
+    }
+
     val isUpdateNotificationEnabled by viewModel.isUpdateNotificationEnabled
     val isPreReleaseCheckEnabled by viewModel.isPreReleaseCheckEnabled
     val isRootEnabled by viewModel.isRootEnabled
@@ -462,6 +469,8 @@ fun SettingsContent(
                     .height(72.dp)
             )
         }
+
+
 
         // Updates Section
         Text(
@@ -715,6 +724,16 @@ fun SettingsContent(
                     }
                 }
             )
+
+            if (isGenAISupported) {
+                IconToggleItem(
+                    iconRes = R.drawable.rounded_auto_awesome_24,
+                    title = stringResource(R.string.settings_genai_automation_title),
+                    description = stringResource(R.string.settings_genai_automation_desc),
+                    isChecked = isGenAIAutomationEnabled,
+                    onCheckedChange = { viewModel.setGenAIAutomationEnabled(it, context) }
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

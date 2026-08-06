@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -80,7 +81,9 @@ import com.sameerasw.essentials.domain.registry.FeatureRegistry
 import com.sameerasw.essentials.domain.registry.PermissionRegistry
 import com.sameerasw.essentials.ui.activities.YourAndroidActivity
 import com.sameerasw.essentials.ui.components.FavoriteCarousel
+import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
 import com.sameerasw.essentials.ui.components.cards.FeatureCard
+import com.sameerasw.essentials.ui.components.cards.IconToggleItem
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.sheets.PermissionItem
 import com.sameerasw.essentials.ui.components.sheets.PermissionsBottomSheet
@@ -843,6 +846,14 @@ fun SetupFeatures(
         }
     }
 
+    var showInstructionsSheet by rememberSaveable { mutableStateOf(false) }
+
+    if (showInstructionsSheet) {
+        com.sameerasw.essentials.ui.components.sheets.InstructionsBottomSheet(
+            onDismissRequest = { showInstructionsSheet = false }
+        )
+    }
+
     if (showHelpSheet && selectedHelpFeature != null) {
         com.sameerasw.essentials.ui.components.sheets.FeatureHelpBottomSheet(
             onDismissRequest = {
@@ -1105,26 +1116,31 @@ fun SetupFeatures(
                         viewModel.onSearchQueryChanged(new, context)
                     },
                     maxLines = 1,
+                    textStyle = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
+                        .defaultMinSize(minHeight = 64.dp)
                         .focusRequester(focusRequester)
                         .onFocusChanged { isFocused = it.isFocused },
                     leadingIcon = {
-                        if (isSearchingViewModel) {
-                            LoadingIndicator()
-                        } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_search_24),
-                                contentDescription = stringResource(R.string.label_search_content_description),
-                                modifier = Modifier.size(24.dp)
-                            )
+                        Box(modifier = Modifier.padding(start = 16.dp, end = 8.dp)) {
+                            if (isSearchingViewModel) {
+                                LoadingIndicator()
+                            } else {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_search_24),
+                                    contentDescription = stringResource(R.string.label_search_content_description),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     },
                     placeholder = {
                         if (!isFocused && searchQuery.isEmpty())
                             Text(
                                 text = stringResource(R.string.search_placeholder),
+                                style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                                 modifier = Modifier.basicMarquee()
                             )
@@ -1134,7 +1150,8 @@ fun SetupFeatures(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceBright
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest
                     ),
                     trailingIcon = {
                         if (isFocused || searchQuery.isNotEmpty()) {
@@ -1210,7 +1227,12 @@ fun SetupFeatures(
                                 text = stringResource(id = R.string.search_no_results, searchQuery),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 8.dp)
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                maxLines = 2,
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .padding(horizontal = 32.dp)
                             )
                         }
                     }
@@ -1228,12 +1250,48 @@ fun SetupFeatures(
             } else if (!isFocused) {
                 val topLevelFeatures =
                     allFeatures.filter { it.parentFeatureId == null && it.isVisibleInMain }
-                if (topLevelFeatures.isNotEmpty()) {
+                val featureMap = topLevelFeatures.associateBy { it.id }
+
+                val sectionFeatureIdsList = listOf(
+                    listOf(
+                        "Notifications",
+                        "Sound",
+                        "Display",
+                        "Maps power saving mode",
+                        "Daily Wallpaper",
+                        "Widgets"
+                    ),
+                    listOf(
+                        "Input",
+                        "Power and battery",
+                        "Quick settings tiles",
+                        "Watch"
+                    ),
+                    listOf(
+                        "Security",
+                        "Networks"
+                    ),
+                    listOf(
+                        "Location reached",
+                        "Watermark"
+                    )
+                )
+
+                val assignedIds = sectionFeatureIdsList.flatten().toSet()
+                val unassignedFeatures = topLevelFeatures.filter { it.id !in assignedIds }
+
+                val sections = sectionFeatureIdsList.map { ids ->
+                    ids.mapNotNull { featureMap[it] }
+                }.filter { it.isNotEmpty() } + if (unassignedFeatures.isNotEmpty()) listOf(unassignedFeatures) else emptyList()
+
+                sections.forEachIndexed { sectionIndex, sectionFeatures ->
                     item {
                         RoundedCardContainer(
-                            modifier = Modifier.padding(horizontal = 16.dp),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(bottom = 12.dp),
                         ) {
-                            topLevelFeatures.forEachIndexed { index, feature ->
+                            sectionFeatures.forEach { feature ->
                                 FeatureCard(
                                     title = feature.title,
                                     isEnabled = feature.isEnabled(viewModel),
@@ -1286,6 +1344,21 @@ fun SetupFeatures(
                             }
                         }
                     }
+                }
+
+                item {
+                    ListExpandToggleButton(
+                        isExpanded = false,
+                        onToggle = {
+                            showInstructionsSheet = true
+                        },
+                        title = R.string.label_help_guide,
+                        description = R.string.label_help_guide,
+                        iconRes = R.drawable.rounded_help_24,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 16.dp, bottom = 12.dp)
+                    )
                 }
             }
         }

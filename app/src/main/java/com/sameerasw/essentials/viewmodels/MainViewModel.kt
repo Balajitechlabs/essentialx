@@ -106,6 +106,8 @@ class MainViewModel : ViewModel() {
     val volumeDownActionOn = mutableStateOf("None")
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
+    val isSmartPixelsEnabled = mutableStateOf(false)
+    val smartPixelsIntensity = mutableFloatStateOf(50f)
     val snoozeChannels =
         mutableStateOf<List<com.sameerasw.essentials.domain.model.SnoozeChannel>>(emptyList())
     val mapsChannels =
@@ -248,6 +250,7 @@ class MainViewModel : ViewModel() {
     val isFreezeShowInLauncherEnabled = mutableStateOf(true)
     val freezeTags = mutableStateOf<List<com.sameerasw.essentials.domain.model.AppTag>>(emptyList())
     val freezeAppTagMap = mutableStateOf<Map<String, List<String>>>(emptyMap())
+    val isFreezeTagColorCodedEnabled = mutableStateOf(false)
 
     // Search state
     val searchQuery = mutableStateOf("")
@@ -269,6 +272,8 @@ class MainViewModel : ViewModel() {
     val hasPendingUpdates = mutableStateOf(false)
 
     val isPitchBlackThemeEnabled = mutableStateOf(false)
+    val isGenAIAutomationEnabled = mutableStateOf(false)
+
     val isEnableUnsupportedFeatures = mutableStateOf(false)
     val isBlurEnabled = mutableStateOf(true)
     val isBlurSettingEnabled = mutableStateOf(true)
@@ -445,6 +450,10 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_DYNAMIC_NIGHT_LIGHT_ENABLED -> isDynamicNightLightEnabled.value =
                         settingsRepository.getBoolean(key)
+                    SettingsRepository.KEY_SMART_PIXELS_ENABLED -> isSmartPixelsEnabled.value =
+                        settingsRepository.getBoolean(key)
+                    SettingsRepository.KEY_SMART_PIXELS_INTENSITY -> smartPixelsIntensity.floatValue =
+                        settingsRepository.getFloat(key, 50f)
 
                     SettingsRepository.KEY_SCREEN_LOCKED_SECURITY_ENABLED -> isScreenLockedSecurityEnabled.value =
                         settingsRepository.getBoolean(key)
@@ -1473,6 +1482,10 @@ class MainViewModel : ViewModel() {
 
         isDynamicNightLightEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_DYNAMIC_NIGHT_LIGHT_ENABLED)
+        isSmartPixelsEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED)
+        smartPixelsIntensity.floatValue =
+            settingsRepository.getFloat(SettingsRepository.KEY_SMART_PIXELS_INTENSITY, 50f)
         loadSnoozeChannels(context)
         loadMapsChannels(context)
         isSnoozeHeadsUpEnabled.value =
@@ -1591,6 +1604,9 @@ class MainViewModel : ViewModel() {
 
         isAutoUpdateEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_AUTO_UPDATE_ENABLED, true)
+        isGenAIAutomationEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED, false)
+
         isUpdateNotificationEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_UPDATE_NOTIFICATION_ENABLED, true)
         freezeMode.intValue = settingsRepository.getFreezeMode()
@@ -1611,6 +1627,8 @@ class MainViewModel : ViewModel() {
             settingsRepository.getBoolean(SettingsRepository.KEY_FREEZE_SHOW_IN_LAUNCHER, true)
         freezeTags.value = settingsRepository.getFreezeTags()
         freezeAppTagMap.value = settingsRepository.getFreezeAppTagMap()
+        isFreezeTagColorCodedEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_FREEZE_TAG_COLOR_CODED_ENABLED, false)
 
         // Sync PackageManager component enabled state on startup
         val showLauncher = isFreezeShowInLauncherEnabled.value
@@ -1819,6 +1837,12 @@ class MainViewModel : ViewModel() {
         isAutoUpdateEnabled.value = enabled
         settingsRepository.putBoolean(SettingsRepository.KEY_AUTO_UPDATE_ENABLED, enabled)
     }
+
+    fun setGenAIAutomationEnabled(enabled: Boolean, context: Context) {
+        isGenAIAutomationEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED, enabled)
+    }
+
 
     fun setUpdateNotificationEnabled(enabled: Boolean, context: Context) {
         isUpdateNotificationEnabled.value = enabled
@@ -2939,6 +2963,16 @@ class MainViewModel : ViewModel() {
         isDynamicNightLightEnabled.value = enabled
         settingsRepository.putBoolean(SettingsRepository.KEY_DYNAMIC_NIGHT_LIGHT_ENABLED, enabled)
         updateAppDetectionService(context)
+    }
+
+    fun setSmartPixelsEnabled(context: Context, enabled: Boolean) {
+        isSmartPixelsEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED, enabled)
+    }
+
+    fun setSmartPixelsIntensity(context: Context, intensity: Float) {
+        smartPixelsIntensity.floatValue = intensity
+        settingsRepository.putFloat(SettingsRepository.KEY_SMART_PIXELS_INTENSITY, intensity)
     }
 
     fun setAppLockEnabled(enabled: Boolean, context: Context) {
@@ -4192,6 +4226,11 @@ class MainViewModel : ViewModel() {
         freezeAppTagMap.value = currentMap
         settingsRepository.saveFreezeAppTagMap(currentMap)
         syncNeverAutoFreezeApps(context)
+    }
+
+    fun setFreezeTagColorCoded(enabled: Boolean) {
+        isFreezeTagColorCodedEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_FREEZE_TAG_COLOR_CODED_ENABLED, enabled)
     }
 
     fun refreshFreezePickedApps(context: Context, silent: Boolean = false) {

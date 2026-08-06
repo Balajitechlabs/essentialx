@@ -382,7 +382,7 @@
     <string name="cat_visuals">Visuaalisuus</string>
     <string name="cat_system">Järjestelmä</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Ei tuloksia haulle \"%1$s\"</string>
     <string name="search_results_title">Hakutulokset</string>
     <string name="requires_following_permissions">%1$s vaatii seuraavat luvat</string>

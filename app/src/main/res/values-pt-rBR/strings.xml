@@ -398,7 +398,7 @@
     <string name="cat_visuals">Visuais</string>
     <string name="cat_system">Sistema</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Nenhum resultado para \"%1$s\"</string>
     <string name="search_results_title">Resultados da pesquisa</string>
     <string name="requires_following_permissions">%1$s requer as seguintes permissões</string>

@@ -60,4 +60,4 @@
 -keepclassmembers class com.sameerasw.essentials.R$string {
     public static <fields>;
 }
-
+-keep class com.sameerasw.essentials.domain.genai.** { *; }

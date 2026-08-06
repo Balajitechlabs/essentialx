@@ -345,6 +345,10 @@ object CombinedActionExecutor {
                         repository.setBatteryNotificationEnabled(action.batteryNotificationEnabled)
                     }
 
+                    if (action.changeSmartPixels) {
+                        repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_SMART_PIXELS_ENABLED, action.smartPixelsEnabled)
+                    }
+
                     if (action.changeEssentialsOnDisplay) {
                         when (action.essentialsOnDisplayMode) {
                             "Off" -> {
@@ -414,6 +418,26 @@ object CombinedActionExecutor {
                     if (action.changeSyncSoundModeWatch) {
                         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
                         prefs.edit().putBoolean("watch_sync_sound_mode_enabled", action.syncSoundModeWatchEnabled).apply()
+                    }
+                }
+
+                is Action.FreezeTag -> {
+                    val repository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                    val appTagMap = repository.getFreezeAppTagMap()
+                    val selectedTags = action.tagIds.toSet()
+
+                    if (selectedTags.isNotEmpty()) {
+                        val matchingPackages = appTagMap.filterValues { tags ->
+                            tags.any { selectedTags.contains(it) }
+                        }.keys
+
+                        matchingPackages.forEach { pkg ->
+                            if (action.mode == "Freeze") {
+                                com.sameerasw.essentials.utils.FreezeManager.freezeApp(context, pkg)
+                            } else {
+                                com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(context, pkg)
+                            }
+                        }
                     }
                 }
 

@@ -117,6 +117,7 @@ fun FreezeGridUI(
 
     val freezeTags by viewModel.freezeTags
     val freezeAppTagMap by viewModel.freezeAppTagMap
+    val isTagColorCodedEnabled by viewModel.isFreezeTagColorCodedEnabled
 
     var selectedTagId by rememberSaveable { mutableStateOf<String?>(null) }
 
@@ -377,15 +378,17 @@ fun FreezeGridUI(
                                         val neverAutoFreezeTagIds = freezeTags.filter { it.neverAutoFreeze }.map { it.id }.toSet()
                                         val isLockedByTag = appTagIds.any { neverAutoFreezeTagIds.contains(it) }
 
-                                        val tagColor = appTagIds.firstOrNull()?.let { firstTagId ->
-                                            freezeTags.find { it.id == firstTagId }?.colorHex?.let { colorHex ->
-                                                try {
-                                                    Color(android.graphics.Color.parseColor(colorHex))
-                                                } catch (e: Exception) {
-                                                    null
+                                        val tagColor = if (isTagColorCodedEnabled) {
+                                            appTagIds.firstOrNull()?.let { firstTagId ->
+                                                freezeTags.find { it.id == firstTagId }?.colorHex?.let { colorHex ->
+                                                    try {
+                                                        Color(android.graphics.Color.parseColor(colorHex))
+                                                    } catch (e: Exception) {
+                                                        null
+                                                    }
                                                 }
                                             }
-                                        }
+                                        } else null
 
                                         Box(modifier = Modifier.weight(1f)) {
                                             AppGridItem(

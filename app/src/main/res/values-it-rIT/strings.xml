@@ -398,7 +398,7 @@
     <string name="cat_visuals">Immagini</string>
     <string name="cat_system">Sistema</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Cerca Essentials</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Nessun risultato per \"%1$s\"</string>
     <string name="search_results_title">Risultati della ricerca</string>
     <string name="requires_following_permissions">%1$s richiede le seguenti autorizzazioni</string>

@@ -3,7 +3,9 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
+
 
 
 
@@ -87,8 +89,8 @@ android {
         applicationId = "com.sameerasw.essentials"
         minSdk = 26
         targetSdk = 37
-        versionCode = 58
-        versionName = "16.6"
+        versionCode = 59
+        versionName = "17.0"
 
         val whatsNewCounter = 2
         buildConfigField("int", "WHATS_NEW_COUNTER", whatsNewCounter.toString())
@@ -162,6 +164,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.genai.schema)
     implementation(libs.material)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.foundation.layout)
@@ -231,5 +234,9 @@ dependencies {
 
     // Lottie for animations
     implementation(libs.lottie.compose)
+
+    // ML Kit GenAI Prompt API & Structured Output Compiler
+    implementation(libs.mlkit.genai.prompt)
+    ksp(libs.mlkit.genai.schema.compiler)
 
 }
