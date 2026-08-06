@@ -181,6 +181,11 @@ fun HelpAndGuidesContent() {
             description = stringResource(R.string.instruction_section_backup_desc)
         ),
         InstructionSection(
+            title = stringResource(R.string.instruction_section_pocketmode_title),
+            iconRes = R.drawable.rounded_mobile_off_24,
+            description = stringResource(R.string.instruction_section_pocketmode_desc)
+        ),
+        InstructionSection(
             title = stringResource(R.string.instruction_section_about_title),
             iconRes = R.drawable.ic_stat_name,
             description = stringResource(R.string.instruction_section_about_desc)

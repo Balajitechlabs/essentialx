@@ -1327,6 +1327,9 @@
     <string name="instruction_section_backup_title">Backup &amp; Restore Configurations</string>
     <string name="instruction_section_backup_desc">Safeguard and transfer your custom setup across devices.\n\n• Export Config: Generate a JSON backup of your DIY Automations, App Tags, Tile configurations, and custom preferences.\n• Import Config: Easily restore your saved setup file without re-configuring individual settings.</string>
 
+    <string name="instruction_section_pocketmode_title">Pocket Mode Protection</string>
+    <string name="instruction_section_pocketmode_desc">Prevents accidental touch interactions when your device is in a pocket, bag, or face down.\n\n• Proximity &amp; Light Sensors: Uses hardware proximity and ambient light sensors to detect enclosed spaces.\n• Touch Blocking: Disables screen touch input temporarily when obscured to prevent accidental pocket dials and app launches.</string>
+
     <!-- Bug Reporting -->
     <string name="toast_bug_report_copied">Bug report copied to clipboard</string>
     <string name="bug_report_title">Bug report</string>
