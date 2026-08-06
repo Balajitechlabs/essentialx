@@ -398,7 +398,7 @@
     <string name="cat_visuals">Imagini vizuale</string>
     <string name="cat_system">Sistem</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Niciun rezultat pentru \"%1$s\"</string>
     <string name="search_results_title">Rezultatele căutării</string>
     <string name="requires_following_permissions">%1$s necesită următoarele permisiuni</string>

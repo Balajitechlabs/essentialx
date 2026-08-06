@@ -380,7 +380,7 @@
     <string name="cat_visuals">视觉效果</string>
     <string name="cat_system">系统</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">搜索 Essentials</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">没有找到 \"%1$s\" 的结果</string>
     <string name="search_results_title">搜索结果</string>
     <string name="requires_following_permissions">%1$s 需要以下权限</string>

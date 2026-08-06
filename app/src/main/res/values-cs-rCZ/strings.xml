@@ -398,7 +398,7 @@
     <string name="cat_visuals">Vizuály</string>
     <string name="cat_system">Systém</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Žádné výsledky pro \"%1$s\"</string>
     <string name="search_results_title">Výsledky vyhledávání</string>
     <string name="requires_following_permissions">%1$s vyžaduje následující oprávnění</string>

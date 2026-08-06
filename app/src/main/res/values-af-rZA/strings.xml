@@ -398,7 +398,7 @@
     <string name="cat_visuals">Beeldmateriaal</string>
     <string name="cat_system">Stelsel</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Geen resultate vir \"%1$s\"</string>
     <string name="search_results_title">Soekresultate</string>
     <string name="requires_following_permissions">%1$s vereis volgende toestemmings</string>

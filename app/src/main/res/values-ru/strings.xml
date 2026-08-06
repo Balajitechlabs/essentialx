@@ -382,7 +382,7 @@
     <string name="cat_visuals">Визуальные эффекты</string>
     <string name="cat_system">Система</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Поиск Essentials</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Нет результатов для \"%1$s\"</string>
     <string name="search_results_title">Результаты поиска</string>
     <string name="requires_following_permissions">%1$s требует следующие разрешения</string>

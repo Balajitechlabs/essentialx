@@ -382,7 +382,7 @@
     <string name="cat_visuals">Візуальні матеріали</string>
     <string name="cat_system">система</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">Немає результатів для \"%1$s\"</string>
     <string name="search_results_title">Результати пошуку</string>
     <string name="requires_following_permissions">%1$s вимагає наступних дозволів</string>

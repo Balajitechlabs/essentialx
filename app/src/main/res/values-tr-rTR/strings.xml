@@ -398,7 +398,7 @@
     <string name="cat_visuals">Görseller</string>
     <string name="cat_system">Sistem</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Essentials\'ta Ara</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">\"%1$s\" için sonuç yok</string>
     <string name="search_results_title">Arama Sonuçları</string>
     <string name="requires_following_permissions">%1$s aşağıdaki izinleri gerektirir</string>

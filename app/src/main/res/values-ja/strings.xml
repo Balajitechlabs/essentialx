@@ -382,7 +382,7 @@
     <string name="cat_visuals">ビジュアル</string>
     <string name="cat_system">システム</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">ツール、Mod、微調整を検索</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">「%1$s」の検索結果がありませんでした</string>
     <string name="search_results_title">検索結果</string>
     <string name="requires_following_permissions">%1$sを使用するには以下の権限が必要です</string>

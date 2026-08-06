@@ -382,7 +382,7 @@
     <string name="cat_visuals">Visuals</string>
     <string name="cat_system">Sistema</string>
     <!-- UI Elements -->
-    <string name="search_placeholder">Search for Tools, Mods and Tweaks</string>
+    <string name="search_placeholder">Search Essentials</string>
     <string name="search_no_results">No hi ha resultats per a \"%1$s\"</string>
     <string name="search_results_title">Resultats de la cerca</string>
     <string name="requires_following_permissions">%1$s requereix els següents permisos</string>

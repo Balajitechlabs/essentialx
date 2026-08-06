@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -1115,26 +1116,31 @@ fun SetupFeatures(
                         viewModel.onSearchQueryChanged(new, context)
                     },
                     maxLines = 1,
+                    textStyle = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(horizontal = 16.dp, vertical = 16.dp)
+                        .defaultMinSize(minHeight = 64.dp)
                         .focusRequester(focusRequester)
                         .onFocusChanged { isFocused = it.isFocused },
                     leadingIcon = {
-                        if (isSearchingViewModel) {
-                            LoadingIndicator()
-                        } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_search_24),
-                                contentDescription = stringResource(R.string.label_search_content_description),
-                                modifier = Modifier.size(24.dp)
-                            )
+                        Box(modifier = Modifier.padding(start = 16.dp, end = 8.dp)) {
+                            if (isSearchingViewModel) {
+                                LoadingIndicator()
+                            } else {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_search_24),
+                                    contentDescription = stringResource(R.string.label_search_content_description),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            }
                         }
                     },
                     placeholder = {
                         if (!isFocused && searchQuery.isEmpty())
                             Text(
                                 text = stringResource(R.string.search_placeholder),
+                                style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                                 modifier = Modifier.basicMarquee()
                             )
@@ -1144,7 +1150,8 @@ fun SetupFeatures(
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceBright
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest
                     ),
                     trailingIcon = {
                         if (isFocused || searchQuery.isNotEmpty()) {
@@ -1220,7 +1227,12 @@ fun SetupFeatures(
                                 text = stringResource(id = R.string.search_no_results, searchQuery),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 8.dp)
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                maxLines = 2,
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .padding(horizontal = 32.dp)
                             )
                         }
                     }
