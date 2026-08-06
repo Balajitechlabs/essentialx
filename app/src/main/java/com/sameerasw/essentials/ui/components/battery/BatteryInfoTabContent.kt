@@ -134,21 +134,21 @@ fun BatteryInfoTabContent(
                 val fullMah = if (full > 10000) full / 1000 else full
                 val designMah = if (design > 10000) design / 1000 else design
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_capacity),
+                    title = R.string.label_battery_capacity,
                     value = "$fullMah / $designMah mAh",
                     iconRes = R.drawable.battery_android_frame_shield_24px
                 )
             } else if (design != null && design > 0) {
                 val designMah = if (design > 10000) design / 1000 else design
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_capacity),
+                    title = R.string.label_battery_capacity,
                     value = "$designMah mAh",
                     iconRes = R.drawable.battery_android_frame_shield_24px
                 )
             } else if (full != null && full > 0) {
                 val fullMah = if (full > 10000) full / 1000 else full
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_capacity),
+                    title = R.string.label_battery_capacity,
                     value = "$fullMah mAh",
                     iconRes = R.drawable.battery_android_frame_shield_24px
                 )
@@ -157,7 +157,7 @@ fun BatteryInfoTabContent(
             if (full != null && design != null && design > 0) {
                 val healthPct = (full.toDouble() / design.toDouble()) * 100.0
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_capacity_health),
+                    title = R.string.label_battery_capacity_health,
                     value = String.format(Locale.getDefault(), "%.1f %%", healthPct),
                     iconRes = R.drawable.rounded_ecg_heart_24
                 )
@@ -165,7 +165,7 @@ fun BatteryInfoTabContent(
 
             batteryDetails.cycleCount?.let { cycles ->
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_cycle_count),
+                    title = R.string.label_battery_cycle_count,
                     value = "$cycles",
                     iconRes = R.drawable.rounded_cycle_24
                 )
@@ -180,7 +180,7 @@ fun BatteryInfoTabContent(
     RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
         // Plug type renamed to "Mode"
         InfoDetailRow(
-            title = stringResource(R.string.label_battery_mode),
+            title = R.string.label_battery_mode,
             value = BatteryInfoUtil.formatPlugged(batteryDetails.plugged),
             iconRes = R.drawable.rounded_cable_24
         )
@@ -201,7 +201,7 @@ fun BatteryInfoTabContent(
 
                     batteryDetails.chargingPolicy?.let { policy ->
                         InfoDetailRow(
-                            title = stringResource(R.string.label_battery_charging_policy),
+                            title = R.string.label_battery_charging_policy,
                             value = BatteryInfoUtil.formatChargingPolicy(policy),
                             iconRes = R.drawable.rounded_info_24
                         )
@@ -211,7 +211,7 @@ fun BatteryInfoTabContent(
                         if (maxCur > 0) {
                             val curMa = if (maxCur > 10000) maxCur / 1000 else maxCur
                             InfoDetailRow(
-                                title = stringResource(R.string.label_battery_max_current),
+                                title = R.string.label_battery_max_current,
                                 value = "$curMa mA",
                                 iconRes = R.drawable.rounded_power_input_24
                             )
@@ -222,7 +222,7 @@ fun BatteryInfoTabContent(
                         if (maxVol > 0) {
                             val volMv = if (maxVol > 100000) maxVol / 1000 else maxVol
                             InfoDetailRow(
-                                title = stringResource(R.string.label_battery_max_voltage),
+                                title = R.string.label_battery_max_voltage,
                                 value = "$volMv mV",
                                 iconRes = R.drawable.rounded_power_input_24
                             )
@@ -232,7 +232,7 @@ fun BatteryInfoTabContent(
                     /*
                     batteryDetails.chargingStatusNew?.let { statusNew ->
                         InfoDetailRow(
-                            title = stringResource(R.string.label_battery_charging_status),
+                            title = R.string.label_battery_charging_status,
                             value = BatteryInfoUtil.formatChargingStatusNew(statusNew),
                             iconRes = R.drawable.rounded_charger_24
                         )
@@ -241,7 +241,7 @@ fun BatteryInfoTabContent(
 
                     batteryDetails.chargeTimeRemainingMs?.let { timeMs ->
                         InfoDetailRow(
-                            title = stringResource(R.string.label_battery_charge_time_remaining),
+                            title = R.string.label_battery_charge_time_remaining,
                             value = BatteryInfoUtil.formatChargeTimeRemaining(timeMs),
                             iconRes = R.drawable.battery_android_frame_bolt_24px
                         )
@@ -256,12 +256,12 @@ fun BatteryInfoTabContent(
 
     RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
         InfoDetailRow(
-            title = stringResource(R.string.label_battery_voltage),
+            title = R.string.label_battery_voltage,
             value = "${batteryDetails.voltage} mV",
             iconRes = R.drawable.rounded_power_input_24
         )
         InfoDetailRow(
-            title = stringResource(R.string.label_battery_technology),
+            title = R.string.label_battery_technology,
             value = batteryDetails.technology,
             iconRes = R.drawable.rounded_memory_alt_24
         )
@@ -271,7 +271,7 @@ fun BatteryInfoTabContent(
             if (counter != null && counter > 0) {
                 val counterMah = if (counter > 10000) counter / 1000 else counter
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_charge_counter),
+                    title = R.string.label_battery_charge_counter,
                     value = "$counterMah mAh",
                     iconRes = R.drawable.battery_android_frame_4_24px
                 )
@@ -281,7 +281,7 @@ fun BatteryInfoTabContent(
 
             batteryDetails.currentNowMa?.let { curNow ->
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_current_now),
+                    title = R.string.label_battery_current_now,
                     value = "$curNow mA",
                     iconRes = R.drawable.rounded_power_input_24
                 )
@@ -289,7 +289,7 @@ fun BatteryInfoTabContent(
 
             batteryDetails.currentAvgMa?.let { curAvg ->
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_current_avg),
+                    title = R.string.label_battery_current_avg,
                     value = "$curAvg mA",
                     iconRes = R.drawable.rounded_power_input_24
                 )
@@ -297,7 +297,7 @@ fun BatteryInfoTabContent(
 
             batteryDetails.remainingEnergyMwh?.let { energy ->
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_remaining_energy),
+                    title = R.string.label_battery_remaining_energy,
                     value = "$energy mWh",
                     iconRes = R.drawable.battery_android_frame_4_24px
                 )
@@ -319,7 +319,7 @@ fun BatteryInfoTabContent(
                     "${m}m"
                 }
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_avg_remaining),
+                    title = R.string.label_battery_avg_remaining,
                     value = formattedRemaining,
                     iconRes = R.drawable.rounded_av_timer_24
                 )
@@ -328,7 +328,7 @@ fun BatteryInfoTabContent(
             batteryDetails.manufacturingDate?.let { mfg ->
                 val (dateStr, isSuspicious) = BatteryInfoUtil.formatDate(mfg)
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_manufacturing_date),
+                    title = R.string.label_battery_manufacturing_date,
                     value = dateStr,
                     iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24
                 )
@@ -337,7 +337,7 @@ fun BatteryInfoTabContent(
             batteryDetails.firstUsageDate?.let { firstUse ->
                 val (dateStr, isSuspicious) = BatteryInfoUtil.formatDate(firstUse)
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_first_usage_date),
+                    title = R.string.label_battery_first_usage_date,
                     value = dateStr,
                     iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24
                 )
@@ -346,7 +346,7 @@ fun BatteryInfoTabContent(
             batteryDetails.serialNumber?.let { serial ->
                 if (serial.isNotBlank()) {
                     InfoDetailRow(
-                        title = stringResource(R.string.label_battery_serial_number),
+                        title = R.string.label_battery_serial_number,
                         value = serial,
                         iconRes = R.drawable.rounded_info_24
                     )
@@ -354,7 +354,7 @@ fun BatteryInfoTabContent(
             }
             batteryDetails.partStatus?.let { part ->
                 InfoDetailRow(
-                    title = stringResource(R.string.label_battery_part_status),
+                    title = R.string.label_battery_part_status,
                     value = BatteryInfoUtil.formatPartStatus(part),
                     iconRes = R.drawable.battery_android_frame_shield_24px
                 )
@@ -369,7 +369,7 @@ fun BatteryInfoTabContent(
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             thermal.maxCpuTemp?.let { cpu ->
                 InfoDetailRow(
-                    title = stringResource(R.string.label_thermal_cpu),
+                    title = R.string.label_thermal_cpu,
                     value = "${"%.1f".format(Locale.US, cpu)} °C",
                     iconRes = R.drawable.rounded_memory_alt_24
                 )
@@ -377,7 +377,7 @@ fun BatteryInfoTabContent(
 
             thermal.maxGpuTemp?.let { gpu ->
                 InfoDetailRow(
-                    title = stringResource(R.string.label_thermal_gpu),
+                    title = R.string.label_thermal_gpu,
                     value = "${"%.1f".format(Locale.US, gpu)} °C",
                     iconRes = R.drawable.rounded_memory_alt_24
                 )
@@ -385,7 +385,7 @@ fun BatteryInfoTabContent(
 
             thermal.skinTemp?.let { skin ->
                 InfoDetailRow(
-                    title = stringResource(R.string.label_thermal_skin),
+                    title = R.string.label_thermal_skin,
                     value = "${"%.1f".format(Locale.US, skin)} °C",
                     iconRes = R.drawable.rounded_device_thermostat_24
                 )
@@ -403,7 +403,7 @@ fun BatteryInfoTabContent(
             }
 
             InfoDetailRow(
-                title = stringResource(R.string.label_thermal_throttling_status),
+                title = R.string.label_thermal_throttling_status,
                 value = statusText,
                 iconRes = if (thermal.maxThrottlingStatus > ThermalInfo.THROTTLING_NONE) R.drawable.rounded_release_alert_24 else R.drawable.rounded_device_thermostat_24
             )

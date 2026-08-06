@@ -102,14 +102,8 @@ fun SectionHeaderTitle(
 
     val keyForSheet1 = translationSheetKey
     if (keyForSheet1 != null) {
-        val resolvedKey = remember(keyForSheet1) {
-            com.sameerasw.essentials.translation.TranslationManager.resolveKey(
-                context,
-                keyForSheet1
-            ) ?: keyForSheet1
-        }
         com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
-            stringKey = resolvedKey,
+            stringKey = keyForSheet1,
             onDismissRequest = { translationSheetKey = null }
         )
     }
@@ -222,14 +216,8 @@ fun InfoDetailRow(
 
     val keyForSheet2 = translationSheetKey
     if (keyForSheet2 != null) {
-        val resolvedKey = remember(keyForSheet2) {
-            com.sameerasw.essentials.translation.TranslationManager.resolveKey(
-                context,
-                keyForSheet2
-            ) ?: keyForSheet2
-        }
         com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
-            stringKey = resolvedKey,
+            stringKey = keyForSheet2,
             onDismissRequest = { translationSheetKey = null }
         )
     }

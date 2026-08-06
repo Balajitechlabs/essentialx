@@ -54,6 +54,11 @@ object TranslationManager {
         if (resOrText is String && resOrText.isNotBlank()) {
             val trimmed = resOrText.trim()
 
+            val all = StringLoader.getAllTranslations(context)
+            if (all.containsKey(trimmed)) {
+                return trimmed
+            }
+
             session.edits.firstOrNull { it.newValue.trim() == trimmed || it.originalValue.trim() == trimmed }
                 ?.let {
                     return it.key
@@ -62,16 +67,17 @@ object TranslationManager {
                 return it.key.first
             }
 
-            val all = StringLoader.getAllTranslations(context)
-
+            // Exact match in translations
             all.entries.firstOrNull { (_, map) ->
                 map.values.any { it == resOrText || it.trim() == trimmed }
             }?.let { return it.key }
 
+            // Case-insensitive exact match
             all.entries.firstOrNull { (_, map) ->
                 map.values.any { it.trim().equals(trimmed, ignoreCase = true) }
             }?.let { return it.key }
 
+            // Formatting pattern match (e.g. %1$s)
             all.entries.firstOrNull { (_, map) ->
                 map.values.any { v ->
                     if (!v.contains("%")) return@any false
@@ -83,16 +89,6 @@ object TranslationManager {
                     } catch (e: Exception) {
                         false
                     }
-                }
-            }?.let { return it.key }
-
-            all.entries.firstOrNull { (_, map) ->
-                map.values.any { v ->
-                    val cleanV = v.replace(Regex("%[0-9]*\\$?[a-zA-Z]"), "").trim()
-                    cleanV.length >= 3 && (trimmed.contains(
-                        cleanV,
-                        ignoreCase = true
-                    ) || cleanV.contains(trimmed, ignoreCase = true))
                 }
             }?.let { return it.key }
         }
