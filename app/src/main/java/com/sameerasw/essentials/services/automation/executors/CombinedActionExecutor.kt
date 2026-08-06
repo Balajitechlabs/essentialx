@@ -417,6 +417,26 @@ object CombinedActionExecutor {
                     }
                 }
 
+                is Action.FreezeTag -> {
+                    val repository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                    val appTagMap = repository.getFreezeAppTagMap()
+                    val selectedTags = action.tagIds.toSet()
+
+                    if (selectedTags.isNotEmpty()) {
+                        val matchingPackages = appTagMap.filterValues { tags ->
+                            tags.any { selectedTags.contains(it) }
+                        }.keys
+
+                        matchingPackages.forEach { pkg ->
+                            if (action.mode == "Freeze") {
+                                com.sameerasw.essentials.utils.FreezeManager.freezeApp(context, pkg)
+                            } else {
+                                com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(context, pkg)
+                            }
+                        }
+                    }
+                }
+
                 is Action.PinApp -> {
                     try {
                         val useActivityTask = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q

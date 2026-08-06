@@ -219,4 +219,15 @@ sealed interface Action {
                 return perms
             }
     }
+
+    @Keep
+    data class FreezeTag(
+        @SerializedName("mode") val mode: String = "Freeze", // "Freeze", "Unfreeze"
+        @SerializedName("tagIds") val tagIds: List<String> = emptyList()
+    ) : Action {
+        override val title: Int get() = R.string.diy_action_freeze_tag
+        override val icon: Int get() = R.drawable.rounded_mode_cool_24
+        override val isConfigurable: Boolean = true
+        override val permissions: List<String> = listOf("shizuku", "root")
+    }
 }
