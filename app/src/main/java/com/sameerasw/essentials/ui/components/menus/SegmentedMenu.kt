@@ -22,6 +22,7 @@ fun SegmentedDropdownMenu(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
+    containerColor: Color = Color.Transparent,
     content: @Composable ColumnScope.() -> Unit
 ) {
     DropdownMenu(
@@ -29,7 +30,7 @@ fun SegmentedDropdownMenu(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         offset = offset,
-        containerColor = Color.Transparent,
+        containerColor = containerColor,
         tonalElevation = 0.dp,
         shadowElevation = 0.dp
     ) {
@@ -49,6 +50,7 @@ fun SegmentedDropdownMenuItem(
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
+    itemContainerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     colors: MenuItemColors = MenuDefaults.itemColors(
         textColor = MaterialTheme.colorScheme.onSurface,
         leadingIconColor = MaterialTheme.colorScheme.onSurface,
@@ -69,7 +71,7 @@ fun SegmentedDropdownMenuItem(
         },
         modifier = modifier
             .clip(MaterialTheme.shapes.extraSmall)
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
+            .background(itemContainerColor),
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         enabled = enabled,
