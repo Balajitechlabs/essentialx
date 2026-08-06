@@ -189,7 +189,8 @@ fun DIYScreen(
             )
         }
 
-        if (showGenAIPill && genAIState !is com.sameerasw.essentials.viewmodels.GenAIState.Success) {
+        if (showGenAIPill) {
+            val currentSuggestion = (genAIState as? com.sameerasw.essentials.viewmodels.GenAIState.Success)?.suggestion
             com.sameerasw.essentials.ui.components.genai.GenAIFloatingPill(
                 onSend = { prompt ->
                     viewModel.requestGenAISuggestion(prompt)
@@ -198,25 +199,20 @@ fun DIYScreen(
                     showGenAIPill = false
                     viewModel.dismissGenAISuggestion()
                 },
+                onConfirm = { suggestion ->
+                    viewModel.confirmGenAISuggestion(suggestion)
+                    showGenAIPill = false
+                },
+                onReset = {
+                    viewModel.dismissGenAISuggestion()
+                },
                 isLoading = genAIState is com.sameerasw.essentials.viewmodels.GenAIState.Loading,
+                suggestion = currentSuggestion,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
 
         when (val state = genAIState) {
-            is com.sameerasw.essentials.viewmodels.GenAIState.Success -> {
-                com.sameerasw.essentials.ui.components.sheets.GenAIAutomationPreviewSheet(
-                    suggestion = state.suggestion,
-                    onConfirm = { suggestion ->
-                        viewModel.confirmGenAISuggestion(suggestion)
-                        showGenAIPill = false
-                    },
-                    onDismiss = {
-                        viewModel.dismissGenAISuggestion()
-                        showGenAIPill = false
-                    }
-                )
-            }
             is com.sameerasw.essentials.viewmodels.GenAIState.Error -> {
                 androidx.compose.runtime.LaunchedEffect(state) {
                     android.widget.Toast.makeText(context, state.message, android.widget.Toast.LENGTH_LONG).show()

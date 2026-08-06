@@ -13,10 +13,13 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -31,8 +34,10 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,26 +50,42 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.domain.genai.AutomationSuggestion
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.utils.HapticUtil
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun GenAIFloatingPill(
     onSend: (String) -> Unit,
     onDismiss: () -> Unit,
+    onConfirm: (AutomationSuggestion) -> Unit,
+    onReset: () -> Unit = {},
     isLoading: Boolean = false,
+    suggestion: AutomationSuggestion? = null,
     modifier: Modifier = Modifier
 ) {
     val view = LocalView.current
     var promptText by remember { mutableStateOf("") }
     val isPromptValid = promptText.isNotBlank()
+
+    LaunchedEffect(isLoading) {
+        if (isLoading) {
+            while (true) {
+                HapticUtil.performLightHaptic(view)
+                delay(300)
+            }
+        }
+    }
 
     val pulseDuration = if (isLoading) 500 else 1750
     val infiniteTransition = rememberInfiniteTransition(label = "blurPulse")
@@ -109,8 +130,15 @@ fun GenAIFloatingPill(
                 .imePadding()
                 .padding(horizontal = 32.dp, vertical = 16.dp)
         ) {
-            Box(
-                modifier = Modifier
+            val bgModifier = if (suggestion != null) {
+                Modifier
+                    .matchParentSize()
+                    .background(
+                        color = MaterialTheme.colorScheme.primary,
+                        shape = RoundedCornerShape(32.dp)
+                    )
+            } else {
+                Modifier
                     .matchParentSize()
                     .progressiveBlur(
                         blurRadius = animatedBlurRadius,
@@ -122,75 +150,259 @@ fun GenAIFloatingPill(
                         color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(32.dp)
                     )
-            )
+            }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Box(modifier = bgModifier)
+
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedTextField(
-                    value = promptText,
-                    onValueChange = { promptText = it },
-                    placeholder = {
-                        Text(
-                            text = stringResource(R.string.diy_genai_describe_placeholder),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
-                        )
-                    },
-                    singleLine = true,
-                    enabled = !isLoading,
-                    shape = RoundedCornerShape(24.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.Transparent,
-                        unfocusedBorderColor = Color.Transparent,
-                        disabledBorderColor = Color.Transparent,
-                        focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledTextColor = MaterialTheme.colorScheme.onPrimary,
-                        disabledPlaceholderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        cursorColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
+                if (suggestion != null) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 10.dp, end = 10.dp, top = 12.dp, bottom = 4.dp)
+                    ) {
+                        if (!suggestion.explanation.isNullOrEmpty()) {
+                            Text(
+                                text = suggestion.explanation,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
+                                modifier = Modifier.padding(bottom = 12.dp, start = 4.dp, end = 4.dp)
+                            )
+                        }
 
-                AnimatedVisibility(
-                    visible = isPromptValid || isLoading,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
-                ) {
-                    Row {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        IconButton(
-                            onClick = {
-                                if (isPromptValid && !isLoading) {
-                                    HapticUtil.performVirtualKeyHaptic(view)
-                                    onSend(promptText.trim())
-                                }
-                            },
-                            enabled = isPromptValid && !isLoading,
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.onPrimary)
+                        val triggerOrStateTitle = suggestion.triggerType
+                            ?: suggestion.stateType
+                            ?: suggestion.title.ifEmpty { suggestion.type }
+
+                        val iconRes = when {
+                            suggestion.triggerType != null -> R.drawable.rounded_bolt_24
+                            suggestion.stateType != null -> R.drawable.rounded_toggle_on_24
+                            else -> R.drawable.rounded_apps_24
+                        }
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.18f),
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            if (isLoading) {
-                                LoadingIndicator(
-                                    modifier = Modifier.size(48.dp),
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            } else {
+                            Row(
+                                modifier = Modifier.padding(14.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 Icon(
-                                    painter = painterResource(R.drawable.rounded_arrow_upward_24),
-                                    contentDescription = stringResource(R.string.diy_genai_describe_send),
-                                    modifier = Modifier.size(20.dp),
-                                    tint = MaterialTheme.colorScheme.primary
+                                    painter = painterResource(iconRes),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimary
                                 )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Text(
+                                    text = triggerOrStateTitle,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(28.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.25f)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.rounded_arrow_cool_down_24),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
+                        }
+
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            if (suggestion.actionTypes.isNotEmpty()) {
+                                suggestion.actionTypes.forEach { actionName ->
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.18f),
+                                        shape = RoundedCornerShape(16.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(14.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(R.drawable.rounded_play_arrow_24),
+                                                contentDescription = null,
+                                                modifier = Modifier.size(24.dp),
+                                                tint = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                            Spacer(modifier = Modifier.width(12.dp))
+                                            Text(
+                                                text = actionName,
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = MaterialTheme.colorScheme.onPrimary,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
+                                }
+                            } else {
+                                Surface(
+                                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.18f),
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "No actions defined",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.padding(14.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Text(
+                            text = stringResource(R.string.diy_genai_disclaimer),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 4.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+
+                // Prompt
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = promptText,
+                        onValueChange = { promptText = it },
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.diy_genai_describe_placeholder),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                            )
+                        },
+                        singleLine = true,
+                        enabled = !isLoading && suggestion == null,
+                        shape = RoundedCornerShape(24.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            disabledBorderColor = Color.Transparent,
+                            focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledTextColor = MaterialTheme.colorScheme.onPrimary,
+                            disabledPlaceholderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            cursorColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    AnimatedVisibility(
+                        visible = isPromptValid || isLoading || suggestion != null,
+                        enter = fadeIn() + scaleIn(),
+                        exit = fadeOut() + scaleOut()
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            if (suggestion != null) {
+                                IconButton(
+                                    onClick = {
+                                        HapticUtil.performVirtualKeyHaptic(view)
+                                        promptText = ""
+                                        onReset()
+                                    },
+                                    modifier = Modifier
+                                        .size(44.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f))
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.rounded_refresh_24),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                IconButton(
+                                    onClick = {
+                                        HapticUtil.performVirtualKeyHaptic(view)
+                                        onConfirm(suggestion)
+                                    },
+                                    modifier = Modifier
+                                        .size(44.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.onPrimary)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.rounded_check_24),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                            } else {
+                                IconButton(
+                                    onClick = {
+                                        if (isPromptValid && !isLoading) {
+                                            HapticUtil.performVirtualKeyHaptic(view)
+                                            onSend(promptText.trim())
+                                        }
+                                    },
+                                    enabled = isPromptValid && !isLoading,
+                                    modifier = Modifier
+                                        .size(44.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.onPrimary)
+                                ) {
+                                    if (isLoading) {
+                                        LoadingIndicator(
+                                            modifier = Modifier.size(48.dp),
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    } else {
+                                        Icon(
+                                            painter = painterResource(R.drawable.rounded_arrow_upward_24),
+                                            contentDescription = stringResource(R.string.diy_genai_describe_send),
+                                            modifier = Modifier.size(20.dp),
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
