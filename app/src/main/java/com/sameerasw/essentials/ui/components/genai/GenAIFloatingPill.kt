@@ -237,6 +237,31 @@ fun GenAIFloatingPill(
                         ) {
                             if (suggestion.actionTypes.isNotEmpty()) {
                                 suggestion.actionTypes.forEach { actionName ->
+                                    val actionIconRes = when (actionName) {
+                                        "FreezeTag" -> R.drawable.rounded_mode_cool_24
+                                        "SometimesEssentials" -> R.drawable.rounded_settings_24
+                                        "DimWallpaper" -> R.drawable.rounded_mobile_screensaver_24
+                                        "DeviceEffects" -> R.drawable.rounded_bed_24
+                                        "SoundMode" -> R.drawable.rounded_volume_up_24
+                                        "TurnOnFlashlight", "ToggleFlashlight" -> R.drawable.rounded_flashlight_on_24
+                                        "TurnOffFlashlight" -> R.drawable.rounded_flashlight_on_24
+                                        "HapticVibration" -> R.drawable.rounded_mobile_vibrate_24
+                                        "ShowNotification" -> R.drawable.rounded_notifications_unread_24
+                                        "RemoveNotification" -> R.drawable.rounded_notifications_off_24
+                                        "TurnOnLowPower", "TurnOffLowPower" -> R.drawable.rounded_battery_android_frame_shield_24
+                                        "ScreenOff" -> R.drawable.rounded_mobile_off_24
+                                        "MediaPlayPause" -> R.drawable.round_play_arrow_24
+                                        "MediaNext" -> R.drawable.rounded_skip_next_24
+                                        "MediaPrevious" -> R.drawable.rounded_skip_previous_24
+                                        "AIAssistant" -> R.drawable.google
+                                        "TakeScreenshot" -> R.drawable.rounded_screenshot_region_24
+                                        "ToggleMediaVolume" -> R.drawable.rounded_mobile_sound_24
+                                        "LikeCurrentSong" -> R.drawable.rounded_favorite_24
+                                        "CircleToSearch" -> R.drawable.rounded_search_24
+                                        "PinApp" -> R.drawable.rounded_shield_lock_24
+                                        else -> R.drawable.rounded_play_arrow_24
+                                    }
+
                                     Surface(
                                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.18f),
                                         shape = RoundedCornerShape(16.dp),
@@ -247,7 +272,7 @@ fun GenAIFloatingPill(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Icon(
-                                                painter = painterResource(R.drawable.rounded_play_arrow_24),
+                                                painter = painterResource(actionIconRes),
                                                 contentDescription = null,
                                                 modifier = Modifier.size(24.dp),
                                                 tint = MaterialTheme.colorScheme.onPrimary

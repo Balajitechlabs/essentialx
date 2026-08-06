@@ -70,6 +70,8 @@ object GenAIAutomationService {
                   "explanation": "Brief 1-2 sentence description of what this automation does"
                 }
 
+                When user mentions freezing or unfreezing apps, background apps, or apps with tags, map it to action "FreezeTag".
+
                 Respond ONLY with valid raw JSON without any markdown formatting or code blocks.
             """.trimIndent()
 
