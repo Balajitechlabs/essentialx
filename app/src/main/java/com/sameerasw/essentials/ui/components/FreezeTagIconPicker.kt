@@ -42,11 +42,11 @@ fun FreezeTagIconPicker(
         "rounded_favorite_24",
         "rounded_shopping_cart_24",
         "rounded_music_note_24",
+        "rounded_videogame_asset_24",
         "rounded_apartment_24",
         "rounded_beach_access_24",
         "rounded_local_pizza_24",
         "rounded_train_24",
-        "rounded_directions_bus_24",
         "rounded_flight_24",
         "rounded_directions_boat_24"
     )
