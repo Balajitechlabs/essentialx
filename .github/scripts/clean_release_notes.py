@@ -1,55 +1,66 @@
 #!/usr/bin/env python3
 import os
 import re
-import html
+
+def escape_telegram_html(text: str) -> str:
+    text = re.sub(r"&(?!amp;|lt;|gt;|quot;|#\d+;|#x[0-9a-fA-F]+;)", "&amp;", text)
+    valid_tag_pattern = r"(</?(?:a|b|i|s|u|code|pre|blockquote)(?:\s+href=\"[^\"]*\")?\s*>)"
+    parts = re.split(valid_tag_pattern, text, flags=re.IGNORECASE)
+    for i in range(len(parts)):
+        if not re.match(valid_tag_pattern, parts[i], flags=re.IGNORECASE):
+            parts[i] = parts[i].replace("<", "&lt;").replace(">", "&gt;")
+    return "".join(parts)
 
 def clean_release_notes(raw: str) -> str:
-    # 1. Remove HTML img tags (<img ... /> or <img ...>)
     text = re.sub(r"<img\b[^>]*\/?>", "", raw, flags=re.IGNORECASE)
-
-    # 2. Remove layout/header HTML tags (<details>, <summary>, <h1-6>, <p>, <div>, <span>, <align>)
+    text = re.sub(r"<a\b[^>]*>\s*</a>", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"^[-\*_]{3,}\s*$", "", text, flags=re.MULTILINE)
     text = re.sub(r"</?(?:details|summary|h[1-6]|p|div|span|align)\b[^>]*>", "", text, flags=re.IGNORECASE)
-
-    # 3. Remove Markdown image tags ![alt](url)
     text = re.sub(r"!\[.*?\]\(.*?\)", "", text)
 
-    # 4. Transform PR lines to "- #123 by @author"
+    def convert_md_link(match):
+        return f'<a href="{match.group(2)}">{match.group(1)}</a>'
+
+    text = re.sub(r"\[(.*?)\]\((.*?)\)", convert_md_link, text)
+    text = re.sub(r"\*\*(.*?)\*\*", r"<b>\1</b>", text)
+
     cleaned_lines = []
+    in_quote = False
+    quote_buf = []
+
     for line in text.splitlines():
+        trimmed = line.lstrip()
+        if trimmed.startswith(">"):
+            content = trimmed[1:].strip()
+            if content:
+                quote_buf.append(content)
+                in_quote = True
+            continue
+        else:
+            if in_quote:
+                if quote_buf:
+                    cleaned_lines.append("<blockquote>" + "\n".join(quote_buf) + "</blockquote>")
+                quote_buf = []
+                in_quote = False
+
         pr_match = re.search(r"/pull/(\d+)", line)
         if pr_match:
             pr_num = pr_match.group(1)
             users = re.findall(r"@[A-Za-z0-9_-]+", line)
-            author = None
-            for u in users:
-                if u.lower() != "@github-actions":
-                    author = u
-                    break
-            if not author and users:
-                author = users[0]
-
-            if author:
-                cleaned_lines.append(f"- #{pr_num} by {author}")
-            else:
-                cleaned_lines.append(f"- #{pr_num}")
+            author = next((u for u in users if u.lower() != "@github-actions"), users[0] if users else None)
+            cleaned_lines.append(f"- #{pr_num} by {author}" if author else f"- #{pr_num}")
         else:
             cleaned_lines.append(line)
 
+    if in_quote and quote_buf:
+        cleaned_lines.append("<blockquote>" + "\n".join(quote_buf) + "</blockquote>")
+
     text = "\n".join(cleaned_lines)
-
-    # 5. Strip leading markdown header symbols (### Header -> Header)
     text = re.sub(r"^#+\s*", "", text, flags=re.MULTILINE)
-
-    # 6. Convert bullet lists starting with "* " to "- "
     text = re.sub(r"^\*\s+", "- ", text, flags=re.MULTILINE)
-
-    # 7. Compress 3 or more consecutive blank lines into a single blank line
     text = re.sub(r"\n\s*\n\s*\n+", "\n\n", text).strip()
+    text = escape_telegram_html(text)
 
-    # 8. Escape HTML special characters for Telegram parse_mode: HTML
-    text = html.escape(text)
-
-    # 9. Truncate safely at 3800 chars to avoid Telegram message length limit (4096)
     return text[:3800]
 
 if __name__ == "__main__":
