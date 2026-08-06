@@ -270,6 +270,8 @@ class MainViewModel : ViewModel() {
     val hasPendingUpdates = mutableStateOf(false)
 
     val isPitchBlackThemeEnabled = mutableStateOf(false)
+    val isGenAIAutomationEnabled = mutableStateOf(false)
+
     val isEnableUnsupportedFeatures = mutableStateOf(false)
     val isBlurEnabled = mutableStateOf(true)
     val isBlurSettingEnabled = mutableStateOf(true)
@@ -1592,6 +1594,9 @@ class MainViewModel : ViewModel() {
 
         isAutoUpdateEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_AUTO_UPDATE_ENABLED, true)
+        isGenAIAutomationEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED, false)
+
         isUpdateNotificationEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_UPDATE_NOTIFICATION_ENABLED, true)
         freezeMode.intValue = settingsRepository.getFreezeMode()
@@ -1822,6 +1827,12 @@ class MainViewModel : ViewModel() {
         isAutoUpdateEnabled.value = enabled
         settingsRepository.putBoolean(SettingsRepository.KEY_AUTO_UPDATE_ENABLED, enabled)
     }
+
+    fun setGenAIAutomationEnabled(enabled: Boolean, context: Context) {
+        isGenAIAutomationEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED, enabled)
+    }
+
 
     fun setUpdateNotificationEnabled(enabled: Boolean, context: Context) {
         isUpdateNotificationEnabled.value = enabled

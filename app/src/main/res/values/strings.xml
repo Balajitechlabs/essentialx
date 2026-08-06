@@ -1,5 +1,20 @@
 <resources>
+    <string name="diy_genai_lazy_title">I’m lazy, Do it for me</string>
+    <string name="settings_genai_automation_title">Enable GenAI use</string>
+
+
+    <string name="settings_genai_automation_desc">Use on-device Gemini Nano to help create automations from descriptions</string>
+    <string name="diy_genai_describe_placeholder">Describe the automation…</string>
+    <string name="diy_genai_describe_send">Send</string>
+    <string name="diy_genai_preview_title">AI Suggested Automation</string>
+    <string name="diy_genai_disclaimer">AI is dumb and sometimes can mess up, Please review the recommended automation</string>
+    <string name="diy_genai_error">AI could not understand the request. Please try rephrasing.</string>
+    <string name="diy_genai_unavailable">GenAI not available on this device</string>
+    <string name="label_ai_features">AI Features</string>
+    <string name="action_create">Create</string>
+    <string name="action_dismiss">Dismiss</string>
     <string name="label_app_info">App Info</string>
+
     <string name="label_customization">Customization</string>
     <string name="label_beta">BETA</string>
     <string name="shut_up_attempt_shizuku_restart">Attempt Shizuku restart</string>

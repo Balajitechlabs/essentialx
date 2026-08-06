@@ -17,7 +17,13 @@ import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
+
+
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -37,9 +43,26 @@ import com.sameerasw.essentials.utils.HapticUtil
 @Composable
 fun NewAutomationSheet(
     onDismiss: () -> Unit,
-    onOptionSelected: (Automation.Type) -> Unit
+    onOptionSelected: (Automation.Type) -> Unit,
+    onAIDescribeRequested: ((String) -> Unit)? = null,
+    isGenAILoading: Boolean = false
 ) {
     val context = LocalContext.current
+    val view = LocalView.current
+    var aiPromptText by remember { mutableStateOf("") }
+
+    val isGenAIEnabled = remember(context) {
+        SettingsRepository(context).getBoolean(SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED, false)
+    }
+    var isGenAISupported by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        if (isGenAIEnabled) {
+            isGenAISupported = com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
+        }
+    }
+
+
     val isPixelSearchbarEnabled = remember(context) {
         SettingsRepository(context).getBoolean(SettingsRepository.KEY_PIXEL_SEARCHBAR, false)
     }
@@ -89,7 +112,32 @@ fun NewAutomationSheet(
                 }
             }
 
+            if (isGenAIEnabled && isGenAISupported && onAIDescribeRequested != null) {
+                RoundedCardContainer(
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+                        iconRes = R.drawable.rounded_auto_awesome_24,
+                        title = stringResource(R.string.diy_genai_lazy_title),
+                        showToggle = false,
+                        onClick = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onDismiss()
+                            onAIDescribeRequested("")
+                        },
+                        onCheckedChange = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onDismiss()
+                            onAIDescribeRequested("")
+                        }
+                    )
+                }
+            }
+
+
+
             RoundedCardContainer {
+
                 // Trigger Option
                 AutomationTypeOption(
                     title = stringResource(R.string.diy_create_trigger_title),

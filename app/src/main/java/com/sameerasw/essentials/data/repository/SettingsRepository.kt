@@ -46,7 +46,9 @@ class SettingsRepository(private val context: Context) {
         const val PREFS_NAME = "essentials_prefs"
 
         // Keys
+        const val KEY_GENAI_AUTOMATION_ENABLED = "genai_automation_enabled"
         const val KEY_DAILY_WALLPAPER_LAST_ID = "daily_wallpaper_last_id"
+
         const val KEY_DAILY_WALLPAPER_LAST_URL_MOBILE = "daily_wallpaper_last_url_mobile"
         const val KEY_DAILY_WALLPAPER_LAST_URL = "daily_wallpaper_last_url"
         const val KEY_DAILY_WALLPAPER_AUTHOR_NAME = "daily_wallpaper_author_name"
