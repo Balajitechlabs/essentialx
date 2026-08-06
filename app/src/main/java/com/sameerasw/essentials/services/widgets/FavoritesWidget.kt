@@ -193,7 +193,7 @@ class FavoritesWidget : GlanceAppWidget() {
                                                                             .cornerRadius(
                                                                                 iconCornerRadius
                                                                             )
-                                                                            .background(pastelColor),
+                                                                            .background(ColorProvider(pastelColor)),
                                                                         contentAlignment = Alignment.Center
                                                                     ) {
                                                                         Image(
@@ -246,7 +246,7 @@ class FavoritesWidget : GlanceAppWidget() {
                                                                             .cornerRadius(
                                                                                 iconCornerRadius
                                                                             )
-                                                                            .background(pastelColor),
+                                                                            .background(ColorProvider(pastelColor)),
                                                                         contentAlignment = Alignment.Center
                                                                     ) {
                                                                         Image(
