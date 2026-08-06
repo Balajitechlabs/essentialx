@@ -156,6 +156,17 @@ object FeatureRegistry {
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
         object : Feature(
+            id = "Power and battery",
+            title = R.string.feat_power_battery_title,
+            iconRes = R.drawable.rounded_battery_charging_60_24,
+            category = R.string.cat_system,
+            description = R.string.feat_power_battery_desc,
+            showToggle = false
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = true
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+        },
+        object : Feature(
             id = "Widgets",
             title = R.string.feat_widgets_title,
             iconRes = R.drawable.rounded_widgets_24,
@@ -614,12 +625,12 @@ object FeatureRegistry {
 
         object : Feature(
             id = "Power and Battery",
-            title = R.string.feat_power_battery_title,
+            title = R.string.feat_power_saving_title,
             iconRes = R.drawable.rounded_battery_charging_60_24,
-            category = R.string.cat_interaction,
-            description = R.string.feat_power_battery_desc,
+            category = R.string.cat_system,
+            description = R.string.feat_power_saving_desc,
             aboutDescription = R.string.about_desc_power_battery,
-            parentFeatureId = "Input",
+            parentFeatureId = "Power and battery",
             showToggle = false,
             hasMoreSettings = true,
             permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
@@ -667,11 +678,11 @@ object FeatureRegistry {
             id = "Standby apps",
             title = R.string.feat_standby_apps_title,
             iconRes = R.drawable.rounded_app_registration_24,
-            category = R.string.cat_interaction,
+            category = R.string.cat_system,
             description = R.string.feat_standby_apps_desc,
             aboutDescription = R.string.about_desc_standby_apps,
             permissionKeys = listOf("SHIZUKU"),
-            parentFeatureId = "Input",
+            parentFeatureId = "Power and battery",
             showToggle = false,
             hasMoreSettings = true
         ) {
@@ -745,7 +756,7 @@ object FeatureRegistry {
             aboutDescription = R.string.about_desc_battery_notification,
             permissionKeys = listOf("POST_NOTIFICATIONS", "BLUETOOTH_CONNECT", "BLUETOOTH_SCAN"),
             showToggle = true,
-            parentFeatureId = "Notifications"
+            parentFeatureId = "Power and battery"
         ) {
             override fun isEnabled(viewModel: MainViewModel) =
                 viewModel.isBatteryNotificationEnabled.value

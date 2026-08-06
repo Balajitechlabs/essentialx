@@ -1466,7 +1466,9 @@
     <string name="perm_watch_write_secure_desc">Requires secure settings write permission on your Watch. Grant it using the ADB command below.</string>
 
     <string name="feat_power_battery_title">Power and battery</string>
-    <string name="feat_power_battery_desc">Configure the power saving policies</string>
+    <string name="feat_power_battery_desc">Optimize the power draw</string>
+    <string name="feat_power_saving_title">Power saving</string>
+    <string name="feat_power_saving_desc">Configure the power saving policies</string>
     <string name="label_low_power_trigger_level">Custom trigger level</string>
     <string name="desc_low_power_trigger_level">for power saving</string>
     <string name="title_battery_saver_general">General Settings</string>
