@@ -266,9 +266,9 @@
     <string name="dns_preset_cleanbrowsing">CleanBrowsing</string>
     <string name="dns_preset_cleanbrowsing_hostname">adult-filter-dns.cleanbrowsing.org</string>
     <string name="tile_charge_optimization">充電中</string>
-    <string name="limit_to_80">Limit to 80%</string>
-    <string name="adaptive_charging">Adaptive</string>
-    <string name="deactivated">Not optimized</string>
+    <string name="limit_to_80"> 80%に制限</string>
+    <string name="adaptive_charging">適応型</string>
+    <string name="deactivated">最適化なし</string>
     <string name="permission_missing">Permission missing</string>
     <!-- Screen Locked Security -->
     <string name="screen_locked_security_title">ロック画面セキュリティ</string>
@@ -1558,4 +1558,13 @@
 ロックダウンモードでは、顔認証や指紋認証などの脆弱なロック解除方法が無効になり、パターンまたはPINコードによる安全なロック解除が必須となります。
 
 ロックダウン機能を使用するには、端末管理者権限が必要です。</string>
+    <string name="label_thermal_cpu">CPU温度</string>
+    <string name="label_thermal_gpu">GPU温度</string>
+    <string name="label_battery_status">状態</string>
+    <string name="label_auto_reset_battery_stats_title">自動リセット</string>
+    <string name="label_auto_reset_battery_stats_desc">充電量が90%を超えている状態でデバイスの電源ケーブルを抜いた際、バッテリーの統計情報を自動的にリセットします。</string>
+    <string name="label_audio_drain">音声による消費電力</string>
+    <string name="label_camera_drain">カメラによる消費電力</string>
+    <string name="label_cpu_idle_drain">CPUアイドル時の消費電力</string>
+    <string name="label_cpu_suspend_drain">CPUサスペンド時の消費電力</string>
 </resources>
