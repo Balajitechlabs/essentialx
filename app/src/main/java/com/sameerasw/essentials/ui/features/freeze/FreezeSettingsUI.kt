@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.composables.configs
+package com.sameerasw.essentials.ui.features.system
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts

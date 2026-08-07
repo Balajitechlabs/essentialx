@@ -53,43 +53,43 @@ import com.sameerasw.essentials.ui.core.cards.FeatureCard
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.linkActions.LinkPickerScreen
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
-import com.sameerasw.essentials.ui.composables.configs.AlwaysOnDisplaySettingsUI
+import com.sameerasw.essentials.ui.features.system.AlwaysOnDisplaySettingsUI
 import com.sameerasw.essentials.ui.features.battery.BatteriesSettingsUI
 import com.sameerasw.essentials.ui.features.security.AppLockSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.BatteryNotificationSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.ButtonRemapSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.CaffeinateSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.CalendarSyncSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.DynamicNightLightSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.EssentialsOnDisplaySettingsUI
-import com.sameerasw.essentials.ui.composables.configs.FlashlightPulseSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.FlashlightSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.FreezeSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.KeyboardSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.LiveWallpaperSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.LocationReachedSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.LockScreenClockSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.MapsPowerSavingSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.NavigationSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.NetworksSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.NotificationLightingSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.NotificationSnoozingSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.OtherCustomizationsSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.PocketModeSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.PowerAndBatterySettingsUI
-import com.sameerasw.essentials.ui.composables.configs.QuickSettingsTilesSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.RefreshRateSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.RemoteLockSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.ScreenLockedSecuritySettingsUI
-import com.sameerasw.essentials.ui.composables.configs.ScreenOffWidgetSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.ShutUpSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.SnoozeNotificationsSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.SoundModeTileSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.StandbyAppsSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.StatusBarIconSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.TextAnimationsSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.WatchControlsSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.WatchSettingsUI
+import com.sameerasw.essentials.ui.features.system.BatteryNotificationSettingsUI
+import com.sameerasw.essentials.ui.features.system.ButtonRemapSettingsUI
+import com.sameerasw.essentials.ui.features.system.CaffeinateSettingsUI
+import com.sameerasw.essentials.ui.features.system.CalendarSyncSettingsUI
+import com.sameerasw.essentials.ui.features.system.DynamicNightLightSettingsUI
+import com.sameerasw.essentials.ui.features.system.EssentialsOnDisplaySettingsUI
+import com.sameerasw.essentials.ui.features.system.FlashlightPulseSettingsUI
+import com.sameerasw.essentials.ui.features.system.FlashlightSettingsUI
+import com.sameerasw.essentials.ui.features.system.FreezeSettingsUI
+import com.sameerasw.essentials.ui.features.system.KeyboardSettingsUI
+import com.sameerasw.essentials.ui.features.system.LiveWallpaperSettingsUI
+import com.sameerasw.essentials.ui.features.system.LocationReachedSettingsUI
+import com.sameerasw.essentials.ui.features.system.LockScreenClockSettingsUI
+import com.sameerasw.essentials.ui.features.system.MapsPowerSavingSettingsUI
+import com.sameerasw.essentials.ui.features.system.NavigationSettingsUI
+import com.sameerasw.essentials.ui.features.system.NetworksSettingsUI
+import com.sameerasw.essentials.ui.features.system.NotificationLightingSettingsUI
+import com.sameerasw.essentials.ui.features.system.NotificationSnoozingSettingsUI
+import com.sameerasw.essentials.ui.features.system.OtherCustomizationsSettingsUI
+import com.sameerasw.essentials.ui.features.system.PocketModeSettingsUI
+import com.sameerasw.essentials.ui.features.system.PowerAndBatterySettingsUI
+import com.sameerasw.essentials.ui.features.system.QuickSettingsTilesSettingsUI
+import com.sameerasw.essentials.ui.features.system.RefreshRateSettingsUI
+import com.sameerasw.essentials.ui.features.system.RemoteLockSettingsUI
+import com.sameerasw.essentials.ui.features.system.ScreenLockedSecuritySettingsUI
+import com.sameerasw.essentials.ui.features.system.ScreenOffWidgetSettingsUI
+import com.sameerasw.essentials.ui.features.system.ShutUpSettingsUI
+import com.sameerasw.essentials.ui.features.system.SnoozeNotificationsSettingsUI
+import com.sameerasw.essentials.ui.features.system.SoundModeTileSettingsUI
+import com.sameerasw.essentials.ui.features.system.StandbyAppsSettingsUI
+import com.sameerasw.essentials.ui.features.system.StatusBarIconSettingsUI
+import com.sameerasw.essentials.ui.features.system.TextAnimationsSettingsUI
+import com.sameerasw.essentials.ui.features.system.WatchControlsSettingsUI
+import com.sameerasw.essentials.ui.features.system.WatchSettingsUI
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
@@ -802,7 +802,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                     }
 
                                     "Smart pixels" -> {
-                                        com.sameerasw.essentials.ui.composables.configs.SmartPixelsSettingsUI(
+                                        com.sameerasw.essentials.ui.features.system.SmartPixelsSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightSetting = highlightSetting
