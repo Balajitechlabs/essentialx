@@ -716,7 +716,9 @@
     <string name="action_what_is_this">Đây là cái gì?</string>
     <string name="update_available_title">Cập nhật có sẵn</string>
     <string name="about_desc_your_android">Glance at your device\'s hardware and software specifications in detail. This information is fetched from GSMArena and system properties to provide a comprehensive overview of your Android device.</string>
-    <string name="about_desc_essentials_on_display">Essentials On Display shows a Now Playing overlay on your lock screen when music is playing and playback changes. \n\nIf your device does not support overlays over AOD, you can opt for the Ambience screensaver added in your Android settings as an alternative while charging.</string>
+    <string name="about_desc_essentials_on_display">Tính năng \"Essentials On Display\" hiển thị lớp phủ thông tin bài hát đang phát trên màn hình khóa mỗi khi nhạc đang chạy hoặc có thay đổi về trạng thái phát nhạc.
+
+Nếu thiết bị của bạn không hỗ trợ hiển thị lớp phủ đè lên màn hình AOD (Always On Display), bạn có thể chọn sử dụng trình bảo vệ màn hình \"Ambience\" (có trong phần cài đặt Android) làm giải pháp thay thế khi đang sạc pin.</string>
     <string name="about_desc_notification_lighting">Ánh sáng thông báo thêm hiệu ứng ánh sáng cạnh đẹp mắt khi bạn nhận được thông báo.\n\nBạn có thể tùy chỉnh kiểu hoạt ảnh, màu sắc và hành vi. Nó hoạt động ngay cả khi màn hình tắt (phụ thuộc OEM) hoặc ở trên ứng dụng hiện tại của bạn. Chọn ứng dụng, mức độ ưu tiên của thông báo hoặc hành vi nào sẽ được kích hoạt từ các điều khiển nhất định. Nếu OEM của bạn không hỗ trợ lớp phủ trên AOD, hãy kiện tùy chọn Hiển thị xung quanh được tìm thấy bên dưới.</string>
     <string name="about_desc_screen_off_widget">Dễ dàng tắt màn hình bằng một cú chạm vào tiện ích trong suốt có thể thay đổi kích thước, không thêm biểu tượng hoặc bất kỳ sự lộn xộn nào vào màn hình chính của bạn.</string>
     <string name="about_desc_statusbar_icons">Kiểm soát hoàn toàn các biểu tượng trên thanh trạng thái của bạn.\n\nẨn các biểu tượng cụ thể như WiFi, Bluetooth hoặc dữ liệu di động để giữ cho thanh trạng thái của bạn luôn sạch sẽ. Bạn cũng có thể tùy chỉnh định dạng đồng hồ và chỉ báo pin bằng một số điều khiển thông minh. Đây là danh sách các điều khiển AOSP có sẵn nên hệ điều hành trên thiết bị của bạn có thể không tôn trọng tất cả các điều khiển.</string>
@@ -1174,7 +1176,7 @@
     <string name="download_airsync_summary">Cần thiết để đồng bộ hóa pin Mac</string>
     <string name="feat_battery_notification_title">Thông báo pin</string>
     <string name="feat_battery_notification_desc">Thông báo trạng thái pin của thiết bị liên tục</string>
-    <string name="battery_notification_hint">This notification displays battery levels for your connected Mac and Bluetooth devices. You can configure which devices to show in the Battery Widget settings.</string>
+    <string name="battery_notification_hint">Thông báo này hiển thị mức pin của máy Mac và các thiết bị Bluetooth đang được kết nối. Bạn có thể tùy chọn các thiết bị sẽ hiển thị trong phần cài đặt Tiện ích Pin (Battery Widget).</string>
     <string name="about_desc_battery_notification">Tái tạo trải nghiệm tiện ích pin trong bóng thông báo của bạn. Nó sẽ hiển thị mức pin của tất cả các thiết bị được kết nối của bạn trong một thông báo liên tục, được cập nhật theo thời gian thực. Điều này bao gồm máy Mac của bạn (thông qua AirSync) và các phụ kiện Bluetooth.</string>
     <string name="battery_notification_channel_name">Thông báo trạng thái pin</string>
     <string name="battery_notification_channel_desc">Thông báo liên tục hiển thị mức pin của thiết bị được kết nối</string>
@@ -1316,7 +1318,7 @@
     <string name="label_transition_animation_scale">Quy mô hoạt ảnh chuyển tiếp</string>
     <string name="label_window_animation_scale">Tỷ lệ hoạt ảnh cửa sổ</string>
     <string name="about_desc_text_animations">Điều chỉnh tỷ lệ phông chữ, trọng lượng và tốc độ hoạt ảnh trên toàn hệ thống. Lưu ý rằng một số cài đặt có thể yêu cầu quyền nâng cao hoặc khởi động lại thiết bị đối với một số ứng dụng nhất định để phản ánh các thay đổi. \n\nCó thể cần thêm quyền shizuku hoặc quyền root để điều chỉnh tỷ lệ</string>
-    <string name="about_desc_screen_refresh_rate">Set a custom screen refresh rate using Shizuku. Fixed mode locks both the minimum and peak refresh rate to one value, while range mode lets you define separate minimum and peak values. Reset clears the custom override and returns the device to its system-managed refresh behavior.</string>
+    <string name="about_desc_screen_refresh_rate">Thiết lập tốc độ làm mới màn hình tùy chỉnh bằng Shizuku. Chế độ cố định (Fixed mode) khóa cả tốc độ làm mới tối thiểu và tối đa ở cùng một giá trị, trong khi chế độ dải (range mode) cho phép bạn thiết lập các giá trị tối thiểu và tối đa riêng biệt. Lệnh đặt lại (Reset) sẽ xóa các thiết lập tùy chỉnh và đưa thiết bị trở về cơ chế quản lý tốc độ làm mới mặc định của hệ thống.</string>
     <string name="refresh_rate_section_mode">Mode</string>
     <string name="refresh_rate_section_values">Refresh Rate</string>
     <string name="refresh_rate_mode_fixed">Cố định</string>
@@ -1415,7 +1417,7 @@
     <!-- Lock Screen Clock -->
     <string name="feat_lock_screen_clock_title">Đồng hồ màn hình khóa</string>
     <string name="feat_lock_screen_clock_desc">Tùy chỉnh đồng hồ màn hình khóa trên điện thoại Pixel</string>
-    <string name="about_desc_lock_screen_clock">Change the lock screen clock style on Pixels. Select from the available clock faces provided by the System UI. Some old styles might not be available.</string>
+    <string name="about_desc_lock_screen_clock">Thay đổi kiểu đồng hồ trên màn hình khóa của điện thoại Pixel. Hãy chọn từ các kiểu mặt đồng hồ có sẵn do System UI cung cấp. Một số kiểu cũ có thể sẽ không còn khả dụng.</string>
     <string name="lock_screen_clock_bignum">Big Number</string>
     <string name="lock_screen_clock_calligraphy">Calligraphy</string>
     <string name="lock_screen_clock_flex">Flex</string>
@@ -1494,4 +1496,51 @@
     <string name="label_snooze_option_2">Lựa chọn 2</string>
     <string name="label_snooze_option_3">Lựa chọn 3</string>
     <string name="label_snooze_option_4">Lựa chọn 4</string>
+    <string name="settings_translate_mode_desc">Nhấn và giữ bất kỳ văn bản nào để dịch và đóng góp cho cộng đồng.</string>
+    <string name="feat_standby_apps_title">Ứng dụng ở chế độ chờ</string>
+    <string name="feat_standby_apps_desc">Tối ưu hóa các hoạt động chạy ngầm của ứng dụng</string>
+    <string name="flashlight_pocket_title">Tính năng phát hiện trong túi</string>
+    <string name="flashlight_pocket_desc">Tắt đèn pin khi điện thoại ở trong túi của bạn.</string>
+    <string name="flashlight_overheat_title">Phòng tránh quá nhiệt</string>
+    <string name="flashlight_overheat_desc">Giảm độ sáng khi sử dụng trong thời gian dài.</string>
+    <string name="label_low_power_trigger_level">Mức kích hoạt tùy chỉnh</string>
+    <string name="desc_low_power_trigger_level">để tiết kiệm điện</string>
+    <string name="label_enable_firewall">Bật tường lửa</string>
+    <string name="desc_enable_firewall">Bật tường lửa mạng để hạn chế hoạt động mạng chạy ngầm.</string>
+    <string name="label_force_all_apps_standby">Buộc Chế độ chờ</string>
+    <string name="desc_force_all_apps_standby">Đưa tất cả ứng dụng vào nhóm App Standby khi đang hoạt động.</string>
+    <string name="title_battery_saver_general">Cài đặt chung</string>
+    <string name="label_enable_brightness_adjustment">Bật tính năng giảm độ sáng</string>
+    <string name="desc_enable_brightness_adjustment">Cho phép giảm giới hạn độ sáng màn hình khi chế độ tiết kiệm đang hoạt động.</string>
+    <string name="label_adjust_brightness_factor">Hệ số điều chỉnh độ sáng</string>
+    <string name="label_disable_animation">Tắt hiệu ứng động</string>
+    <string name="desc_disable_animation">Tắt hiệu ứng động của cửa sổ và hệ thống.</string>
+    <string name="label_disable_aod">Tắt tính năng Always-on Display</string>
+    <string name="desc_disable_aod">Tắt tính năng Ambient Display / Màn hình luôn bật</string>
+    <string name="label_enable_night_mode">Buộc sử dụng Chế độ Tối/Ban đêm</string>
+    <string name="desc_enable_night_mode">Buộc sử dụng giao diện tối khi chế độ tiết kiệm pin được kích hoạt.</string>
+    <string name="label_disable_launch_boost">Tắt tính năng Tăng tốc khởi động</string>
+    <string name="desc_disable_launch_boost">Giảm mức tăng xung nhịp CPU khi khởi động ứng dụng để tiết kiệm điện năng.</string>
+    <string name="label_enable_quick_doze">Bật Quick Doze</string>
+    <string name="desc_enable_quick_doze">Chuyển sang chế độ ngủ Doze nhanh hơn khi màn hình tắt.</string>
+    <string name="label_disable_optional_sensors">Vô hiệu hóa các cảm biến tùy chọn</string>
+    <string name="desc_disable_optional_sensors">Vô hiệu hóa các cảm biến tùy chọn tiêu tốn nhiều năng lượng như cảm biến tiệm cận, con quay hồi chuyển, v.v.</string>
+    <string name="desc_enable_datasaver">Bật chế độ Tiết kiệm dữ liệu để hạn chế sử dụng dữ liệu nền.</string>
+    <string name="label_defer_full_backup">Hoãn sao lưu toàn bộ</string>
+    <string name="desc_defer_full_backup">Hoãn việc sao lưu toàn bộ hệ thống cho đến khi chế độ tiết kiệm pin được tắt.</string>
+    <string name="label_defer_keyvalue_backup">Hoãn sao lưu cặp khóa-giá trị</string>
+    <string name="desc_defer_keyvalue_backup">Hoãn việc sao lưu cặp khóa-giá trị.</string>
+    <string name="label_disable_vibration">Tắt chế độ rung</string>
+    <string name="desc_disable_vibration">Tắt phản hồi xúc giác và rung trên toàn hệ thống.</string>
+    <string name="label_soundtrigger_mode">Chế độ kích hoạt bằng âm thanh</string>
+    <string name="desc_soundtrigger_mode">Hạn chế tính năng phát hiện từ đánh thức trợ lý (ví dụ: \"Hey Google\").</string>
+    <string name="label_location_mode">Chế độ GPS / Vị trí</string>
+    <string name="desc_location_mode">Hạn chế các yêu cầu về vị trí khi chế độ tiết kiệm pin đang bật.</string>
+    <string name="about_desc_power_battery">Tinh chỉnh chính sách các tham số nội bộ của tính năng Tiết kiệm pin trên Android. Tùy chỉnh các cơ chế hoạt động như giới hạn độ sáng, hạn chế tần suất cập nhật vị trí, bật/tắt rung, trì hoãn đồng bộ hóa nền và trạng thái cảm biến khi chế độ tiết kiệm pin được kích hoạt.</string>
+    <string name="about_desc_standby_apps">Quản lý các nhóm trạng thái chờ của ứng dụng Android (Active, Working set, Frequent, Rare, Restricted) để kiểm soát việc thực thi ứng dụng chạy ngầm, mức sử dụng mạng và mức tiêu thụ pin.</string>
+    <string name="about_desc_pixel_searchbar">Thay thế thanh tìm kiếm mặc định của Pixel Launcher trên màn hình chính. Bạn có thể tùy chỉnh nội dung hiển thị là không gì cả (Trống) hoặc ngày hiện tại.
+
+Xin lưu ý rằng việc kích hoạt tính năng này có thể làm lỗi các tiện ích \"At a Glance\" của Pixel Launcher (chẳng hạn như tiện ích thể thao và tài chính).
+
+Ngoài ra, có thể cần áp đặt cài đặt này nhiều lần để thay đổi có hiệu lực.</string>
 </resources>

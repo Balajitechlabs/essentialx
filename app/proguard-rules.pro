@@ -61,3 +61,6 @@
     public static <fields>;
 }
 -keep class com.sameerasw.essentials.domain.genai.** { *; }
+-keep class com.sameerasw.essentials.appfunctions.** { *; }
+-keep class androidx.appfunctions.** { *; }
+
