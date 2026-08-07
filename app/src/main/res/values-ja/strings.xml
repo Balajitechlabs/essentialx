@@ -354,7 +354,7 @@
     <string name="hide_notification_icons_title">通知を隠す</string>
     <string name="hide_notification_icons_desc">すべての着信や通知アイコンを非表示にする</string>
     <string name="feat_hide_gesture_bar_title">ジェスチャーバーを隠す</string>
-    <string name="feat_hide_gesture_bar_desc">In gesture navigation</string>
+    <string name="feat_hide_gesture_bar_desc">ジェスチャーナビゲーションにおいて</string>
     <string name="feat_hide_gesture_bar_on_launcher_title">ランチャーに表示</string>
     <string name="feat_hide_gesture_bar_on_launcher_desc">ホーム画面にいるときのみ、ジェスチャーバーを動的に表示する</string>
     <string name="feat_circle_to_search_gesture_title">かこって検索ジェスチャー</string>
@@ -1464,7 +1464,7 @@
     <string name="setting_enable_unsupported_features_title">非対応機能を有効化</string>
     <string name="setting_enable_unsupported_features_desc">デフォルトで非表示になっているOEM固有または冗長な機能を表示します。</string>
     <string name="settings_translate_mode">翻訳モード</string>
-    <string name="settings_translate_mode_desc">任意のテキストを長押しし翻訳、コミュニティへ登校します</string>
+    <string name="settings_translate_mode_desc">任意のテキストを長押しして翻訳、コミュニティへ投稿します</string>
     <string name="settings_translated_texts">翻訳済み</string>
     <string name="settings_translated_texts_desc">%d 個の編集が保存済み — タップして送信または破棄</string>
     <string name="shut_up_restore_delay_title">復元までの遅延</string>
@@ -1550,4 +1550,7 @@
     <string name="about_desc_restart_systemui_tile">クイック設定パネルからシステムUIを簡単に再起動できます。ステータスバーの不具合を素早く解決したり、システムUIの変更をすぐに適用したりするのに役立ちます。root権限またはShizukuシェルへのアクセスが必要です。</string>
     <string name="feat_daily_wallpaper_title">壁紙</string>
     <string name="feat_daily_wallpaper_desc">毎日厳選されたライブ壁紙</string>
+    <string name="title_battery_saver_general">一般設定</string>
+    <string name="tile_lockdown_mode_desc">クイック設定タイルで画面をオフにする</string>
+    <string name="tile_lockdown_mode">ロック</string>
 </resources>
