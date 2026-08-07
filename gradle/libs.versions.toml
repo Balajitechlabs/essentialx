@@ -47,9 +47,13 @@ graphicsShapes = "1.1.0"
 media3 = "1.10.1"
 wearRemoteInteractions = "1.2.0"
 genaiSchema = "1.0.0-alpha1"
-
+appfunctions = "1.0.0-alpha10"
 
 [libraries]
+androidx-appfunctions = { module = "androidx.appfunctions:appfunctions", version.ref = "appfunctions" }
+androidx-appfunctions-compiler = { module = "androidx.appfunctions:appfunctions-compiler", version.ref = "appfunctions" }
+
+
 mlkit-genai-prompt = { module = "com.google.mlkit:genai-prompt", version.ref = "mlkitGenaiPrompt" }
 mlkit-genai-schema-compiler = { module = "com.google.mlkit:genai-schema-compiler", version.ref = "mlkitGenaiSchemaCompiler" }
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }

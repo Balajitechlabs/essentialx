@@ -40,6 +40,8 @@ class EssentialsApp : Application() {
         com.sameerasw.essentials.services.DeviceInfoSyncManager.init(this)
         com.sameerasw.essentials.utils.ServiceUtils.startRequiredServices(this)
 
+        com.sameerasw.essentials.appfunctions.AppFunctionAvailabilityManager.updateAvailability(this)
+
         initSentry()
 
         val intentFilter = IntentFilter().apply {
