@@ -1,6 +1,16 @@
-package com.sameerasw.essentials.utils
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Hardware Utilities
+ * File: ThermalUtil.kt
+ * Description: Hardware helper for monitoring device thermal zones and CPU throttling states.
+ */
+
+package com.sameerasw.essentials.utils.hardware
 
 import android.content.Context
+import com.sameerasw.essentials.utils.ShellUtils
 
 data class ThermalItem(
     val name: String,

@@ -40,9 +40,9 @@ import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.pickers.MultiSegmentedPicker
 import com.sameerasw.essentials.ui.theme.Shapes
-import com.sameerasw.essentials.utils.BatteryDetails
-import com.sameerasw.essentials.utils.BatteryInfoUtil
-import com.sameerasw.essentials.utils.ThermalInfo
+import com.sameerasw.essentials.utils.battery.BatteryDetails
+import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
+import com.sameerasw.essentials.utils.hardware.ThermalInfo
 import java.util.Locale
 
 @Composable

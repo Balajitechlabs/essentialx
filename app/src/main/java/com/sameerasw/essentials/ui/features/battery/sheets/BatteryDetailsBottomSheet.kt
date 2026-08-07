@@ -40,8 +40,8 @@ import com.sameerasw.essentials.ui.components.battery.BatteryAppsTabContent
 import com.sameerasw.essentials.ui.components.battery.BatteryInfoTabContent
 import com.sameerasw.essentials.ui.components.battery.BatterySystemTabContent
 import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.utils.BatteryDetails
-import com.sameerasw.essentials.utils.BatteryInfoUtil
+import com.sameerasw.essentials.utils.battery.BatteryDetails
+import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
 import com.sameerasw.essentials.utils.BatteryStatsUtil
 import com.sameerasw.essentials.utils.BatteryUsageApp
 import com.sameerasw.essentials.utils.CpuWakeupItem

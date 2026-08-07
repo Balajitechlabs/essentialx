@@ -1,10 +1,22 @@
-package com.sameerasw.essentials.utils
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Battery Utilities
+ * File: BatteryInfoUtil.kt
+ * Description: System helper utility for querying battery status, health, and design stats.
+ */
+
+package com.sameerasw.essentials.utils.battery
 
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.utils.ShellUtils
+import com.sameerasw.essentials.utils.hardware.ThermalInfo
+import com.sameerasw.essentials.utils.hardware.ThermalUtil
 
 data class BatteryDetails(
     val level: Int,

@@ -1,4 +1,13 @@
-package com.sameerasw.essentials.ui.composables.configs
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Battery Settings
+ * File: BatteriesSettingsUI.kt
+ * Description: UI settings composable screen for battery stats, rings, and charging options.
+ */
+
+package com.sameerasw.essentials.ui.features.battery
 
 import android.content.Intent
 import android.net.Uri
