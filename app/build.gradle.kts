@@ -239,4 +239,7 @@ dependencies {
     implementation(libs.mlkit.genai.prompt)
     ksp(libs.mlkit.genai.schema.compiler)
 
+    // AppFunctions API
+    implementation(libs.androidx.appfunctions)
+    ksp(libs.androidx.appfunctions.compiler)
 }
