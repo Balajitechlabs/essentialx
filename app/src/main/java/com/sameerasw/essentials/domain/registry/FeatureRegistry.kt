@@ -36,19 +36,6 @@ object FeatureRegistry {
         ALL_FEATURES.filter { !it.isDeviceSupported(context) }
 
     val ALL_FEATURES = listOf(
-        object : Feature(
-            id = "AppFunctions AI",
-            title = R.string.feat_app_functions_title,
-            iconRes = R.drawable.google,
-            category = R.string.cat_system,
-            description = R.string.feat_app_functions_desc,
-            aboutDescription = R.string.about_desc_app_functions,
-            showToggle = true
-        ) {
-            override fun isEnabled(viewModel: MainViewModel) = true
-            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
-            override fun isDeviceSupported(context: Context) = android.os.Build.VERSION.SDK_INT >= 35
-        },
         // Sound Group Children
         object : Feature(
             id = "Sound mode tile",
