@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Automation & DIY Rules
+ * File: DIYViewModel.kt
+ * Description: ViewModel managing custom triggers, system actions, AI automation suggestions,
+ * and rule persistent storage.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.app.Application

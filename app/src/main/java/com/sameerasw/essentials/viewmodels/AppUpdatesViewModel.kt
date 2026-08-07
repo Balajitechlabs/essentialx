@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: App Updates & Release Tracking
+ * File: AppUpdatesViewModel.kt
+ * Description: ViewModel managing GitHub repository tracking, update notifications,
+ * release downloads, and in-app APK installation triggers.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.content.Context
