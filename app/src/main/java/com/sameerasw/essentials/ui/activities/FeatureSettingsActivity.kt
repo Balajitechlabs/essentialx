@@ -55,7 +55,7 @@ import com.sameerasw.essentials.ui.components.linkActions.LinkPickerScreen
 import com.sameerasw.essentials.ui.components.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.ui.composables.configs.AlwaysOnDisplaySettingsUI
 import com.sameerasw.essentials.ui.features.battery.BatteriesSettingsUI
-import com.sameerasw.essentials.ui.composables.configs.AppLockSettingsUI
+import com.sameerasw.essentials.ui.features.security.AppLockSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.BatteryNotificationSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.ButtonRemapSettingsUI
 import com.sameerasw.essentials.ui.composables.configs.CaffeinateSettingsUI

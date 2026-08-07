@@ -1,4 +1,14 @@
-package com.sameerasw.essentials.ui.composables.configs
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Security & Device Protection
+ * File: AppLockSettingsUI.kt
+ * Description: Composable UI for configuring AppLock authentication, target applications,
+ * usage access permissions, and auto-lock delay intervals.
+ */
+
+package com.sameerasw.essentials.ui.features.security
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -27,20 +37,24 @@ import com.sameerasw.essentials.ui.components.sheets.AppSelectionSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.BiometricHelper
 import com.sameerasw.essentials.viewmodels.MainViewModel
+import com.sameerasw.essentials.viewmodels.PermissionViewModel
+import com.sameerasw.essentials.viewmodels.SecurityViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppLockSettingsUI(
     viewModel: MainViewModel,
+    securityViewModel: SecurityViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    permissionViewModel: PermissionViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     modifier: Modifier = Modifier,
     highlightKey: String? = null
 ) {
     val context = LocalContext.current
     var isAppSelectionSheetOpen by remember { mutableStateOf(false) }
 
-    val isAppLockEnabled by viewModel.isAppLockEnabled
+    val isAppLockEnabled by securityViewModel.isAppLockEnabled
     val isUseUsageAccess by viewModel.isUseUsageAccess
-    val isAccessibilityEnabled by viewModel.isAccessibilityEnabled
+    val isAccessibilityEnabled by permissionViewModel.isAccessibilityEnabled
     val isUsageStatsPermissionGranted by viewModel.isUsageStatsPermissionGranted
 
     val canEnableAppLock =
