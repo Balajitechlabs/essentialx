@@ -335,7 +335,7 @@
     <string name="stb_battery_percentage_never">表示しない</string>
     <string name="stb_privacy_chip">カメラとマイクのアクセスチップ</string>
     <string name="smart_data_title">スマートモバイルデータ</string>
-    <string name="permission_read_phone_state_title">電話</string>
+    <string name="permission_read_phone_state_title">電話の状態の読み取り</string>
     <string name="permission_read_phone_state_desc">スマートデータのネットワークタイプを検出するために必要です</string>
     <string name="permission_read_phone_state_desc_call_vibrations">触覚フィードバックをトリガーするための通話ステータスの変化の検出に必要です。</string>
     <string name="settings_section_smart_visibility">スマートな可視性</string>
@@ -1551,6 +1551,11 @@
     <string name="feat_daily_wallpaper_title">壁紙</string>
     <string name="feat_daily_wallpaper_desc">毎日厳選されたライブ壁紙</string>
     <string name="title_battery_saver_general">一般設定</string>
-    <string name="tile_lockdown_mode_desc">クイック設定タイルで画面をオフにする</string>
-    <string name="tile_lockdown_mode">ロック</string>
+    <string name="tile_lockdown_mode_desc">クイック設定タイルで画面をオフにします</string>
+    <string name="tile_lockdown_mode">ロックダウン</string>
+    <string name="tile_lockdown_mode_about_desc">ロックダウンモードがオンになっている場合は、端末をロックしてください。
+
+ロックダウンモードでは、顔認証や指紋認証などの脆弱なロック解除方法が無効になり、パターンまたはPINコードによる安全なロック解除が必須となります。
+
+ロックダウン機能を使用するには、端末管理者権限が必要です。</string>
 </resources>
