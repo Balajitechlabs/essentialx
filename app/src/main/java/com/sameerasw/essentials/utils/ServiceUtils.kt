@@ -27,6 +27,11 @@ import java.util.concurrent.TimeUnit
 
 object ServiceUtils {
 
+    /**
+     * Executes the start required services operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun startRequiredServices(context: Context) {
         val settingsRepository = SettingsRepository(context)
 

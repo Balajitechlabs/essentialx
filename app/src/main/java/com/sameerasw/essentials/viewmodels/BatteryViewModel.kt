@@ -26,7 +26,7 @@ class BatteryViewModel : ViewModel() {
     /**
      * Initializes battery settings and updates state.
      *
-     * @param context Application context used for checking battery info and settings.
+     * @param context [Context] Application context used for checking battery info and settings.
      */
     fun loadBatteryState(context: Context) {
         val repo = SettingsRepository(context)
@@ -41,8 +41,8 @@ class BatteryViewModel : ViewModel() {
     /**
      * Updates power saving toggle for Maps navigation.
      *
-     * @param context Application context for persistence.
-     * @param enabled True if maps power saving mode should be active.
+     * @param context [Context] Application context for persistence.
+     * @param enabled [Boolean] True if maps power saving mode should be active.
      */
     fun setMapsPowerSavingEnabled(context: Context, enabled: Boolean) {
         isMapsPowerSavingEnabled.value = enabled

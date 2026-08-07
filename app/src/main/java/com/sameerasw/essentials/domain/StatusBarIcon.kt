@@ -357,7 +357,7 @@ object StatusBarIconRegistry {
 
     /**
      * Get all blacklist names that should be hidden
-     * @param iconVisibilities Map of icon IDs to their visibility state
+     * @param iconVisibilities [Map<String] Map of icon IDs to their visibility state
      * @return Set of blacklist names that should be in the blacklist
      */
     fun getBlacklistNames(iconVisibilities: Map<String, Boolean>): Set<String> {
@@ -376,7 +376,7 @@ object StatusBarIconRegistry {
 
     /**
      * Get visibility state for all icons based on current blacklist
-     * @param blacklist Comma-separated blacklist string from settings
+     * @param blacklist [String?] Comma-separated blacklist string from settings
      * @return Map of icon ID to visibility state
      */
     fun getVisibilityState(blacklist: String?): Map<String, Boolean> {

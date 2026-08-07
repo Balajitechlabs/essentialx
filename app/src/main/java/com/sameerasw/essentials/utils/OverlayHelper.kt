@@ -390,6 +390,9 @@ object OverlayHelper {
             savedStateRegistryController.savedStateRegistry
         override val viewModelStore: ViewModelStore = store
 
+    /**
+     * Executes the on create operation.
+     */
         fun onCreate() {
             savedStateRegistryController.performRestore(null)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -397,6 +400,9 @@ object OverlayHelper {
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         }
 
+    /**
+     * Executes the on destroy operation.
+     */
         fun onDestroy() {
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
@@ -473,8 +479,8 @@ object OverlayHelper {
     /**
      * Removes an overlay view from the WindowManager.
      *
-     * @param windowManager The WindowManager instance
-     * @param view The overlay view to remove
+     * @param windowManager [WindowManager?] The WindowManager instance
+     * @param view [View] The overlay view to remove
      */
     fun removeOverlayView(windowManager: WindowManager?, view: View) {
         try {
@@ -486,8 +492,8 @@ object OverlayHelper {
     /**
      * Removes all overlay views and clears the list.
      *
-     * @param windowManager The WindowManager instance
-     * @param overlayViews The list of overlay views to remove
+     * @param windowManager [WindowManager?] The WindowManager instance
+     * @param overlayViews [MutableList<View>] The list of overlay views to remove
      */
     fun removeAllOverlays(windowManager: WindowManager?, overlayViews: MutableList<View>) {
         try {
@@ -560,8 +566,8 @@ object OverlayHelper {
     /**
      * Animates the overlay view to fade in over 1 second.
      *
-     * @param view The overlay view to animate
-     * @param onAnimationEnd Optional callback when animation completes
+     * @param view [View] The overlay view to animate
+     * @param onAnimationEnd [((] Optional callback when animation completes
      */
     fun fadeInOverlay(view: View, onAnimationEnd: (() -> Unit)? = null) {
         view.alpha = 0f
@@ -664,6 +670,9 @@ object OverlayHelper {
         val durationHold = (pulseDurationMillis * 0.4).toLong()
         val durationOut = (pulseDurationMillis * 0.5).toLong()
 
+    /**
+     * Executes the start pulse operation.
+     */
         fun startPulse() {
             if (pulseCount >= maxPulses) {
                 onAnimationEnd?.invoke()
@@ -721,6 +730,9 @@ object OverlayHelper {
         val holdDuration = (pulseDurationMillis * 0.4).toLong()
         val shrinkDuration = (pulseDurationMillis * 0.5).toLong()
 
+    /**
+     * Executes the start pulse operation.
+     */
         fun startPulse() {
             if (pulseCount >= maxPulses) {
                 onAnimationEnd?.invoke()
@@ -842,6 +854,9 @@ object OverlayHelper {
 
         var pulseCount = 0
 
+    /**
+     * Executes the start pulse operation.
+     */
         fun startPulse() {
             if (pulseCount >= maxPulses) {
                 onAnimationEnd?.invoke()

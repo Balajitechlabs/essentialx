@@ -19,6 +19,12 @@ import com.sameerasw.essentials.ShortcutHandlerActivity
 import com.sameerasw.essentials.domain.model.NotificationApp
 
 object ShortcutUtil {
+    /**
+     * Executes the pin app shortcut operation.
+     *
+     * @param context [Context] Target context.
+     * @param app [NotificationApp] Target app.
+     */
     fun pinAppShortcut(context: Context, app: NotificationApp) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
@@ -51,6 +57,11 @@ object ShortcutUtil {
         }
     }
 
+    /**
+     * Executes the update launcher dynamic shortcuts operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun updateLauncherDynamicShortcuts(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
             val repository = com.sameerasw.essentials.data.repository.SettingsRepository(context)

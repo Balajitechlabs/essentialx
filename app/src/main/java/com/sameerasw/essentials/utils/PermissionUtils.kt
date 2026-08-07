@@ -23,6 +23,12 @@ import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 
 object PermissionUtils {
 
+    /**
+     * Executes the is accessibility service enabled operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun isAccessibilityServiceEnabled(context: Context): Boolean {
         val enabledServices = Settings.Secure.getString(
             context.contentResolver,
@@ -32,11 +38,23 @@ object PermissionUtils {
         return enabledServices?.contains(serviceName) == true
     }
 
+    /**
+     * Executes the can write secure settings operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun canWriteSecureSettings(context: Context): Boolean {
         return context.checkSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS) ==
                 android.content.pm.PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * Executes the has notification listener permission operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun hasNotificationListenerPermission(context: Context): Boolean {
         return try {
             val enabledServices = Settings.Secure.getString(
@@ -50,6 +68,12 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the can draw overlays operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun canDrawOverlays(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Settings.canDrawOverlays(context)
@@ -58,12 +82,24 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the is device admin active operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun isDeviceAdminActive(context: Context): Boolean {
         val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         val adminComponent = ComponentName(context, SecurityDeviceAdminReceiver::class.java)
         return dpm.isAdminActive(adminComponent)
     }
 
+    /**
+     * Executes the is notification lighting accessibility service enabled operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun isNotificationLightingAccessibilityServiceEnabled(context: Context): Boolean {
         return try {
             val enabledServices = Settings.Secure.getString(
@@ -78,6 +114,12 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the is default browser operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun isDefaultBrowser(context: Context): Boolean {
         return try {
             val pm = context.packageManager
@@ -100,6 +142,11 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the open accessibility settings operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun openAccessibilitySettings(context: Context) {
         try {
             val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
@@ -110,6 +157,12 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the has location permission operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun hasLocationPermission(context: Context): Boolean {
         return androidx.core.content.ContextCompat.checkSelfPermission(
             context,
@@ -117,6 +170,12 @@ object PermissionUtils {
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * Executes the has background location permission operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun hasBackgroundLocationPermission(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             androidx.core.content.ContextCompat.checkSelfPermission(
@@ -128,6 +187,12 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the can use full screen intent operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun canUseFullScreenIntent(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             val nm =
@@ -138,12 +203,24 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the is keyboard enabled operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun isKeyboardEnabled(context: Context): Boolean {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         val enabledImeList = imm.enabledInputMethodList
         return enabledImeList.any { it.packageName == context.packageName }
     }
 
+    /**
+     * Executes the is keyboard selected operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun isKeyboardSelected(context: Context): Boolean {
         val defaultIme = Settings.Secure.getString(
             context.contentResolver,
@@ -152,10 +229,22 @@ object PermissionUtils {
         return defaultIme?.startsWith(context.packageName) == true
     }
 
+    /**
+     * Executes the can write system settings operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun canWriteSystemSettings(context: Context): Boolean {
         return Settings.System.canWrite(context)
     }
 
+    /**
+     * Executes the has bluetooth permission operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun hasBluetoothPermission(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             androidx.core.content.ContextCompat.checkSelfPermission(
@@ -174,6 +263,12 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the has read phone state permission operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun hasReadPhoneStatePermission(context: Context): Boolean {
         return androidx.core.content.ContextCompat.checkSelfPermission(
             context,
@@ -181,12 +276,24 @@ object PermissionUtils {
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * Executes the has notification policy access operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun hasNotificationPolicyAccess(context: Context): Boolean {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
         return notificationManager.isNotificationPolicyAccessGranted
     }
 
+    /**
+     * Executes the has read calendar permission operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun hasReadCalendarPermission(context: Context): Boolean {
         return androidx.core.content.ContextCompat.checkSelfPermission(
             context,
@@ -194,6 +301,11 @@ object PermissionUtils {
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
     }
 
+    /**
+     * Executes the open notification policy settings operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun openNotificationPolicySettings(context: Context) {
         try {
             val intent = Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS)
@@ -204,6 +316,11 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the open write settings operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun openWriteSettings(context: Context) {
         try {
             val intent = Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS)
@@ -217,6 +334,11 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the open overlay settings operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun openOverlaySettings(context: Context) {
         try {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
@@ -230,6 +352,12 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the is post notifications enabled operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun isPostNotificationsEnabled(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             androidx.core.content.ContextCompat.checkSelfPermission(
@@ -241,6 +369,12 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the has usage stats permission operation.
+     *
+     * @param context [Context] Target context.
+     * @return The resulting Boolean data.
+     */
     fun hasUsageStatsPermission(context: Context): Boolean {
         val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as android.app.AppOpsManager
         val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -259,6 +393,11 @@ object PermissionUtils {
         return mode == android.app.AppOpsManager.MODE_ALLOWED
     }
 
+    /**
+     * Executes the open usage stats settings operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun openUsageStatsSettings(context: Context) {
         try {
             val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
@@ -268,6 +407,11 @@ object PermissionUtils {
         }
     }
 
+    /**
+     * Executes the open device admin settings operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun openDeviceAdminSettings(context: Context) {
         try {
             val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN)

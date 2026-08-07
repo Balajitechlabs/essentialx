@@ -24,7 +24,7 @@ class SecurityViewModel : ViewModel() {
     /**
      * Initializes security toggles and states from persistent repository.
      *
-     * @param context Application context used to retrieve settings.
+     * @param context [Context] Application context used to retrieve settings.
      */
     fun loadSecurityState(context: Context) {
         val repo = SettingsRepository(context)
@@ -36,8 +36,8 @@ class SecurityViewModel : ViewModel() {
     /**
      * Sets AppLock active state.
      *
-     * @param context Application context for persistence.
-     * @param enabled True to enable AppLock protection.
+     * @param context [Context] Application context for persistence.
+     * @param enabled [Boolean] True to enable AppLock protection.
      */
     fun setAppLockEnabled(context: Context, enabled: Boolean) {
         isAppLockEnabled.value = enabled

@@ -97,6 +97,13 @@ object FreezeManager {
         }
     }
 
+    /**
+     * Executes the is app active operation.
+     *
+     * @param context [Context] Target context.
+     * @param packageName [String] Target package name.
+     * @return The resulting Boolean data.
+     */
     fun isAppActive(context: Context, packageName: String): Boolean {
         // 1. Check Foreground
         if (isAppInForeground(context, packageName)) return true
@@ -311,6 +318,12 @@ object FreezeManager {
                 HiddenApiBypass.invoke(builderClass, builder, "build")
             } else null
 
+    /**
+     * Executes the call set packages suspended operation.
+     *
+             * @param version [Int] Target version.
+     * @return The resulting Array< data.
+     */
             fun callSetPackagesSuspended(version: Int): Array<*>? {
                 return try {
                     when (version) {

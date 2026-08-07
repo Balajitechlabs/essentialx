@@ -32,7 +32,7 @@ class PermissionViewModel : ViewModel() {
     /**
      * Refreshes all system and app permissions status.
      *
-     * @param context Application context used for checking system services and permissions.
+     * @param context [Context] Application context used for checking system services and permissions.
      */
     fun refreshPermissions(context: Context) {
         isAccessibilityEnabled.value = PermissionUtils.isAccessibilityServiceEnabled(context)

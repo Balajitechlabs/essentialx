@@ -26,7 +26,7 @@ class SettingsViewModel : ViewModel() {
     /**
      * Loads saved pinned features and user settings from repository.
      *
-     * @param context Application context for shared preferences access.
+     * @param context [Context] Application context for shared preferences access.
      */
     fun loadSettings(context: Context) {
         val repo = SettingsRepository(context)
@@ -37,8 +37,8 @@ class SettingsViewModel : ViewModel() {
     /**
      * Toggles a pinned feature key.
      *
-     * @param context Application context for persistence.
-     * @param key Unique key of the feature card.
+     * @param context [Context] Application context for persistence.
+     * @param key [String] Unique key of the feature card.
      */
     fun togglePinFeature(context: Context, key: String) {
         val repo = SettingsRepository(context)

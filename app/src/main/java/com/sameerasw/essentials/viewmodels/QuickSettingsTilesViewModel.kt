@@ -25,7 +25,7 @@ class QuickSettingsTilesViewModel : ViewModel() {
     /**
      * Synchronizes Quick Settings tile state values with system setting values.
      *
-     * @param context Application context used for checking system tile states.
+     * @param context [Context] Application context used for checking system tile states.
      */
     fun syncTileStates(context: Context) {
         val repo = SettingsRepository(context)

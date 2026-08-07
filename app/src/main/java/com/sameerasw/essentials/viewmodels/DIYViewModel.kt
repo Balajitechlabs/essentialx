@@ -52,16 +52,32 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
             initialValue = emptyList()
         )
 
+    /**
+     * Executes the delete automation operation.
+     *
+     * @param id [String] Target id.
+     */
     fun deleteAutomation(id: String) {
         repository.removeAutomation(id)
     }
 
+    /**
+     * Executes the toggle automation operation.
+     *
+     * @param id [String] Target id.
+     */
     fun toggleAutomation(id: String) {
         repository.getAutomation(id)?.let { automation ->
             repository.updateAutomation(automation.copy(isEnabled = !automation.isEnabled))
         }
     }
 
+    /**
+     * Executes the request gen ai suggestion operation.
+     *
+     * @param description [String] Target description.
+     * @param context [Context?] Target context.
+     */
     fun requestGenAISuggestion(description: String, context: Context? = null) {
         viewModelScope.launch {
             _genAIState.value = GenAIState.Loading
@@ -74,10 +90,18 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Executes the dismiss gen ai suggestion operation.
+     */
     fun dismissGenAISuggestion() {
         _genAIState.value = GenAIState.Idle
     }
 
+    /**
+     * Executes the confirm gen ai suggestion operation.
+     *
+     * @param suggestion [AutomationSuggestion] Target suggestion.
+     */
     fun confirmGenAISuggestion(suggestion: AutomationSuggestion) {
         val automation = mapSuggestionToAutomation(suggestion)
         repository.addAutomation(automation)
