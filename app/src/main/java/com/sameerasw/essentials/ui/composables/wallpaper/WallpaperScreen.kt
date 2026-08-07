@@ -1,16 +1,20 @@
 package com.sameerasw.essentials.ui.composables.wallpaper
 
+import android.app.WallpaperColors
 import android.app.WallpaperManager
 import android.content.ComponentName
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -82,6 +86,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -112,6 +117,12 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+private data class ExtractedWallpaperColors(
+    val primary: Color,
+    val secondary: Color?,
+    val tertiary: Color?
+)
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun WallpaperScreen(
@@ -130,6 +141,8 @@ fun WallpaperScreen(
     val isAutoUpdateEnabled by viewModel.isDailyWallpaperAutoUpdateEnabled
     val dailyWallpaperAutoUpdateTime by viewModel.dailyWallpaperAutoUpdateTime
     val isDailyWallpaperShowLastTime by viewModel.isDailyWallpaperShowLastTime
+
+    var extractedColors by remember { mutableStateOf<ExtractedWallpaperColors?>(null) }
 
     // Live Wallpaper Settings State
     var availableVideos by remember { mutableStateOf(repository.getLiveWallpaperAvailableVideos()) }
@@ -179,7 +192,39 @@ fun WallpaperScreen(
     }
 
     LaunchedEffect(Unit) {
+        viewModel.loadCachedWallpaper()
         viewModel.fetchTodayWallpaper(context)
+    }
+
+    LaunchedEffect(wallpaperInfo?.urlMobile) {
+        val url = wallpaperInfo?.urlMobile
+        if (!url.isNullOrEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            coroutineScope.launch(Dispatchers.IO) {
+                runCatching {
+                    val loader = coil.ImageLoader(context)
+                    val request = coil.request.ImageRequest.Builder(context)
+                        .data(url)
+                        .allowHardware(false)
+                        .build()
+                    val result = loader.execute(request)
+                    val drawable = result.drawable
+                    if (drawable is BitmapDrawable) {
+                        val bitmap = drawable.bitmap
+                        val wallpaperColors = WallpaperColors.fromBitmap(bitmap)
+                        val primary = Color(wallpaperColors.primaryColor.toArgb())
+                        val secondary = wallpaperColors.secondaryColor?.let { Color(it.toArgb()) }
+                        val tertiary = wallpaperColors.tertiaryColor?.let { Color(it.toArgb()) }
+                        withContext(Dispatchers.Main) {
+                            extractedColors = ExtractedWallpaperColors(
+                                primary = primary,
+                                secondary = secondary,
+                                tertiary = tertiary
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     val density = LocalDensity.current
@@ -255,15 +300,37 @@ fun WallpaperScreen(
 
 
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .progressiveBlur(
-                blurRadius = if (isBlurEnabled) 40f else 0f,
-                height = topBlurHeightPx,
-                direction = BlurDirection.TOP
-            )
-    ) {
+    val baseColorScheme = MaterialTheme.colorScheme
+    val targetPrimary = if (pagerState.currentPage == 0 && extractedColors != null) extractedColors!!.primary else baseColorScheme.primary
+    val targetSecondary = if (pagerState.currentPage == 0 && extractedColors?.secondary != null) extractedColors!!.secondary!! else baseColorScheme.secondary
+    val targetTertiary = if (pagerState.currentPage == 0 && extractedColors?.tertiary != null) extractedColors!!.tertiary!! else baseColorScheme.tertiary
+
+    val animSpec = tween<Color>(durationMillis = 800)
+
+    val animatedPrimary by animateColorAsState(targetValue = targetPrimary, animationSpec = animSpec, label = "animatedPrimary")
+    val animatedSecondary by animateColorAsState(targetValue = targetSecondary, animationSpec = animSpec, label = "animatedSecondary")
+    val animatedTertiary by animateColorAsState(targetValue = targetTertiary, animationSpec = animSpec, label = "animatedTertiary")
+
+    val activeColorScheme = remember(animatedPrimary, animatedSecondary, animatedTertiary, baseColorScheme) {
+        baseColorScheme.copy(
+            primary = animatedPrimary,
+            secondary = animatedSecondary,
+            tertiary = animatedTertiary,
+            primaryContainer = animatedPrimary.copy(alpha = 0.25f),
+            onPrimaryContainer = animatedPrimary
+        )
+    }
+
+    MaterialTheme(colorScheme = activeColorScheme) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .progressiveBlur(
+                    blurRadius = if (isBlurEnabled) 40f else 0f,
+                    height = topBlurHeightPx,
+                    direction = BlurDirection.TOP
+                )
+        ) {
         Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -322,6 +389,33 @@ fun WallpaperScreen(
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize(),
+                            onSuccess = { state ->
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                                    val drawable = state.result.drawable
+                                    val bitmap = (drawable as? BitmapDrawable)?.bitmap 
+                                        ?: (drawable as? coil.drawable.CrossfadeDrawable)?.let {
+                                            // Handle crossfade or custom coil drawable if needed
+                                            null
+                                        }
+                                    bitmap?.let { b ->
+                                        coroutineScope.launch(Dispatchers.Default) {
+                                            runCatching {
+                                                val wallpaperColors = WallpaperColors.fromBitmap(b)
+                                                val primary = Color(wallpaperColors.primaryColor.toArgb())
+                                                val secondary = wallpaperColors.secondaryColor?.let { Color(it.toArgb()) }
+                                                val tertiary = wallpaperColors.tertiaryColor?.let { Color(it.toArgb()) }
+                                                withContext(Dispatchers.Main) {
+                                                    extractedColors = ExtractedWallpaperColors(
+                                                        primary = primary,
+                                                        secondary = secondary,
+                                                        tertiary = tertiary
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
                             loading = {
                                 Box(
                                     modifier = Modifier
@@ -610,6 +704,46 @@ fun WallpaperScreen(
                                         Text("Lock Screen")
                                     }
                                 }
+
+                                extractedColors?.let { colors ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 4.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.label_wallpaper_extracted_colors),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .size(24.dp)
+                                                    .background(colors.primary, CircleShape)
+                                            )
+                                            colors.secondary?.let { sec ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(24.dp)
+                                                        .background(sec, CircleShape)
+                                                )
+                                            }
+                                            colors.tertiary?.let { tert ->
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(24.dp)
+                                                        .background(tert, CircleShape)
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         } else {
                             Column(
@@ -797,6 +931,7 @@ fun WallpaperScreen(
             )
         }
     }
+}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
