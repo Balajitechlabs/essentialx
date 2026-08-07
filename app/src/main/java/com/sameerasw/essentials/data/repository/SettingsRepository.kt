@@ -351,18 +351,60 @@ class SettingsRepository(private val context: Context) {
         awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
+    /**
+     * Registers a listener to be notified when shared preference values change.
+     *
+     * @param listener The listener instance to register.
+     */
     fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
     }
 
+    /**
+     * Unregisters a previously registered shared preference change listener.
+     *
+     * @param listener The listener instance to unregister.
+     */
     fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
     // General Getters
+
+    /**
+     * Retrieves a boolean preference value by key.
+     *
+     * @param key Preference key name.
+     * @param default Fallback boolean value if key is absent.
+     * @return The stored boolean value or default.
+     */
     fun getBoolean(key: String, default: Boolean = false): Boolean = prefs.getBoolean(key, default)
+
+    /**
+     * Retrieves a string preference value by key.
+     *
+     * @param key Preference key name.
+     * @param default Fallback string value if key is absent.
+     * @return The stored string value or default.
+     */
     fun getString(key: String, default: String? = null): String? = prefs.getString(key, default)
+
+    /**
+     * Retrieves an integer preference value by key.
+     *
+     * @param key Preference key name.
+     * @param default Fallback integer value if key is absent.
+     * @return The stored integer value or default.
+     */
     fun getInt(key: String, default: Int = 0): Int = prefs.getInt(key, default)
+
+    /**
+     * Retrieves a float preference value by key, with legacy integer migration fallback.
+     *
+     * @param key Preference key name.
+     * @param default Fallback float value if key is absent.
+     * @return The stored float value or default.
+     */
     fun getFloat(key: String, default: Float = 0f): Float {
         return try {
             prefs.getFloat(key, default)
@@ -379,15 +421,70 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Retrieves a long integer preference value by key.
+     *
+     * @param key Preference key name.
+     * @param default Fallback long value if key is absent.
+     * @return The stored long value or default.
+     */
     fun getLong(key: String, default: Long = 0L): Long = prefs.getLong(key, default)
 
     // General Setters
+
+    /**
+     * Checks if a preference key exists in persistent storage.
+     *
+     * @param key Preference key name.
+     * @return True if key exists in shared preferences.
+     */
     fun contains(key: String): Boolean = prefs.contains(key)
+
+    /**
+     * Asynchronously stores a boolean preference value.
+     *
+     * @param key Preference key name.
+     * @param value Boolean value to store.
+     */
     fun putBoolean(key: String, value: Boolean) = prefs.edit().putBoolean(key, value).apply()
+
+    /**
+     * Asynchronously stores a string preference value.
+     *
+     * @param key Preference key name.
+     * @param value String value to store.
+     */
     fun putString(key: String, value: String?) = prefs.edit().putString(key, value).apply()
+
+    /**
+     * Asynchronously stores an integer preference value.
+     *
+     * @param key Preference key name.
+     * @param value Integer value to store.
+     */
     fun putInt(key: String, value: Int) = prefs.edit().putInt(key, value).apply()
+
+    /**
+     * Asynchronously stores a float preference value.
+     *
+     * @param key Preference key name.
+     * @param value Float value to store.
+     */
     fun putFloat(key: String, value: Float) = prefs.edit().putFloat(key, value).apply()
+
+    /**
+     * Asynchronously stores a long integer preference value.
+     *
+     * @param key Preference key name.
+     * @param value Long value to store.
+     */
     fun putLong(key: String, value: Long) = prefs.edit().putLong(key, value).apply()
+
+    /**
+     * Asynchronously removes a preference entry by key.
+     *
+     * @param key Preference key name to remove.
+     */
     fun remove(key: String) = prefs.edit().remove(key).apply()
 
     // Specific Getters with logic from ViewModel

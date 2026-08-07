@@ -875,21 +875,40 @@ class MainViewModel : ViewModel() {
             }
         }
 
+    /**
+     * Updates the Sentry crash and feedback reporting mode preference.
+     *
+     * @param mode Desired report mode ("automatic", "manual", or "disabled").
+     * @param context Application context for settings persistence.
+     */
     fun setSentryReportMode(mode: String, context: Context) {
         sentryReportMode.value = mode
         settingsRepository.putString(SettingsRepository.KEY_SENTRY_REPORT_MODE, mode)
     }
 
+    /**
+     * Applies and updates the application-wide display language locale.
+     *
+     * @param languageCode BCP-47 language tag (e.g., "en", "si", "de").
+     */
     fun setAppLanguage(languageCode: String) {
         appLanguage.value = languageCode
         val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageCode)
         AppCompatDelegate.setApplicationLocales(appLocale)
     }
 
+    /**
+     * Loads saved ShutUp per-app media ducking and mute configurations from persistent storage.
+     */
     fun loadShutUpConfigs() {
         shutUpConfigs.value = settingsRepository.loadShutUpConfigs()
     }
 
+    /**
+     * Updates ducking or mute configuration for a specific target package.
+     *
+     * @param config The updated ShutUpAppConfig object to store.
+     */
     fun updateShutUpConfig(config: com.sameerasw.essentials.domain.model.ShutUpAppConfig) {
         settingsRepository.updateShutUpConfig(config)
         loadShutUpConfigs()
