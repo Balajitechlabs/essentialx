@@ -396,7 +396,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                     }
 
                     if (showWatchInstallHelpSheet) {
-                        com.sameerasw.essentials.ui.core.sheets.WatchInstallHelpBottomSheet(
+                        com.sameerasw.essentials.ui.features.watch.sheets.WatchInstallHelpBottomSheet(
                             onDismissRequest = { showWatchInstallHelpSheet = false }
                         )
                     }

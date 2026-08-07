@@ -1,4 +1,13 @@
-package com.sameerasw.essentials.ui.core.sheets
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: WearOS Companion
+ * File: WatchInstallHelpBottomSheet.kt
+ * Description: Guidance bottom sheet for installing the WearOS companion APK via ADB commands.
+ */
+
+package com.sameerasw.essentials.ui.features.watch.sheets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.WatchViewModel
 
