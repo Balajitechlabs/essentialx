@@ -17,7 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -43,11 +43,11 @@ fun RemoteLockSettingsUI(
     }
 
     if (showPermissionSheet) {
-        com.sameerasw.essentials.ui.components.sheets.PermissionsBottomSheet(
+        com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet(
             onDismissRequest = { showPermissionSheet = false },
             featureTitle = R.string.feat_lock_from_watch_title,
             permissions = listOf(
-                com.sameerasw.essentials.ui.components.sheets.PermissionItem(
+                com.sameerasw.essentials.ui.core.sheets.PermissionItem(
                     iconRes = R.drawable.rounded_settings_accessibility_24,
                     title = R.string.perm_accessibility_title,
                     description = R.string.perm_accessibility_desc_common,
@@ -56,7 +56,7 @@ fun RemoteLockSettingsUI(
                     action = { PermissionUtils.openAccessibilitySettings(context) },
                     isGranted = isAccessibilityEnabled
                 ),
-                com.sameerasw.essentials.ui.components.sheets.PermissionItem(
+                com.sameerasw.essentials.ui.core.sheets.PermissionItem(
                     iconRes = R.drawable.rounded_security_24,
                     title = R.string.perm_device_admin_title,
                     description = R.string.perm_device_admin_desc,
@@ -82,7 +82,7 @@ fun RemoteLockSettingsUI(
         )
 
         RoundedCardContainer {
-            com.sameerasw.essentials.ui.components.pickers.SegmentedPicker(
+            com.sameerasw.essentials.ui.core.pickers.SegmentedPicker(
                 items = listOf(0, 1),
                 selectedItem = remoteLockMode,
                 onItemSelected = { mode ->

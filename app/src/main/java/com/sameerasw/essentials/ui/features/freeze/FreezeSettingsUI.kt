@@ -49,15 +49,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.FreezeMode
-import com.sameerasw.essentials.ui.components.cards.AppToggleItem
-import com.sameerasw.essentials.ui.components.cards.FeatureCard
-import com.sameerasw.essentials.ui.components.cards.IconToggleItem
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.cards.AppToggleItem
+import com.sameerasw.essentials.ui.core.cards.FeatureCard
+import com.sameerasw.essentials.ui.core.cards.IconToggleItem
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
-import com.sameerasw.essentials.ui.components.pickers.SegmentedPicker
-import com.sameerasw.essentials.ui.components.sheets.AppSelectionSheet
-import com.sameerasw.essentials.ui.components.sheets.PermissionsBottomSheet
+import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
+import com.sameerasw.essentials.ui.core.sheets.AppSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.PermissionUIHelper
@@ -732,7 +732,7 @@ fun FreezeSettingsUI(
         }
 
         if (isTagEditorSheetOpen) {
-            com.sameerasw.essentials.ui.components.sheets.FreezeTagEditorSheet(
+            com.sameerasw.essentials.ui.core.sheets.FreezeTagEditorSheet(
                 tagToEdit = tagToEdit,
                 onDismissRequest = { isTagEditorSheetOpen = false },
                 onSave = { tag ->

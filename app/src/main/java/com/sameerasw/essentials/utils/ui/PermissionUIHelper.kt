@@ -11,7 +11,7 @@ import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.registry.PermissionRegistry
-import com.sameerasw.essentials.ui.components.sheets.PermissionItem
+import com.sameerasw.essentials.ui.core.sheets.PermissionItem
 import com.sameerasw.essentials.viewmodels.MainViewModel
 
 object PermissionUIHelper {

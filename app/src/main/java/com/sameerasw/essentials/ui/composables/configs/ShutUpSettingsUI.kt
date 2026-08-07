@@ -23,12 +23,12 @@ import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.ShutUpAppConfig
-import com.sameerasw.essentials.ui.components.cards.FeatureCard
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.cards.FeatureCard
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
-import com.sameerasw.essentials.ui.components.pickers.RestoreModePicker
-import com.sameerasw.essentials.ui.components.sheets.AppSelectionSheet
-import com.sameerasw.essentials.ui.components.sheets.ShutUpPerAppSettingsSheet
+import com.sameerasw.essentials.ui.core.pickers.RestoreModePicker
+import com.sameerasw.essentials.ui.core.sheets.AppSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.ShutUpPerAppSettingsSheet
 import com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel

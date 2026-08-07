@@ -30,9 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.activities.AutomationEditorActivity
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.diy.AutomationItem
-import com.sameerasw.essentials.ui.components.sheets.NewAutomationSheet
+import com.sameerasw.essentials.ui.core.sheets.NewAutomationSheet
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.DIYViewModel
 

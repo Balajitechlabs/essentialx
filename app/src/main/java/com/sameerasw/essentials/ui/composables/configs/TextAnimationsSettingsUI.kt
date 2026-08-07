@@ -23,8 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.pickers.SegmentedPicker
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -69,14 +69,14 @@ fun TextAnimationsSettingsUI(
         }
 
         RoundedCardContainer {
-            com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+            com.sameerasw.essentials.ui.core.cards.IconToggleItem(
                 title = stringResource(R.string.label_increase_touch_sensitivity),
                 subtitle = stringResource(R.string.desc_increase_touch_sensitivity),
                 icon = R.drawable.rounded_touch_app_24,
                 checked = viewModel.isTouchSensitivityEnabled.value,
                 onCheckedChange = { viewModel.setTouchSensitivityEnabled(it) }
             )
-            com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+            com.sameerasw.essentials.ui.core.cards.IconToggleItem(
                 title = stringResource(R.string.label_auto_rotate),
                 subtitle = stringResource(R.string.desc_auto_rotate),
                 icon = R.drawable.rounded_mobile_rotate_24,

@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.sheets
+package com.sameerasw.essentials.ui.core.sheets
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -39,7 +39,7 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.battery.BatteryAppsTabContent
 import com.sameerasw.essentials.ui.components.battery.BatteryInfoTabContent
 import com.sameerasw.essentials.ui.components.battery.BatterySystemTabContent
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.battery.BatteryDetails
 import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
 import com.sameerasw.essentials.utils.BatteryStatsUtil
@@ -233,7 +233,7 @@ fun BatteryDetailsBottomSheet(
             }
 
             RoundedCardContainer {
-                com.sameerasw.essentials.ui.components.pickers.SegmentedPicker(
+                com.sameerasw.essentials.ui.core.pickers.SegmentedPicker(
                     items = tabResIds,
                     selectedItem = tabResIds[selectedTab],
                     onItemSelected = { selectedTab = tabResIds.indexOf(it) },

@@ -1,4 +1,14 @@
-package com.sameerasw.essentials.ui.components.cards
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Core UI Components
+ * File: PermissionCard.kt
+ * Description: Material 3 card container for rendering permission requirement states,
+ * action triggers, Shizuku options, and guidance instructions.
+ */
+
+package com.sameerasw.essentials.ui.core.cards
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

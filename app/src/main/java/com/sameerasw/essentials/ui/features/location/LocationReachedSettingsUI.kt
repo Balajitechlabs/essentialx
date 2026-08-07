@@ -41,9 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.cards.LocationAlarmCard
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.sheets.LocationReachedBottomSheet
+import com.sameerasw.essentials.ui.core.cards.LocationAlarmCard
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.sheets.LocationReachedBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.LocationReachedViewModel
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -207,7 +207,7 @@ fun LocationReachedSettingsUI(
                         modifier = Modifier.fillMaxWidth(),
                         containerColor = MaterialTheme.colorScheme.errorContainer
                     ) {
-                        com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+                        com.sameerasw.essentials.ui.core.cards.IconToggleItem(
                             title = stringResource(R.string.location_reached_fsi_title),
                             description = stringResource(R.string.location_reached_fsi_desc),
                             isChecked = false,

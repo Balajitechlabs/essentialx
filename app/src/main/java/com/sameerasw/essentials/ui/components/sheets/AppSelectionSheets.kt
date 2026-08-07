@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.sheets
+package com.sameerasw.essentials.ui.core.sheets
 
 import android.content.Context
 import androidx.compose.foundation.Image
@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.NotificationApp
-import com.sameerasw.essentials.ui.components.cards.AppToggleItem
+import com.sameerasw.essentials.ui.core.cards.AppToggleItem
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.Dispatchers

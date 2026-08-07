@@ -8,7 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.sameerasw.essentials.ui.components.sheets.BatteryDetailsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.BatteryDetailsBottomSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.battery.BatteryDetails
 import com.sameerasw.essentials.utils.battery.BatteryInfoUtil

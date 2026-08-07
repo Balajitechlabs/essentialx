@@ -11,7 +11,7 @@ import android.os.BatteryManager
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import com.sameerasw.essentials.domain.StatusBarIconRegistry
-import com.sameerasw.essentials.ui.components.pickers.NetworkType
+import com.sameerasw.essentials.ui.core.pickers.NetworkType
 import com.sameerasw.essentials.utils.updateIconBlacklistSetting
 import com.sameerasw.essentials.viewmodels.StatusBarIconViewModel
 import kotlinx.coroutines.CoroutineScope

@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.pickers.MultiSegmentedPicker
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.MultiSegmentedPicker
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.battery.BatteryDetails
 import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
@@ -542,7 +542,7 @@ fun BatteryInfoTabContent(
                 var autoResetEnabled by remember {
                     mutableStateOf(settingsRepository.getBoolean("auto_reset_battery_stats", false))
                 }
-                com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+                com.sameerasw.essentials.ui.core.cards.IconToggleItem(
                     title = stringResource(R.string.label_auto_reset_battery_stats_title),
                     description = stringResource(R.string.label_auto_reset_battery_stats_desc),
                     isChecked = autoResetEnabled,

@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.sheets
+package com.sameerasw.essentials.ui.core.sheets
 
 import android.content.Intent
 import androidx.compose.foundation.background
@@ -39,8 +39,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.pickers.SegmentedPicker
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.utils.ColorFormatUtils
 import com.sameerasw.essentials.utils.HapticUtil
 

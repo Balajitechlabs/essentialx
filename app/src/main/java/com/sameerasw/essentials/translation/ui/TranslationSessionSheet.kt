@@ -44,7 +44,7 @@ import com.sameerasw.essentials.data.repository.GitHubRepository
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.translation.TranslationManager
 import com.sameerasw.essentials.translation.model.TranslationEdit
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.launch
 

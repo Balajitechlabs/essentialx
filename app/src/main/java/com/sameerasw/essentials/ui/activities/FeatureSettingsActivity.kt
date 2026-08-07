@@ -49,10 +49,10 @@ import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.registry.FeatureRegistry
 import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.animations.LottieFeatureAnimation
-import com.sameerasw.essentials.ui.components.cards.FeatureCard
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.cards.FeatureCard
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.linkActions.LinkPickerScreen
-import com.sameerasw.essentials.ui.components.sheets.PermissionsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.ui.composables.configs.AlwaysOnDisplaySettingsUI
 import com.sameerasw.essentials.ui.features.battery.BatteriesSettingsUI
 import com.sameerasw.essentials.ui.features.security.AppLockSettingsUI
@@ -380,7 +380,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                     }
 
                     if (showHelpSheet && selectedHelpFeature != null) {
-                        com.sameerasw.essentials.ui.components.sheets.FeatureHelpBottomSheet(
+                        com.sameerasw.essentials.ui.core.sheets.FeatureHelpBottomSheet(
                             onDismissRequest = {
                                 showHelpSheet = false
                                 selectedHelpFeature = null
@@ -390,13 +390,13 @@ class FeatureSettingsActivity : AppCompatActivity() {
                     }
 
                     if (showInstructionsSheet) {
-                        com.sameerasw.essentials.ui.components.sheets.InstructionsBottomSheet(
+                        com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet(
                             onDismissRequest = { showInstructionsSheet = false }
                         )
                     }
 
                     if (showWatchInstallHelpSheet) {
-                        com.sameerasw.essentials.ui.components.sheets.WatchInstallHelpBottomSheet(
+                        com.sameerasw.essentials.ui.core.sheets.WatchInstallHelpBottomSheet(
                             onDismissRequest = { showWatchInstallHelpSheet = false }
                         )
                     }

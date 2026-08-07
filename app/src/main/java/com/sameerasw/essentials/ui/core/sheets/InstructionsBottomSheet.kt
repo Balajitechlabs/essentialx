@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.sheets
+package com.sameerasw.essentials.ui.core.sheets
 
 import android.content.ActivityNotFoundException
 import android.content.Intent

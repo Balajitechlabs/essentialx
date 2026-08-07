@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.pickers
+package com.sameerasw.essentials.ui.core.pickers
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.cards.ConfigPickerItem
+import com.sameerasw.essentials.ui.core.cards.ConfigPickerItem
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.utils.LanguageUtils
 

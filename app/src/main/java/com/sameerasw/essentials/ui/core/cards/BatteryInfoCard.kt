@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.cards
+package com.sameerasw.essentials.ui.core.cards
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.sheets.BatteryDetailsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.BatteryDetailsBottomSheet
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.battery.BatteryDetails
 import com.sameerasw.essentials.utils.battery.BatteryInfoUtil

@@ -21,9 +21,9 @@ import androidx.core.content.edit
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.ScreenOffMethod
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.pickers.HapticFeedbackPicker
-import com.sameerasw.essentials.ui.components.pickers.ScreenOffMethodPicker
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.HapticFeedbackPicker
+import com.sameerasw.essentials.ui.core.pickers.ScreenOffMethodPicker
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.performHapticFeedback
 import com.sameerasw.essentials.viewmodels.MainViewModel

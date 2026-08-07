@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.containers
+package com.sameerasw.essentials.ui.core.containers
 
 import android.content.Intent
 import android.net.Uri

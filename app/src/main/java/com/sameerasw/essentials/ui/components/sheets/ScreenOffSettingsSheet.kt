@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.sheets
+package com.sameerasw.essentials.ui.core.sheets
 
 import android.os.Build
 import android.os.Vibrator
@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.ScreenOffMethod
 import com.sameerasw.essentials.domain.diy.Action
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.pickers.HapticFeedbackPicker
-import com.sameerasw.essentials.ui.components.pickers.ScreenOffMethodPicker
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.HapticFeedbackPicker
+import com.sameerasw.essentials.ui.core.pickers.ScreenOffMethodPicker
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.performHapticFeedback

@@ -12,7 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.sheets.ColorPickerBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.ColorPickerBottomSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.HapticUtil
 

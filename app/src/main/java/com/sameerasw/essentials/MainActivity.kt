@@ -77,11 +77,11 @@ import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.ToolbarItem
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
-import com.sameerasw.essentials.ui.components.sheets.AddRepoBottomSheet
-import com.sameerasw.essentials.ui.components.sheets.GitHubAuthSheet
-import com.sameerasw.essentials.ui.components.sheets.InstructionsBottomSheet
-import com.sameerasw.essentials.ui.components.sheets.PrankBottomSheet
-import com.sameerasw.essentials.ui.components.sheets.UpdateBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.AddRepoBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.GitHubAuthSheet
+import com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.PrankBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.composables.DIYScreen
 import com.sameerasw.essentials.ui.composables.FreezeGridUI
 import com.sameerasw.essentials.ui.composables.SetupFeatures

@@ -1,4 +1,14 @@
-package com.sameerasw.essentials.ui.components.cards
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Core UI Components
+ * File: FeatureCard.kt
+ * Description: Reusable high-level feature card composable with pastel icon containers
+ * and status indicators.
+ */
+
+package com.sameerasw.essentials.ui.core.cards
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState

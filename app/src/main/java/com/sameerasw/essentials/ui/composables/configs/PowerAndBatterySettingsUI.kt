@@ -19,8 +19,8 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.cards.IconToggleItem
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.cards.IconToggleItem
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -363,7 +363,7 @@ fun PowerAndBatterySettingsUI(
 
             // Sound Trigger Mode Selector
             val soundTriggerValue = getInt("soundtrigger_mode", 1)
-            com.sameerasw.essentials.ui.components.cards.ConfigPickerItem(
+            com.sameerasw.essentials.ui.core.cards.ConfigPickerItem(
                 title = stringResource(R.string.label_soundtrigger_mode),
                 description = stringResource(R.string.desc_soundtrigger_mode),
                 selectedValue = when (soundTriggerValue) {
@@ -412,7 +412,7 @@ fun PowerAndBatterySettingsUI(
                 else -> stringResource(R.string.location_mode_throttle)
             }
 
-            com.sameerasw.essentials.ui.components.cards.ConfigPickerItem(
+            com.sameerasw.essentials.ui.core.cards.ConfigPickerItem(
                 title = stringResource(R.string.label_location_mode),
                 description = stringResource(R.string.desc_location_mode),
                 selectedValue = selectedLabel,

@@ -462,7 +462,7 @@ fun FreezeGridUI(
         }
 
         appForTagAssignment?.let { targetApp ->
-            com.sameerasw.essentials.ui.components.sheets.AssignTagsSheet(
+            com.sameerasw.essentials.ui.core.sheets.AssignTagsSheet(
                 appName = targetApp.appName,
                 availableTags = freezeTags,
                 assignedTagIds = freezeAppTagMap[targetApp.packageName] ?: emptyList(),

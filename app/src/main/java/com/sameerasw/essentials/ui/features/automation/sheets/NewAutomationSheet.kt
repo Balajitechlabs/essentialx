@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.sheets
+package com.sameerasw.essentials.ui.core.sheets
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +36,7 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.diy.Automation
 import com.sameerasw.essentials.domain.diy.DIYRepository
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.HapticUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -116,7 +116,7 @@ fun NewAutomationSheet(
                 RoundedCardContainer(
                     modifier = Modifier.padding(bottom = 16.dp)
                 ) {
-                    com.sameerasw.essentials.ui.components.cards.IconToggleItem(
+                    com.sameerasw.essentials.ui.core.cards.IconToggleItem(
                         iconRes = R.drawable.rounded_auto_awesome_24,
                         title = stringResource(R.string.diy_genai_lazy_title),
                         showToggle = false,

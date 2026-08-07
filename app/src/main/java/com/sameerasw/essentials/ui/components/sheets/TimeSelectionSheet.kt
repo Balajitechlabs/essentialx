@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.sheets
+package com.sameerasw.essentials.ui.core.sheets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.diy.Trigger
-import com.sameerasw.essentials.ui.components.pickers.MultiSegmentedPicker
+import com.sameerasw.essentials.ui.core.pickers.MultiSegmentedPicker
 import com.sameerasw.essentials.utils.HapticUtil
 import java.util.Calendar
 import com.sameerasw.essentials.domain.diy.State as DIYState

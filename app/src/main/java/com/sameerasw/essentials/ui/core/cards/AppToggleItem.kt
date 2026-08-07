@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.cards
+package com.sameerasw.essentials.ui.core.cards
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

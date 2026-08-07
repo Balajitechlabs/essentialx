@@ -11,7 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import com.sameerasw.essentials.domain.StatusBarIconRegistry
-import com.sameerasw.essentials.ui.components.pickers.NetworkType
+import com.sameerasw.essentials.ui.core.pickers.NetworkType
 import com.sameerasw.essentials.utils.resetAllIconVisibilities
 import com.sameerasw.essentials.utils.updateIconBlacklistSetting
 import kotlinx.coroutines.CoroutineScope

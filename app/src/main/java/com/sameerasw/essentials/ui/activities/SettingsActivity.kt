@@ -85,20 +85,20 @@ import com.sameerasw.essentials.translation.TranslationManager
 import com.sameerasw.essentials.translation.ui.TranslationSessionSheet
 import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.MadebySameeraswCard
-import com.sameerasw.essentials.ui.components.cards.FeatureCard
-import com.sameerasw.essentials.ui.components.cards.IconToggleItem
-import com.sameerasw.essentials.ui.components.cards.PermissionCard
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.cards.FeatureCard
+import com.sameerasw.essentials.ui.core.cards.IconToggleItem
+import com.sameerasw.essentials.ui.core.cards.PermissionCard
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.dialogs.AboutSection
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
-import com.sameerasw.essentials.ui.components.pickers.CrashReportingPicker
-import com.sameerasw.essentials.ui.components.pickers.DefaultTabPicker
-import com.sameerasw.essentials.ui.components.pickers.LanguagePicker
-import com.sameerasw.essentials.ui.components.sheets.GitHubAuthSheet
-import com.sameerasw.essentials.ui.components.sheets.ImportConfigConfirmationSheet
-import com.sameerasw.essentials.ui.components.sheets.InstructionsBottomSheet
-import com.sameerasw.essentials.ui.components.sheets.UnsupportedFeaturesConfirmationSheet
-import com.sameerasw.essentials.ui.components.sheets.UpdateBottomSheet
+import com.sameerasw.essentials.ui.core.pickers.CrashReportingPicker
+import com.sameerasw.essentials.ui.core.pickers.DefaultTabPicker
+import com.sameerasw.essentials.ui.core.pickers.LanguagePicker
+import com.sameerasw.essentials.ui.core.sheets.GitHubAuthSheet
+import com.sameerasw.essentials.ui.core.sheets.ImportConfigConfirmationSheet
+import com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.UnsupportedFeaturesConfirmationSheet
+import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
@@ -152,7 +152,7 @@ class SettingsActivity : AppCompatActivity() {
                 }
 
                 if (showBugReportSheet) {
-                    com.sameerasw.essentials.ui.components.sheets.BugReportBottomSheet(
+                    com.sameerasw.essentials.ui.core.sheets.BugReportBottomSheet(
                         viewModel = viewModel,
                         onDismissRequest = { showBugReportSheet = false }
                     )

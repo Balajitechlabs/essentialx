@@ -75,7 +75,7 @@ import com.sameerasw.essentials.services.tiles.StayAwakeTileService
 import com.sameerasw.essentials.services.tiles.TapToWakeTileService
 import com.sameerasw.essentials.services.tiles.UiBlurTileService
 import com.sameerasw.essentials.services.tiles.UsbDebuggingTileService
-import com.sameerasw.essentials.ui.components.sheets.PermissionsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.PermissionUIHelper
@@ -401,7 +401,7 @@ fun QuickSettingsTilesSettingsUI(
             }
         }
 
-        com.sameerasw.essentials.ui.components.sheets.FeatureHelpBottomSheet(
+        com.sameerasw.essentials.ui.core.sheets.FeatureHelpBottomSheet(
             onDismissRequest = {
                 showHelpSheet = false
                 selectedHelpTile = null

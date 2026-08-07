@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.pickers
+package com.sameerasw.essentials.ui.core.pickers
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee

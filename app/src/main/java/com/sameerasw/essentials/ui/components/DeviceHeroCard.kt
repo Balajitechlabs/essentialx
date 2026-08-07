@@ -48,7 +48,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.request.ImageRequest
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.DeviceImageMapper
 import com.sameerasw.essentials.utils.DeviceInfo
@@ -326,7 +326,7 @@ fun DeviceHeroCard(
             )
         }
 
-        com.sameerasw.essentials.ui.components.cards.BatteryInfoCard()
+        com.sameerasw.essentials.ui.core.cards.BatteryInfoCard()
 
         if (isPixel) {
             Column(

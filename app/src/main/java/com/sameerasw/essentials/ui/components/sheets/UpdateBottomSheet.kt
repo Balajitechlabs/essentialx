@@ -1,4 +1,4 @@
-package com.sameerasw.essentials.ui.components.sheets
+package com.sameerasw.essentials.ui.core.sheets
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +46,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.UpdateInfo
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.text.SimpleMarkdown
 import com.sameerasw.essentials.utils.AutoUpdateManagerHelper
 import com.sameerasw.essentials.utils.HapticUtil
