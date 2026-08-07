@@ -346,7 +346,9 @@ object FeatureRegistry {
             parentFeatureId = "Networks",
             showToggle = false
         ) {
-            override fun isEnabled(viewModel: MainViewModel) = viewModel.networkDownloadRateLimit.intValue != -1
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.networkDownloadRateLimit.intValue != -1
+
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
 
@@ -359,7 +361,9 @@ object FeatureRegistry {
             permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
             parentFeatureId = "Networks"
         ) {
-            override fun isEnabled(viewModel: MainViewModel) = viewModel.isMobileDataAlwaysOnEnabled.value
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.isMobileDataAlwaysOnEnabled.value
+
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
                 viewModel.setMobileDataAlwaysOnEnabled(enabled, context)
         },
@@ -373,7 +377,9 @@ object FeatureRegistry {
             permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
             parentFeatureId = "Networks"
         ) {
-            override fun isEnabled(viewModel: MainViewModel) = viewModel.isWirelessDisplayCertificationEnabled.value
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.isWirelessDisplayCertificationEnabled.value
+
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
                 viewModel.setWirelessDisplayCertificationEnabled(enabled, context)
         },
@@ -1109,7 +1115,6 @@ object FeatureRegistry {
             override fun isEnabled(viewModel: MainViewModel) = true
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
-
 
 
         object : Feature(

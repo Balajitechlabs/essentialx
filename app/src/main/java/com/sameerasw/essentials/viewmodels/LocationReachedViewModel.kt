@@ -277,9 +277,9 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
     }
 
     @android.annotation.SuppressLint("MissingPermission")
-    /**
-     * Executes the update current distance operation.
-     */
+            /**
+             * Executes the update current distance operation.
+             */
     fun updateCurrentDistance() {
         val id = activeAlarmId.value
         val activeAlarm = savedAlarms.value.find { it.id == id } ?: tempAlarm.value ?: return

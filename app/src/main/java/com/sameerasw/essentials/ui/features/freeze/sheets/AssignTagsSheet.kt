@@ -109,7 +109,9 @@ fun AssignTagsSheet(
 
                         androidx.compose.material3.ListItem(
                             leadingContent = {
-                                val richColor = remember(color) { com.sameerasw.essentials.utils.ColorUtil.toRichColor(color) }
+                                val richColor = remember(color) {
+                                    com.sameerasw.essentials.utils.ColorUtil.toRichColor(color)
+                                }
                                 Box(
                                     modifier = Modifier
                                         .size(32.dp)

@@ -58,12 +58,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.FreezeMode
+import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
+import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.ui.core.cards.AppToggleItem
 import com.sameerasw.essentials.ui.core.cards.FeatureCard
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
-import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.AppSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
@@ -505,7 +505,9 @@ fun FreezeSettingsUI(
 
                     androidx.compose.material3.ListItem(
                         leadingContent = {
-                            val richColor = androidx.compose.runtime.remember(color) { com.sameerasw.essentials.utils.ColorUtil.toRichColor(color) }
+                            val richColor = androidx.compose.runtime.remember(color) {
+                                com.sameerasw.essentials.utils.ColorUtil.toRichColor(color)
+                            }
                             Box(
                                 modifier = Modifier
                                     .size(32.dp)
@@ -732,7 +734,11 @@ fun FreezeSettingsUI(
                         enabled = !isLockedByTag,
                         onCheckedChange = { isChecked ->
                             if (!isLockedByTag) {
-                                viewModel.updateFreezeAppAutoFreeze(context, app.packageName, isChecked)
+                                viewModel.updateFreezeAppAutoFreeze(
+                                    context,
+                                    app.packageName,
+                                    isChecked
+                                )
                             }
                         }
                     )

@@ -128,7 +128,10 @@ class FlashlightHandler(
 
     fun register() {
         if (com.sameerasw.essentials.utils.DeviceUtils.isTclDevice()) {
-            Log.w("Flashlight", "Disabling flashlight handler callbacks on TCL device to prevent HAL lock issue")
+            Log.w(
+                "Flashlight",
+                "Disabling flashlight handler callbacks on TCL device to prevent HAL lock issue"
+            )
             return
         }
         torchCallback.let { cameraManager.registerTorchCallback(it, handler) }

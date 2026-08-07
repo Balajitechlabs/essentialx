@@ -41,8 +41,10 @@ class PermissionViewModel : ViewModel() {
         isPostNotificationsEnabled.value = PermissionUtils.isPostNotificationsEnabled(context)
         isShizukuAvailable.value = ShizukuUtils.isShizukuAvailable()
         isShizukuPermissionGranted.value = ShizukuUtils.hasPermission()
-        isNotificationListenerEnabled.value = PermissionUtils.hasNotificationListenerPermission(context)
+        isNotificationListenerEnabled.value =
+            PermissionUtils.hasNotificationListenerPermission(context)
         isOverlayPermissionGranted.value = PermissionUtils.canDrawOverlays(context)
-        isNotificationLightingAccessibilityEnabled.value = PermissionUtils.isNotificationLightingAccessibilityServiceEnabled(context)
+        isNotificationLightingAccessibilityEnabled.value =
+            PermissionUtils.isNotificationLightingAccessibilityServiceEnabled(context)
     }
 }

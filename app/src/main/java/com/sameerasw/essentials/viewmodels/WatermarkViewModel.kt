@@ -48,12 +48,12 @@ class WatermarkViewModel(
 ) : ViewModel() {
 
     companion object {
-    /**
-     * Executes the provide factory operation.
-     *
+        /**
+         * Executes the provide factory operation.
+         *
          * @param context [Context] Target context.
-     * @return The resulting ViewModelProvider data.
-     */
+         * @return The resulting ViewModelProvider data.
+         */
         fun provideFactory(context: Context): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")

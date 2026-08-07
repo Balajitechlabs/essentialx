@@ -103,7 +103,7 @@ fun FreezeTagEditorSheet(
             ) {
                 Text(
                     text = if (tagToEdit == null) stringResource(R.string.action_create_tag)
-                           else stringResource(R.string.action_update_tag),
+                    else stringResource(R.string.action_update_tag),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface

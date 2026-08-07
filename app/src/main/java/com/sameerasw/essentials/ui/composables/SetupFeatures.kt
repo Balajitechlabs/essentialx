@@ -92,7 +92,6 @@ import com.sameerasw.essentials.ui.activities.YourAndroidActivity
 import com.sameerasw.essentials.ui.components.FavoriteCarousel
 import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
 import com.sameerasw.essentials.ui.core.cards.FeatureCard
-import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.PermissionItem
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
@@ -1291,7 +1290,9 @@ fun SetupFeatures(
 
                 val sections = sectionFeatureIdsList.map { ids ->
                     ids.mapNotNull { featureMap[it] }
-                }.filter { it.isNotEmpty() } + if (unassignedFeatures.isNotEmpty()) listOf(unassignedFeatures) else emptyList()
+                }.filter { it.isNotEmpty() } + if (unassignedFeatures.isNotEmpty()) listOf(
+                    unassignedFeatures
+                ) else emptyList()
 
                 sections.forEachIndexed { sectionIndex, sectionFeatures ->
                     item {

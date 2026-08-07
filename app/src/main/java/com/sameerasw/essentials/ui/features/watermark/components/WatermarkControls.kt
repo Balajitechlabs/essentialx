@@ -43,10 +43,10 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.watermark.ColorMode
 import com.sameerasw.essentials.domain.watermark.WatermarkOptions
 import com.sameerasw.essentials.domain.watermark.WatermarkStyle
+import com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
-import com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem
 import com.sameerasw.essentials.utils.HapticUtil.performSliderHaptic
 import com.sameerasw.essentials.utils.HapticUtil.performUIHaptic
 

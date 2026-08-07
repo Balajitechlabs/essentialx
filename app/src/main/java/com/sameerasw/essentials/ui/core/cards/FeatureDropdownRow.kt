@@ -100,7 +100,9 @@ fun <T> FeatureDropdownRow(
                     enabled = isChecked,
                     shape = RoundedCornerShape(12.dp),
                     color = if (isChecked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
-                    contentColor = if (isChecked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    contentColor = if (isChecked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                        alpha = 0.5f
+                    )
                 ) {
                     Text(
                         text = selectedValue,

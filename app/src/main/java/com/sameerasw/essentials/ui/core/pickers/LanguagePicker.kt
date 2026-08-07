@@ -16,8 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.core.cards.ConfigPickerItem
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
+import com.sameerasw.essentials.ui.core.cards.ConfigPickerItem
 import com.sameerasw.essentials.utils.LanguageUtils
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)

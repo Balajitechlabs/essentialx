@@ -14,9 +14,9 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.diy.Automation
+import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.State
 import com.sameerasw.essentials.domain.diy.Trigger
 import com.sameerasw.essentials.domain.genai.AutomationSuggestion
@@ -126,6 +126,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                 hour = suggestion.hour ?: 0,
                 minute = suggestion.minute ?: 0
             )
+
             "BluetoothConnected" -> Trigger.BluetoothConnected()
             "BluetoothDisconnected" -> Trigger.BluetoothDisconnected()
             "WifiConnected" -> Trigger.WifiConnected()
@@ -142,6 +143,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                 endHour = suggestion.endHour ?: 0,
                 endMinute = suggestion.endMinute ?: 0
             )
+
             else -> if (type == Automation.Type.STATE) State.Charging else null
         }
 
@@ -156,6 +158,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                 "DimWallpaper" -> Action.DimWallpaper(
                     dimAmount = suggestion.dimWallpaperAmount ?: 0.5f
                 )
+
                 "DeviceEffects" -> Action.DeviceEffects()
                 "SoundMode" -> {
                     val mode = when (suggestion.soundMode?.uppercase()) {
@@ -165,6 +168,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                     }
                     Action.SoundMode(mode = mode)
                 }
+
                 "TurnOnLowPower" -> Action.TurnOnLowPower
                 "TurnOffLowPower" -> Action.TurnOffLowPower
                 "ScreenOff" -> Action.ScreenOff()
@@ -191,10 +195,12 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                     changeSmartPixels = suggestion.smartPixelsEnabled != null,
                     smartPixelsEnabled = suggestion.smartPixelsEnabled ?: true
                 )
+
                 "FreezeTag" -> Action.FreezeTag(
                     mode = suggestion.freezeTagMode ?: "Freeze",
                     tagIds = suggestion.freezeTagIds
                 )
+
                 else -> null
             }
         }

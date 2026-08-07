@@ -390,9 +390,9 @@ object OverlayHelper {
             savedStateRegistryController.savedStateRegistry
         override val viewModelStore: ViewModelStore = store
 
-    /**
-     * Executes the on create operation.
-     */
+        /**
+         * Executes the on create operation.
+         */
         fun onCreate() {
             savedStateRegistryController.performRestore(null)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -400,9 +400,9 @@ object OverlayHelper {
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         }
 
-    /**
-     * Executes the on destroy operation.
-     */
+        /**
+         * Executes the on destroy operation.
+         */
         fun onDestroy() {
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
             lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
@@ -670,9 +670,9 @@ object OverlayHelper {
         val durationHold = (pulseDurationMillis * 0.4).toLong()
         val durationOut = (pulseDurationMillis * 0.5).toLong()
 
-    /**
-     * Executes the start pulse operation.
-     */
+        /**
+         * Executes the start pulse operation.
+         */
         fun startPulse() {
             if (pulseCount >= maxPulses) {
                 onAnimationEnd?.invoke()
@@ -730,9 +730,9 @@ object OverlayHelper {
         val holdDuration = (pulseDurationMillis * 0.4).toLong()
         val shrinkDuration = (pulseDurationMillis * 0.5).toLong()
 
-    /**
-     * Executes the start pulse operation.
-     */
+        /**
+         * Executes the start pulse operation.
+         */
         fun startPulse() {
             if (pulseCount >= maxPulses) {
                 onAnimationEnd?.invoke()
@@ -854,9 +854,9 @@ object OverlayHelper {
 
         var pulseCount = 0
 
-    /**
-     * Executes the start pulse operation.
-     */
+        /**
+         * Executes the start pulse operation.
+         */
         fun startPulse() {
             if (pulseCount >= maxPulses) {
                 onAnimationEnd?.invoke()

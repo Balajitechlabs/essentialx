@@ -383,15 +383,23 @@ fun FreezeGridUI(
                                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
                                     rowApps.forEach { app ->
-                                        val appTagIds = freezeAppTagMap[app.packageName] ?: emptyList()
-                                        val neverAutoFreezeTagIds = freezeTags.filter { it.neverAutoFreeze }.map { it.id }.toSet()
-                                        val isLockedByTag = appTagIds.any { neverAutoFreezeTagIds.contains(it) }
+                                        val appTagIds =
+                                            freezeAppTagMap[app.packageName] ?: emptyList()
+                                        val neverAutoFreezeTagIds =
+                                            freezeTags.filter { it.neverAutoFreeze }.map { it.id }
+                                                .toSet()
+                                        val isLockedByTag =
+                                            appTagIds.any { neverAutoFreezeTagIds.contains(it) }
 
                                         val tagColor = if (isTagColorCodedEnabled) {
                                             appTagIds.firstOrNull()?.let { firstTagId ->
                                                 freezeTags.find { it.id == firstTagId }?.colorHex?.let { colorHex ->
                                                     try {
-                                                        Color(android.graphics.Color.parseColor(colorHex))
+                                                        Color(
+                                                            android.graphics.Color.parseColor(
+                                                                colorHex
+                                                            )
+                                                        )
                                                     } catch (e: Exception) {
                                                         null
                                                     }

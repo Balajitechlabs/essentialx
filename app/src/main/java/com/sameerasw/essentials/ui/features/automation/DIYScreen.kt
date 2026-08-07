@@ -9,6 +9,7 @@
 
 package com.sameerasw.essentials.ui.composables
 
+
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,8 +28,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-
-
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -39,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.activities.AutomationEditorActivity
-import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.diy.AutomationItem
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.NewAutomationSheet
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.DIYViewModel
@@ -199,7 +198,8 @@ fun DIYScreen(
         }
 
         if (showGenAIPill) {
-            val currentSuggestion = (genAIState as? com.sameerasw.essentials.viewmodels.GenAIState.Success)?.suggestion
+            val currentSuggestion =
+                (genAIState as? com.sameerasw.essentials.viewmodels.GenAIState.Success)?.suggestion
             com.sameerasw.essentials.ui.components.genai.GenAIFloatingPill(
                 onSend = { prompt ->
                     viewModel.requestGenAISuggestion(prompt, context)
@@ -224,10 +224,15 @@ fun DIYScreen(
         when (val state = genAIState) {
             is com.sameerasw.essentials.viewmodels.GenAIState.Error -> {
                 androidx.compose.runtime.LaunchedEffect(state) {
-                    android.widget.Toast.makeText(context, state.message, android.widget.Toast.LENGTH_LONG).show()
+                    android.widget.Toast.makeText(
+                        context,
+                        state.message,
+                        android.widget.Toast.LENGTH_LONG
+                    ).show()
                     viewModel.dismissGenAISuggestion()
                 }
             }
+
             else -> {}
         }
     }

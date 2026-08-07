@@ -340,14 +340,21 @@ object CombinedActionExecutor {
                 }
 
                 is Action.SometimesEssentials -> {
-                    val repository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                    val repository =
+                        com.sameerasw.essentials.data.repository.SettingsRepository(context)
 
                     if (action.changeNotificationLighting) {
-                        repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_EDGE_LIGHTING_ENABLED, action.notificationLightingEnabled)
+                        repository.putBoolean(
+                            com.sameerasw.essentials.data.repository.SettingsRepository.KEY_EDGE_LIGHTING_ENABLED,
+                            action.notificationLightingEnabled
+                        )
                     }
 
                     if (action.changeFlashlightPulse) {
-                        repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_FLASHLIGHT_PULSE_ENABLED, action.flashlightPulseEnabled)
+                        repository.putBoolean(
+                            com.sameerasw.essentials.data.repository.SettingsRepository.KEY_FLASHLIGHT_PULSE_ENABLED,
+                            action.flashlightPulseEnabled
+                        )
                     }
 
                     if (action.changeBatteryNotification) {
@@ -355,22 +362,45 @@ object CombinedActionExecutor {
                     }
 
                     if (action.changeSmartPixels) {
-                        repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_SMART_PIXELS_ENABLED, action.smartPixelsEnabled)
+                        repository.putBoolean(
+                            com.sameerasw.essentials.data.repository.SettingsRepository.KEY_SMART_PIXELS_ENABLED,
+                            action.smartPixelsEnabled
+                        )
                     }
 
                     if (action.changeEssentialsOnDisplay) {
                         when (action.essentialsOnDisplayMode) {
                             "Off" -> {
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED, false)
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE, false)
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED,
+                                    false
+                                )
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE,
+                                    false
+                                )
                             }
+
                             "On" -> {
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED, true)
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE, false)
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED,
+                                    true
+                                )
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE,
+                                    false
+                                )
                             }
+
                             "Docked" -> {
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED, true)
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE, true)
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED,
+                                    true
+                                )
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE,
+                                    true
+                                )
                             }
                         }
                     }
@@ -379,15 +409,26 @@ object CombinedActionExecutor {
                         when (action.alwaysOnDisplayMode) {
                             "Off" -> {
                                 repository.setAodEnabled(false)
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED, false)
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED,
+                                    false
+                                )
                             }
+
                             "On" -> {
                                 repository.setAodEnabled(true)
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED, false)
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED,
+                                    false
+                                )
                             }
+
                             "Dynamic" -> {
                                 repository.setAodEnabled(true)
-                                repository.putBoolean(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED, true)
+                                repository.putBoolean(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED,
+                                    true
+                                )
                             }
                         }
                     }
@@ -400,9 +441,18 @@ object CombinedActionExecutor {
                             repository.setScaleAnimationsMode(newMode)
                             repository.setFontScale(profile.fontScale)
                             repository.setFontWeight(profile.fontWeight)
-                            repository.setAnimationScale(android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, profile.animatorDurationScale)
-                            repository.setAnimationScale(android.provider.Settings.Global.TRANSITION_ANIMATION_SCALE, profile.transitionAnimationScale)
-                            repository.setAnimationScale(android.provider.Settings.Global.WINDOW_ANIMATION_SCALE, profile.windowAnimationScale)
+                            repository.setAnimationScale(
+                                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+                                profile.animatorDurationScale
+                            )
+                            repository.setAnimationScale(
+                                android.provider.Settings.Global.TRANSITION_ANIMATION_SCALE,
+                                profile.transitionAnimationScale
+                            )
+                            repository.setAnimationScale(
+                                android.provider.Settings.Global.WINDOW_ANIMATION_SCALE,
+                                profile.windowAnimationScale
+                            )
                             repository.setSmallestWidth(profile.smallestWidth)
                             repository.setTouchSensitivityEnabled(profile.touchSensitivityEnabled)
                             repository.setAutoRotateEnabled(profile.autoRotateEnabled)
@@ -414,7 +464,11 @@ object CombinedActionExecutor {
                         val key = "lock_screen_custom_clock_face"
                         val value = "{\"clockId\":\"${action.lockScreenClockStyle}\"}"
                         val success = try {
-                            android.provider.Settings.Secure.putString(context.contentResolver, key, value)
+                            android.provider.Settings.Secure.putString(
+                                context.contentResolver,
+                                key,
+                                value
+                            )
                         } catch (e: Exception) {
                             false
                         }
@@ -425,13 +479,18 @@ object CombinedActionExecutor {
                     }
 
                     if (action.changeSyncSoundModeWatch) {
-                        val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-                        prefs.edit().putBoolean("watch_sync_sound_mode_enabled", action.syncSoundModeWatchEnabled).apply()
+                        val prefs =
+                            context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                        prefs.edit().putBoolean(
+                            "watch_sync_sound_mode_enabled",
+                            action.syncSoundModeWatchEnabled
+                        ).apply()
                     }
                 }
 
                 is Action.FreezeTag -> {
-                    val repository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                    val repository =
+                        com.sameerasw.essentials.data.repository.SettingsRepository(context)
                     val appTagMap = repository.getFreezeAppTagMap()
                     val selectedTags = action.tagIds.toSet()
 
@@ -444,7 +503,10 @@ object CombinedActionExecutor {
                             if (action.mode == "Freeze") {
                                 com.sameerasw.essentials.utils.FreezeManager.freezeApp(context, pkg)
                             } else {
-                                com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(context, pkg)
+                                com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(
+                                    context,
+                                    pkg
+                                )
                             }
                         }
                     }

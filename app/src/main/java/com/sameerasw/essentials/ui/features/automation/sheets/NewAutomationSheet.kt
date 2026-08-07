@@ -9,6 +9,7 @@
 
 package com.sameerasw.essentials.ui.core.sheets
 
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,10 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
-
-
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -61,13 +60,17 @@ fun NewAutomationSheet(
     var aiPromptText by remember { mutableStateOf("") }
 
     val isGenAIEnabled = remember(context) {
-        SettingsRepository(context).getBoolean(SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED, false)
+        SettingsRepository(context).getBoolean(
+            SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED,
+            false
+        )
     }
     var isGenAISupported by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (isGenAIEnabled) {
-            isGenAISupported = com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
+            isGenAISupported =
+                com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
         }
     }
 

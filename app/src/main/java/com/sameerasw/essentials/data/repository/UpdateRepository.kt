@@ -143,12 +143,12 @@ class UpdateRepository {
         }
 
         companion object {
-    /**
-     * Executes the parse operation.
-     *
+            /**
+             * Executes the parse operation.
+             *
              * @param versionInfo [String] Target version info.
-     * @return The resulting SemanticVersion data.
-     */
+             * @return The resulting SemanticVersion data.
+             */
             fun parse(versionInfo: String): SemanticVersion {
                 try {
                     // Remove "v" prefix if present

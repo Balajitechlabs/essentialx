@@ -459,8 +459,10 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_DYNAMIC_NIGHT_LIGHT_ENABLED -> isDynamicNightLightEnabled.value =
                         settingsRepository.getBoolean(key)
+
                     SettingsRepository.KEY_SMART_PIXELS_ENABLED -> isSmartPixelsEnabled.value =
                         settingsRepository.getBoolean(key)
+
                     SettingsRepository.KEY_SMART_PIXELS_INTENSITY -> smartPixelsIntensity.floatValue =
                         settingsRepository.getFloat(key, 50f)
 
@@ -1098,7 +1100,10 @@ class MainViewModel : ViewModel() {
         isMobileDataAlwaysOnEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_MOBILE_DATA_ALWAYS_ON, false)
         isWirelessDisplayCertificationEnabled.value =
-            settingsRepository.getBoolean(SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION, false)
+            settingsRepository.getBoolean(
+                SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION,
+                false
+            )
         isTransparentNavigationBarEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR, false)
         isPreferGpuComposingEnabled.value =
@@ -1692,7 +1697,10 @@ class MainViewModel : ViewModel() {
         freezeTags.value = settingsRepository.getFreezeTags()
         freezeAppTagMap.value = settingsRepository.getFreezeAppTagMap()
         isFreezeTagColorCodedEnabled.value =
-            settingsRepository.getBoolean(SettingsRepository.KEY_FREEZE_TAG_COLOR_CODED_ENABLED, false)
+            settingsRepository.getBoolean(
+                SettingsRepository.KEY_FREEZE_TAG_COLOR_CODED_ENABLED,
+                false
+            )
 
         // Sync PackageManager component enabled state on startup
         val showLauncher = isFreezeShowInLauncherEnabled.value
@@ -2562,9 +2570,13 @@ class MainViewModel : ViewModel() {
      */
     fun refreshAllowOverlaysInSettingsState(context: Context) {
         try {
-            val currentVal = Settings.Secure.getInt(context.contentResolver, "secure_overlay_settings", 0) == 1
+            val currentVal =
+                Settings.Secure.getInt(context.contentResolver, "secure_overlay_settings", 0) == 1
             isAllowOverlaysInSettingsEnabled.value = currentVal
-            settingsRepository.putBoolean(SettingsRepository.KEY_ALLOW_OVERLAYS_IN_SETTINGS, currentVal)
+            settingsRepository.putBoolean(
+                SettingsRepository.KEY_ALLOW_OVERLAYS_IN_SETTINGS,
+                currentVal
+            )
         } catch (e: Exception) {
             // Secure setting not accessible without permission
         }
@@ -2622,7 +2634,10 @@ class MainViewModel : ViewModel() {
      */
     fun setWirelessDisplayCertificationEnabled(enabled: Boolean, context: Context) {
         isWirelessDisplayCertificationEnabled.value = enabled
-        settingsRepository.putBoolean(SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION, enabled)
+        settingsRepository.putBoolean(
+            SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION,
+            enabled
+        )
         applyWirelessDisplayCertification(context, enabled)
     }
 
@@ -2633,25 +2648,43 @@ class MainViewModel : ViewModel() {
      */
     fun refreshNetworksState(context: Context) {
         try {
-            val liveRateLimit = Settings.Global.getInt(context.contentResolver, "ingress_rate_limit_bytes_per_second", -1)
+            val liveRateLimit = Settings.Global.getInt(
+                context.contentResolver,
+                "ingress_rate_limit_bytes_per_second",
+                -1
+            )
             networkDownloadRateLimit.intValue = liveRateLimit
-            settingsRepository.putInt(SettingsRepository.KEY_NETWORK_DOWNLOAD_RATE_LIMIT, liveRateLimit)
+            settingsRepository.putInt(
+                SettingsRepository.KEY_NETWORK_DOWNLOAD_RATE_LIMIT,
+                liveRateLimit
+            )
         } catch (e: Exception) {
             // Permission restricted
         }
 
         try {
-            val liveMobileData = Settings.Global.getInt(context.contentResolver, "mobile_data_always_on", 0) == 1
+            val liveMobileData =
+                Settings.Global.getInt(context.contentResolver, "mobile_data_always_on", 0) == 1
             isMobileDataAlwaysOnEnabled.value = liveMobileData
-            settingsRepository.putBoolean(SettingsRepository.KEY_MOBILE_DATA_ALWAYS_ON, liveMobileData)
+            settingsRepository.putBoolean(
+                SettingsRepository.KEY_MOBILE_DATA_ALWAYS_ON,
+                liveMobileData
+            )
         } catch (e: Exception) {
             // Permission restricted
         }
 
         try {
-            val liveWirelessDisplay = Settings.Global.getInt(context.contentResolver, "wifi_display_certification_on", 0) == 1
+            val liveWirelessDisplay = Settings.Global.getInt(
+                context.contentResolver,
+                "wifi_display_certification_on",
+                0
+            ) == 1
             isWirelessDisplayCertificationEnabled.value = liveWirelessDisplay
-            settingsRepository.putBoolean(SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION, liveWirelessDisplay)
+            settingsRepository.putBoolean(
+                SettingsRepository.KEY_WIRELESS_DISPLAY_CERTIFICATION,
+                liveWirelessDisplay
+            )
         } catch (e: Exception) {
             // Permission restricted
         }
@@ -2737,7 +2770,10 @@ class MainViewModel : ViewModel() {
                 }
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                     isTransparentNavigationBarEnabled.value = isEnabled
-                    settingsRepository.putBoolean(SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR, isEnabled)
+                    settingsRepository.putBoolean(
+                        SettingsRepository.KEY_TRANSPARENT_NAVIGATION_BAR,
+                        isEnabled
+                    )
                 }
             }
         }
@@ -2848,7 +2884,10 @@ class MainViewModel : ViewModel() {
                 val isRoot = isRootAvailable.value && isRootPermissionGranted.value
                 val liveValue = SurfaceFlingerControl.isHwOverlaysDisabled(context, isRoot)
                 isPreferGpuComposingEnabled.value = liveValue
-                settingsRepository.putBoolean(SettingsRepository.KEY_PREFER_GPU_COMPOSING, liveValue)
+                settingsRepository.putBoolean(
+                    SettingsRepository.KEY_PREFER_GPU_COMPOSING,
+                    liveValue
+                )
             }
         }
     }
@@ -5318,7 +5357,8 @@ class MainViewModel : ViewModel() {
     }
 
     private fun syncNeverAutoFreezeApps(context: Context) {
-        val neverAutoFreezeTagIds = freezeTags.value.filter { it.neverAutoFreeze }.map { it.id }.toSet()
+        val neverAutoFreezeTagIds =
+            freezeTags.value.filter { it.neverAutoFreeze }.map { it.id }.toSet()
         if (neverAutoFreezeTagIds.isEmpty()) return
 
         val currentExcluded = freezeAutoExcludedApps.value.toMutableSet()
@@ -5407,7 +5447,10 @@ class MainViewModel : ViewModel() {
      */
     fun setFreezeTagColorCoded(enabled: Boolean) {
         isFreezeTagColorCodedEnabled.value = enabled
-        settingsRepository.putBoolean(SettingsRepository.KEY_FREEZE_TAG_COLOR_CODED_ENABLED, enabled)
+        settingsRepository.putBoolean(
+            SettingsRepository.KEY_FREEZE_TAG_COLOR_CODED_ENABLED,
+            enabled
+        )
     }
 
     /**
@@ -6707,6 +6750,7 @@ class MainViewModel : ViewModel() {
     }
 
     val isLockdownModeEnabled = mutableStateOf(false)
+
     /**
      * Executes the toggle lockdown mode operation.
      */

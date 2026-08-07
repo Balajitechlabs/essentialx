@@ -584,6 +584,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Int data.
      */
     fun getNotificationLightingSystemMode(): Int = getInt(KEY_EDGE_LIGHTING_SYSTEM_MODE, 0)
+
     /**
      * Executes the save notification lighting system mode operation.
      *
@@ -773,6 +774,7 @@ class SettingsRepository(private val context: Context) {
     // Feature specific App selections
 
     fun loadNotificationLightingSelectedApps() = loadAppSelection(KEY_EDGE_LIGHTING_SELECTED_APPS)
+
     /**
      * Executes the save notification lighting selected apps operation.
      *
@@ -817,6 +819,7 @@ class SettingsRepository(private val context: Context) {
      * Executes the load app lock selected apps operation.
      */
     fun loadAppLockSelectedApps() = loadAppSelection(KEY_APP_LOCK_SELECTED_APPS)
+
     /**
      * Executes the save app lock selected apps operation.
      *
@@ -838,6 +841,7 @@ class SettingsRepository(private val context: Context) {
      * Executes the load freeze selected apps operation.
      */
     fun loadFreezeSelectedApps() = loadAppSelection(KEY_FREEZE_SELECTED_APPS)
+
     /**
      * Executes the save freeze selected apps operation.
      *
@@ -859,6 +863,7 @@ class SettingsRepository(private val context: Context) {
      * Executes the load flashlight pulse selected apps operation.
      */
     fun loadFlashlightPulseSelectedApps() = loadAppSelection(KEY_FLASHLIGHT_PULSE_SELECTED_APPS)
+
     /**
      * Executes the save flashlight pulse selected apps operation.
      *
@@ -903,6 +908,7 @@ class SettingsRepository(private val context: Context) {
      * Executes the load pocket mode excluded apps operation.
      */
     fun loadPocketModeExcludedApps() = loadAppSelection(KEY_POCKET_MODE_EXCLUDED_APPS)
+
     /**
      * Executes the save pocket mode excluded apps operation.
      *
@@ -1320,6 +1326,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Boolean data.
      */
     fun isBluetoothDevicesEnabled(): Boolean = getBoolean(KEY_SHOW_BLUETOOTH_DEVICES, false)
+
     /**
      * Executes the set bluetooth devices enabled operation.
      *
@@ -1333,6 +1340,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Int data.
      */
     fun getBatteryWidgetMaxDevices(): Int = getInt(KEY_BATTERY_WIDGET_MAX_DEVICES, 8)
+
     /**
      * Executes the set battery widget max devices operation.
      *
@@ -1876,6 +1884,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Boolean data.
      */
     fun isUserDictionaryEnabled(): Boolean = getBoolean(KEY_USER_DICTIONARY_ENABLED, false)
+
     /**
      * Executes the set user dictionary enabled operation.
      *
@@ -1889,6 +1898,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Boolean data.
      */
     fun isAccentedCharactersEnabled(): Boolean = getBoolean(KEY_KEYBOARD_ACCENTED_CHARACTERS, false)
+
     /**
      * Executes the set accented characters enabled operation.
      *
@@ -2722,6 +2732,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Int data.
      */
     fun getLockScreenClockWeight(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_WEIGHT, 300)
+
     /**
      * Executes the set lock screen clock weight operation.
      *
@@ -2734,6 +2745,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Int data.
      */
     fun getLockScreenClockWidth(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_WIDTH, 116)
+
     /**
      * Executes the set lock screen clock width operation.
      *
@@ -2746,6 +2758,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Int data.
      */
     fun getLockScreenClockGrade(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_GRADE, 0)
+
     /**
      * Executes the set lock screen clock grade operation.
      *
@@ -2758,6 +2771,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Int data.
      */
     fun getLockScreenClockRoundness(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_ROUNDNESS, 100)
+
     /**
      * Executes the set lock screen clock roundness operation.
      *
@@ -2770,6 +2784,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Int data.
      */
     fun getLockScreenClockColorTone(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_COLOR_TONE, 75)
+
     /**
      * Executes the set lock screen clock color tone operation.
      *
@@ -2797,6 +2812,7 @@ class SettingsRepository(private val context: Context) {
      * @return The resulting Int data.
      */
     fun getLockScreenClockSeedColor(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_SEED_COLOR, 0)
+
     /**
      * Executes the set lock screen clock seed color operation.
      *

@@ -15,7 +15,9 @@ import android.content.IntentFilter
 import android.media.AudioManager
 import android.os.BatteryManager
 import androidx.annotation.RequiresApi
-import androidx.appfunctions.*
+import androidx.appfunctions.AppFunction
+import androidx.appfunctions.AppFunctionService
+import androidx.appfunctions.AppFunctionServiceEntryPoint
 import com.sameerasw.essentials.appfunctions.dto.AppFunctionResult
 import com.sameerasw.essentials.appfunctions.dto.AutomationSummary
 import com.sameerasw.essentials.appfunctions.dto.CreateAutomationParams
@@ -50,11 +52,12 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
      * @return Result indicating whether the operation succeeded.
      */
     @AppFunction(isDescribedByKDoc = true)
-    suspend fun toggleFlashlight(enabled: Boolean): AppFunctionResult = withContext(Dispatchers.IO) {
-        val action = if (enabled) Action.TurnOnFlashlight else Action.TurnOffFlashlight
-        CombinedActionExecutor.execute(applicationContext, action)
-        AppFunctionResult(true, "Flashlight set to ${if (enabled) "ON" else "OFF"}")
-    }
+    suspend fun toggleFlashlight(enabled: Boolean): AppFunctionResult =
+        withContext(Dispatchers.IO) {
+            val action = if (enabled) Action.TurnOnFlashlight else Action.TurnOffFlashlight
+            CombinedActionExecutor.execute(applicationContext, action)
+            AppFunctionResult(true, "Flashlight set to ${if (enabled) "ON" else "OFF"}")
+        }
 
     /**
      * Toggles Caffeinate mode to keep the device screen awake.
@@ -63,14 +66,15 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
      * @return Result indicating whether Caffeinate state changed.
      */
     @AppFunction(isDescribedByKDoc = true)
-    suspend fun toggleCaffeinate(enabled: Boolean): AppFunctionResult = withContext(Dispatchers.IO) {
-        if (enabled) {
-            CaffeinateController.toggle(applicationContext)
-        } else {
-            CaffeinateController.cancelAll(applicationContext)
+    suspend fun toggleCaffeinate(enabled: Boolean): AppFunctionResult =
+        withContext(Dispatchers.IO) {
+            if (enabled) {
+                CaffeinateController.toggle(applicationContext)
+            } else {
+                CaffeinateController.cancelAll(applicationContext)
+            }
+            AppFunctionResult(true, "Caffeinate ${if (enabled) "activated" else "deactivated"}")
         }
-        AppFunctionResult(true, "Caffeinate ${if (enabled) "activated" else "deactivated"}")
-    }
 
     /**
      * Sets the device ringer or sound mode.
@@ -99,12 +103,14 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
         val context = applicationContext
         val repo = SettingsRepository(context)
 
-        val batteryIntent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        val batteryIntent =
+            context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
         val level = batteryIntent?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
         val scale = batteryIntent?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
         val batteryPct = if (level >= 0 && scale > 0) (level * 100 / scale.toFloat()).toInt() else 0
         val status = batteryIntent?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
-        val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
+        val isCharging =
+            status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
 
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val soundModeStr = when (audioManager.ringerMode) {
@@ -113,7 +119,8 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
             else -> "SOUND"
         }
 
-        val isTorchOn = ScreenOffAccessibilityService.instance?.flashlightHandler?.isTorchOn ?: false
+        val isTorchOn =
+            ScreenOffAccessibilityService.instance?.flashlightHandler?.isTorchOn ?: false
 
         DeviceStatusResponse(
             batteryLevel = batteryPct,
@@ -122,7 +129,10 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
             isCaffeinateActive = CaffeinateController.isActive.value,
             isFlashlightOn = isTorchOn,
             isAodEnabled = repo.isAodEnabled(),
-            isNotificationLightingEnabled = repo.getBoolean(SettingsRepository.KEY_EDGE_LIGHTING_ENABLED, false)
+            isNotificationLightingEnabled = repo.getBoolean(
+                SettingsRepository.KEY_EDGE_LIGHTING_ENABLED,
+                false
+            )
         )
     }
 
@@ -160,11 +170,12 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
      * @return Result of applying clock style.
      */
     @AppFunction(isDescribedByKDoc = true)
-    suspend fun setLockScreenClockStyle(style: String): AppFunctionResult = withContext(Dispatchers.IO) {
-        val repo = SettingsRepository(applicationContext)
-        repo.putString("lock_screen_clock_style", style.uppercase())
-        AppFunctionResult(true, "Lock screen clock style set to ${style.uppercase()}")
-    }
+    suspend fun setLockScreenClockStyle(style: String): AppFunctionResult =
+        withContext(Dispatchers.IO) {
+            val repo = SettingsRepository(applicationContext)
+            repo.putString("lock_screen_clock_style", style.uppercase())
+            AppFunctionResult(true, "Lock screen clock style set to ${style.uppercase()}")
+        }
 
     /**
      * Toggles Notification Edge Lighting effect for incoming notifications.
@@ -173,11 +184,15 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
      * @return Result of toggling notification lighting.
      */
     @AppFunction(isDescribedByKDoc = true)
-    suspend fun toggleNotificationLighting(enabled: Boolean): AppFunctionResult = withContext(Dispatchers.IO) {
-        val repo = SettingsRepository(applicationContext)
-        repo.putBoolean(SettingsRepository.KEY_EDGE_LIGHTING_ENABLED, enabled)
-        AppFunctionResult(true, "Notification lighting ${if (enabled) "enabled" else "disabled"}")
-    }
+    suspend fun toggleNotificationLighting(enabled: Boolean): AppFunctionResult =
+        withContext(Dispatchers.IO) {
+            val repo = SettingsRepository(applicationContext)
+            repo.putBoolean(SettingsRepository.KEY_EDGE_LIGHTING_ENABLED, enabled)
+            AppFunctionResult(
+                true,
+                "Notification lighting ${if (enabled) "enabled" else "disabled"}"
+            )
+        }
 
     /**
      * Toggles Flashlight Pulse notification alerts.
@@ -186,11 +201,12 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
      * @return Result of toggling flashlight pulse.
      */
     @AppFunction(isDescribedByKDoc = true)
-    suspend fun toggleFlashlightPulse(enabled: Boolean): AppFunctionResult = withContext(Dispatchers.IO) {
-        val repo = SettingsRepository(applicationContext)
-        repo.putBoolean(SettingsRepository.KEY_FLASHLIGHT_PULSE_ENABLED, enabled)
-        AppFunctionResult(true, "Flashlight pulse ${if (enabled) "enabled" else "disabled"}")
-    }
+    suspend fun toggleFlashlightPulse(enabled: Boolean): AppFunctionResult =
+        withContext(Dispatchers.IO) {
+            val repo = SettingsRepository(applicationContext)
+            repo.putBoolean(SettingsRepository.KEY_FLASHLIGHT_PULSE_ENABLED, enabled)
+            AppFunctionResult(true, "Flashlight pulse ${if (enabled) "enabled" else "disabled"}")
+        }
 
     /**
      * Turns off the device screen immediately.
@@ -245,10 +261,18 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
     suspend fun freezeTagApps(tagId: String): AppFunctionResult = withContext(Dispatchers.IO) {
         val repo = SettingsRepository(applicationContext)
         val tags = repo.getFreezeTags()
-        val targetTag = tags.find { it.id.equals(tagId, ignoreCase = true) || it.name.equals(tagId, ignoreCase = true) }
+        val targetTag = tags.find {
+            it.id.equals(tagId, ignoreCase = true) || it.name.equals(
+                tagId,
+                ignoreCase = true
+            )
+        }
             ?: return@withContext AppFunctionResult(false, "Freeze tag '$tagId' not found")
 
-        CombinedActionExecutor.execute(applicationContext, Action.FreezeTag("Freeze", listOf(targetTag.id)))
+        CombinedActionExecutor.execute(
+            applicationContext,
+            Action.FreezeTag("Freeze", listOf(targetTag.id))
+        )
         AppFunctionResult(true, "Apps in tag '${targetTag.name}' frozen successfully")
     }
 
@@ -262,10 +286,18 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
     suspend fun unfreezeTagApps(tagId: String): AppFunctionResult = withContext(Dispatchers.IO) {
         val repo = SettingsRepository(applicationContext)
         val tags = repo.getFreezeTags()
-        val targetTag = tags.find { it.id.equals(tagId, ignoreCase = true) || it.name.equals(tagId, ignoreCase = true) }
+        val targetTag = tags.find {
+            it.id.equals(tagId, ignoreCase = true) || it.name.equals(
+                tagId,
+                ignoreCase = true
+            )
+        }
             ?: return@withContext AppFunctionResult(false, "Freeze tag '$tagId' not found")
 
-        CombinedActionExecutor.execute(applicationContext, Action.FreezeTag("Unfreeze", listOf(targetTag.id)))
+        CombinedActionExecutor.execute(
+            applicationContext,
+            Action.FreezeTag("Unfreeze", listOf(targetTag.id))
+        )
         AppFunctionResult(true, "Apps in tag '${targetTag.name}' unfrozen successfully")
     }
 
@@ -303,14 +335,21 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
      * @return Result of toggling the automation.
      */
     @AppFunction(isDescribedByKDoc = true)
-    suspend fun toggleAutomation(automationId: String, enabled: Boolean): AppFunctionResult = withContext(Dispatchers.IO) {
-        val automations = DIYRepository.automations.value
-        val target = automations.find { it.id.equals(automationId, ignoreCase = true) }
-            ?: return@withContext AppFunctionResult(false, "Automation '$automationId' not found")
+    suspend fun toggleAutomation(automationId: String, enabled: Boolean): AppFunctionResult =
+        withContext(Dispatchers.IO) {
+            val automations = DIYRepository.automations.value
+            val target = automations.find { it.id.equals(automationId, ignoreCase = true) }
+                ?: return@withContext AppFunctionResult(
+                    false,
+                    "Automation '$automationId' not found"
+                )
 
-        DIYRepository.updateAutomation(target.copy(isEnabled = enabled))
-        AppFunctionResult(true, "Automation '${target.id}' ${if (enabled) "enabled" else "disabled"}")
-    }
+            DIYRepository.updateAutomation(target.copy(isEnabled = enabled))
+            AppFunctionResult(
+                true,
+                "Automation '${target.id}' ${if (enabled) "enabled" else "disabled"}"
+            )
+        }
 
     /**
      * Deletes a DIY automation by its ID.
@@ -319,14 +358,18 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
      * @return Result of deleting the automation.
      */
     @AppFunction(isDescribedByKDoc = true)
-    suspend fun deleteAutomation(automationId: String): AppFunctionResult = withContext(Dispatchers.IO) {
-        val automations = DIYRepository.automations.value
-        val target = automations.find { it.id.equals(automationId, ignoreCase = true) }
-            ?: return@withContext AppFunctionResult(false, "Automation '$automationId' not found")
+    suspend fun deleteAutomation(automationId: String): AppFunctionResult =
+        withContext(Dispatchers.IO) {
+            val automations = DIYRepository.automations.value
+            val target = automations.find { it.id.equals(automationId, ignoreCase = true) }
+                ?: return@withContext AppFunctionResult(
+                    false,
+                    "Automation '$automationId' not found"
+                )
 
-        DIYRepository.removeAutomation(target.id)
-        AppFunctionResult(true, "Automation '${target.id}' deleted successfully")
-    }
+            DIYRepository.removeAutomation(target.id)
+            AppFunctionResult(true, "Automation '${target.id}' deleted successfully")
+        }
 
     /**
      * Creates a new DIY automation in Essentials directly from parameters parsed by AI.
@@ -335,65 +378,73 @@ abstract class BaseEssentialsAppFunctionService : AppFunctionService() {
      * @return Result of creating the automation.
      */
     @AppFunction(isDescribedByKDoc = true)
-    suspend fun createAutomation(params: CreateAutomationParams): AppFunctionResult = withContext(Dispatchers.IO) {
-        val autoType = when (params.type.uppercase()) {
-            "STATE" -> Automation.Type.STATE
-            "APP" -> Automation.Type.APP
-            else -> Automation.Type.TRIGGER
-        }
-
-        val trigger: Trigger? = if (autoType == Automation.Type.TRIGGER) {
-            when (params.triggerType) {
-                "ScreenOff" -> Trigger.ScreenOff
-                "ScreenOn" -> Trigger.ScreenOn
-                "DeviceUnlock" -> Trigger.DeviceUnlock
-                "ChargerConnected" -> Trigger.ChargerConnected
-                "ChargerDisconnected" -> Trigger.ChargerDisconnected
-                "Schedule" -> Trigger.Schedule(params.hour, params.minute)
-                else -> Trigger.ChargerConnected
+    suspend fun createAutomation(params: CreateAutomationParams): AppFunctionResult =
+        withContext(Dispatchers.IO) {
+            val autoType = when (params.type.uppercase()) {
+                "STATE" -> Automation.Type.STATE
+                "APP" -> Automation.Type.APP
+                else -> Automation.Type.TRIGGER
             }
-        } else null
 
-        val state: State? = if (autoType == Automation.Type.STATE) {
-            when (params.stateType) {
-                "Charging" -> State.Charging
-                "ScreenOn" -> State.ScreenOn
-                "TimePeriod" -> State.TimePeriod(params.hour, params.minute, params.endHour, params.endMinute)
-                else -> State.Charging
-            }
-        } else null
-
-        val action: Action = when (params.actionType) {
-            "TurnOnFlashlight" -> Action.TurnOnFlashlight
-            "TurnOffFlashlight" -> Action.TurnOffFlashlight
-            "ToggleFlashlight" -> Action.ToggleFlashlight
-            "DimWallpaper" -> Action.DimWallpaper(params.dimWallpaperAmount)
-            "SoundMode" -> Action.SoundMode(
-                when (params.soundMode.uppercase()) {
-                    "VIBRATE" -> Action.SoundModeType.VIBRATE
-                    "SILENT" -> Action.SoundModeType.SILENT
-                    else -> Action.SoundModeType.SOUND
+            val trigger: Trigger? = if (autoType == Automation.Type.TRIGGER) {
+                when (params.triggerType) {
+                    "ScreenOff" -> Trigger.ScreenOff
+                    "ScreenOn" -> Trigger.ScreenOn
+                    "DeviceUnlock" -> Trigger.DeviceUnlock
+                    "ChargerConnected" -> Trigger.ChargerConnected
+                    "ChargerDisconnected" -> Trigger.ChargerDisconnected
+                    "Schedule" -> Trigger.Schedule(params.hour, params.minute)
+                    else -> Trigger.ChargerConnected
                 }
+            } else null
+
+            val state: State? = if (autoType == Automation.Type.STATE) {
+                when (params.stateType) {
+                    "Charging" -> State.Charging
+                    "ScreenOn" -> State.ScreenOn
+                    "TimePeriod" -> State.TimePeriod(
+                        params.hour,
+                        params.minute,
+                        params.endHour,
+                        params.endMinute
+                    )
+
+                    else -> State.Charging
+                }
+            } else null
+
+            val action: Action = when (params.actionType) {
+                "TurnOnFlashlight" -> Action.TurnOnFlashlight
+                "TurnOffFlashlight" -> Action.TurnOffFlashlight
+                "ToggleFlashlight" -> Action.ToggleFlashlight
+                "DimWallpaper" -> Action.DimWallpaper(params.dimWallpaperAmount)
+                "SoundMode" -> Action.SoundMode(
+                    when (params.soundMode.uppercase()) {
+                        "VIBRATE" -> Action.SoundModeType.VIBRATE
+                        "SILENT" -> Action.SoundModeType.SILENT
+                        else -> Action.SoundModeType.SOUND
+                    }
+                )
+
+                "TurnOnLowPower" -> Action.TurnOnLowPower
+                "TurnOffLowPower" -> Action.TurnOffLowPower
+                "ScreenOff" -> Action.ScreenOff()
+                "MediaPlayPause" -> Action.MediaPlayPause
+                "TakeScreenshot" -> Action.TakeScreenshot
+                "FreezeTag" -> Action.FreezeTag(params.freezeMode, listOf(params.freezeTagId))
+                else -> Action.HapticVibration
+            }
+
+            val newAutomation = Automation(
+                id = UUID.randomUUID().toString(),
+                type = autoType,
+                trigger = trigger,
+                state = state,
+                actions = listOf(action),
+                isEnabled = true
             )
-            "TurnOnLowPower" -> Action.TurnOnLowPower
-            "TurnOffLowPower" -> Action.TurnOffLowPower
-            "ScreenOff" -> Action.ScreenOff()
-            "MediaPlayPause" -> Action.MediaPlayPause
-            "TakeScreenshot" -> Action.TakeScreenshot
-            "FreezeTag" -> Action.FreezeTag(params.freezeMode, listOf(params.freezeTagId))
-            else -> Action.HapticVibration
+
+            DIYRepository.addAutomation(newAutomation)
+            AppFunctionResult(true, "Created automation '${params.title}' successfully")
         }
-
-        val newAutomation = Automation(
-            id = UUID.randomUUID().toString(),
-            type = autoType,
-            trigger = trigger,
-            state = state,
-            actions = listOf(action),
-            isEnabled = true
-        )
-
-        DIYRepository.addAutomation(newAutomation)
-        AppFunctionResult(true, "Created automation '${params.title}' successfully")
-    }
 }

@@ -211,7 +211,10 @@ fun SometimesEssentialsSettingsSheet(
                         }
                     )
 
-                    val currentClockLabel = clockOptions.find { it.first == lockScreenClockStyle }?.second?.let { stringResource(it) } ?: lockScreenClockStyle
+                    val currentClockLabel =
+                        clockOptions.find { it.first == lockScreenClockStyle }?.second?.let {
+                            stringResource(it)
+                        } ?: lockScreenClockStyle
                     FeatureDropdownRow(
                         title = stringResource(R.string.feat_lock_screen_clock_title),
                         iconRes = R.drawable.rounded_nest_clock_farsight_analog_24,

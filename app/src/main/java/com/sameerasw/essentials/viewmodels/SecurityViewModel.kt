@@ -30,7 +30,8 @@ class SecurityViewModel : ViewModel() {
         val repo = SettingsRepository(context)
         isAppLockEnabled.value = repo.getBoolean(SettingsRepository.KEY_APP_LOCK_ENABLED, false)
         isRemoteLockEnabled.value = repo.getBoolean("remote_lock_enabled", false)
-        isScreenLockedSecurityEnabled.value = repo.getBoolean("screen_locked_security_enabled", false)
+        isScreenLockedSecurityEnabled.value =
+            repo.getBoolean("screen_locked_security_enabled", false)
     }
 
     /**

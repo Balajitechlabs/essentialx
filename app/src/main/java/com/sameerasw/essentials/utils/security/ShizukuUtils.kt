@@ -132,7 +132,8 @@ object ShizukuUtils {
     }
 
     fun stopShizuku(context: android.content.Context) {
-        val settingsRepository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
+        val settingsRepository =
+            com.sameerasw.essentials.data.repository.SettingsRepository(context)
         val token = settingsRepository.getShizukuAuthToken()
         if (token.isEmpty()) {
             android.util.Log.w("ShizukuUtils", "Shizuku auth token is missing, cannot stop Shizuku")

@@ -85,7 +85,8 @@ fun FreezeTagIconPicker(
         ) { index ->
             val iconName = icons[index]
             val isSelected = iconName == selectedIconName
-            val iconResId = context.resources.getIdentifier(iconName, "drawable", context.packageName)
+            val iconResId =
+                context.resources.getIdentifier(iconName, "drawable", context.packageName)
 
             Box(
                 modifier = Modifier

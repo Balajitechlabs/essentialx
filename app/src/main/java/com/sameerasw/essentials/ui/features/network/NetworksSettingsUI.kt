@@ -32,11 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.PermissionItem
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
-import com.sameerasw.essentials.ui.components.sliders.ConfigSliderItem
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -103,7 +103,8 @@ fun NetworksSettingsUI(
     val isShizukuGranted = viewModel.isShizukuPermissionGranted.value
     val isRootAvailable = viewModel.isRootAvailable.value
     val isRootGranted = viewModel.isRootPermissionGranted.value
-    val isShellGranted = (isShizukuAvailable && isShizukuGranted) || (isRootAvailable && isRootGranted)
+    val isShellGranted =
+        (isShizukuAvailable && isShizukuGranted) || (isRootAvailable && isRootGranted)
     val isHasWritePermission = viewModel.isWriteSecureSettingsEnabled.value || isShellGranted
 
     LaunchedEffect(Unit) {
@@ -171,7 +172,8 @@ fun NetworksSettingsUI(
             val currentIndex = remember(currentRateLimit) {
                 val idx = presetValues.indexOf(currentRateLimit)
                 if (idx != -1) idx
-                else presetValues.indices.minByOrNull { kotlin.math.abs(presetValues[it] - currentRateLimit) } ?: 0
+                else presetValues.indices.minByOrNull { kotlin.math.abs(presetValues[it] - currentRateLimit) }
+                    ?: 0
             }
             var sliderValue by remember(currentIndex) { mutableFloatStateOf(currentIndex.toFloat()) }
 
@@ -232,13 +234,15 @@ fun NetworksSettingsUI(
                     if (isHasWritePermission) {
                         viewModel.setWirelessDisplayCertificationEnabled(enabled, context)
                     } else {
-                        requestingPermissionFor = NetworkPermissionModule.WIRELESS_DISPLAY_CERTIFICATION
+                        requestingPermissionFor =
+                            NetworkPermissionModule.WIRELESS_DISPLAY_CERTIFICATION
                     }
                 },
                 enabled = true,
                 onDisabledClick = {
                     if (!isHasWritePermission) {
-                        requestingPermissionFor = NetworkPermissionModule.WIRELESS_DISPLAY_CERTIFICATION
+                        requestingPermissionFor =
+                            NetworkPermissionModule.WIRELESS_DISPLAY_CERTIFICATION
                     }
                 },
                 iconRes = R.drawable.rounded_cast_24,

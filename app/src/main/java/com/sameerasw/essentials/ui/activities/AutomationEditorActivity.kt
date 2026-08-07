@@ -74,10 +74,10 @@ import com.sameerasw.essentials.domain.diy.Trigger
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.NotificationApp
 import com.sameerasw.essentials.ui.components.ReusableTopAppBar
-import com.sameerasw.essentials.ui.core.cards.AppToggleItem
-import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
+import com.sameerasw.essentials.ui.core.cards.AppToggleItem
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.BluetoothDeviceSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.DimWallpaperSettingsSheet
@@ -929,7 +929,8 @@ class AutomationEditorActivity : ComponentActivity() {
 
                         if (showFreezeTagSettings && configAction is Action.FreezeTag) {
                             val availableTags = remember {
-                                com.sameerasw.essentials.data.repository.SettingsRepository(context).getFreezeTags()
+                                com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                                    .getFreezeTags()
                             }
                             com.sameerasw.essentials.ui.core.sheets.FreezeTagSettingsSheet(
                                 initialAction = configAction as Action.FreezeTag,

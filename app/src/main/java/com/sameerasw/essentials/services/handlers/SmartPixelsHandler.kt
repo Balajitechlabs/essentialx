@@ -27,11 +27,15 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
     private var isOverlayAdded = false
 
     private val prefs by lazy {
-        service.getSharedPreferences(SettingsRepository.PREFS_NAME, AccessibilityService.MODE_PRIVATE)
+        service.getSharedPreferences(
+            SettingsRepository.PREFS_NAME,
+            AccessibilityService.MODE_PRIVATE
+        )
     }
 
     fun init() {
-        windowManager = service.getSystemService(AccessibilityService.WINDOW_SERVICE) as? WindowManager
+        windowManager =
+            service.getSystemService(AccessibilityService.WINDOW_SERVICE) as? WindowManager
         updateState()
     }
 
@@ -89,7 +93,11 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
             try {
                 windowManager?.removeView(overlayView)
             } catch (e: Exception) {
-                Log.e("SmartPixelsHandler", "Failed to remove Smart Pixels accessibility overlay", e)
+                Log.e(
+                    "SmartPixelsHandler",
+                    "Failed to remove Smart Pixels accessibility overlay",
+                    e
+                )
             }
             isOverlayAdded = false
         }

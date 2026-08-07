@@ -49,12 +49,12 @@ import com.sameerasw.essentials.ui.components.battery.BatteryAppsTabContent
 import com.sameerasw.essentials.ui.components.battery.BatteryInfoTabContent
 import com.sameerasw.essentials.ui.components.battery.BatterySystemTabContent
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
-import com.sameerasw.essentials.utils.battery.BatteryDetails
-import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
 import com.sameerasw.essentials.utils.BatteryStatsUtil
 import com.sameerasw.essentials.utils.BatteryUsageApp
 import com.sameerasw.essentials.utils.CpuWakeupItem
 import com.sameerasw.essentials.utils.DeviceUtils
+import com.sameerasw.essentials.utils.battery.BatteryDetails
+import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

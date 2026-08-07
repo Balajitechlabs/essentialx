@@ -43,11 +43,10 @@ import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.core.sheets.BatteryDetailsBottomSheet
 import com.sameerasw.essentials.ui.theme.Shapes
-import com.sameerasw.essentials.utils.battery.BatteryDetails
-import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.ShellUtils
+import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

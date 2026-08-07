@@ -88,7 +88,8 @@ object SurfaceFlingerControl {
         }
 
         if (context != null) {
-            val output = ShellUtils.runCommandWithOutput(context, "service call SurfaceFlinger 1010")
+            val output =
+                ShellUtils.runCommandWithOutput(context, "service call SurfaceFlinger 1010")
             if (!output.isNullOrEmpty()) {
                 val hexValues = Regex("0x[0-9a-fA-F]+").findAll(output).map { it.value }.toList()
                 if (hexValues.size >= 5) {

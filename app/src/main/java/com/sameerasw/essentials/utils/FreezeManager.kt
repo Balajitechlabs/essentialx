@@ -318,12 +318,12 @@ object FreezeManager {
                 HiddenApiBypass.invoke(builderClass, builder, "build")
             } else null
 
-    /**
-     * Executes the call set packages suspended operation.
-     *
+            /**
+             * Executes the call set packages suspended operation.
+             *
              * @param version [Int] Target version.
-     * @return The resulting Array< data.
-     */
+             * @return The resulting Array< data.
+             */
             fun callSetPackagesSuspended(version: Int): Array<*>? {
                 return try {
                     when (version) {

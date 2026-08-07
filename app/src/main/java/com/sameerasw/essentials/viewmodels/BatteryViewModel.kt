@@ -32,10 +32,11 @@ class BatteryViewModel : ViewModel() {
         val repo = SettingsRepository(context)
         isBatteryNotificationEnabled.value = repo.isBatteryNotificationEnabled()
         isMapsPowerSavingEnabled.value = repo.getBoolean("maps_power_saving_enabled", false)
-        
+
         val details = BatteryInfoUtil.getBasicDetails(context)
         batteryPercentage.value = details.level
-        isCharging.value = details.plugged != 0 || details.status == android.os.BatteryManager.BATTERY_STATUS_CHARGING
+        isCharging.value =
+            details.plugged != 0 || details.status == android.os.BatteryManager.BATTERY_STATUS_CHARGING
     }
 
     /**

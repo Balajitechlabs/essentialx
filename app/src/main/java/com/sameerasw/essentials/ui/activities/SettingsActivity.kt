@@ -94,12 +94,12 @@ import com.sameerasw.essentials.translation.TranslationManager
 import com.sameerasw.essentials.translation.ui.TranslationSessionSheet
 import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.MadebySameeraswCard
+import com.sameerasw.essentials.ui.components.dialogs.AboutSection
+import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.ui.core.cards.FeatureCard
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.cards.PermissionCard
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.dialogs.AboutSection
-import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
 import com.sameerasw.essentials.ui.core.pickers.CrashReportingPicker
 import com.sameerasw.essentials.ui.core.pickers.DefaultTabPicker
 import com.sameerasw.essentials.ui.core.pickers.LanguagePicker
@@ -275,7 +275,8 @@ fun SettingsContent(
     var isGenAISupported by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        isGenAISupported = com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
+        isGenAISupported =
+            com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
     }
 
     val isUpdateNotificationEnabled by viewModel.isUpdateNotificationEnabled
@@ -478,7 +479,6 @@ fun SettingsContent(
                     .height(72.dp)
             )
         }
-
 
 
         // Updates Section

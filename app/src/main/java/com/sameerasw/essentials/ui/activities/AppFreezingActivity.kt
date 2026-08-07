@@ -103,7 +103,9 @@ class AppFreezingActivity : ComponentActivity() {
                         val isShizukuAvailable by viewModel.isShizukuAvailable
                         val isShizukuPermissionGranted by viewModel.isShizukuPermissionGranted
                         var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
-                        androidx.activity.compose.BackHandler(fabMenuExpanded) { fabMenuExpanded = false }
+                        androidx.activity.compose.BackHandler(fabMenuExpanded) {
+                            fabMenuExpanded = false
+                        }
 
                         Box(
                             modifier = Modifier
@@ -145,7 +147,10 @@ class AppFreezingActivity : ComponentActivity() {
                             Box(
                                 modifier = Modifier
                                     .align(Alignment.BottomEnd)
-                                    .padding(bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 16.dp, end = 16.dp)
+                                    .padding(
+                                        bottom = WindowInsets.navigationBars.asPaddingValues()
+                                            .calculateBottomPadding() + 16.dp, end = 16.dp
+                                    )
                             ) {
                                 FloatingActionButton(
                                     onClick = {
@@ -247,7 +252,10 @@ class AppFreezingActivity : ComponentActivity() {
                                         onClick = {
                                             HapticUtil.performVirtualKeyHaptic(view)
                                             fabMenuExpanded = false
-                                            val intent = Intent(context, FeatureSettingsActivity::class.java).apply {
+                                            val intent = Intent(
+                                                context,
+                                                FeatureSettingsActivity::class.java
+                                            ).apply {
                                                 putExtra("feature", "Freeze")
                                             }
                                             context.startActivity(intent)

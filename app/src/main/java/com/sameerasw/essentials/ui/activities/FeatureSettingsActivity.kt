@@ -58,13 +58,13 @@ import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.registry.FeatureRegistry
 import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.animations.LottieFeatureAnimation
+import com.sameerasw.essentials.ui.components.linkActions.LinkPickerScreen
 import com.sameerasw.essentials.ui.core.cards.FeatureCard
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.linkActions.LinkPickerScreen
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
-import com.sameerasw.essentials.ui.features.system.AlwaysOnDisplaySettingsUI
 import com.sameerasw.essentials.ui.features.battery.BatteriesSettingsUI
 import com.sameerasw.essentials.ui.features.security.AppLockSettingsUI
+import com.sameerasw.essentials.ui.features.system.AlwaysOnDisplaySettingsUI
 import com.sameerasw.essentials.ui.features.system.BatteryNotificationSettingsUI
 import com.sameerasw.essentials.ui.features.system.ButtonRemapSettingsUI
 import com.sameerasw.essentials.ui.features.system.CaffeinateSettingsUI
@@ -349,7 +349,10 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                             "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
                             "Power and Battery" -> !isWriteSecureSettingsEnabled
-                            "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
+                            "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                context
+                            )
+
                             else -> false
                         }
                         if (hasMissingPermissions) {
@@ -551,6 +554,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 "Other customizations"
                                             )
                                         )
+
                                         "Notifications" -> listOf(
                                             listOf(
                                                 "Notification lighting",
@@ -561,6 +565,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 "Snooze system notifications"
                                             )
                                         )
+
                                         "Widgets" -> listOf(
                                             listOf(
                                                 "Pixel Searchbar"
@@ -570,6 +575,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 "Batteries"
                                             )
                                         )
+
                                         "Input" -> listOf(
                                             listOf(
                                                 "Button remap",
@@ -580,6 +586,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 "System Keyboard"
                                             )
                                         )
+
                                         "Power and battery" -> listOf(
                                             listOf(
                                                 "Power and Battery",
@@ -589,6 +596,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 "Battery notification"
                                             )
                                         )
+
                                         "Watch" -> listOf(
                                             listOf(
                                                 "Watch Controls",
@@ -603,6 +611,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 "Watch Wireless Debugging"
                                             )
                                         )
+
                                         "Security" -> listOf(
                                             listOf(
                                                 "Screen locked security",
@@ -613,13 +622,17 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 "Lockdown mode"
                                             )
                                         )
+
                                         else -> null
                                     }
 
                                     if (definedSections != null) {
                                         val assignedIds = definedSections.flatten().toSet()
                                         val unassigned = children.filter { it.id !in assignedIds }
-                                        definedSections.map { ids -> ids.mapNotNull { childMap[it] } }.filter { it.isNotEmpty() } + if (unassigned.isNotEmpty()) listOf(unassigned) else emptyList()
+                                        definedSections.map { ids -> ids.mapNotNull { childMap[it] } }
+                                            .filter { it.isNotEmpty() } + if (unassigned.isNotEmpty()) listOf(
+                                            unassigned
+                                        ) else emptyList()
                                     } else {
                                         listOf(children)
                                     }
@@ -632,66 +645,74 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             .padding(top = 16.dp)
                                     ) {
                                         sectionChildren.forEach { child ->
-                                            val permissionAwareToggle: (Boolean) -> Unit = { enabled ->
-                                                val missingPermission = when (child.id) {
-                                                    "Screen off widget" -> !isAccessibilityEnabled
-                                                    "Statusbar icons" -> !isWriteSecureSettingsEnabled
-                                                    "Notification lighting" -> !isOverlayPermissionGranted || !isNotificationLightingAccessibilityEnabled || !isNotificationListenerEnabled
-                                                    "Button remap" -> !isAccessibilityEnabled
-                                                    "Dynamic night light" -> (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) || !isWriteSecureSettingsEnabled
-                                                    "Snooze system notifications" -> !isNotificationListenerEnabled
-                                                    "Screen locked security" -> !isAccessibilityEnabled || !isWriteSecureSettingsEnabled || !viewModel.isDeviceAdminEnabled.value
-                                                    "App lock" -> !isAccessibilityEnabled || (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else false)
-                                                    "Freeze" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                        context
-                                                    )
+                                            val permissionAwareToggle: (Boolean) -> Unit =
+                                                { enabled ->
+                                                    val missingPermission = when (child.id) {
+                                                        "Screen off widget" -> !isAccessibilityEnabled
+                                                        "Statusbar icons" -> !isWriteSecureSettingsEnabled
+                                                        "Notification lighting" -> !isOverlayPermissionGranted || !isNotificationLightingAccessibilityEnabled || !isNotificationListenerEnabled
+                                                        "Button remap" -> !isAccessibilityEnabled
+                                                        "Dynamic night light" -> (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) || !isWriteSecureSettingsEnabled
+                                                        "Snooze system notifications" -> !isNotificationListenerEnabled
+                                                        "Screen locked security" -> !isAccessibilityEnabled || !isWriteSecureSettingsEnabled || !viewModel.isDeviceAdminEnabled.value
+                                                        "App lock" -> !isAccessibilityEnabled || (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else false)
+                                                        "Freeze" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                            context
+                                                        )
 
-                                                    "Essentials On Display" -> !isAccessibilityEnabled || !isNotificationListenerEnabled
-                                                    "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
-                                                    "Calendar Sync" -> androidx.core.content.ContextCompat.checkSelfPermission(
-                                                        context,
-                                                        android.Manifest.permission.READ_CALENDAR
-                                                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                                                        "Essentials On Display" -> !isAccessibilityEnabled || !isNotificationListenerEnabled
+                                                        "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
+                                                        "Calendar Sync" -> androidx.core.content.ContextCompat.checkSelfPermission(
+                                                            context,
+                                                            android.Manifest.permission.READ_CALENDAR
+                                                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED
 
-                                                    "Batteries" -> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && androidx.core.content.ContextCompat.checkSelfPermission(
-                                                        context,
-                                                        android.Manifest.permission.BLUETOOTH_CONNECT
-                                                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED)
+                                                        "Batteries" -> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && androidx.core.content.ContextCompat.checkSelfPermission(
+                                                            context,
+                                                            android.Manifest.permission.BLUETOOTH_CONNECT
+                                                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED)
 
-                                                    "Maps power saving mode" -> !isNotificationListenerEnabled || !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                        context
-                                                    )
+                                                        "Maps power saving mode" -> !isNotificationListenerEnabled || !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                            context
+                                                        )
 
-                                                    "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
-                                                    "Battery notification" -> !viewModel.isPostNotificationsEnabled.value || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !viewModel.isBluetoothPermissionGranted.value)
-                                                    "Text and animations" -> !viewModel.isWriteSettingsEnabled.value || !isWriteSecureSettingsEnabled
-                                                    "Lock screen clock" -> !isWriteSecureSettingsEnabled
-                                                    "Screen refresh rate" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                        context
-                                                    )
+                                                        "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
+                                                        "Battery notification" -> !viewModel.isPostNotificationsEnabled.value || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !viewModel.isBluetoothPermissionGranted.value)
+                                                        "Text and animations" -> !viewModel.isWriteSettingsEnabled.value || !isWriteSecureSettingsEnabled
+                                                        "Lock screen clock" -> !isWriteSecureSettingsEnabled
+                                                        "Screen refresh rate" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                            context
+                                                        )
 
-                                                    "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
-                                                    "Power and Battery" -> !isWriteSecureSettingsEnabled
-                                                    "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
-                                                    "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
-                                                    "Notification snoozing" -> !isWriteSecureSettingsEnabled
-                                                    else -> false
+                                                        "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
+                                                        "Power and Battery" -> !isWriteSecureSettingsEnabled
+                                                        "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                            context
+                                                        )
+
+                                                        "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
+                                                        "Notification snoozing" -> !isWriteSecureSettingsEnabled
+                                                        else -> false
+                                                    }
+
+                                                    if (missingPermission) {
+                                                        childFeatureForPermissions = child.id
+                                                        showPermissionSheet = true
+                                                    } else {
+                                                        BiometricSecurityHelper.runWithAuth(
+                                                            activity = this@FeatureSettingsActivity,
+                                                            feature = child,
+                                                            isToggle = true,
+                                                            action = {
+                                                                child.onToggle(
+                                                                    viewModel,
+                                                                    context,
+                                                                    enabled
+                                                                )
+                                                            }
+                                                        )
+                                                    }
                                                 }
-
-                                                if (missingPermission) {
-                                                    childFeatureForPermissions = child.id
-                                                    showPermissionSheet = true
-                                                } else {
-                                                    BiometricSecurityHelper.runWithAuth(
-                                                        activity = this@FeatureSettingsActivity,
-                                                        feature = child,
-                                                        isToggle = true,
-                                                        action = {
-                                                            child.onToggle(viewModel, context, enabled)
-                                                        }
-                                                    )
-                                                }
-                                            }
 
                                             FeatureCard(
                                                 modifier = Modifier.highlight(highlightSetting == child.id),

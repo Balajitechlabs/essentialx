@@ -47,9 +47,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.AppStandbyInfo
-import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.PermissionItem
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
@@ -64,7 +64,8 @@ fun StandbyAppsSettingsUI(
     val context = LocalContext.current
     var requestingPermissionFor by remember { mutableStateOf(false) }
 
-    val isShizukuGranted = viewModel.isShizukuAvailable.value && viewModel.isShizukuPermissionGranted.value
+    val isShizukuGranted =
+        viewModel.isShizukuAvailable.value && viewModel.isShizukuPermissionGranted.value
     val isRootGranted = viewModel.isRootAvailable.value && viewModel.isRootPermissionGranted.value
     val isShellGranted = isShizukuGranted || isRootGranted
 
@@ -156,7 +157,7 @@ fun StandbyAppsSettingsUI(
                         modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
                     )
 
-                    RoundedCardContainer{
+                    RoundedCardContainer {
                         if (bucketApps.isEmpty()) {
                             Box(
                                 modifier = Modifier
@@ -178,7 +179,11 @@ fun StandbyAppsSettingsUI(
                                     isShellGranted = isShellGranted,
                                     onMoveBucket = { targetBucket ->
                                         if (isShellGranted) {
-                                            viewModel.setAppStandbyBucket(app.packageName, targetBucket, context)
+                                            viewModel.setAppStandbyBucket(
+                                                app.packageName,
+                                                targetBucket,
+                                                context
+                                            )
                                         } else {
                                             requestingPermissionFor = true
                                         }

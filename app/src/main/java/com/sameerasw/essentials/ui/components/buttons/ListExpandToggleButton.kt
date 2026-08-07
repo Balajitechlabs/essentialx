@@ -105,7 +105,9 @@ fun ListExpandToggleButton(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp)
         ) {
             Icon(
-                painter = painterResource(id = iconRes ?: R.drawable.rounded_keyboard_arrow_down_24),
+                painter = painterResource(
+                    id = iconRes ?: R.drawable.rounded_keyboard_arrow_down_24
+                ),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier

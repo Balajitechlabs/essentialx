@@ -225,7 +225,11 @@ class QsTilesWidget : GlanceAppWidget() {
                                                                         .cornerRadius(
                                                                             iconCornerRadius
                                                                         )
-                                                                        .background(ColorProvider(pastelColor)),
+                                                                        .background(
+                                                                            ColorProvider(
+                                                                                pastelColor
+                                                                            )
+                                                                        ),
                                                                     contentAlignment = Alignment.Center
                                                                 ) {
                                                                     Image(
