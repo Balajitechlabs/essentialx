@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Viewmodels
+ * File: MainViewModel.kt
+ * Description: Component file for MainViewModel.kt.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.Manifest

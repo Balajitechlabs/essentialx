@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Core Application Entrypoint
+ * File: EssentialsApp.kt
+ * Description: Main application entrypoint for EssentialsApp.kt.
+ */
+
 package com.sameerasw.essentials
 
 import android.app.Application

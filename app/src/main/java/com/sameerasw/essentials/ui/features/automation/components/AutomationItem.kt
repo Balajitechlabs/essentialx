@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Feature - Automation
+ * File: AutomationItem.kt
+ * Description: UI component and settings composable for Automation feature domain.
+ */
+
 package com.sameerasw.essentials.ui.components.diy
 
 import androidx.compose.foundation.ExperimentalFoundationApi

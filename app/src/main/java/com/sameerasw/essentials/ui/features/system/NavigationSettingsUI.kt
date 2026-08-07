@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Feature - System
+ * File: NavigationSettingsUI.kt
+ * Description: UI component and settings composable for System feature domain.
+ */
+
 package com.sameerasw.essentials.ui.features.system
 
 import android.content.Intent

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: AboutSection.kt
+ * Description: UI layout element for AboutSection.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.dialogs
 
 import android.content.ActivityNotFoundException

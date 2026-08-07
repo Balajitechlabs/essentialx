@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: PocketModeTileService.kt
+ * Description: Background service component for PocketModeTileService.kt.
+ */
+
 package com.sameerasw.essentials.services.tiles
 
 import android.graphics.drawable.Icon

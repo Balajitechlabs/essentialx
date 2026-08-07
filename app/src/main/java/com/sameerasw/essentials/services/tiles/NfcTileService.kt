@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: NfcTileService.kt
+ * Description: Background service component for NfcTileService.kt.
+ */
+
 package com.sameerasw.essentials.services.tiles
 
 import android.content.Context

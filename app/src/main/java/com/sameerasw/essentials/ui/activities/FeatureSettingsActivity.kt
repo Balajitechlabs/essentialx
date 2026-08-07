@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: FeatureSettingsActivity.kt
+ * Description: Activity component for FeatureSettingsActivity.kt.
+ */
+
 package com.sameerasw.essentials
 
 import android.os.Build

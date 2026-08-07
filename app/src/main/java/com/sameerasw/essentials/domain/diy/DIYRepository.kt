@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Domain Layer Models & Registries
+ * File: DIYRepository.kt
+ * Description: Domain model and business logic entry for DIYRepository.kt.
+ */
+
 package com.sameerasw.essentials.domain.diy
 
 import android.content.Context

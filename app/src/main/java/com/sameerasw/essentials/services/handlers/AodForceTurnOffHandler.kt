@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: AodForceTurnOffHandler.kt
+ * Description: Background service component for AodForceTurnOffHandler.kt.
+ */
+
 package com.sameerasw.essentials.services.handlers
 
 import android.accessibilityservice.AccessibilityService

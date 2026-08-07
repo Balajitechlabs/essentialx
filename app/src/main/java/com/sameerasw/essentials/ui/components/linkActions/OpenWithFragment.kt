@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: OpenWithFragment.kt
+ * Description: UI layout element for OpenWithFragment.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.linkActions
 
 import android.content.Intent

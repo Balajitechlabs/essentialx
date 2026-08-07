@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: AutomationModule.kt
+ * Description: Background service component for AutomationModule.kt.
+ */
+
 package com.sameerasw.essentials.services.automation.modules
 
 import android.content.Context

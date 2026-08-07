@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: AutomationEditorActivity.kt
+ * Description: Activity component for AutomationEditorActivity.kt.
+ */
+
 package com.sameerasw.essentials.ui.activities
 
 import android.content.Context

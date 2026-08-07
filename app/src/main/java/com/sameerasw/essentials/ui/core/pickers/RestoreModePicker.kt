@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Core Components
+ * File: RestoreModePicker.kt
+ * Description: Reusable core UI component for RestoreModePicker.kt.
+ */
+
 package com.sameerasw.essentials.ui.core.pickers
 
 import androidx.compose.foundation.background

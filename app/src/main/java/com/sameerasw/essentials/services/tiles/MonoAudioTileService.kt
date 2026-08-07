@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: MonoAudioTileService.kt
+ * Description: Background service component for MonoAudioTileService.kt.
+ */
+
 package com.sameerasw.essentials.services.tiles
 
 import android.graphics.drawable.Icon

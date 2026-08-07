@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Appfunctions
+ * File: AutomationSummary.kt
+ * Description: Component file for AutomationSummary.kt.
+ */
+
 package com.sameerasw.essentials.appfunctions.dto
 
 import androidx.annotation.Keep

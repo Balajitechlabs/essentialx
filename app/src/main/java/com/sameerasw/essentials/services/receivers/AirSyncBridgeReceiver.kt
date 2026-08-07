@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: AirSyncBridgeReceiver.kt
+ * Description: Background service component for AirSyncBridgeReceiver.kt.
+ */
+
 package com.sameerasw.essentials.services.receivers
 
 import android.content.BroadcastReceiver

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Core Components
+ * File: TrackedRepoCard.kt
+ * Description: Reusable core UI component for TrackedRepoCard.kt.
+ */
+
 package com.sameerasw.essentials.ui.core.cards
 
 import androidx.compose.foundation.Image

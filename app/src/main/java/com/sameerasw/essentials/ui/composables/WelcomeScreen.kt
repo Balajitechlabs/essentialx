@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: WelcomeScreen.kt
+ * Description: UI layout element for WelcomeScreen.kt.
+ */
+
 package com.sameerasw.essentials.ui.composables
 
 import android.content.Intent

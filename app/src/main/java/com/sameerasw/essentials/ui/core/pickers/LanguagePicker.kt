@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Core Components
+ * File: LanguagePicker.kt
+ * Description: Reusable core UI component for LanguagePicker.kt.
+ */
+
 package com.sameerasw.essentials.ui.core.pickers
 
 import androidx.compose.foundation.layout.fillMaxWidth

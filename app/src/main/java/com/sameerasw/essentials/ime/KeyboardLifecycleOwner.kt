@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Ime
+ * File: KeyboardLifecycleOwner.kt
+ * Description: Component file for KeyboardLifecycleOwner.kt.
+ */
+
 package com.sameerasw.essentials.ime
 
 import androidx.lifecycle.Lifecycle

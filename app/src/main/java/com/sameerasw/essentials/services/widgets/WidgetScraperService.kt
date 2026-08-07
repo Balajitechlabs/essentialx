@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: WidgetScraperService.kt
+ * Description: Background service component for WidgetScraperService.kt.
+ */
+
 package com.sameerasw.essentials.services.widgets
 
 import android.app.Service

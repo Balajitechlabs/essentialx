@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Data & Repository Layer
+ * File: WallpaperRepository.kt
+ * Description: Data repository and storage component for WallpaperRepository.kt.
+ */
+
 package com.sameerasw.essentials.data.repository
 
 import android.app.WallpaperManager

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: ShortcutHandlerActivity.kt
+ * Description: Activity component for ShortcutHandlerActivity.kt.
+ */
+
 package com.sameerasw.essentials
 
 import android.content.Intent

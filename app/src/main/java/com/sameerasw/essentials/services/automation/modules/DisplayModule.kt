@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: DisplayModule.kt
+ * Description: Background service component for DisplayModule.kt.
+ */
+
 package com.sameerasw.essentials.services.automation.modules
 
 import android.content.BroadcastReceiver

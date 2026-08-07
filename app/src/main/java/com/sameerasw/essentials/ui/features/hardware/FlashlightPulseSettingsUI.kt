@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Feature - Hardware
+ * File: FlashlightPulseSettingsUI.kt
+ * Description: UI component and settings composable for Hardware feature domain.
+ */
+
 package com.sameerasw.essentials.ui.features.system
 
 import androidx.compose.foundation.layout.Arrangement

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Translation
+ * File: TranslationFocusOutline.kt
+ * Description: Component file for TranslationFocusOutline.kt.
+ */
+
 package com.sameerasw.essentials.translation.ui
 
 import androidx.compose.animation.core.FastOutSlowInEasing

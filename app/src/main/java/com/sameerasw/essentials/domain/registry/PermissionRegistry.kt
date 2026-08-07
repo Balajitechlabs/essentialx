@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Domain Layer Registries
+ * File: PermissionRegistry.kt
+ * Description: Registry containing system permission declarations, intent actions, and guidance strings.
+ */
+
 package com.sameerasw.essentials.domain.registry
 
 import com.sameerasw.essentials.R

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Core Components
+ * File: UnsupportedFeaturesConfirmationSheet.kt
+ * Description: Reusable core UI component for UnsupportedFeaturesConfirmationSheet.kt.
+ */
+
 package com.sameerasw.essentials.ui.core.sheets
 
 import androidx.compose.foundation.layout.Arrangement

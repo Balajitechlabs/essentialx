@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: ListExpandToggleButton.kt
+ * Description: UI layout element for ListExpandToggleButton.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.buttons
 
 import androidx.compose.animation.core.animateFloatAsState

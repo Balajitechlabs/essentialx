@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Feature - Audio
+ * File: ShutUpPerAppSettingsSheet.kt
+ * Description: UI component and settings composable for Audio feature domain.
+ */
+
 package com.sameerasw.essentials.ui.core.sheets
 
 import androidx.compose.foundation.layout.Arrangement

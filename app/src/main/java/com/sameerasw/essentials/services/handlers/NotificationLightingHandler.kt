@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: NotificationLightingHandler.kt
+ * Description: Background service component for NotificationLightingHandler.kt.
+ */
+
 package com.sameerasw.essentials.services.handlers
 
 import android.accessibilityservice.AccessibilityService

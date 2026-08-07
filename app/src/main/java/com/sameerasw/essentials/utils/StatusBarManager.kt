@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: System UI & Status Bar Controls
+ * File: StatusBarManager.kt
+ * Description: Manages System UI status bar disable flags, quick settings panel expansion,
+ * and lock screen security restrictions via system shell commands.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

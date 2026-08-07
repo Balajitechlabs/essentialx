@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Feature - Location
+ * File: LocationAlarmCard.kt
+ * Description: UI component and settings composable for Location feature domain.
+ */
+
 package com.sameerasw.essentials.ui.core.cards
 
 import androidx.compose.foundation.background

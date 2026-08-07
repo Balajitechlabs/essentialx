@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Shizuku
+ * File: ShizukuProcessHelper.kt
+ * Description: Component file for ShizukuProcessHelper.kt.
+ */
+
 package com.sameerasw.essentials.shizuku
 
 import rikka.shizuku.Shizuku

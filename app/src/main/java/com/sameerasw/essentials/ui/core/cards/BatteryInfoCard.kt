@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Core Components
+ * File: BatteryInfoCard.kt
+ * Description: Reusable core UI component for BatteryInfoCard.kt.
+ */
+
 package com.sameerasw.essentials.ui.core.cards
 
 import android.content.BroadcastReceiver

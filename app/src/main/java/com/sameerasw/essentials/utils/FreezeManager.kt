@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Utilities - General
+ * File: FreezeManager.kt
+ * Description: Utility helper for FreezeManager.kt.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

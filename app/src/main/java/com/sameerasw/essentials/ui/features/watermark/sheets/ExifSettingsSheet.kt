@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Feature - Watermark
+ * File: ExifSettingsSheet.kt
+ * Description: UI component and settings composable for Watermark feature domain.
+ */
+
 package com.sameerasw.essentials.ui.core.sheets
 
 import androidx.compose.foundation.layout.Arrangement

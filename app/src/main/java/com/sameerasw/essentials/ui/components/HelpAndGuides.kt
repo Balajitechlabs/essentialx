@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: HelpAndGuides.kt
+ * Description: UI layout element for HelpAndGuides.kt.
+ */
+
 package com.sameerasw.essentials.ui.components
 
 import android.content.Intent

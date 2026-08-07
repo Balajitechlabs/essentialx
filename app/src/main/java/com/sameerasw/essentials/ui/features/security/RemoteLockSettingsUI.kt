@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Feature - Security
+ * File: RemoteLockSettingsUI.kt
+ * Description: UI component and settings composable for Security feature domain.
+ */
+
 package com.sameerasw.essentials.ui.features.system
 
 import androidx.compose.foundation.layout.Column

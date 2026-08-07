@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Input
+ * File: VolumeLongPressDetector.kt
+ * Description: Component file for VolumeLongPressDetector.kt.
+ */
+
 package com.sameerasw.essentials.input
 
 import kotlinx.coroutines.CoroutineScope

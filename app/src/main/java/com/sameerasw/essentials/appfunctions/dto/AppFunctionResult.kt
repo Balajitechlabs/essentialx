@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Appfunctions
+ * File: AppFunctionResult.kt
+ * Description: Component file for AppFunctionResult.kt.
+ */
+
 package com.sameerasw.essentials.appfunctions.dto
 
 import androidx.annotation.Keep

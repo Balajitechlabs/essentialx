@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Domain Layer Registries
+ * File: FeatureRegistry.kt
+ * Description: Central registry defining all app features, categories, permission requirements, and toggles.
+ */
+
 package com.sameerasw.essentials.domain.registry
 
 import android.content.Context

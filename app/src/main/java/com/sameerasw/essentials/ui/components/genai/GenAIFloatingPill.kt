@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: GenAIFloatingPill.kt
+ * Description: UI layout element for GenAIFloatingPill.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.genai
 
 import android.view.Gravity

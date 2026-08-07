@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: TimeAutomationReceiver.kt
+ * Description: Background service component for TimeAutomationReceiver.kt.
+ */
+
 package com.sameerasw.essentials.services.automation.receivers
 
 import android.content.BroadcastReceiver

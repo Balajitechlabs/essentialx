@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Core Application Entrypoint
+ * File: MainActivity.kt
+ * Description: Main application entrypoint for MainActivity.kt.
+ */
+
 package com.sameerasw.essentials
 
 import android.animation.ObjectAnimator

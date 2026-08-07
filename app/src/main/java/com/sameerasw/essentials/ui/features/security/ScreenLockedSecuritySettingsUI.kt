@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Feature - Security
+ * File: ScreenLockedSecuritySettingsUI.kt
+ * Description: UI component and settings composable for Security feature domain.
+ */
+
 package com.sameerasw.essentials.ui.features.system
 
 import android.content.Intent

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Appfunctions
+ * File: FreezeTagSummary.kt
+ * Description: Component file for FreezeTagSummary.kt.
+ */
+
 package com.sameerasw.essentials.appfunctions.dto
 
 import androidx.annotation.Keep

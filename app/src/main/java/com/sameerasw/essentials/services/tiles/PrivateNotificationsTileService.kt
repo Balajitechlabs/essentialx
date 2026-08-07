@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: PrivateNotificationsTileService.kt
+ * Description: Background service component for PrivateNotificationsTileService.kt.
+ */
+
 package com.sameerasw.essentials.services.tiles
 
 import android.Manifest
