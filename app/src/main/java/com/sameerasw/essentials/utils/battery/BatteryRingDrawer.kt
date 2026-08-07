@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Battery Utilities
+ * File: BatteryRingDrawer.kt
+ * Description: Draws dynamic battery level ring indicators on camera cutouts.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

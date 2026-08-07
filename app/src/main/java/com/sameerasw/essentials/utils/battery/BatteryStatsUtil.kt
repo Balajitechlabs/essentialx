@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Battery Utilities
+ * File: BatteryStatsUtil.kt
+ * Description: Calculates per-app battery consumption statistics.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

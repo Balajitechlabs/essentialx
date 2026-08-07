@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Utilities
+ * File: HapticUtil.kt
+ * Description: Provides haptic feedback helpers using HapticFeedbackType preferences.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

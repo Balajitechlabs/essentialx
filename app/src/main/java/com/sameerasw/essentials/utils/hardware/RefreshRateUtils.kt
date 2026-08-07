@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Hardware Utilities
+ * File: RefreshRateUtils.kt
+ * Description: Queries and modifies display refresh rate profiles.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

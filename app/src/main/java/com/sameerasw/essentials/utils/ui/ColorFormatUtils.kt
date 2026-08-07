@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Utilities
+ * File: ColorFormatUtils.kt
+ * Description: Utility methods for formatting ARGB and HEX color codes.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.graphics.Color

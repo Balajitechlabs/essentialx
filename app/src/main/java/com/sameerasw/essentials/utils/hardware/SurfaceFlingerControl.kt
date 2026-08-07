@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Hardware Utilities
+ * File: SurfaceFlingerControl.kt
+ * Description: Interacts with SurfaceFlinger for display mode adjustments.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

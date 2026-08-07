@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Utilities
+ * File: DeviceImageMapper.kt
+ * Description: Maps device model codenames to hero device image assets.
+ */
+
 package com.sameerasw.essentials.utils
 
 import com.sameerasw.essentials.R

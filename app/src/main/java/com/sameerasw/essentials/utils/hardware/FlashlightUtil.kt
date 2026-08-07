@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Hardware Utilities
+ * File: FlashlightUtil.kt
+ * Description: Controls camera torch intensity and pulse patterns.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

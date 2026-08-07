@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Security Utilities
+ * File: BiometricHelper.kt
+ * Description: BiometricPrompt wrapper for authenticating user identity.
+ */
+
 package com.sameerasw.essentials.utils
 
 import androidx.biometric.BiometricManager

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Battery Utilities
+ * File: BatteryHistoryManager.kt
+ * Description: Stores and queries historical battery charge log points.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context

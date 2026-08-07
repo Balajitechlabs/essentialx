@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Utilities
+ * File: ColorUtil.kt
+ * Description: Generates pastel background and vibrant icon tint pairs.
+ */
+
 package com.sameerasw.essentials.utils
 
 import androidx.compose.ui.graphics.Color
