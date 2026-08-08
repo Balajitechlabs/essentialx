@@ -1,12 +1,22 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Automation & DIY Rules
+ * File: DIYViewModel.kt
+ * Description: ViewModel managing custom triggers, system actions, AI automation suggestions,
+ * and rule persistent storage.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.diy.Automation
+import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.State
 import com.sameerasw.essentials.domain.diy.Trigger
 import com.sameerasw.essentials.domain.genai.AutomationSuggestion
@@ -42,16 +52,32 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
             initialValue = emptyList()
         )
 
+    /**
+     * Executes the delete automation operation.
+     *
+     * @param id [String] Target id.
+     */
     fun deleteAutomation(id: String) {
         repository.removeAutomation(id)
     }
 
+    /**
+     * Executes the toggle automation operation.
+     *
+     * @param id [String] Target id.
+     */
     fun toggleAutomation(id: String) {
         repository.getAutomation(id)?.let { automation ->
             repository.updateAutomation(automation.copy(isEnabled = !automation.isEnabled))
         }
     }
 
+    /**
+     * Executes the request gen ai suggestion operation.
+     *
+     * @param description [String] Target description.
+     * @param context [Context?] Target context.
+     */
     fun requestGenAISuggestion(description: String, context: Context? = null) {
         viewModelScope.launch {
             _genAIState.value = GenAIState.Loading
@@ -64,10 +90,18 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Executes the dismiss gen ai suggestion operation.
+     */
     fun dismissGenAISuggestion() {
         _genAIState.value = GenAIState.Idle
     }
 
+    /**
+     * Executes the confirm gen ai suggestion operation.
+     *
+     * @param suggestion [AutomationSuggestion] Target suggestion.
+     */
     fun confirmGenAISuggestion(suggestion: AutomationSuggestion) {
         val automation = mapSuggestionToAutomation(suggestion)
         repository.addAutomation(automation)
@@ -92,6 +126,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                 hour = suggestion.hour ?: 0,
                 minute = suggestion.minute ?: 0
             )
+
             "BluetoothConnected" -> Trigger.BluetoothConnected()
             "BluetoothDisconnected" -> Trigger.BluetoothDisconnected()
             "WifiConnected" -> Trigger.WifiConnected()
@@ -108,6 +143,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                 endHour = suggestion.endHour ?: 0,
                 endMinute = suggestion.endMinute ?: 0
             )
+
             else -> if (type == Automation.Type.STATE) State.Charging else null
         }
 
@@ -122,6 +158,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                 "DimWallpaper" -> Action.DimWallpaper(
                     dimAmount = suggestion.dimWallpaperAmount ?: 0.5f
                 )
+
                 "DeviceEffects" -> Action.DeviceEffects()
                 "SoundMode" -> {
                     val mode = when (suggestion.soundMode?.uppercase()) {
@@ -131,6 +168,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                     }
                     Action.SoundMode(mode = mode)
                 }
+
                 "TurnOnLowPower" -> Action.TurnOnLowPower
                 "TurnOffLowPower" -> Action.TurnOffLowPower
                 "ScreenOff" -> Action.ScreenOff()
@@ -157,10 +195,12 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
                     changeSmartPixels = suggestion.smartPixelsEnabled != null,
                     smartPixelsEnabled = suggestion.smartPixelsEnabled ?: true
                 )
+
                 "FreezeTag" -> Action.FreezeTag(
                     mode = suggestion.freezeTagMode ?: "Freeze",
                     tagIds = suggestion.freezeTagIds
                 )
+
                 else -> null
             }
         }

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: AppFreezingTileService.kt
+ * Description: Background service component for AppFreezingTileService.kt.
+ */
+
 package com.sameerasw.essentials.services.tiles
 
 import android.app.PendingIntent

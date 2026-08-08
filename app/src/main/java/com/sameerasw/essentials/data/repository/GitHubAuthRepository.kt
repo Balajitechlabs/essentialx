@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Data & Repository Layer
+ * File: GitHubAuthRepository.kt
+ * Description: Data repository and storage component for GitHubAuthRepository.kt.
+ */
+
 package com.sameerasw.essentials.data.repository
 
 import com.google.gson.Gson

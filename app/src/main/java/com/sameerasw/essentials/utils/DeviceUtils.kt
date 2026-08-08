@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Utilities - General
+ * File: DeviceUtils.kt
+ * Description: Utility helper for DeviceUtils.kt.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.app.ActivityManager

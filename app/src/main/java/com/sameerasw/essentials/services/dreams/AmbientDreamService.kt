@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: AmbientDreamService.kt
+ * Description: Background service component for AmbientDreamService.kt.
+ */
+
 package com.sameerasw.essentials.services.dreams
 
 import android.content.BroadcastReceiver

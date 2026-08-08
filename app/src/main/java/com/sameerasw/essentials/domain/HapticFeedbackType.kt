@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Domain Layer Models & Registries
+ * File: HapticFeedbackType.kt
+ * Description: Domain model and business logic entry for HapticFeedbackType.kt.
+ */
+
 package com.sameerasw.essentials.domain
 
 enum class HapticFeedbackType {

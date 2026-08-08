@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Translation
+ * File: TranslationBottomSheet.kt
+ * Description: Component file for TranslationBottomSheet.kt.
+ */
+
 package com.sameerasw.essentials.translation.ui
 
 import androidx.compose.foundation.background
@@ -34,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.translation.StringLoader
 import com.sameerasw.essentials.translation.TranslationManager
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.HapticUtil
 
 @OptIn(ExperimentalMaterial3Api::class)

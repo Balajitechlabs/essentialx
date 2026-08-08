@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: ScreenOffWidgetProvider.kt
+ * Description: Background service component for ScreenOffWidgetProvider.kt.
+ */
+
 package com.sameerasw.essentials.services
 
 import android.app.PendingIntent

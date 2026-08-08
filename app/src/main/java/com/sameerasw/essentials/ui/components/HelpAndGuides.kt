@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: HelpAndGuides.kt
+ * Description: UI layout element for HelpAndGuides.kt.
+ */
+
 package com.sameerasw.essentials.ui.components
 
 import android.content.Intent
@@ -41,7 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 
 data class InstructionStep(
     val instruction: String,

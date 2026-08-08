@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: Shapes.kt
+ * Description: UI layout element for Shapes.kt.
+ */
+
 package com.sameerasw.essentials.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape

@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Status Bar Customization
+ * File: StatusBarIconViewModel.kt
+ * Description: ViewModel managing status bar icon visibility, blacklist state,
+ * smart Wi-Fi/Data icon hiding, and tile synchronization.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.content.Context
@@ -11,7 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import com.sameerasw.essentials.domain.StatusBarIconRegistry
-import com.sameerasw.essentials.ui.components.pickers.NetworkType
+import com.sameerasw.essentials.ui.core.pickers.NetworkType
 import com.sameerasw.essentials.utils.resetAllIconVisibilities
 import com.sameerasw.essentials.utils.updateIconBlacklistSetting
 import kotlinx.coroutines.CoroutineScope
@@ -99,6 +109,11 @@ class StatusBarIconViewModel : ViewModel() {
     val isShizukuAvailable = mutableStateOf(false)
     val isRootAvailable = mutableStateOf(false)
 
+    /**
+     * Executes the check operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun check(context: Context) {
         isWriteSecureSettingsEnabled.value = canWriteSecureSettings(context)
         isShizukuAvailable.value = com.sameerasw.essentials.utils.ShizukuUtils.hasPermission()
@@ -143,54 +158,132 @@ class StatusBarIconViewModel : ViewModel() {
         setIconVisibility("mobile_data", visible, context)
     }
 
+    /**
+     * Executes the set wi fi visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setWiFiVisible(visible: Boolean, context: Context) {
         setIconVisibility("wifi", visible, context)
     }
 
+    /**
+     * Executes the set vpn visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setVpnVisible(visible: Boolean, context: Context) {
         setIconVisibility("vpn", visible, context)
     }
 
+    /**
+     * Executes the set alarm clock visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setAlarmClockVisible(visible: Boolean, context: Context) {
         setIconVisibility("alarm", visible, context)
     }
 
+    /**
+     * Executes the set hotspot visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setHotspotVisible(visible: Boolean, context: Context) {
         setIconVisibility("hotspot", visible, context)
     }
 
+    /**
+     * Executes the set bluetooth visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setBluetoothVisible(visible: Boolean, context: Context) {
         setIconVisibility("bluetooth", visible, context)
     }
 
+    /**
+     * Executes the set data saver visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setDataSaverVisible(visible: Boolean, context: Context) {
         setIconVisibility("data_saver", visible, context)
     }
 
+    /**
+     * Executes the set headset visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setHeadsetVisible(visible: Boolean, context: Context) {
         setIconVisibility("headset", visible, context)
     }
 
+    /**
+     * Executes the set rotate visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setRotateVisible(visible: Boolean, context: Context) {
         setIconVisibility("rotate", visible, context)
     }
 
+    /**
+     * Executes the set volte visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setVolteVisible(visible: Boolean, context: Context) {
         setIconVisibility("volte", visible, context)
     }
 
+    /**
+     * Executes the set cast visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setCastVisible(visible: Boolean, context: Context) {
         setIconVisibility("cast", visible, context)
     }
 
+    /**
+     * Executes the set clock visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setClockVisible(visible: Boolean, context: Context) {
         setIconVisibility("clock", visible, context)
     }
 
+    /**
+     * Executes the set airplane visible operation.
+     *
+     * @param visible [Boolean] Target visible.
+     * @param context [Context] Target context.
+     */
     fun setAirplaneVisible(visible: Boolean, context: Context) {
         setIconVisibility("airplane_mode", visible, context)
     }
 
+    /**
+     * Executes the set smart wi fi enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     * @param context [Context] Target context.
+     */
     fun setSmartWiFiEnabled(enabled: Boolean, context: Context) {
         isSmartWiFiEnabled.value = enabled
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
@@ -199,6 +292,12 @@ class StatusBarIconViewModel : ViewModel() {
         updateIconBlacklist(context)
     }
 
+    /**
+     * Executes the set smart data enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     * @param context [Context] Target context.
+     */
     fun setSmartDataEnabled(enabled: Boolean, context: Context) {
         isSmartDataEnabled.value = enabled
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
@@ -208,6 +307,12 @@ class StatusBarIconViewModel : ViewModel() {
         updateSelectedNetworkTypes(context, enabled)
     }
 
+    /**
+     * Executes the update selected network types operation.
+     *
+     * @param context [Context] Target context.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun updateSelectedNetworkTypes(context: Context, enabled: Boolean) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         val currentTypes = prefs.getStringSet(
@@ -301,6 +406,10 @@ class StatusBarIconViewModel : ViewModel() {
         return com.sameerasw.essentials.utils.PermissionUtils.canWriteSecureSettings(context)
     }
 
+    /**
+     * Executes the get adb command operation.
+     * @return The resulting String data.
+     */
     fun getAdbCommand(): String {
         return "adb shell pm grant com.sameerasw.essentials android.permission.WRITE_SECURE_SETTINGS"
     }
@@ -371,6 +480,12 @@ class StatusBarIconViewModel : ViewModel() {
                     ) == 1)
     }
 
+    /**
+     * Executes the set clock position operation.
+     *
+     * @param position [Int] Target position.
+     * @param context [Context] Target context.
+     */
     fun setClockPosition(position: Int, context: Context) {
         clockPosition.value = position
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
@@ -379,16 +494,34 @@ class StatusBarIconViewModel : ViewModel() {
         updateIconBlacklist(context)
     }
 
+    /**
+     * Executes the set clock seconds enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     * @param context [Context] Target context.
+     */
     fun setClockSecondsEnabled(enabled: Boolean, context: Context) {
         isClockSecondsEnabled.value = enabled
         updateSettingsValue(context, "clock_seconds", if (enabled) 1 else 0)
     }
 
+    /**
+     * Executes the set privacy chip enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     * @param context [Context] Target context.
+     */
     fun setPrivacyChipEnabled(enabled: Boolean, context: Context) {
         isPrivacyChipEnabled.value = enabled
         updateSettingsValue(context, "privacy_chip_2447_enabled", if (enabled) 1 else 0)
     }
 
+    /**
+     * Executes the set battery percentage mode operation.
+     *
+     * @param mode [Int] Target mode.
+     * @param context [Context] Target context.
+     */
     fun setBatteryPercentageMode(mode: Int, context: Context) {
         batteryPercentageMode.value = mode
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
@@ -456,6 +589,13 @@ class StatusBarIconViewModel : ViewModel() {
         applyAdvancedFlags(context)
     }
 
+    /**
+     * Executes the set advanced flag enabled operation.
+     *
+     * @param context [Context] Target context.
+     * @param flagKey [String] Target flag key.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setAdvancedFlagEnabled(context: Context, flagKey: String, enabled: Boolean) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         when (flagKey) {

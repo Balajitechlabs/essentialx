@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Domain Layer Registries
+ * File: FeatureRegistry.kt
+ * Description: Central registry defining all app features, categories, permission requirements, and toggles.
+ */
+
 package com.sameerasw.essentials.domain.registry
 
 import android.content.Context
@@ -36,19 +45,6 @@ object FeatureRegistry {
         ALL_FEATURES.filter { !it.isDeviceSupported(context) }
 
     val ALL_FEATURES = listOf(
-        object : Feature(
-            id = "AppFunctions AI",
-            title = R.string.feat_app_functions_title,
-            iconRes = R.drawable.google,
-            category = R.string.cat_system,
-            description = R.string.feat_app_functions_desc,
-            aboutDescription = R.string.about_desc_app_functions,
-            showToggle = true
-        ) {
-            override fun isEnabled(viewModel: MainViewModel) = true
-            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
-            override fun isDeviceSupported(context: Context) = android.os.Build.VERSION.SDK_INT >= 35
-        },
         // Sound Group Children
         object : Feature(
             id = "Sound mode tile",
@@ -350,7 +346,9 @@ object FeatureRegistry {
             parentFeatureId = "Networks",
             showToggle = false
         ) {
-            override fun isEnabled(viewModel: MainViewModel) = viewModel.networkDownloadRateLimit.intValue != -1
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.networkDownloadRateLimit.intValue != -1
+
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
 
@@ -363,7 +361,9 @@ object FeatureRegistry {
             permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
             parentFeatureId = "Networks"
         ) {
-            override fun isEnabled(viewModel: MainViewModel) = viewModel.isMobileDataAlwaysOnEnabled.value
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.isMobileDataAlwaysOnEnabled.value
+
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
                 viewModel.setMobileDataAlwaysOnEnabled(enabled, context)
         },
@@ -377,7 +377,9 @@ object FeatureRegistry {
             permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
             parentFeatureId = "Networks"
         ) {
-            override fun isEnabled(viewModel: MainViewModel) = viewModel.isWirelessDisplayCertificationEnabled.value
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.isWirelessDisplayCertificationEnabled.value
+
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
                 viewModel.setWirelessDisplayCertificationEnabled(enabled, context)
         },
@@ -1113,7 +1115,6 @@ object FeatureRegistry {
             override fun isEnabled(viewModel: MainViewModel) = true
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
-
 
 
         object : Feature(

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Domain Layer Registries
+ * File: PermissionRegistry.kt
+ * Description: Registry containing system permission declarations, intent actions, and guidance strings.
+ */
+
 package com.sameerasw.essentials.domain.registry
 
 import com.sameerasw.essentials.R
@@ -30,11 +39,20 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.tile_developer_options)
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.tile_charge_optimization)
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_lock_screen_clock_title)
-    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_allow_overlays_in_settings_title)
+    PermissionRegistry.register(
+        "WRITE_SECURE_SETTINGS",
+        R.string.feat_allow_overlays_in_settings_title
+    )
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_networks_title)
-    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_network_download_rate_limit_title)
+    PermissionRegistry.register(
+        "WRITE_SECURE_SETTINGS",
+        R.string.feat_network_download_rate_limit_title
+    )
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_mobile_data_always_on_title)
-    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_wireless_display_certification_title)
+    PermissionRegistry.register(
+        "WRITE_SECURE_SETTINGS",
+        R.string.feat_wireless_display_certification_title
+    )
 
     // Shizuku permission
     PermissionRegistry.register("SHIZUKU", R.string.feat_freeze_title)

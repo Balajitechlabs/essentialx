@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: FlashlightHandler.kt
+ * Description: Background service component for FlashlightHandler.kt.
+ */
+
 package com.sameerasw.essentials.services.handlers
 
 import android.accessibilityservice.AccessibilityService
@@ -119,7 +128,10 @@ class FlashlightHandler(
 
     fun register() {
         if (com.sameerasw.essentials.utils.DeviceUtils.isTclDevice()) {
-            Log.w("Flashlight", "Disabling flashlight handler callbacks on TCL device to prevent HAL lock issue")
+            Log.w(
+                "Flashlight",
+                "Disabling flashlight handler callbacks on TCL device to prevent HAL lock issue"
+            )
             return
         }
         torchCallback.let { cameraManager.registerTorchCallback(it, handler) }

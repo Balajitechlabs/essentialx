@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Core Utilities
+ * File: AppUtil.kt
+ * Description: General application helper methods for installed package details.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context
@@ -198,6 +207,13 @@ object AppUtil {
         return bitmap
     }
 
+    /**
+     * Executes the drawable to bitmap operation.
+     *
+     * @param drawable [android.graphics.drawable.Drawable] Target drawable.
+     * @param size [Int?] Target size.
+     * @return The resulting Bitmap data.
+     */
     fun drawableToBitmap(drawable: android.graphics.drawable.Drawable, size: Int? = null): Bitmap {
         if (drawable is BitmapDrawable && size == null) {
             return drawable.bitmap
@@ -229,6 +245,13 @@ object AppUtil {
         return drawableToBitmap(drawable, SHORTCUT_ICON_SIZE)
     }
 
+    /**
+     * Executes the get app version operation.
+     *
+     * @param context [Context] Target context.
+     * @param packageName [String] Target package name.
+     * @return The resulting String? data.
+     */
     fun getAppVersion(context: Context, packageName: String): String? {
         return try {
             val pInfo = context.packageManager.getPackageInfo(packageName, 0)

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: External
+ * File: ExternalRouter.kt
+ * Description: Component file for ExternalRouter.kt.
+ */
+
 package com.sameerasw.essentials.external
 
 import android.content.Context

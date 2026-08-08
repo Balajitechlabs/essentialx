@@ -214,7 +214,7 @@
     <string name="qs_tile_already_added">Zaten eklendi</string>
     <string name="qs_tile_requires_android_13">Android 13+ gerektirir</string>
     <string name="tile_ui_blur">Kullanıcı Arayüzü Bulanıklığı</string>
-    <string name="tile_bubbles">Kabarcıklar</string>
+    <string name="tile_bubbles">Konuşma balonları</string>
     <string name="tile_sensitive_content">Hassas İçerik</string>
     <string name="tile_tap_to_wake">Uyandırmak için dokunun</string>
     <string name="tile_aod">AOD</string>
@@ -265,7 +265,7 @@
     <string name="dns_preset_quad9_hostname">dns.quad9.net</string>
     <string name="dns_preset_cleanbrowsing">Temiz Tarama</string>
     <string name="dns_preset_cleanbrowsing_hostname">adult-filter-dns.cleanbrowsing.org</string>
-    <string name="tile_charge_optimization">Şarj etme</string>
+    <string name="tile_charge_optimization">Şarj</string>
     <string name="limit_to_80">%80 ile sınırla</string>
     <string name="adaptive_charging">Uyarlanabilir</string>
     <string name="deactivated">Optimize edilmemiş</string>
@@ -758,7 +758,9 @@
     <string name="about_desc_freeze">Arka planda çalışmasını durdurmak için uygulamaları dondurun.\n\nUygulamaları kullanmadığınız zamanlarda tamamen dondurarak pil tüketimini ve veri kullanımını önleyin. Başlattığınızda anında donmuş olacaklar. Uygulamalar uygulama çekmecesinde görünmeyecek ve dondurulduğunda Play Store\'daki uygulama güncellemeleri için de görünmeyecek.</string>
     <string name="about_desc_system_keyboard">Kimsenin istemediği özel bir giriş yöntemi.\n\nBu sadece bir deney. Çok karmaşık ve zaman alıcı bir uygulama olduğundan birden fazla dil destek alamayabilir.</string>
     <string name="about_desc_batteries">Bağlı tüm cihazlarınızın pil seviyelerini izleyin.\n\nBluetooth kulaklığınızın, saatinizin ve diğer aksesuarlarınızın pil durumunu tek bir yerden görün. Mac pil seviyenizi de görüntülemek için AirSync uygulamasına bağlanın.</string>
-    <string name="about_desc_watermark">EXIF verileri ve cihaz bilgileriyle fotoğraflarınıza özel bir başlık/filigran ekleyin.\n\nKolayca filigran eklemek için bir görüntüyü doğrudan diğer uygulamadan Essentials\'a paylaşın.</string>
+    <string name="about_desc_watermark">EXIF verileri ve cihaz bilgileriyle fotoğraflarınıza özel bir başlık/filigran ekleyin.
+
+Kolayca filigran eklemek için bir görüntüyü doğrudan başka bir uygulamadan Essentials\'a paylaşın.</string>
     <string name="about_desc_calendar_sync">İş veya okul politikaları nedeniyle WearOS cihazlarına eklenmesine izin vermeyen Google hesaplarındaki kısıtlamalar ne olursa olsun, yaklaşan tüm takvim programınızı senkronize edin. \n\nPlanlamayı uygulamada, bir kutucukta veya komplikasyonda görüntülemek için WearOS Essentials yardımcı uygulamasını yüklediğinizden emin olun.</string>
     <string name="about_desc_app_updates">Yüklü uygulamalarınız için güncellemeleri takip edin.\n\nMevcut güncellemeler hakkında bildirim alın, değişiklik günlüklerini görüntüleyin ve bunları tek bir dokunuşla kolayca yükleyin.</string>
     <string name="about_desc_call_vibrations">Çağrılarınıza dokunsal geri bildirim ekleyin.\n\nBir çağrı bağlandığında, bağlantısı kesildiğinde veya kabul edildiğinde titreşerek ekrana bakmadan dokunsal onay verin.</string>
@@ -1456,7 +1458,7 @@
     <string name="whats_new_apps_title">Uygulama Güncellemeleri Taşındı</string>
     <string name="whats_new_apps_desc">Uygulamalar sekmesi artık Android Cihazınız özelliğine tamamen entegre edildi ve bu sayede tüm uygulama güncellemelerinizi tek bir bütünleşik merkezden yönetmek daha kolay hale geldi.</string>
     <string name="feat_safe_volume_title">Güvenli ses seviyesi uyarısını devre dışı bırak</string>
-    <string name="feat_safe_volume_desc">Yüksek sesli diyalogları bastır</string>
+    <string name="feat_safe_volume_desc">Yüksek ses diyaloglarını bastır</string>
     <string name="shut_up_restore_delay_desc">Bir Kapa Çeneni! uygulamasından çıktıktan sonra ayarları geri yüklemeden önceki bekleme süresi</string>
     <string name="shut_up_restore_delay_title">Geri Yükleme Gecikmesi</string>
     <string name="feat_notification_snoozing_title">Bildirim erteleme</string>
@@ -1482,4 +1484,33 @@
     <string name="feat_watch_wireless_debugging_desc">Uzaktan etkinleştirin</string>
     <string name="feat_sync_sound_mode_title">Ses modunu senkronize et</string>
     <string name="feat_sync_sound_mode_desc">Saatle otomatik olarak senkronize et</string>
+    <string name="about_desc_safe_volume">Avrupa yönetmelikleri, akıllı telefonlarının belirli ses seviyesinin (85 dB) üzerine çıktığında uyarı vermesini zorunlu kılıyor. Bu uyarı, her yeniden başlatmanın ardından veya 20 saatlik kesintisiz müzik çalmanın ardından bir kez gösterilmelidir. Bu düğmeyi kullanarak bu özelliği kalıcı olarak devre dışı bırakabilirsiniz.</string>
+    <string name="tile_lockdown_mode">Karantina</string>
+    <string name="tile_lockdown_mode_desc">Ekran kapama QS kutucuğu</string>
+    <string name="tile_lockdown_mode_about_desc">Telefonunuzu kilitleyin veya karantina modu açıksa karantinaya alın.
+
+Karantina modu, yüz tanıma/parmak izi gibi zayıf kilit açma yöntemlerini devre dışı bırakır ve telefonunuzun kilidini açmak için desen veya PIN kodunu güvenli bir şekilde girmenizi gerektirir.
+
+Karantina modunu kullanmak için cihaz yöneticisinin izni gereklidir.</string>
+    <string name="about_desc_power_battery">Android\'in dahili Pil Tasarrufu sabitleri politikasına ince ayar yapın. Pil tasarrufu açıkken parlaklık sınırı, konum kısıtlaması, titreşim açma/kapama, arka plan senkronizasyon ertelemeleri ve sensör durumları gibi davranışları özelleştirin.</string>
+    <string name="about_desc_pixel_searchbar">Ana ekranınızdaki varsayılan Pixel Launcher arama çubuğunu değiştirin. İçeriği hiçbir şey göstermeyecek (Boş) veya geçerli tarihi gösterecek şekilde özelleştirebilirsiniz.
+
+Lütfen bu özelliği etkinleştirmenin Pixel Launcher\'ın Bir Bakışta widget\'larını (spor ve finans widget\'ları gibi) bozabileceğini unutmayın.
+
+Ve ayarın etkili olması için birden fazla kez uygulanması gerekebilir.</string>
+    <string name="feat_pixel_searchbar_title">Arama çubuğunu değiştir</string>
+    <string name="feat_pixel_searchbar_desc">Pixel Launcher\'ın varsayılan arama çubuğunu değiştirin.</string>
+    <string name="tile_lock">Kilit</string>
+    <string name="tile_restart_systemui">SystemUI Yeniden Başlatma</string>
+    <string name="about_desc_restart_systemui_tile">SystemUI\'ı Hızlı Ayarlar panelinizden kolayca yeniden başlatın. Durum çubuğu sorunlarını hızlıca çözmek veya sistem arayüzü değişikliklerini anında uygulamak için kullanışlıdır. Root veya Shizuku shell erişimi gerektirir.</string>
+    <string name="label_low_power_trigger_level">Özel tetikleme seviyesi</string>
+    <string name="desc_low_power_trigger_level">pil tasarrufu için</string>
+    <string name="setting_swipe_tabs_title">Sekmeler arasında kaydır</string>
+    <string name="setting_swipe_tabs_desc">Ana ekranda</string>
+    <string name="setting_enable_unsupported_features_title">Desteklenmeyen özellikleri etkinleştir</string>
+    <string name="setting_enable_unsupported_features_desc">Varsayılan olarak gizlenmiş olan, OEM\'e özgü veya gereksiz özellikleri göster.</string>
+    <string name="settings_translated_texts">Çevrildi</string>
+    <string name="settings_translated_texts_desc">%d düzenleme beklemede — göndermek veya iptal etmek için dokunun</string>
+    <string name="settings_translate_mode">Çeviri Modu</string>
+    <string name="settings_translate_mode_desc">Çeviri yapmak ve topluluğa katkıda bulunmak için herhangi bir metne uzun basın</string>
 </resources>

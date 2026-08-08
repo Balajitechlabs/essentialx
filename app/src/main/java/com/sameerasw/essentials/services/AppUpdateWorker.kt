@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: AppUpdateWorker.kt
+ * Description: Background service component for AppUpdateWorker.kt.
+ */
+
 package com.sameerasw.essentials.services
 
 import android.content.Context

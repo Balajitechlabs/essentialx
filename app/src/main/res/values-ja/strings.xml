@@ -266,9 +266,9 @@
     <string name="dns_preset_cleanbrowsing">CleanBrowsing</string>
     <string name="dns_preset_cleanbrowsing_hostname">adult-filter-dns.cleanbrowsing.org</string>
     <string name="tile_charge_optimization">充電中</string>
-    <string name="limit_to_80">Limit to 80%</string>
-    <string name="adaptive_charging">Adaptive</string>
-    <string name="deactivated">Not optimized</string>
+    <string name="limit_to_80"> 80%に制限</string>
+    <string name="adaptive_charging">適応型</string>
+    <string name="deactivated">最適化なし</string>
     <string name="permission_missing">Permission missing</string>
     <!-- Screen Locked Security -->
     <string name="screen_locked_security_title">ロック画面セキュリティ</string>
@@ -335,7 +335,7 @@
     <string name="stb_battery_percentage_never">表示しない</string>
     <string name="stb_privacy_chip">カメラとマイクのアクセスチップ</string>
     <string name="smart_data_title">スマートモバイルデータ</string>
-    <string name="permission_read_phone_state_title">電話</string>
+    <string name="permission_read_phone_state_title">電話の状態の読み取り</string>
     <string name="permission_read_phone_state_desc">スマートデータのネットワークタイプを検出するために必要です</string>
     <string name="permission_read_phone_state_desc_call_vibrations">触覚フィードバックをトリガーするための通話ステータスの変化の検出に必要です。</string>
     <string name="settings_section_smart_visibility">スマートな可視性</string>
@@ -354,7 +354,7 @@
     <string name="hide_notification_icons_title">通知を隠す</string>
     <string name="hide_notification_icons_desc">すべての着信や通知アイコンを非表示にする</string>
     <string name="feat_hide_gesture_bar_title">ジェスチャーバーを隠す</string>
-    <string name="feat_hide_gesture_bar_desc">In gesture navigation</string>
+    <string name="feat_hide_gesture_bar_desc">ジェスチャーナビゲーションにおいて</string>
     <string name="feat_hide_gesture_bar_on_launcher_title">ランチャーに表示</string>
     <string name="feat_hide_gesture_bar_on_launcher_desc">ホーム画面にいるときのみ、ジェスチャーバーを動的に表示する</string>
     <string name="feat_circle_to_search_gesture_title">かこって検索ジェスチャー</string>
@@ -1464,7 +1464,7 @@
     <string name="setting_enable_unsupported_features_title">非対応機能を有効化</string>
     <string name="setting_enable_unsupported_features_desc">デフォルトで非表示になっているOEM固有または冗長な機能を表示します。</string>
     <string name="settings_translate_mode">翻訳モード</string>
-    <string name="settings_translate_mode_desc">任意のテキストを長押しし翻訳、コミュニティへ登校します</string>
+    <string name="settings_translate_mode_desc">任意のテキストを長押しして翻訳、コミュニティへ投稿します</string>
     <string name="settings_translated_texts">翻訳済み</string>
     <string name="settings_translated_texts_desc">%d 個の編集が保存済み — タップして送信または破棄</string>
     <string name="shut_up_restore_delay_title">復元までの遅延</string>
@@ -1550,4 +1550,21 @@
     <string name="about_desc_restart_systemui_tile">クイック設定パネルからシステムUIを簡単に再起動できます。ステータスバーの不具合を素早く解決したり、システムUIの変更をすぐに適用したりするのに役立ちます。root権限またはShizukuシェルへのアクセスが必要です。</string>
     <string name="feat_daily_wallpaper_title">壁紙</string>
     <string name="feat_daily_wallpaper_desc">毎日厳選されたライブ壁紙</string>
+    <string name="title_battery_saver_general">一般設定</string>
+    <string name="tile_lockdown_mode_desc">クイック設定タイルで画面をオフにします</string>
+    <string name="tile_lockdown_mode">ロックダウン</string>
+    <string name="tile_lockdown_mode_about_desc">ロックダウンモードがオンになっている場合は、端末をロックしてください。
+
+ロックダウンモードでは、顔認証や指紋認証などの脆弱なロック解除方法が無効になり、パターンまたはPINコードによる安全なロック解除が必須となります。
+
+ロックダウン機能を使用するには、端末管理者権限が必要です。</string>
+    <string name="label_thermal_cpu">CPU温度</string>
+    <string name="label_thermal_gpu">GPU温度</string>
+    <string name="label_battery_status">状態</string>
+    <string name="label_auto_reset_battery_stats_title">自動リセット</string>
+    <string name="label_auto_reset_battery_stats_desc">充電量が90%を超えている状態でデバイスの電源ケーブルを抜いた際、バッテリーの統計情報を自動的にリセットします。</string>
+    <string name="label_audio_drain">音声による消費電力</string>
+    <string name="label_camera_drain">カメラによる消費電力</string>
+    <string name="label_cpu_idle_drain">CPUアイドル時の消費電力</string>
+    <string name="label_cpu_suspend_drain">CPUサスペンド時の消費電力</string>
 </resources>

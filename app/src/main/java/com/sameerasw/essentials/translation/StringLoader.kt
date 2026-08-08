@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Translation
+ * File: StringLoader.kt
+ * Description: Component file for StringLoader.kt.
+ */
+
 package com.sameerasw.essentials.translation
 
 import android.content.Context

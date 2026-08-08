@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: GenAIFloatingPill.kt
+ * Description: UI layout element for GenAIFloatingPill.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.genai
 
 import android.view.Gravity
@@ -116,7 +125,7 @@ fun GenAIFloatingPill(
                 )
                 window.setSoftInputMode(
                     WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN or
-                    WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+                            WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
                 )
                 window.setDimAmount(0.32f)
                 window.setBackgroundDrawableResource(android.R.color.transparent)
@@ -168,7 +177,11 @@ fun GenAIFloatingPill(
                                 text = suggestion.explanation,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
-                                modifier = Modifier.padding(bottom = 12.dp, start = 4.dp, end = 4.dp)
+                                modifier = Modifier.padding(
+                                    bottom = 12.dp,
+                                    start = 4.dp,
+                                    end = 4.dp
+                                )
                             )
                         }
 
@@ -177,19 +190,36 @@ fun GenAIFloatingPill(
                                 val appsCount = suggestion.selectedApps.size
                                 if (appsCount > 0) "Apps ($appsCount selected)" else "App Automation"
                             }
+
                             suggestion.triggerType == "Schedule" && suggestion.hour != null -> {
-                                String.format("Schedule (%02d:%02d)", suggestion.hour, suggestion.minute ?: 0)
+                                String.format(
+                                    "Schedule (%02d:%02d)",
+                                    suggestion.hour,
+                                    suggestion.minute ?: 0
+                                )
                             }
+
                             suggestion.stateType == "TimePeriod" && suggestion.hour != null && suggestion.endHour != null -> {
-                                String.format("Time Period (%02d:%02d - %02d:%02d)", suggestion.hour, suggestion.minute ?: 0, suggestion.endHour, suggestion.endMinute ?: 0)
+                                String.format(
+                                    "Time Period (%02d:%02d - %02d:%02d)",
+                                    suggestion.hour,
+                                    suggestion.minute ?: 0,
+                                    suggestion.endHour,
+                                    suggestion.endMinute ?: 0
+                                )
                             }
+
                             else -> suggestion.triggerType
                                 ?: suggestion.stateType
                                 ?: suggestion.title.ifEmpty { suggestion.type }
                         }
 
                         val iconRes = when {
-                            suggestion.type.equals("APP", ignoreCase = true) -> R.drawable.rounded_apps_24
+                            suggestion.type.equals(
+                                "APP",
+                                ignoreCase = true
+                            ) -> R.drawable.rounded_apps_24
+
                             suggestion.triggerType != null -> R.drawable.rounded_bolt_24
                             suggestion.stateType != null -> R.drawable.rounded_toggle_on_24
                             else -> R.drawable.rounded_apps_24
@@ -281,14 +311,22 @@ fun GenAIFloatingPill(
                                             val tags = suggestion.freezeTagIds.joinToString()
                                             if (tags.isNotBlank()) "$mode ($tags)" else mode
                                         }
+
                                         "SoundMode" -> suggestion.soundMode ?: "SOUND"
                                         "SometimesEssentials" -> {
                                             val details = mutableListOf<String>()
-                                            if (suggestion.lockScreenClockStyle != null) details.add("Clock: ${suggestion.lockScreenClockStyle}")
-                                            if (suggestion.alwaysOnDisplayMode != null) details.add("AOD: ${suggestion.alwaysOnDisplayMode}")
-                                            if (suggestion.essentialsOnDisplayMode != null) details.add("EOD: ${suggestion.essentialsOnDisplayMode}")
+                                            if (suggestion.lockScreenClockStyle != null) details.add(
+                                                "Clock: ${suggestion.lockScreenClockStyle}"
+                                            )
+                                            if (suggestion.alwaysOnDisplayMode != null) details.add(
+                                                "AOD: ${suggestion.alwaysOnDisplayMode}"
+                                            )
+                                            if (suggestion.essentialsOnDisplayMode != null) details.add(
+                                                "EOD: ${suggestion.essentialsOnDisplayMode}"
+                                            )
                                             if (details.isNotEmpty()) details.joinToString(" • ") else null
                                         }
+
                                         else -> null
                                     }
 
@@ -321,7 +359,9 @@ fun GenAIFloatingPill(
                                                     Text(
                                                         text = actionDetail,
                                                         style = MaterialTheme.typography.bodySmall,
-                                                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
+                                                        color = MaterialTheme.colorScheme.onPrimary.copy(
+                                                            alpha = 0.8f
+                                                        ),
                                                         maxLines = 1,
                                                         overflow = TextOverflow.Ellipsis
                                                     )
@@ -386,7 +426,9 @@ fun GenAIFloatingPill(
                             focusedTextColor = MaterialTheme.colorScheme.onPrimary,
                             unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
                             disabledTextColor = MaterialTheme.colorScheme.onPrimary,
-                            disabledPlaceholderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f),
+                            disabledPlaceholderColor = MaterialTheme.colorScheme.onPrimary.copy(
+                                alpha = 0.6f
+                            ),
                             focusedContainerColor = Color.Transparent,
                             unfocusedContainerColor = Color.Transparent,
                             disabledContainerColor = Color.Transparent,

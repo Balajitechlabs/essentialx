@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Core Utilities
+ * File: ShellUtils.kt
+ * Description: Executes shell commands with root or Shizuku fallback.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.app.NotificationChannel

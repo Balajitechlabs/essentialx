@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Utilities - General
+ * File: ServiceUtils.kt
+ * Description: Utility helper for ServiceUtils.kt.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context
@@ -18,6 +27,11 @@ import java.util.concurrent.TimeUnit
 
 object ServiceUtils {
 
+    /**
+     * Executes the start required services operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun startRequiredServices(context: Context) {
         val settingsRepository = SettingsRepository(context)
 

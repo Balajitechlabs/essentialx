@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: PixelSearchbarWidgetReceiver.kt
+ * Description: Background service component for PixelSearchbarWidgetReceiver.kt.
+ */
+
 package com.sameerasw.essentials.services.widgets
 
 import android.content.Context

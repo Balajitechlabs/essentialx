@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Ime
+ * File: EssentialsInputMethodService.kt
+ * Description: Component file for EssentialsInputMethodService.kt.
+ */
+
 package com.sameerasw.essentials.ime
 
 import android.content.ClipboardManager

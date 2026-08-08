@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: WhatsNewCustomContent.kt
+ * Description: UI layout element for WhatsNewCustomContent.kt.
+ */
+
 package com.sameerasw.essentials.ui.components
 
 import androidx.compose.foundation.layout.Arrangement

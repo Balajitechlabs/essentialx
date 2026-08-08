@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Data & Repository Layer
+ * File: SettingsRepository.kt
+ * Description: Data repository and storage component for SettingsRepository.kt.
+ */
+
 package com.sameerasw.essentials.data.repository
 
 import android.content.Context
@@ -315,9 +324,18 @@ class SettingsRepository(private val context: Context) {
         const val KEY_LOCKDOWN_MODE = "lockdown_mode"
     }
 
+    /**
+     * Executes the is translation mode warning suppressed operation.
+     * @return The resulting Boolean data.
+     */
     fun isTranslationModeWarningSuppressed(): Boolean =
         getBoolean(KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING, false)
 
+    /**
+     * Executes the set translation mode warning suppressed operation.
+     *
+     * @param suppressed [Boolean] Target suppressed.
+     */
     fun setTranslationModeWarningSuppressed(suppressed: Boolean) =
         putBoolean(KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING, suppressed)
 
@@ -342,18 +360,60 @@ class SettingsRepository(private val context: Context) {
         awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
+    /**
+     * Registers a listener to be notified when shared preference values change.
+     *
+     * @param listener [SharedPreferences.OnSharedPreferenceChangeListener] The listener instance to register.
+     */
     fun registerOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.registerOnSharedPreferenceChangeListener(listener)
     }
 
+    /**
+     * Unregisters a previously registered shared preference change listener.
+     *
+     * @param listener [SharedPreferences.OnSharedPreferenceChangeListener] The listener instance to unregister.
+     */
     fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {
         prefs.unregisterOnSharedPreferenceChangeListener(listener)
     }
 
     // General Getters
+
+    /**
+     * Retrieves a boolean preference value by key.
+     *
+     * @param key [String] Preference key name.
+     * @param default [Boolean] Fallback boolean value if key is absent.
+     * @return The stored boolean value or default.
+     */
     fun getBoolean(key: String, default: Boolean = false): Boolean = prefs.getBoolean(key, default)
+
+    /**
+     * Retrieves a string preference value by key.
+     *
+     * @param key [String] Preference key name.
+     * @param default [String?] Fallback string value if key is absent.
+     * @return The stored string value or default.
+     */
     fun getString(key: String, default: String? = null): String? = prefs.getString(key, default)
+
+    /**
+     * Retrieves an integer preference value by key.
+     *
+     * @param key [String] Preference key name.
+     * @param default [Int] Fallback integer value if key is absent.
+     * @return The stored integer value or default.
+     */
     fun getInt(key: String, default: Int = 0): Int = prefs.getInt(key, default)
+
+    /**
+     * Retrieves a float preference value by key, with legacy integer migration fallback.
+     *
+     * @param key [String] Preference key name.
+     * @param default [Float] Fallback float value if key is absent.
+     * @return The stored float value or default.
+     */
     fun getFloat(key: String, default: Float = 0f): Float {
         return try {
             prefs.getFloat(key, default)
@@ -370,15 +430,70 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Retrieves a long integer preference value by key.
+     *
+     * @param key [String] Preference key name.
+     * @param default [Long] Fallback long value if key is absent.
+     * @return The stored long value or default.
+     */
     fun getLong(key: String, default: Long = 0L): Long = prefs.getLong(key, default)
 
     // General Setters
+
+    /**
+     * Checks if a preference key exists in persistent storage.
+     *
+     * @param key [String] Preference key name.
+     * @return True if key exists in shared preferences.
+     */
     fun contains(key: String): Boolean = prefs.contains(key)
+
+    /**
+     * Asynchronously stores a boolean preference value.
+     *
+     * @param key [String] Preference key name.
+     * @param value [Boolean] Boolean value to store.
+     */
     fun putBoolean(key: String, value: Boolean) = prefs.edit().putBoolean(key, value).apply()
+
+    /**
+     * Asynchronously stores a string preference value.
+     *
+     * @param key [String] Preference key name.
+     * @param value [String?] String value to store.
+     */
     fun putString(key: String, value: String?) = prefs.edit().putString(key, value).apply()
+
+    /**
+     * Asynchronously stores an integer preference value.
+     *
+     * @param key [String] Preference key name.
+     * @param value [Int] Integer value to store.
+     */
     fun putInt(key: String, value: Int) = prefs.edit().putInt(key, value).apply()
+
+    /**
+     * Asynchronously stores a float preference value.
+     *
+     * @param key [String] Preference key name.
+     * @param value [Float] Float value to store.
+     */
     fun putFloat(key: String, value: Float) = prefs.edit().putFloat(key, value).apply()
+
+    /**
+     * Asynchronously stores a long integer preference value.
+     *
+     * @param key [String] Preference key name.
+     * @param value [Long] Long value to store.
+     */
     fun putLong(key: String, value: Long) = prefs.edit().putLong(key, value).apply()
+
+    /**
+     * Asynchronously removes a preference entry by key.
+     *
+     * @param key [String] Preference key name to remove.
+     */
     fun remove(key: String) = prefs.edit().remove(key).apply()
 
     // Specific Getters with logic from ViewModel
@@ -393,6 +508,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get notification lighting color mode operation.
+     * @return The resulting NotificationLightingColorMode data.
+     */
     fun getNotificationLightingColorMode(): NotificationLightingColorMode {
         val colorModeName =
             prefs.getString(KEY_EDGE_LIGHTING_COLOR_MODE, NotificationLightingColorMode.SYSTEM.name)
@@ -405,6 +524,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get notification lighting glow sides operation.
+     * @return The resulting Set<NotificationLightingSide> data.
+     */
     fun getNotificationLightingGlowSides(): Set<NotificationLightingSide> {
         val json = prefs.getString(KEY_EDGE_LIGHTING_GLOW_SIDES, null)
         return if (json != null) {
@@ -419,11 +542,20 @@ class SettingsRepository(private val context: Context) {
     }
 
 
+    /**
+     * Executes the save notification lighting glow sides operation.
+     *
+     * @param sides [Set<NotificationLightingSide>] Target sides.
+     */
     fun saveNotificationLightingGlowSides(sides: Set<NotificationLightingSide>) {
         val json = gson.toJson(sides)
         putString(KEY_EDGE_LIGHTING_GLOW_SIDES, json)
     }
 
+    /**
+     * Executes the get notification lighting sweep position operation.
+     * @return The resulting NotificationLightingSweepPosition data.
+     */
     fun getNotificationLightingSweepPosition(): NotificationLightingSweepPosition {
         val posName = prefs.getString(
             KEY_EDGE_LIGHTING_SWEEP_POSITION,
@@ -438,13 +570,32 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save notification lighting sweep position operation.
+     *
+     * @param position [NotificationLightingSweepPosition] Target position.
+     */
     fun saveNotificationLightingSweepPosition(position: NotificationLightingSweepPosition) {
         putString(KEY_EDGE_LIGHTING_SWEEP_POSITION, position.name)
     }
 
+    /**
+     * Executes the get notification lighting system mode operation.
+     * @return The resulting Int data.
+     */
     fun getNotificationLightingSystemMode(): Int = getInt(KEY_EDGE_LIGHTING_SYSTEM_MODE, 0)
+
+    /**
+     * Executes the save notification lighting system mode operation.
+     *
+     * @param mode [Int] Target mode.
+     */
     fun saveNotificationLightingSystemMode(mode: Int) = putInt(KEY_EDGE_LIGHTING_SYSTEM_MODE, mode)
 
+    /**
+     * Executes the get freeze auto excluded apps operation.
+     * @return The resulting Set<String> data.
+     */
     fun getFreezeAutoExcludedApps(): Set<String> {
         val json = prefs.getString(KEY_FREEZE_AUTO_EXCLUDED_APPS, null)
         return if (json != null) {
@@ -456,11 +607,20 @@ class SettingsRepository(private val context: Context) {
         } else emptySet()
     }
 
+    /**
+     * Executes the save freeze auto excluded apps operation.
+     *
+     * @param apps [Set<String>] Target apps.
+     */
     fun saveFreezeAutoExcludedApps(apps: Set<String>) {
         val json = gson.toJson(apps)
         putString(KEY_FREEZE_AUTO_EXCLUDED_APPS, json)
     }
 
+    /**
+     * Executes the get freeze tags operation.
+     * @return The resulting List<AppTag> data.
+     */
     fun getFreezeTags(): List<AppTag> {
         val json = prefs.getString(KEY_FREEZE_TAGS, null) ?: return emptyList()
         return try {
@@ -471,11 +631,20 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save freeze tags operation.
+     *
+     * @param tags [List<AppTag>] Target tags.
+     */
     fun saveFreezeTags(tags: List<AppTag>) {
         val json = gson.toJson(tags)
         putString(KEY_FREEZE_TAGS, json)
     }
 
+    /**
+     * Executes the get freeze app tag map operation.
+     * @return The resulting Map<String, List<String>> data.
+     */
     fun getFreezeAppTagMap(): Map<String, List<String>> {
         val json = prefs.getString(KEY_FREEZE_APP_TAG_MAP, null) ?: return emptyMap()
         return try {
@@ -486,13 +655,27 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save freeze app tag map operation.
+     *
+     * @param map [Map<String] Target map.
+     * @param List<String>> Target list string.
+     */
     fun saveFreezeAppTagMap(map: Map<String, List<String>>) {
         val json = gson.toJson(map)
         putString(KEY_FREEZE_APP_TAG_MAP, json)
     }
 
+    /**
+     * Executes the get freeze mode operation.
+     * @return The resulting Int data.
+     */
     fun getFreezeMode(): Int = getInt(KEY_FREEZE_MODE, 0)
 
+    /**
+     * Executes the get haptic feedback type operation.
+     * @return The resulting HapticFeedbackType data.
+     */
     fun getHapticFeedbackType(): HapticFeedbackType {
         val typeName = prefs.getString(KEY_HAPTIC_FEEDBACK_TYPE, HapticFeedbackType.SUBTLE.name)
         return try {
@@ -502,6 +685,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get diy tab operation.
+     * @return The resulting com data.
+     */
     fun getDIYTab(): com.sameerasw.essentials.domain.DIYTabs {
         val tabName = prefs.getString(
             KEY_DEFAULT_TAB,
@@ -516,10 +703,19 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save diy tab operation.
+     *
+     * @param tab [com.sameerasw.essentials.domain.DIYTabs] Target tab.
+     */
     fun saveDIYTab(tab: com.sameerasw.essentials.domain.DIYTabs) {
         putString(KEY_DEFAULT_TAB, tab.name)
     }
 
+    /**
+     * Executes the get calendar sync selected calendars operation.
+     * @return The resulting Set<String> data.
+     */
     fun getCalendarSyncSelectedCalendars(): Set<String> {
         val json = prefs.getString(KEY_CALENDAR_SYNC_SELECTED_CALENDARS, null)
         return if (json != null) {
@@ -531,14 +727,28 @@ class SettingsRepository(private val context: Context) {
         } else emptySet()
     }
 
+    /**
+     * Executes the save calendar sync selected calendars operation.
+     *
+     * @param calendarIds [Set<String>] Target calendar ids.
+     */
     fun saveCalendarSyncSelectedCalendars(calendarIds: Set<String>) {
         val json = gson.toJson(calendarIds)
         putString(KEY_CALENDAR_SYNC_SELECTED_CALENDARS, json)
     }
 
+    /**
+     * Executes the is calendar sync periodic enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isCalendarSyncPeriodicEnabled(): Boolean =
         getBoolean(KEY_CALENDAR_SYNC_PERIODIC_ENABLED, false)
 
+    /**
+     * Executes the set calendar sync periodic enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setCalendarSyncPeriodicEnabled(enabled: Boolean) =
         putBoolean(KEY_CALENDAR_SYNC_PERIODIC_ENABLED, enabled)
 
@@ -564,58 +774,162 @@ class SettingsRepository(private val context: Context) {
     // Feature specific App selections
 
     fun loadNotificationLightingSelectedApps() = loadAppSelection(KEY_EDGE_LIGHTING_SELECTED_APPS)
+
+    /**
+     * Executes the save notification lighting selected apps operation.
+     *
+     * @param apps [List<AppSelection>] Target apps.
+     */
     fun saveNotificationLightingSelectedApps(apps: List<AppSelection>) =
         saveAppSelection(KEY_EDGE_LIGHTING_SELECTED_APPS, apps)
 
+    /**
+     * Executes the update notification lighting app selection operation.
+     *
+     * @param packageName [String] Target package name.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun updateNotificationLightingAppSelection(packageName: String, enabled: Boolean) =
         updateAppSelection(KEY_EDGE_LIGHTING_SELECTED_APPS, packageName, enabled)
 
+    /**
+     * Executes the load dynamic night light selected apps operation.
+     */
     fun loadDynamicNightLightSelectedApps() =
         loadAppSelection(KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS)
 
+    /**
+     * Executes the save dynamic night light selected apps operation.
+     *
+     * @param apps [List<AppSelection>] Target apps.
+     */
     fun saveDynamicNightLightSelectedApps(apps: List<AppSelection>) =
         saveAppSelection(KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS, apps)
 
+    /**
+     * Executes the update dynamic night light app selection operation.
+     *
+     * @param packageName [String] Target package name.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun updateDynamicNightLightAppSelection(packageName: String, enabled: Boolean) =
         updateAppSelection(KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS, packageName, enabled)
 
+    /**
+     * Executes the load app lock selected apps operation.
+     */
     fun loadAppLockSelectedApps() = loadAppSelection(KEY_APP_LOCK_SELECTED_APPS)
+
+    /**
+     * Executes the save app lock selected apps operation.
+     *
+     * @param apps [List<AppSelection>] Target apps.
+     */
     fun saveAppLockSelectedApps(apps: List<AppSelection>) =
         saveAppSelection(KEY_APP_LOCK_SELECTED_APPS, apps)
 
+    /**
+     * Executes the update app lock app selection operation.
+     *
+     * @param packageName [String] Target package name.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun updateAppLockAppSelection(packageName: String, enabled: Boolean) =
         updateAppSelection(KEY_APP_LOCK_SELECTED_APPS, packageName, enabled)
 
+    /**
+     * Executes the load freeze selected apps operation.
+     */
     fun loadFreezeSelectedApps() = loadAppSelection(KEY_FREEZE_SELECTED_APPS)
+
+    /**
+     * Executes the save freeze selected apps operation.
+     *
+     * @param apps [List<AppSelection>] Target apps.
+     */
     fun saveFreezeSelectedApps(apps: List<AppSelection>) =
         saveAppSelection(KEY_FREEZE_SELECTED_APPS, apps.filter { it.isEnabled })
 
+    /**
+     * Executes the update freeze app selection operation.
+     *
+     * @param packageName [String] Target package name.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun updateFreezeAppSelection(packageName: String, enabled: Boolean) =
         updateAppSelection(KEY_FREEZE_SELECTED_APPS, packageName, enabled)
 
+    /**
+     * Executes the load flashlight pulse selected apps operation.
+     */
     fun loadFlashlightPulseSelectedApps() = loadAppSelection(KEY_FLASHLIGHT_PULSE_SELECTED_APPS)
+
+    /**
+     * Executes the save flashlight pulse selected apps operation.
+     *
+     * @param apps [List<AppSelection>] Target apps.
+     */
     fun saveFlashlightPulseSelectedApps(apps: List<AppSelection>) =
         saveAppSelection(KEY_FLASHLIGHT_PULSE_SELECTED_APPS, apps)
 
+    /**
+     * Executes the update flashlight pulse app selection operation.
+     *
+     * @param packageName [String] Target package name.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun updateFlashlightPulseAppSelection(packageName: String, enabled: Boolean) =
         updateAppSelection(KEY_FLASHLIGHT_PULSE_SELECTED_APPS, packageName, enabled)
 
+    /**
+     * Executes the load notification glance selected apps operation.
+     */
     fun loadNotificationGlanceSelectedApps() =
         loadAppSelection(KEY_NOTIFICATION_GLANCE_SELECTED_APPS)
 
+    /**
+     * Executes the save notification glance selected apps operation.
+     *
+     * @param apps [List<AppSelection>] Target apps.
+     */
     fun saveNotificationGlanceSelectedApps(apps: List<AppSelection>) =
         saveAppSelection(KEY_NOTIFICATION_GLANCE_SELECTED_APPS, apps)
 
+    /**
+     * Executes the update notification glance app selection operation.
+     *
+     * @param packageName [String] Target package name.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun updateNotificationGlanceAppSelection(packageName: String, enabled: Boolean) =
         updateAppSelection(KEY_NOTIFICATION_GLANCE_SELECTED_APPS, packageName, enabled)
 
+    /**
+     * Executes the load pocket mode excluded apps operation.
+     */
     fun loadPocketModeExcludedApps() = loadAppSelection(KEY_POCKET_MODE_EXCLUDED_APPS)
+
+    /**
+     * Executes the save pocket mode excluded apps operation.
+     *
+     * @param apps [List<AppSelection>] Target apps.
+     */
     fun savePocketModeExcludedApps(apps: List<AppSelection>) =
         saveAppSelection(KEY_POCKET_MODE_EXCLUDED_APPS, apps)
 
+    /**
+     * Executes the update pocket mode excluded app selection operation.
+     *
+     * @param packageName [String] Target package name.
+     * @param enabled [Boolean] Target enabled.
+     */
     fun updatePocketModeExcludedAppSelection(packageName: String, enabled: Boolean) =
         updateAppSelection(KEY_POCKET_MODE_EXCLUDED_APPS, packageName, enabled)
 
+    /**
+     * Executes the load shut up configs operation.
+     * @return The resulting List<com data.
+     */
     fun loadShutUpConfigs(): List<com.sameerasw.essentials.domain.model.ShutUpAppConfig> {
         val json = prefs.getString(KEY_SHUT_UP_SELECTED_APPS, null)
         return if (json != null) {
@@ -632,11 +946,21 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save shut up configs operation.
+     *
+     * @param configs [List<com.sameerasw.essentials.domain.model.ShutUpAppConfig>] Target configs.
+     */
     fun saveShutUpConfigs(configs: List<com.sameerasw.essentials.domain.model.ShutUpAppConfig>) {
         val json = gson.toJson(configs)
         putString(KEY_SHUT_UP_SELECTED_APPS, json)
     }
 
+    /**
+     * Executes the update shut up config operation.
+     *
+     * @param config [com.sameerasw.essentials.domain.model.ShutUpAppConfig] Target config.
+     */
     fun updateShutUpConfig(config: com.sameerasw.essentials.domain.model.ShutUpAppConfig) {
         val current = loadShutUpConfigs().toMutableList()
         val index = current.indexOfFirst { it.packageName == config.packageName }
@@ -648,11 +972,21 @@ class SettingsRepository(private val context: Context) {
         saveShutUpConfigs(current)
     }
 
+    /**
+     * Executes the save shut up original settings operation.
+     *
+     * @param settings [Map<String] Target settings.
+     * @param String> Target string.
+     */
     fun saveShutUpOriginalSettings(settings: Map<String, String>) {
         val json = gson.toJson(settings)
         putString(KEY_SHUT_UP_ORIGINAL_SETTINGS, json)
     }
 
+    /**
+     * Executes the get shut up original settings operation.
+     * @return The resulting Map<String, String> data.
+     */
     fun getShutUpOriginalSettings(): Map<String, String> {
         val json = prefs.getString(KEY_SHUT_UP_ORIGINAL_SETTINGS, null) ?: return emptyMap()
         return try {
@@ -703,11 +1037,20 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save snooze discovered channels operation.
+     *
+     * @param channels [List<com.sameerasw.essentials.domain.model.SnoozeChannel>] Target channels.
+     */
     fun saveSnoozeDiscoveredChannels(channels: List<com.sameerasw.essentials.domain.model.SnoozeChannel>) {
         val json = gson.toJson(channels)
         putString(KEY_SNOOZE_DISCOVERED_CHANNELS, json)
     }
 
+    /**
+     * Executes the load snooze blocked channels operation.
+     * @return The resulting Set<String> data.
+     */
     fun loadSnoozeBlockedChannels(): Set<String> {
         val json = prefs.getString(KEY_SNOOZE_BLOCKED_CHANNELS, null)
         return if (json != null) {
@@ -721,6 +1064,11 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save snooze blocked channels operation.
+     *
+     * @param blockedChannels [Set<String>] Target blocked channels.
+     */
     fun saveSnoozeBlockedChannels(blockedChannels: Set<String>) {
         val json = gson.toJson(blockedChannels)
         putString(KEY_SNOOZE_BLOCKED_CHANNELS, json)
@@ -743,11 +1091,20 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save maps discovered channels operation.
+     *
+     * @param channels [List<com.sameerasw.essentials.domain.model.MapsChannel>] Target channels.
+     */
     fun saveMapsDiscoveredChannels(channels: List<com.sameerasw.essentials.domain.model.MapsChannel>) {
         val json = gson.toJson(channels)
         putString(KEY_MAPS_DISCOVERED_CHANNELS, json)
     }
 
+    /**
+     * Executes the load maps detection channels operation.
+     * @return The resulting Set<String> data.
+     */
     fun loadMapsDetectionChannels(): Set<String> {
         val json = prefs.getString(KEY_MAPS_DETECTION_CHANNELS, null)
         return if (json != null) {
@@ -766,6 +1123,11 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save maps detection channels operation.
+     *
+     * @param channels [Set<String>] Target channels.
+     */
     fun saveMapsDetectionChannels(channels: Set<String>) {
         val json = gson.toJson(channels)
         putString(KEY_MAPS_DETECTION_CHANNELS, json)
@@ -821,6 +1183,11 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the export configs operation.
+     *
+     * @param outputStream [java.io.OutputStream] Target output stream.
+     */
     fun exportConfigs(outputStream: java.io.OutputStream) {
         try {
             val json = getAllConfigsAsJsonString()
@@ -832,6 +1199,13 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the import configs operation.
+     *
+     * @param inputStream [java.io.InputStream] Target input stream.
+     * @param keepPrefs [Boolean] Target keep prefs.
+     * @return The resulting Boolean data.
+     */
     fun importConfigs(inputStream: java.io.InputStream, keepPrefs: Boolean): Boolean {
         return try {
             val json = inputStream.bufferedReader().use { it.readText() }
@@ -921,6 +1295,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get bluetooth devices battery operation.
+     * @return The resulting List<com data.
+     */
     fun getBluetoothDevicesBattery(): List<com.sameerasw.essentials.utils.BluetoothBatteryUtils.BluetoothDeviceBattery> {
         val json = prefs.getString(KEY_BLUETOOTH_DEVICES_BATTERY, null) ?: return emptyList()
         return try {
@@ -933,24 +1311,62 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save bluetooth devices battery operation.
+     *
+     * @param devices [List<com.sameerasw.essentials.utils.BluetoothBatteryUtils.BluetoothDeviceBattery>] Target devices.
+     */
     fun saveBluetoothDevicesBattery(devices: List<com.sameerasw.essentials.utils.BluetoothBatteryUtils.BluetoothDeviceBattery>) {
         val json = gson.toJson(devices)
         putString(KEY_BLUETOOTH_DEVICES_BATTERY, json)
     }
 
+    /**
+     * Executes the is bluetooth devices enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isBluetoothDevicesEnabled(): Boolean = getBoolean(KEY_SHOW_BLUETOOTH_DEVICES, false)
+
+    /**
+     * Executes the set bluetooth devices enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setBluetoothDevicesEnabled(enabled: Boolean) =
         putBoolean(KEY_SHOW_BLUETOOTH_DEVICES, enabled)
 
+    /**
+     * Executes the get battery widget max devices operation.
+     * @return The resulting Int data.
+     */
     fun getBatteryWidgetMaxDevices(): Int = getInt(KEY_BATTERY_WIDGET_MAX_DEVICES, 8)
+
+    /**
+     * Executes the set battery widget max devices operation.
+     *
+     * @param count [Int] Target count.
+     */
     fun setBatteryWidgetMaxDevices(count: Int) = putInt(KEY_BATTERY_WIDGET_MAX_DEVICES, count)
 
+    /**
+     * Executes the is battery widget background enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isBatteryWidgetBackgroundEnabled(): Boolean =
         getBoolean(KEY_BATTERY_WIDGET_BACKGROUND_ENABLED, true)
 
+    /**
+     * Executes the set battery widget background enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setBatteryWidgetBackgroundEnabled(enabled: Boolean) =
         putBoolean(KEY_BATTERY_WIDGET_BACKGROUND_ENABLED, enabled)
 
+    /**
+     * Executes the get pinned features operation.
+     * @return The resulting List<String> data.
+     */
     fun getPinnedFeatures(): List<String> {
         val json = prefs.getString(KEY_PINNED_FEATURES, null)
         return if (json != null) {
@@ -962,11 +1378,20 @@ class SettingsRepository(private val context: Context) {
         } else emptyList()
     }
 
+    /**
+     * Executes the save pinned features operation.
+     *
+     * @param features [List<String>] Target features.
+     */
     fun savePinnedFeatures(features: List<String>) {
         val json = gson.toJson(features)
         putString(KEY_PINNED_FEATURES, json)
     }
 
+    /**
+     * Executes the get pinned qs tiles operation.
+     * @return The resulting List<String> data.
+     */
     fun getPinnedQsTiles(): List<String> {
         val json = prefs.getString(KEY_PINNED_QS_TILES, null)
         return if (json != null) {
@@ -978,11 +1403,20 @@ class SettingsRepository(private val context: Context) {
         } else emptyList()
     }
 
+    /**
+     * Executes the save pinned qs tiles operation.
+     *
+     * @param tiles [List<String>] Target tiles.
+     */
     fun savePinnedQsTiles(tiles: List<String>) {
         val json = gson.toJson(tiles)
         putString(KEY_PINNED_QS_TILES, json)
     }
 
+    /**
+     * Executes the get recent searches operation.
+     * @return The resulting List<com data.
+     */
     fun getRecentSearches(): List<com.sameerasw.essentials.domain.model.SearchableItem> {
         val json = prefs.getString(KEY_RECENT_SEARCHES, null)
         return if (json != null) {
@@ -997,11 +1431,20 @@ class SettingsRepository(private val context: Context) {
         } else emptyList()
     }
 
+    /**
+     * Executes the save recent searches operation.
+     *
+     * @param items [List<com.sameerasw.essentials.domain.model.SearchableItem>] Target items.
+     */
     fun saveRecentSearches(items: List<com.sameerasw.essentials.domain.model.SearchableItem>) {
         val json = gson.toJson(items)
         putString(KEY_RECENT_SEARCHES, json)
     }
 
+    /**
+     * Executes the get tracked repos operation.
+     * @return The resulting List<TrackedRepo> data.
+     */
     fun getTrackedRepos(): List<TrackedRepo> {
         val json = prefs.getString(KEY_TRACKED_REPOS, null) ?: return emptyList()
         return try {
@@ -1011,11 +1454,21 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save tracked repos operation.
+     *
+     * @param repos [List<TrackedRepo>] Target repos.
+     */
     fun saveTrackedRepos(repos: List<TrackedRepo>) {
         val json = gson.toJson(repos)
         prefs.edit().putString(KEY_TRACKED_REPOS, json).apply()
     }
 
+    /**
+     * Executes the add or update tracked repo operation.
+     *
+     * @param repo [TrackedRepo] Target repo.
+     */
     fun addOrUpdateTrackedRepo(repo: TrackedRepo) {
         val current = getTrackedRepos().toMutableList()
         val index = current.indexOfFirst { it.fullName == repo.fullName }
@@ -1027,120 +1480,284 @@ class SettingsRepository(private val context: Context) {
         saveTrackedRepos(current)
     }
 
+    /**
+     * Executes the is shut up attempt shizuku restart enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isShutUpAttemptShizukuRestartEnabled(): Boolean =
         getBoolean(KEY_SHUT_UP_ATTEMPT_SHIZUKU_RESTART, true)
 
+    /**
+     * Executes the set shut up attempt shizuku restart enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setShutUpAttemptShizukuRestartEnabled(enabled: Boolean) =
         putBoolean(KEY_SHUT_UP_ATTEMPT_SHIZUKU_RESTART, enabled)
 
+    /**
+     * Executes the get shut up restore delay operation.
+     * @return The resulting Int data.
+     */
     fun getShutUpRestoreDelay(): Int =
         getInt(KEY_SHUT_UP_RESTORE_DELAY, 10)
 
+    /**
+     * Executes the set shut up restore delay operation.
+     *
+     * @param delaySeconds [Int] Target delay seconds.
+     */
     fun setShutUpRestoreDelay(delaySeconds: Int) =
         putInt(KEY_SHUT_UP_RESTORE_DELAY, delaySeconds)
 
+    /**
+     * Executes the get shut up restore mode operation.
+     * @return The resulting String data.
+     */
     fun getShutUpRestoreMode(): String =
         prefs.getString(KEY_SHUT_UP_RESTORE_MODE, "Auto") ?: "Auto"
 
+    /**
+     * Executes the set shut up restore mode operation.
+     *
+     * @param mode [String] Target mode.
+     */
     fun setShutUpRestoreMode(mode: String) =
         putString(KEY_SHUT_UP_RESTORE_MODE, mode)
 
+    /**
+     * Executes the get shizuku auth token operation.
+     * @return The resulting String data.
+     */
     fun getShizukuAuthToken(): String =
         prefs.getString(KEY_SHIZUKU_AUTH_TOKEN, "") ?: ""
 
+    /**
+     * Executes the set shizuku auth token operation.
+     *
+     * @param token [String] Target token.
+     */
     fun setShizukuAuthToken(token: String) =
         putString(KEY_SHIZUKU_AUTH_TOKEN, token)
 
+    /**
+     * Executes the get pixel searchbar type operation.
+     * @return The resulting String data.
+     */
     fun getPixelSearchbarType(): String =
         prefs.getString(KEY_PIXEL_SEARCHBAR_TYPE, "empty") ?: "empty"
 
+    /**
+     * Executes the set pixel searchbar type operation.
+     *
+     * @param type [String] Target type.
+     */
     fun setPixelSearchbarType(type: String) =
         putString(KEY_PIXEL_SEARCHBAR_TYPE, type)
 
+    /**
+     * Executes the get pixel searchbar date format operation.
+     * @return The resulting String data.
+     */
     fun getPixelSearchbarDateFormat(): String =
         prefs.getString(KEY_PIXEL_SEARCHBAR_DATE_FORMAT, "EEEE, MMMM d") ?: "EEEE, MMMM d"
 
+    /**
+     * Executes the set pixel searchbar date format operation.
+     *
+     * @param format [String] Target format.
+     */
     fun setPixelSearchbarDateFormat(format: String) =
         putString(KEY_PIXEL_SEARCHBAR_DATE_FORMAT, format)
 
+    /**
+     * Executes the get pixel searchbar background pill operation.
+     * @return The resulting Boolean data.
+     */
     fun getPixelSearchbarBackgroundPill(): Boolean =
         prefs.getBoolean(KEY_PIXEL_SEARCHBAR_BACKGROUND_PILL, false)
 
+    /**
+     * Executes the set pixel searchbar background pill operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setPixelSearchbarBackgroundPill(enabled: Boolean) =
         putBoolean(KEY_PIXEL_SEARCHBAR_BACKGROUND_PILL, enabled)
 
+    /**
+     * Executes the get pixel searchbar widget id operation.
+     * @return The resulting Int data.
+     */
     fun getPixelSearchbarWidgetId(): Int =
         prefs.getInt(
             KEY_PIXEL_SEARCHBAR_WIDGET_ID,
             android.appwidget.AppWidgetManager.INVALID_APPWIDGET_ID
         )
 
+    /**
+     * Executes the set pixel searchbar widget id operation.
+     *
+     * @param id [Int] Target id.
+     */
     fun setPixelSearchbarWidgetId(id: Int) =
         prefs.edit().putInt(KEY_PIXEL_SEARCHBAR_WIDGET_ID, id).apply()
 
+    /**
+     * Executes the get pixel searchbar widget provider operation.
+     * @return The resulting String? data.
+     */
     fun getPixelSearchbarWidgetProvider(): String? =
         prefs.getString(KEY_PIXEL_SEARCHBAR_WIDGET_PROVIDER, null)
 
+    /**
+     * Executes the set pixel searchbar widget provider operation.
+     *
+     * @param provider [String?] Target provider.
+     */
     fun setPixelSearchbarWidgetProvider(provider: String?) =
         if (provider == null) prefs.edit().remove(KEY_PIXEL_SEARCHBAR_WIDGET_PROVIDER).apply()
         else putString(KEY_PIXEL_SEARCHBAR_WIDGET_PROVIDER, provider)
 
+    /**
+     * Executes the get pixel searchbar scraped line1 operation.
+     * @return The resulting String data.
+     */
     fun getPixelSearchbarScrapedLine1(): String =
         prefs.getString(KEY_PIXEL_SEARCHBAR_SCRAPED_LINE1, "") ?: ""
 
+    /**
+     * Executes the set pixel searchbar scraped line1 operation.
+     *
+     * @param text [String] Target text.
+     */
     fun setPixelSearchbarScrapedLine1(text: String) =
         putString(KEY_PIXEL_SEARCHBAR_SCRAPED_LINE1, text)
 
+    /**
+     * Executes the get pixel searchbar scraped line2 operation.
+     * @return The resulting String data.
+     */
     fun getPixelSearchbarScrapedLine2(): String =
         prefs.getString(KEY_PIXEL_SEARCHBAR_SCRAPED_LINE2, "") ?: ""
 
+    /**
+     * Executes the set pixel searchbar scraped line2 operation.
+     *
+     * @param text [String] Target text.
+     */
     fun setPixelSearchbarScrapedLine2(text: String) =
         putString(KEY_PIXEL_SEARCHBAR_SCRAPED_LINE2, text)
 
+    /**
+     * Executes the get pixel searchbar widget padding h operation.
+     * @return The resulting Int data.
+     */
     fun getPixelSearchbarWidgetPaddingH(): Int =
         prefs.getInt(KEY_PIXEL_SEARCHBAR_WIDGET_PADDING_H, 0)
 
+    /**
+     * Executes the set pixel searchbar widget padding h operation.
+     *
+     * @param value [Int] Target value.
+     */
     fun setPixelSearchbarWidgetPaddingH(value: Int) =
         prefs.edit().putInt(KEY_PIXEL_SEARCHBAR_WIDGET_PADDING_H, value).apply()
 
+    /**
+     * Executes the get pixel searchbar widget padding v operation.
+     * @return The resulting Int data.
+     */
     fun getPixelSearchbarWidgetPaddingV(): Int =
         prefs.getInt(KEY_PIXEL_SEARCHBAR_WIDGET_PADDING_V, 0)
 
+    /**
+     * Executes the set pixel searchbar widget padding v operation.
+     *
+     * @param value [Int] Target value.
+     */
     fun setPixelSearchbarWidgetPaddingV(value: Int) =
         prefs.edit().putInt(KEY_PIXEL_SEARCHBAR_WIDGET_PADDING_V, value).apply()
 
+    /**
+     * Executes the get pixel searchbar tap action enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun getPixelSearchbarTapActionEnabled(): Boolean =
         prefs.getBoolean(KEY_PIXEL_SEARCHBAR_TAP_ACTION_ENABLED, true)
 
+    /**
+     * Executes the set pixel searchbar tap action enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setPixelSearchbarTapActionEnabled(enabled: Boolean) =
         putBoolean(KEY_PIXEL_SEARCHBAR_TAP_ACTION_ENABLED, enabled)
 
+    /**
+     * Executes the get pixel searchbar widget revision operation.
+     * @return The resulting Int data.
+     */
     fun getPixelSearchbarWidgetRevision(): Int =
         prefs.getInt(KEY_PIXEL_SEARCHBAR_WIDGET_REVISION, 0)
 
+    /**
+     * Executes the increment pixel searchbar widget revision operation.
+     */
     fun incrementPixelSearchbarWidgetRevision() {
         val current = getPixelSearchbarWidgetRevision()
         prefs.edit().putInt(KEY_PIXEL_SEARCHBAR_WIDGET_REVISION, current + 1).apply()
     }
 
+    /**
+     * Executes the get pixel searchbar music title operation.
+     * @return The resulting String data.
+     */
     fun getPixelSearchbarMusicTitle(): String =
         prefs.getString(KEY_PIXEL_SEARCHBAR_MUSIC_TITLE, "") ?: ""
 
+    /**
+     * Executes the set pixel searchbar music title operation.
+     *
+     * @param value [String] Target value.
+     */
     fun setPixelSearchbarMusicTitle(value: String) =
         putString(KEY_PIXEL_SEARCHBAR_MUSIC_TITLE, value)
 
+    /**
+     * Executes the get pixel searchbar music artist operation.
+     * @return The resulting String data.
+     */
     fun getPixelSearchbarMusicArtist(): String =
         prefs.getString(KEY_PIXEL_SEARCHBAR_MUSIC_ARTIST, "") ?: ""
 
+    /**
+     * Executes the set pixel searchbar music artist operation.
+     *
+     * @param value [String] Target value.
+     */
     fun setPixelSearchbarMusicArtist(value: String) =
         putString(KEY_PIXEL_SEARCHBAR_MUSIC_ARTIST, value)
 
+    /**
+     * Executes the get pixel searchbar music package operation.
+     * @return The resulting String data.
+     */
     fun getPixelSearchbarMusicPackage(): String =
         prefs.getString(KEY_PIXEL_SEARCHBAR_MUSIC_PACKAGE, "") ?: ""
 
+    /**
+     * Executes the set pixel searchbar music package operation.
+     *
+     * @param value [String] Target value.
+     */
     fun setPixelSearchbarMusicPackage(value: String) =
         putString(KEY_PIXEL_SEARCHBAR_MUSIC_PACKAGE, value)
 
+    /**
+     * Executes the get edge lighting sweep selected shapes operation.
+     * @return The resulting Set<String> data.
+     */
     fun getEdgeLightingSweepSelectedShapes(): Set<String> {
         val defaultShapes =
             com.sameerasw.essentials.utils.AmbientMusicShapeHelper.allShapesWithNames.map { it.first }
@@ -1157,21 +1774,40 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save edge lighting sweep selected shapes operation.
+     *
+     * @param shapes [Set<String>] Target shapes.
+     */
     fun saveEdgeLightingSweepSelectedShapes(shapes: Set<String>) {
         val json = gson.toJson(shapes)
         putString(KEY_EDGE_LIGHTING_SWEEP_SELECTED_SHAPES, json)
     }
 
+    /**
+     * Executes the remove tracked repo operation.
+     *
+     * @param fullName [String] Target full name.
+     */
     fun removeTrackedRepo(fullName: String) {
         val current = getTrackedRepos().toMutableList()
         current.removeAll { it.fullName == fullName }
         saveTrackedRepos(current)
     }
 
+    /**
+     * Executes the get git hub token operation.
+     * @return The resulting String? data.
+     */
     fun getGitHubToken(): String? {
         return prefs.getString(KEY_GITHUB_ACCESS_TOKEN, null)
     }
 
+    /**
+     * Executes the save git hub token operation.
+     *
+     * @param token [String?] Target token.
+     */
     fun saveGitHubToken(token: String?) {
         prefs.edit().putString(KEY_GITHUB_ACCESS_TOKEN, token).apply()
     }
@@ -1188,10 +1824,19 @@ class SettingsRepository(private val context: Context) {
         awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
+    /**
+     * Executes the get git hub workflow token operation.
+     * @return The resulting String? data.
+     */
     fun getGitHubWorkflowToken(): String? {
         return prefs.getString(KEY_GITHUB_WORKFLOW_TOKEN, null)
     }
 
+    /**
+     * Executes the save git hub workflow token operation.
+     *
+     * @param token [String?] Target token.
+     */
     fun saveGitHubWorkflowToken(token: String?) {
         prefs.edit().putString(KEY_GITHUB_WORKFLOW_TOKEN, token).apply()
     }
@@ -1207,6 +1852,11 @@ class SettingsRepository(private val context: Context) {
         awaitClose { prefs.unregisterOnSharedPreferenceChangeListener(listener) }
     }
 
+    /**
+     * Executes the save git hub user operation.
+     *
+     * @param user [GitHubUser?] Target user.
+     */
     fun saveGitHubUser(user: GitHubUser?) {
         if (user == null) {
             prefs.edit().remove(KEY_GITHUB_USER_PROFILE).apply()
@@ -1216,6 +1866,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get git hub user operation.
+     * @return The resulting GitHubUser? data.
+     */
     fun getGitHubUser(): GitHubUser? {
         val json = prefs.getString(KEY_GITHUB_USER_PROFILE, null) ?: return null
         return try {
@@ -1225,23 +1879,61 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the is user dictionary enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isUserDictionaryEnabled(): Boolean = getBoolean(KEY_USER_DICTIONARY_ENABLED, false)
+
+    /**
+     * Executes the set user dictionary enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setUserDictionaryEnabled(enabled: Boolean) =
         putBoolean(KEY_USER_DICTIONARY_ENABLED, enabled)
 
+    /**
+     * Executes the is accented characters enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isAccentedCharactersEnabled(): Boolean = getBoolean(KEY_KEYBOARD_ACCENTED_CHARACTERS, false)
+
+    /**
+     * Executes the set accented characters enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setAccentedCharactersEnabled(enabled: Boolean) =
         putBoolean(KEY_KEYBOARD_ACCENTED_CHARACTERS, enabled)
 
+    /**
+     * Executes the is battery notification enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isBatteryNotificationEnabled(): Boolean =
         getBoolean(KEY_BATTERY_NOTIFICATION_ENABLED, false)
 
+    /**
+     * Executes the set battery notification enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setBatteryNotificationEnabled(enabled: Boolean) =
         putBoolean(KEY_BATTERY_NOTIFICATION_ENABLED, enabled)
 
+    /**
+     * Executes the is enable unsupported features operation.
+     * @return The resulting Boolean data.
+     */
     fun isEnableUnsupportedFeatures(): Boolean =
         getBoolean(KEY_ENABLE_UNSUPPORTED_FEATURES, false)
 
+    /**
+     * Executes the set enable unsupported features operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setEnableUnsupportedFeatures(enabled: Boolean) =
         putBoolean(KEY_ENABLE_UNSUPPORTED_FEATURES, enabled)
 
@@ -1250,6 +1942,10 @@ class SettingsRepository(private val context: Context) {
         context.getSharedPreferences(LIVE_WALLPAPER_PREFS_NAME, Context.MODE_PRIVATE)
     }
 
+    /**
+     * Executes the get live wallpaper selected video operation.
+     * @return The resulting String data.
+     */
     fun getLiveWallpaperSelectedVideo(): String =
         liveWallpaperPrefs.getString(
             KEY_LIVE_WALLPAPER_SELECTED_VIDEO,
@@ -1257,9 +1953,18 @@ class SettingsRepository(private val context: Context) {
         )
             ?: LIVE_WALLPAPER_DEFAULT_VIDEO
 
+    /**
+     * Executes the save live wallpaper selected video operation.
+     *
+     * @param video [String] Target video.
+     */
     fun saveLiveWallpaperSelectedVideo(video: String) =
         liveWallpaperPrefs.edit().putString(KEY_LIVE_WALLPAPER_SELECTED_VIDEO, video).apply()
 
+    /**
+     * Executes the get live wallpaper playback trigger operation.
+     * @return The resulting String data.
+     */
     fun getLiveWallpaperPlaybackTrigger(): String =
         liveWallpaperPrefs.getString(
             KEY_LIVE_WALLPAPER_PLAYBACK_TRIGGER,
@@ -1267,9 +1972,18 @@ class SettingsRepository(private val context: Context) {
         )
             ?: LIVE_WALLPAPER_TRIGGER_UNLOCK
 
+    /**
+     * Executes the save live wallpaper playback trigger operation.
+     *
+     * @param trigger [String] Target trigger.
+     */
     fun saveLiveWallpaperPlaybackTrigger(trigger: String) =
         liveWallpaperPrefs.edit().putString(KEY_LIVE_WALLPAPER_PLAYBACK_TRIGGER, trigger).apply()
 
+    /**
+     * Executes the get live wallpaper custom videos operation.
+     * @return The resulting List<String> data.
+     */
     fun getLiveWallpaperCustomVideos(): List<String> {
         val stored = liveWallpaperPrefs.getString(KEY_LIVE_WALLPAPER_CUSTOM_VIDEOS, "") ?: ""
         val delimiter = if (!stored.contains("\n") && stored.contains(",")) "," else "\n"
@@ -1279,6 +1993,11 @@ class SettingsRepository(private val context: Context) {
             .distinct()
     }
 
+    /**
+     * Executes the save live wallpaper custom videos operation.
+     *
+     * @param videos [List<String>] Target videos.
+     */
     fun saveLiveWallpaperCustomVideos(videos: List<String>) =
         liveWallpaperPrefs.edit()
             .putString(
@@ -1286,6 +2005,11 @@ class SettingsRepository(private val context: Context) {
                 videos.filter { it.isNotEmpty() }.distinct().joinToString("\n")
             ).apply()
 
+    /**
+     * Executes the add live wallpaper custom video operation.
+     *
+     * @param uri [String] Target uri.
+     */
     fun addLiveWallpaperCustomVideo(uri: String) {
         val current = getLiveWallpaperCustomVideos().toMutableList()
         if (current.contains(uri)) {
@@ -1295,6 +2019,10 @@ class SettingsRepository(private val context: Context) {
         saveLiveWallpaperCustomVideos(if (current.size > 5) current.take(5) else current)
     }
 
+    /**
+     * Executes the get live wallpaper available videos operation.
+     * @return The resulting List<String> data.
+     */
     fun getLiveWallpaperAvailableVideos(): List<String> {
         val raws = com.sameerasw.essentials.R.raw::class.java.fields.mapNotNull { field ->
             try {
@@ -1306,6 +2034,11 @@ class SettingsRepository(private val context: Context) {
         return (raws + getLiveWallpaperCustomVideos()).filter { it.isNotBlank() }.distinct()
     }
 
+    /**
+     * Executes the remove live wallpaper custom video operation.
+     *
+     * @param videoUri [String] Target video uri.
+     */
     fun removeLiveWallpaperCustomVideo(videoUri: String) {
         val current = getLiveWallpaperCustomVideos().toMutableList()
         val removed = current.removeAll { it == videoUri || it.isBlank() }
@@ -1318,18 +2051,40 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get daily wallpaper apply home operation.
+     * @return The resulting Boolean data.
+     */
     fun getDailyWallpaperApplyHome(): Boolean =
         getBoolean(KEY_DAILY_WALLPAPER_APPLY_HOME, true)
 
+    /**
+     * Executes the set daily wallpaper apply home operation.
+     *
+     * @param value [Boolean] Target value.
+     */
     fun setDailyWallpaperApplyHome(value: Boolean) =
         putBoolean(KEY_DAILY_WALLPAPER_APPLY_HOME, value)
 
+    /**
+     * Executes the get daily wallpaper apply lock operation.
+     * @return The resulting Boolean data.
+     */
     fun getDailyWallpaperApplyLock(): Boolean =
         getBoolean(KEY_DAILY_WALLPAPER_APPLY_LOCK, true)
 
+    /**
+     * Executes the set daily wallpaper apply lock operation.
+     *
+     * @param value [Boolean] Target value.
+     */
     fun setDailyWallpaperApplyLock(value: Boolean) =
         putBoolean(KEY_DAILY_WALLPAPER_APPLY_LOCK, value)
 
+    /**
+     * Executes the get font scale operation.
+     * @return The resulting Float data.
+     */
     fun getFontScale(): Float {
         return try {
             android.provider.Settings.System.getFloat(
@@ -1341,6 +2096,11 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the set font scale operation.
+     *
+     * @param scale [Float] Target scale.
+     */
     fun setFontScale(scale: Float) {
         putFloat(KEY_FONT_SCALE, scale)
         try {
@@ -1354,6 +2114,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get font weight operation.
+     * @return The resulting Int data.
+     */
     fun getFontWeight(): Int {
         return try {
             android.provider.Settings.Secure.getInt(
@@ -1365,6 +2129,11 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the set font weight operation.
+     *
+     * @param weight [Int] Target weight.
+     */
     fun setFontWeight(weight: Int) {
         putInt(KEY_FONT_WEIGHT, weight)
         try {
@@ -1378,6 +2147,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get smallest width operation.
+     * @return The resulting Int data.
+     */
     fun getSmallestWidth(): Int {
         val forcedDensity = try {
             android.provider.Settings.Secure.getInt(
@@ -1395,6 +2168,11 @@ class SettingsRepository(private val context: Context) {
         return context.resources.configuration.smallestScreenWidthDp
     }
 
+    /**
+     * Executes the set smallest width operation.
+     *
+     * @param widthDp [Int] Target width dp.
+     */
     fun setSmallestWidth(widthDp: Int) {
         putInt(KEY_SMALLEST_WIDTH, widthDp)
         val metrics = context.resources.displayMetrics
@@ -1419,6 +2197,9 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the reset smallest width operation.
+     */
     fun resetSmallestWidth() {
         val command = "wm density reset"
         if (ShizukuUtils.isShizukuAvailable() && ShizukuUtils.hasPermission()) {
@@ -1439,6 +2220,12 @@ class SettingsRepository(private val context: Context) {
         remove(KEY_SMALLEST_WIDTH)
     }
 
+    /**
+     * Executes the get animation scale operation.
+     *
+     * @param key [String] Target key.
+     * @return The resulting Float data.
+     */
     fun getAnimationScale(key: String): Float {
         return try {
             android.provider.Settings.Global.getFloat(context.contentResolver, key)
@@ -1447,6 +2234,12 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the set animation scale operation.
+     *
+     * @param key [String] Target key.
+     * @param scale [Float] Target scale.
+     */
     fun setAnimationScale(key: String, scale: Float) {
         when (key) {
             android.provider.Settings.Global.ANIMATOR_DURATION_SCALE -> putFloat(
@@ -1471,6 +2264,9 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the sync system settings with saved operation.
+     */
     fun syncSystemSettingsWithSaved() {
         try {
             if (contains(KEY_FONT_SCALE)) {
@@ -1529,6 +2325,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the is aod enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isAodEnabled(): Boolean {
         return android.provider.Settings.Secure.getInt(
             context.contentResolver,
@@ -1537,6 +2337,11 @@ class SettingsRepository(private val context: Context) {
         ) == 1
     }
 
+    /**
+     * Updates System Secure setting for Doze Always-On-Display (AOD).
+     *
+     * @param enabled [Boolean] True to enable Always-On-Display, false to disable.
+     */
     fun setAodEnabled(enabled: Boolean) {
         try {
             android.provider.Settings.Secure.putInt(
@@ -1549,6 +2354,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get private dns presets operation.
+     * @return The resulting List<DnsPreset> data.
+     */
     fun getPrivateDnsPresets(): List<DnsPreset> {
         val json = prefs.getString(KEY_PRIVATE_DNS_PRESETS, null)
         return if (json != null) {
@@ -1592,54 +2401,125 @@ class SettingsRepository(private val context: Context) {
         )
     }
 
+    /**
+     * Executes the save private dns presets operation.
+     *
+     * @param presets [List<DnsPreset>] Target presets.
+     */
     fun savePrivateDnsPresets(presets: List<DnsPreset>) {
         val json = gson.toJson(presets)
         putString(KEY_PRIVATE_DNS_PRESETS, json)
     }
 
+    /**
+     * Executes the reset private dns presets operation.
+     */
     fun resetPrivateDnsPresets() {
         savePrivateDnsPresets(getDefaultDnsPresets())
     }
 
+    /**
+     * Executes the get ambient music glance album art mode operation.
+     * @return The resulting String data.
+     */
     fun getAmbientMusicGlanceAlbumArtMode(): String =
         prefs.getString(KEY_AMBIENT_MUSIC_GLANCE_ALBUM_ART_MODE, "default") ?: "default"
 
+    /**
+     * Executes the set ambient music glance album art mode operation.
+     *
+     * @param mode [String] Target mode.
+     */
     fun setAmbientMusicGlanceAlbumArtMode(mode: String) =
         prefs.edit().putString(KEY_AMBIENT_MUSIC_GLANCE_ALBUM_ART_MODE, mode).apply()
 
+    /**
+     * Executes the get ambient music glance clock size operation.
+     * @return The resulting Int data.
+     */
     fun getAmbientMusicGlanceClockSize(): Int =
         prefs.getInt(KEY_AMBIENT_MUSIC_GLANCE_CLOCK_SIZE, 80)
 
+    /**
+     * Executes the set ambient music glance clock size operation.
+     *
+     * @param size [Int] Target size.
+     */
     fun setAmbientMusicGlanceClockSize(size: Int) =
         prefs.edit().putInt(KEY_AMBIENT_MUSIC_GLANCE_CLOCK_SIZE, size).apply()
 
+    /**
+     * Executes the get ambient music glance clock weight operation.
+     * @return The resulting Int data.
+     */
     fun getAmbientMusicGlanceClockWeight(): Int =
         prefs.getInt(KEY_AMBIENT_MUSIC_GLANCE_CLOCK_WEIGHT, 400)
 
+    /**
+     * Executes the set ambient music glance clock weight operation.
+     *
+     * @param weight [Int] Target weight.
+     */
     fun setAmbientMusicGlanceClockWeight(weight: Int) =
         prefs.edit().putInt(KEY_AMBIENT_MUSIC_GLANCE_CLOCK_WEIGHT, weight).apply()
 
+    /**
+     * Executes the get ambient music glance clock width operation.
+     * @return The resulting Int data.
+     */
     fun getAmbientMusicGlanceClockWidth(): Int =
         prefs.getInt(KEY_AMBIENT_MUSIC_GLANCE_CLOCK_WIDTH, 100)
 
+    /**
+     * Executes the set ambient music glance clock width operation.
+     *
+     * @param width [Int] Target width.
+     */
     fun setAmbientMusicGlanceClockWidth(width: Int) =
         prefs.edit().putInt(KEY_AMBIENT_MUSIC_GLANCE_CLOCK_WIDTH, width).apply()
 
+    /**
+     * Executes the get ambient music glance clock roundness operation.
+     * @return The resulting Int data.
+     */
     fun getAmbientMusicGlanceClockRoundness(): Int =
         prefs.getInt(KEY_AMBIENT_MUSIC_GLANCE_CLOCK_ROUNDNESS, 50)
 
+    /**
+     * Executes the set ambient music glance clock roundness operation.
+     *
+     * @param roundness [Int] Target roundness.
+     */
     fun setAmbientMusicGlanceClockRoundness(roundness: Int) =
         prefs.edit().putInt(KEY_AMBIENT_MUSIC_GLANCE_CLOCK_ROUNDNESS, roundness).apply()
 
+    /**
+     * Executes the is ambient music glance force fill while charging enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isAmbientMusicGlanceForceFillWhileChargingEnabled(): Boolean =
         prefs.getBoolean(KEY_AMBIENT_MUSIC_GLANCE_FORCE_FILL_WHILE_CHARGING, false)
 
+    /**
+     * Executes the set ambient music glance force fill while charging enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setAmbientMusicGlanceForceFillWhileChargingEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(KEY_AMBIENT_MUSIC_GLANCE_FORCE_FILL_WHILE_CHARGING, enabled).apply()
 
+    /**
+     * Executes the is ambient music glance respect notifications enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun isAmbientMusicGlanceRespectNotificationsEnabled(): Boolean =
         prefs.getBoolean(KEY_AMBIENT_MUSIC_GLANCE_RESPECT_NOTIFICATIONS, true)
 
+    /**
+     * Executes the set ambient music glance respect notifications enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setAmbientMusicGlanceRespectNotificationsEnabled(enabled: Boolean) =
         prefs.edit().putBoolean(KEY_AMBIENT_MUSIC_GLANCE_RESPECT_NOTIFICATIONS, enabled).apply()
 
@@ -1648,14 +2528,36 @@ class SettingsRepository(private val context: Context) {
     fun getScaleAnimationsMode(): String =
         getString(KEY_SCALE_ANIMATIONS_MODE, "default") ?: "default"
 
+    /**
+     * Executes the set scale animations mode operation.
+     *
+     * @param mode [String] Target mode.
+     */
     fun setScaleAnimationsMode(mode: String) = putString(KEY_SCALE_ANIMATIONS_MODE, mode)
 
+    /**
+     * Executes the get refresh rate mode operation.
+     * @return The resulting String data.
+     */
     fun getRefreshRateMode(): String =
         getString(KEY_REFRESH_RATE_MODE, com.sameerasw.essentials.utils.RefreshRateUtils.MODE_FIXED)
             ?: com.sameerasw.essentials.utils.RefreshRateUtils.MODE_FIXED
 
+    /**
+     * Executes the set refresh rate mode operation.
+     *
+     * @param mode [String] Target mode.
+     */
     fun setRefreshRateMode(mode: String) = putString(KEY_REFRESH_RATE_MODE, mode)
 
+    /**
+     * Executes the save refresh rate state operation.
+     *
+     * @param mode [String] Target mode.
+     * @param fixed [Float] Target fixed.
+     * @param min [Float] Target min.
+     * @param peak [Float] Target peak.
+     */
     fun saveRefreshRateState(mode: String, fixed: Float, min: Float, peak: Float) {
         putString(KEY_REFRESH_RATE_MODE, mode)
         putFloat(KEY_REFRESH_RATE_FIXED, fixed)
@@ -1663,12 +2565,27 @@ class SettingsRepository(private val context: Context) {
         putFloat(KEY_REFRESH_RATE_PEAK, peak)
     }
 
+    /**
+     * Executes the should restore infinity peak on refresh rate reset operation.
+     * @return The resulting Boolean data.
+     */
     fun shouldRestoreInfinityPeakOnRefreshRateReset(): Boolean =
         getBoolean(KEY_REFRESH_RATE_DEFAULT_PEAK_INFINITY, false)
 
+    /**
+     * Executes the set restore infinity peak on refresh rate reset operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setRestoreInfinityPeakOnRefreshRateReset(enabled: Boolean) =
         putBoolean(KEY_REFRESH_RATE_DEFAULT_PEAK_INFINITY, enabled)
 
+    /**
+     * Executes the get scale animations profile operation.
+     *
+     * @param mode [String] Target mode.
+     * @return The resulting ScaleAnimationsProfile data.
+     */
     fun getScaleAnimationsProfile(mode: String): ScaleAnimationsProfile {
         val key =
             if (mode == "glove") KEY_SCALE_ANIMATIONS_GLOVE_PROFILE else KEY_SCALE_ANIMATIONS_DEFAULT_PROFILE
@@ -1698,6 +2615,12 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the save scale animations profile operation.
+     *
+     * @param mode [String] Target mode.
+     * @param profile [ScaleAnimationsProfile] Target profile.
+     */
     fun saveScaleAnimationsProfile(mode: String, profile: ScaleAnimationsProfile) {
         val key =
             if (mode == "glove") KEY_SCALE_ANIMATIONS_GLOVE_PROFILE else KEY_SCALE_ANIMATIONS_DEFAULT_PROFILE
@@ -1705,6 +2628,10 @@ class SettingsRepository(private val context: Context) {
         putString(key, json)
     }
 
+    /**
+     * Executes the get touch sensitivity enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun getTouchSensitivityEnabled(): Boolean {
         return try {
             android.provider.Settings.Secure.getInt(
@@ -1717,6 +2644,11 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the set touch sensitivity enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setTouchSensitivityEnabled(enabled: Boolean) {
         try {
             android.provider.Settings.Secure.putInt(
@@ -1729,6 +2661,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get auto rotate enabled operation.
+     * @return The resulting Boolean data.
+     */
     fun getAutoRotateEnabled(): Boolean {
         return try {
             android.provider.Settings.System.getInt(
@@ -1741,6 +2677,11 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the set auto rotate enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setAutoRotateEnabled(enabled: Boolean) {
         try {
             android.provider.Settings.System.putInt(
@@ -1753,6 +2694,10 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get screen timeout operation.
+     * @return The resulting Long data.
+     */
     fun getScreenTimeout(): Long {
         return try {
             android.provider.Settings.System.getLong(
@@ -1765,6 +2710,11 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the set screen timeout operation.
+     *
+     * @param timeoutMs [Long] Target timeout ms.
+     */
     fun setScreenTimeout(timeoutMs: Long) {
         try {
             android.provider.Settings.System.putLong(
@@ -1777,28 +2727,97 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    /**
+     * Executes the get lock screen clock weight operation.
+     * @return The resulting Int data.
+     */
     fun getLockScreenClockWeight(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_WEIGHT, 300)
+
+    /**
+     * Executes the set lock screen clock weight operation.
+     *
+     * @param value [Int] Target value.
+     */
     fun setLockScreenClockWeight(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_WEIGHT, value)
 
+    /**
+     * Executes the get lock screen clock width operation.
+     * @return The resulting Int data.
+     */
     fun getLockScreenClockWidth(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_WIDTH, 116)
+
+    /**
+     * Executes the set lock screen clock width operation.
+     *
+     * @param value [Int] Target value.
+     */
     fun setLockScreenClockWidth(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_WIDTH, value)
 
+    /**
+     * Executes the get lock screen clock grade operation.
+     * @return The resulting Int data.
+     */
     fun getLockScreenClockGrade(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_GRADE, 0)
+
+    /**
+     * Executes the set lock screen clock grade operation.
+     *
+     * @param value [Int] Target value.
+     */
     fun setLockScreenClockGrade(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_GRADE, value)
 
+    /**
+     * Executes the get lock screen clock roundness operation.
+     * @return The resulting Int data.
+     */
     fun getLockScreenClockRoundness(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_ROUNDNESS, 100)
+
+    /**
+     * Executes the set lock screen clock roundness operation.
+     *
+     * @param value [Int] Target value.
+     */
     fun setLockScreenClockRoundness(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_ROUNDNESS, value)
 
+    /**
+     * Executes the get lock screen clock color tone operation.
+     * @return The resulting Int data.
+     */
     fun getLockScreenClockColorTone(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_COLOR_TONE, 75)
+
+    /**
+     * Executes the set lock screen clock color tone operation.
+     *
+     * @param value [Int] Target value.
+     */
     fun setLockScreenClockColorTone(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_COLOR_TONE, value)
 
+    /**
+     * Executes the get lock screen clock selected color id operation.
+     * @return The resulting String data.
+     */
     fun getLockScreenClockSelectedColorId(): String =
         getString(KEY_LOCK_SCREEN_CLOCK_SELECTED_COLOR_ID, "DEFAULT") ?: "DEFAULT"
 
+    /**
+     * Executes the set lock screen clock selected color id operation.
+     *
+     * @param value [String] Target value.
+     */
     fun setLockScreenClockSelectedColorId(value: String) =
         putString(KEY_LOCK_SCREEN_CLOCK_SELECTED_COLOR_ID, value)
 
+    /**
+     * Executes the get lock screen clock seed color operation.
+     * @return The resulting Int data.
+     */
     fun getLockScreenClockSeedColor(): Int = getInt(KEY_LOCK_SCREEN_CLOCK_SEED_COLOR, 0)
+
+    /**
+     * Executes the set lock screen clock seed color operation.
+     *
+     * @param value [Int] Target value.
+     */
     fun setLockScreenClockSeedColor(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_SEED_COLOR, value)
 }
 

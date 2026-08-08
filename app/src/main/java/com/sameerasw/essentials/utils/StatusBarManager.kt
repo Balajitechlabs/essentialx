@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: System UI & Status Bar Controls
+ * File: StatusBarManager.kt
+ * Description: Manages System UI status bar disable flags, quick settings panel expansion,
+ * and lock screen security restrictions via system shell commands.
+ */
+
 package com.sameerasw.essentials.utils
 
 import android.content.Context
@@ -19,9 +29,9 @@ object StatusBarManager {
 
     /**
      * Request disabling specific status bar features.
-     * @param context Context to run shell commands
-     * @param requesterId Unique ID of the module (e.g., "ScreenLockedSecurity")
-     * @param flags Set of flags to disable
+     * @param context [Context] Context to run shell commands
+     * @param requesterId [String] Unique ID of the module (e.g., "ScreenLockedSecurity")
+     * @param flags [Set<String>] Set of flags to disable
      */
     fun requestDisable(context: Context, requesterId: String, flags: Set<String>) {
         disableRequests[requesterId] = flags
@@ -30,8 +40,8 @@ object StatusBarManager {
 
     /**
      * Restore status bar features for a specific module.
-     * @param context Context to run shell commands
-     * @param requesterId Unique ID of the module
+     * @param context [Context] Context to run shell commands
+     * @param requesterId [String] Unique ID of the module
      */
     fun requestRestore(context: Context, requesterId: String) {
         if (disableRequests.containsKey(requesterId)) {

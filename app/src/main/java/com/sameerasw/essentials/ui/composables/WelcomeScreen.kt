@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: WelcomeScreen.kt
+ * Description: UI layout element for WelcomeScreen.kt.
+ */
+
 package com.sameerasw.essentials.ui.composables
 
 import android.content.Intent
@@ -78,12 +87,12 @@ import coil.request.ImageRequest
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.HelpAndGuidesContent
 import com.sameerasw.essentials.ui.components.WhatsNewCustomContent
-import com.sameerasw.essentials.ui.components.cards.IconToggleItem
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.pickers.CrashReportingPicker
-import com.sameerasw.essentials.ui.components.pickers.LanguagePicker
-import com.sameerasw.essentials.ui.components.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.components.text.SimpleMarkdown
+import com.sameerasw.essentials.ui.core.cards.IconToggleItem
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.CrashReportingPicker
+import com.sameerasw.essentials.ui.core.pickers.LanguagePicker
+import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.theme.GoogleSansFlexRounded
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.HapticUtil

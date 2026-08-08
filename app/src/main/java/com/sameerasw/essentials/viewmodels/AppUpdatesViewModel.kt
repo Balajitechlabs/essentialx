@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: App Updates & Release Tracking
+ * File: AppUpdatesViewModel.kt
+ * Description: ViewModel managing GitHub repository tracking, update notifications,
+ * release downloads, and in-app APK installation triggers.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.content.Context
@@ -78,6 +88,11 @@ class AppUpdatesViewModel : ViewModel() {
     private val _selectedApkName = mutableStateOf("Auto")
     val selectedApkName: State<String> = _selectedApkName
 
+    /**
+     * Executes the set selected apk name operation.
+     *
+     * @param name [String] Target name.
+     */
     fun setSelectedApkName(name: String) {
         _selectedApkName.value = name
     }
@@ -88,15 +103,30 @@ class AppUpdatesViewModel : ViewModel() {
     private val _installStatus = mutableStateOf<String?>(null)
     val installStatus: State<String?> = _installStatus
 
+    /**
+     * Executes the on search query changed operation.
+     *
+     * @param query [String] Target query.
+     */
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
         _errorMessage.value = null
     }
 
+    /**
+     * Executes the on app selected operation.
+     *
+     * @param app [NotificationApp?] Target app.
+     */
     fun onAppSelected(app: NotificationApp?) {
         _selectedApp.value = app
     }
 
+    /**
+     * Executes the load tracked repos operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun loadTrackedRepos(context: Context) {
         _isLoading.value = true
         viewModelScope.launch {
@@ -105,6 +135,11 @@ class AppUpdatesViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Executes the search repo operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun searchRepo(context: Context) {
         val query = _searchQuery.value.trim()
         if (query.isEmpty()) return
@@ -174,6 +209,12 @@ class AppUpdatesViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Executes the track repo operation.
+     *
+     * @param context [Context] Target context.
+     * @param selectedApk [String] Target selected apk.
+     */
     fun trackRepo(context: Context, selectedApk: String) {
         val repo = _searchResult.value ?: return
         val release = _latestRelease.value ?: return
@@ -205,11 +246,23 @@ class AppUpdatesViewModel : ViewModel() {
         clearSearch()
     }
 
+    /**
+     * Executes the untrack repo operation.
+     *
+     * @param context [Context] Target context.
+     * @param fullName [String] Target full name.
+     */
     fun untrackRepo(context: Context, fullName: String) {
         SettingsRepository(context).removeTrackedRepo(fullName)
         loadTrackedRepos(context)
     }
 
+    /**
+     * Executes the prepare edit operation.
+     *
+     * @param context [Context] Target context.
+     * @param repo [TrackedRepo] Target repo.
+     */
     fun prepareEdit(context: Context, repo: TrackedRepo) {
         _searchQuery.value = repo.fullName
         _isSearching.value = false
@@ -319,6 +372,9 @@ class AppUpdatesViewModel : ViewModel() {
         return null
     }
 
+    /**
+     * Executes the clear search operation.
+     */
     fun clearSearch() {
         _searchQuery.value = ""
         _searchResult.value = null
@@ -330,22 +386,44 @@ class AppUpdatesViewModel : ViewModel() {
         _selectedApkName.value = "Auto"
     }
 
+    /**
+     * Executes the clear error operation.
+     */
     fun clearError() {
         _errorMessage.value = null
     }
 
+    /**
+     * Executes the consume dismiss signal operation.
+     */
     fun consumeDismissSignal() {
         _shouldDismissSheet.value = false
     }
 
+    /**
+     * Executes the set allow pre releases operation.
+     *
+     * @param allow [Boolean] Target allow.
+     */
     fun setAllowPreReleases(allow: Boolean) {
         _allowPreReleases.value = allow
     }
 
+    /**
+     * Executes the set notifications enabled operation.
+     *
+     * @param enabled [Boolean] Target enabled.
+     */
     fun setNotificationsEnabled(enabled: Boolean) {
         _notificationsEnabled.value = enabled
     }
 
+    /**
+     * Executes the fetch release notes if needed operation.
+     *
+     * @param context [Context] Target context.
+     * @param repo [TrackedRepo] Target repo.
+     */
     fun fetchReleaseNotesIfNeeded(context: Context, repo: TrackedRepo) {
         if (!repo.latestReleaseBody.isNullOrBlank()) return
 
@@ -385,6 +463,11 @@ class AppUpdatesViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Executes the check for updates operation.
+     *
+     * @param context [Context] Target context.
+     */
     fun checkForUpdates(context: Context) {
         if (_trackedRepos.value.isEmpty()) return
 
@@ -478,6 +561,12 @@ class AppUpdatesViewModel : ViewModel() {
         return 0
     }
 
+    /**
+     * Executes the download and install operation.
+     *
+     * @param context [Context] Target context.
+     * @param repo [TrackedRepo] Target repo.
+     */
     fun downloadAndInstall(context: Context, repo: TrackedRepo) {
         val downloadUrl = repo.downloadUrl ?: return
         _installingRepoId.value = repo.fullName
@@ -559,6 +648,12 @@ class AppUpdatesViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Executes the export tracked repos operation.
+     *
+     * @param context [Context] Target context.
+     * @param outputStream [OutputStream] Target output stream.
+     */
     fun exportTrackedRepos(context: Context, outputStream: OutputStream) {
         try {
             val repos = SettingsRepository(context).getTrackedRepos()
@@ -575,6 +670,13 @@ class AppUpdatesViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Executes the import tracked repos operation.
+     *
+     * @param context [Context] Target context.
+     * @param inputStream [InputStream] Target input stream.
+     * @return The resulting Boolean data.
+     */
     fun importTrackedRepos(context: Context, inputStream: InputStream): Boolean {
         return try {
             val json = inputStream.bufferedReader().use { it.readText() }

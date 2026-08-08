@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: AppsComponents.kt
+ * Description: UI layout element for AppsComponents.kt.
+ */
+
 package com.sameerasw.essentials.ui.components
 
 import androidx.compose.foundation.background

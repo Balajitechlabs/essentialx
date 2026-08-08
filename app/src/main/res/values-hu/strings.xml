@@ -361,7 +361,7 @@
     <string name="feat_circle_to_search_gesture_desc">Long-press the bottom area to trigger Circle to Search</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
-    <string name="feat_other_customizations_title">Other customizations</string>
+    <string name="feat_other_customizations_title">Egyéb testreszabási lehetőségek</string>
     <string name="feat_other_customizations_desc">Additional system tweaks and modifications</string>
     <string name="status_bar_icons_disclaimer">Kérjük, vegye figyelembe, hogy ezen opciók megvalósítása az OEM-től függhet, és előfordulhat, hogy egyes opciók egyáltalán nem működnek.</string>
     <!-- Network Type Picker -->
@@ -443,7 +443,7 @@
     <string name="feat_always_on_display_desc">Idő és információ megjelenítése kikapcsolt képernyő mellett</string>
     <string name="feat_calendar_sync_title">Naptár szinkronizálás</string>
     <string name="feat_calendar_sync_desc">Sync your phone calendar to your watch</string>
-    <string name="feat_lock_from_watch_title">Lock from Watch</string>
+    <string name="feat_lock_from_watch_title">Zárolás óráról</string>
     <string name="feat_lock_from_watch_desc">Lock your phone remotely</string>
     <string name="remote_lock_mode_title">Lock Mode</string>
     <string name="remote_lock_mode_screen_off">Screen off</string>
@@ -665,7 +665,7 @@
     <string name="action_report_bug">Hiba bejelentése</string>
     <!-- Sentry Crash Reporting -->
     <string name="sentry_report_mode_title">Crash reporting</string>
-    <string name="sentry_mode_off">Off</string>
+    <string name="sentry_mode_off">Ki</string>
     <string name="sentry_mode_auto">Auto</string>
     <string name="sentry_crash_toast">Essentials crashed, Report sent</string>
     <string name="simulate_crash">Simulate crash</string>
@@ -684,8 +684,8 @@
     <string name="preferences_title">Preferences</string>
     <string name="preferences_desc">Configure some basic settings to get started.</string>
     <string name="label_app_settings">App Settings</string>
-    <string name="label_app_language">Language</string>
-    <string name="label_haptic_feedback">Haptic Feedback</string>
+    <string name="label_app_language">Nyelv</string>
+    <string name="label_haptic_feedback">Haptikus visszajelzés</string>
     <string name="label_updates">Updates</string>
     <string name="label_auto_check_updates">Auto check for updates</string>
     <string name="desc_auto_check_updates">Check for updates at app launch</string>
@@ -706,7 +706,7 @@
     <string name="unit_seconds">%d seconds</string>
     <string name="unit_minute">1 minute</string>
     <string name="unit_minutes">%d minutes</string>
-    <string name="action_restart_systemui">Restart SystemUI</string>
+    <string name="action_restart_systemui">SystemUI újraindítása</string>
     <string name="desc_restart_systemui">Kills and restarts SystemUI process to apply some changes immediately</string>
     <string name="msg_error_load_release_notes">Couldn\'t load the release note</string>
     <string name="action_view_on_web">View on web</string>
@@ -1220,7 +1220,7 @@
     <string name="search_sound_mode_show_slider_desc">Hangerő-csúszka megjelenítése a csempében</string>
     <string name="search_sound_mode_behavior_title">Ciklus viselkedése</string>
     <string name="search_sound_mode_behavior_desc">Válasszon módokat a váltáshoz</string>
-    <string name="feat_sound_haptics_title">Hang és Haptika</string>
+    <string name="feat_sound_haptics_title">Hang és rezgés</string>
     <string name="feat_sound_haptics_desc">Hangerő és tapintási jellemzők</string>
     <string name="feat_security_privacy_title">Biztonság és adatvédelem</string>
     <string name="feat_security_privacy_desc">Védje és biztosítsa készülékét</string>
@@ -1301,7 +1301,7 @@
     <string name="label_apps">Alkalmazások elemre</string>
     <string name="feat_text_animations_title">Skála és animációk</string>
     <string name="feat_text_animations_desc">Állítsa be a rendszer léptékét és az animációkat</string>
-    <string name="feat_screen_refresh_rate_title">Screen Refresh Rate</string>
+    <string name="feat_screen_refresh_rate_title">Képernyő frissítési ráta</string>
     <string name="feat_screen_refresh_rate_desc">Set a fixed or ranged screen refresh rate</string>
     <string name="settings_section_text">Szöveg</string>
     <string name="label_font_scale">Betűméret</string>
@@ -1344,7 +1344,7 @@
     <string name="feat_auto_accessibility_desc">Automatikusan megadja a kisegítő lehetőségeket az alkalmazás indításakor, ha hiányzik a WRITE_SECURE_SETTINGS használatával.</string>
     <string name="label_help_guide">Súgó és útmutatók</string>
     <string name="tab_your_android">Az Ön Android</string>
-    <string name="label_device_storage">Tárolás</string>
+    <string name="label_device_storage">Tárhely</string>
     <string name="label_device_ram">Memória</string>
     <string name="label_use_blur">Használja az elmosódást</string>
     <string name="desc_use_blur">Progresszív elmosódási elemek engedélyezése a felhasználói felületen</string>
@@ -1454,4 +1454,8 @@
     <string name="whats_new_specs_desc">Inaccurate GSMArena-powered specifications have been removed to keep device insights clean, fast, and completely reliable.</string>
     <string name="whats_new_apps_title">App Updates Migrated</string>
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
+    <string name="feat_daily_wallpaper_title">Háttérkép</string>
+    <string name="feat_flashlight_title">Zseblámpa</string>
+    <string name="feat_power_battery_title">Energia és akkumulátor </string>
+    <string name="feat_watch_wireless_debugging_title">Vezeték nélküli hibakeresés</string>
 </resources>

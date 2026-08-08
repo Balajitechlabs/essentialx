@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: AutomationEditorActivity.kt
+ * Description: Activity component for AutomationEditorActivity.kt.
+ */
+
 package com.sameerasw.essentials.ui.activities
 
 import android.content.Context
@@ -65,16 +74,16 @@ import com.sameerasw.essentials.domain.diy.Trigger
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.NotificationApp
 import com.sameerasw.essentials.ui.components.ReusableTopAppBar
-import com.sameerasw.essentials.ui.components.cards.AppToggleItem
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
-import com.sameerasw.essentials.ui.components.pickers.SegmentedPicker
-import com.sameerasw.essentials.ui.components.sheets.BluetoothDeviceSelectionSheet
-import com.sameerasw.essentials.ui.components.sheets.DimWallpaperSettingsSheet
-import com.sameerasw.essentials.ui.components.sheets.ScreenOffSettingsSheet
-import com.sameerasw.essentials.ui.components.sheets.SoundModeSettingsSheet
-import com.sameerasw.essentials.ui.components.sheets.WifiNetworkSelectionSheet
+import com.sameerasw.essentials.ui.core.cards.AppToggleItem
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
+import com.sameerasw.essentials.ui.core.sheets.BluetoothDeviceSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.DimWallpaperSettingsSheet
+import com.sameerasw.essentials.ui.core.sheets.ScreenOffSettingsSheet
+import com.sameerasw.essentials.ui.core.sheets.SoundModeSettingsSheet
+import com.sameerasw.essentials.ui.core.sheets.WifiNetworkSelectionSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
@@ -756,7 +765,7 @@ class AutomationEditorActivity : ComponentActivity() {
                         }
 
                         if (showTimeSettings) {
-                            com.sameerasw.essentials.ui.components.sheets.TimeSelectionSheet(
+                            com.sameerasw.essentials.ui.core.sheets.TimeSelectionSheet(
                                 initialTrigger = selectedTrigger as? Trigger.Schedule,
                                 initialState = selectedState as? DIYState.TimePeriod,
                                 onDismiss = { showTimeSettings = false },
@@ -856,7 +865,7 @@ class AutomationEditorActivity : ComponentActivity() {
                         }
 
                         if (showDeviceEffectsSettings && configAction is Action.DeviceEffects) {
-                            com.sameerasw.essentials.ui.components.sheets.DeviceEffectsSettingsSheet(
+                            com.sameerasw.essentials.ui.core.sheets.DeviceEffectsSettingsSheet(
                                 initialAction = configAction as Action.DeviceEffects,
                                 onDismiss = { showDeviceEffectsSettings = false },
                                 onSave = { newAction ->
@@ -898,7 +907,7 @@ class AutomationEditorActivity : ComponentActivity() {
                         }
 
                         if (showSometimesEssentialsSettings && configAction is Action.SometimesEssentials) {
-                            com.sameerasw.essentials.ui.components.sheets.SometimesEssentialsSettingsSheet(
+                            com.sameerasw.essentials.ui.core.sheets.SometimesEssentialsSettingsSheet(
                                 initialAction = configAction as Action.SometimesEssentials,
                                 onDismiss = { showSometimesEssentialsSettings = false },
                                 onSave = { newAction ->
@@ -920,9 +929,10 @@ class AutomationEditorActivity : ComponentActivity() {
 
                         if (showFreezeTagSettings && configAction is Action.FreezeTag) {
                             val availableTags = remember {
-                                com.sameerasw.essentials.data.repository.SettingsRepository(context).getFreezeTags()
+                                com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                                    .getFreezeTags()
                             }
-                            com.sameerasw.essentials.ui.components.sheets.FreezeTagSettingsSheet(
+                            com.sameerasw.essentials.ui.core.sheets.FreezeTagSettingsSheet(
                                 initialAction = configAction as Action.FreezeTag,
                                 availableTags = availableTags,
                                 onDismiss = { showFreezeTagSettings = false },

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Translation
+ * File: TranslationSessionSheet.kt
+ * Description: Component file for TranslationSessionSheet.kt.
+ */
+
 package com.sameerasw.essentials.translation.ui
 
 import android.util.Log
@@ -44,7 +53,7 @@ import com.sameerasw.essentials.data.repository.GitHubRepository
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.translation.TranslationManager
 import com.sameerasw.essentials.translation.model.TranslationEdit
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.launch
 

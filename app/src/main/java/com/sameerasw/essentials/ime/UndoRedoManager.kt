@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Ime
+ * File: UndoRedoManager.kt
+ * Description: Component file for UndoRedoManager.kt.
+ */
+
 package com.sameerasw.essentials.ime
 
 import android.view.inputmethod.InputConnection

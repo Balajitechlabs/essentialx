@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: BatteryDetailsActivity.kt
+ * Description: Activity component for BatteryDetailsActivity.kt.
+ */
+
 package com.sameerasw.essentials.ui.activities
 
 import android.os.Bundle
@@ -8,9 +17,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.sameerasw.essentials.ui.components.sheets.BatteryDetailsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.BatteryDetailsBottomSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
-import com.sameerasw.essentials.utils.BatteryInfoUtil
+import com.sameerasw.essentials.utils.battery.BatteryInfoUtil
 
 class BatteryDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

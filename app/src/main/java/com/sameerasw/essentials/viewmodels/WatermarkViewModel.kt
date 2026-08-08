@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Photo Watermark & EXIF Processing
+ * File: WatermarkViewModel.kt
+ * Description: ViewModel managing camera photo watermark options, EXIF metadata extraction,
+ * and image rendering engine parameters.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.content.Context
@@ -38,6 +48,12 @@ class WatermarkViewModel(
 ) : ViewModel() {
 
     companion object {
+        /**
+         * Executes the provide factory operation.
+         *
+         * @param context [Context] Target context.
+         * @return The resulting ViewModelProvider data.
+         */
         fun provideFactory(context: Context): ViewModelProvider.Factory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
@@ -108,6 +124,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the load preview operation.
+     *
+     * @param uri [Uri] Target uri.
+     */
     fun loadPreview(uri: Uri) {
         currentUri = uri
         viewModelScope.launch(Dispatchers.IO) {
@@ -175,6 +196,12 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the format date operation.
+     *
+     * @param dateString [String] Target date string.
+     * @return The resulting String data.
+     */
     fun formatDate(dateString: String): String {
         try {
             // Input format: yyyy:MM:dd HH:mm:ss
@@ -288,18 +315,33 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set style operation.
+     *
+     * @param style [WatermarkStyle] Target style.
+     */
     fun setStyle(style: WatermarkStyle) {
         viewModelScope.launch {
             watermarkRepository.updateStyle(style)
         }
     }
 
+    /**
+     * Executes the set show brand operation.
+     *
+     * @param show [Boolean] Target show.
+     */
     fun setShowBrand(show: Boolean) {
         viewModelScope.launch {
             watermarkRepository.updateShowBrand(show)
         }
     }
 
+    /**
+     * Executes the set show exif operation.
+     *
+     * @param show [Boolean] Target show.
+     */
     fun setShowExif(show: Boolean) {
         viewModelScope.launch {
             watermarkRepository.updateShowExif(show)
@@ -320,12 +362,22 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set color mode operation.
+     *
+     * @param mode [ColorMode] Target mode.
+     */
     fun setColorMode(mode: ColorMode) {
         viewModelScope.launch {
             watermarkRepository.updateColorMode(mode)
         }
     }
 
+    /**
+     * Executes the set move to top operation.
+     *
+     * @param move [Boolean] Target move.
+     */
     fun setMoveToTop(move: Boolean) {
         viewModelScope.launch {
             watermarkRepository.updateMoveToTop(move)
@@ -333,6 +385,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set left align operation.
+     *
+     * @param left [Boolean] Target left.
+     */
     fun setLeftAlign(left: Boolean) {
         viewModelScope.launch {
             watermarkRepository.updateLeftAlign(left)
@@ -340,6 +397,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set brand text size operation.
+     *
+     * @param size [Int] Target size.
+     */
     fun setBrandTextSize(size: Int) {
         viewModelScope.launch {
             watermarkRepository.updateBrandTextSize(size)
@@ -347,6 +409,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set data text size operation.
+     *
+     * @param size [Int] Target size.
+     */
     fun setDataTextSize(size: Int) {
         viewModelScope.launch {
             watermarkRepository.updateDataTextSize(size)
@@ -354,6 +421,13 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set custom text settings operation.
+     *
+     * @param show [Boolean] Target show.
+     * @param text [String] Target text.
+     * @param size [Int] Target size.
+     */
     fun setCustomTextSettings(show: Boolean, text: String, size: Int) {
         viewModelScope.launch {
             watermarkRepository.updateCustomTextSettings(show, text, size)
@@ -361,6 +435,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set custom text size operation.
+     *
+     * @param size [Int] Target size.
+     */
     fun setCustomTextSize(size: Int) {
         viewModelScope.launch {
             watermarkRepository.updateCustomTextSize(size)
@@ -368,6 +447,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set padding operation.
+     *
+     * @param padding [Int] Target padding.
+     */
     fun setPadding(padding: Int) {
         viewModelScope.launch {
             watermarkRepository.updatePadding(padding)
@@ -375,6 +459,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set border stroke operation.
+     *
+     * @param stroke [Int] Target stroke.
+     */
     fun setBorderStroke(stroke: Int) {
         viewModelScope.launch {
             watermarkRepository.updateBorderStroke(stroke)
@@ -382,6 +471,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set border corner operation.
+     *
+     * @param corner [Int] Target corner.
+     */
     fun setBorderCorner(corner: Int) {
         viewModelScope.launch {
             watermarkRepository.updateBorderCorner(corner)
@@ -389,6 +483,13 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set logo settings operation.
+     *
+     * @param show [Boolean] Target show.
+     * @param resId [Int?] Target res id.
+     * @param size [Int] Target size.
+     */
     fun setLogoSettings(show: Boolean, resId: Int?, size: Int) {
         _showLogo.value = show
         _logoResId.value = resId
@@ -399,6 +500,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set show logo operation.
+     *
+     * @param show [Boolean] Target show.
+     */
     fun setShowLogo(show: Boolean) {
         _showLogo.value = show
         viewModelScope.launch {
@@ -407,11 +513,21 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the set logo res id operation.
+     *
+     * @param resId [Int?] Target res id.
+     */
     fun setLogoResId(resId: Int?) {
         _logoResId.value = resId
         updatePreview()
     }
 
+    /**
+     * Executes the set logo size operation.
+     *
+     * @param size [Int] Target size.
+     */
     fun setLogoSize(size: Int) {
         viewModelScope.launch {
             watermarkRepository.updateLogoSize(size)
@@ -419,6 +535,11 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the rotate operation.
+     *
+     * @param left [Boolean] Target left.
+     */
     fun rotate(left: Boolean) {
         viewModelScope.launch {
             val currentRotation = _options.value.rotation
@@ -429,6 +550,13 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the update overridden texts operation.
+     *
+     * @param brand [String] Target brand.
+     * @param custom [String] Target custom.
+     * @param date [String?] Target date.
+     */
     fun updateOverriddenTexts(brand: String, custom: String, date: String?) {
         _currentBrandText.value = brand
         _currentCustomText.value = custom
@@ -436,6 +564,11 @@ class WatermarkViewModel(
         updatePreview()
     }
 
+    /**
+     * Executes the save image operation.
+     *
+     * @param uri [Uri] Target uri.
+     */
     fun saveImage(uri: Uri) {
         viewModelScope.launch {
             _uiState.value = WatermarkUiState.Processing
@@ -496,6 +629,12 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the share image operation.
+     *
+     * @param uri [Uri] Target uri.
+     * @param onShareReady [(Uri] Target on share ready.
+     */
     fun shareImage(uri: Uri, onShareReady: (Uri) -> Unit) {
         viewModelScope.launch {
             _uiState.value = WatermarkUiState.Processing
@@ -562,6 +701,9 @@ class WatermarkViewModel(
         }
     }
 
+    /**
+     * Executes the reset state operation.
+     */
     fun resetState() {
         _uiState.value = WatermarkUiState.Idle
     }

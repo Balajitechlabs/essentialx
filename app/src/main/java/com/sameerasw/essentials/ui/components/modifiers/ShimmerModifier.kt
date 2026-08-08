@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: ShimmerModifier.kt
+ * Description: UI layout element for ShimmerModifier.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.modifiers
 
 import androidx.compose.animation.core.FastOutSlowInEasing
