@@ -1,33 +1,17 @@
 # Essentials
 
 Essential tools, mods and workarounds for Pixels and other Androids
-## [sameerasw.com/essentials](https://sameerasw.com/essentials)
 
-<br>
 
 <p align="center">
 <img width="99%" src="https://github.com/user-attachments/assets/c0849951-4cf0-4a91-9964-f7c212977af1" />
 </p>
 
 <p align="center">
-  <a href="https://www.reddit.com/r/MadebySameerasw"><img  width="99%"  alt=" reddit-banner" src="https://github.com/user-attachments/assets/a5197458-d64a-4c6a-a6a3-9e1f36030205" /></a>
-</p>
-<p align="center">
-  <a href="https://t.me/tidwib"><img  width="99%"  alt=" telegram-banner" src="https://github.com/user-attachments/assets/425b3cc1-9ac6-46ec-8f48-71c7af9c9ca2" /></a>
+  <a href="https://www.reddit.com/r/MadebySameerasw"><img  width="49%"  alt=" reddit-banner" src="https://github.com/user-attachments/assets/a5197458-d64a-4c6a-a6a3-9e1f36030205" /></a>
+  <a href="https://t.me/tidwib"><img  width="49%"  alt=" telegram-banner" src="https://github.com/user-attachments/assets/425b3cc1-9ac6-46ec-8f48-71c7af9c9ca2" /></a>
 </p>
 
-<br>
-
-<p align="center">
-  <a href="https://github.com/sameerasw/essentials/releases/latest"><img alt="GitHub Downloads (specific asset, all releases)" src="https://img.shields.io/github/downloads/sameerasw/essentials/app-release.apk?displayAssetName=false&style=for-the-badge&logo=android&logoColor=%23fff&labelColor=%2348C&color=%2348C">      
-</a>
-  <a href="https://github.com/sameerasw/essentials/issues/new?template=bug_report.md"><img alt="GitHub Issues or Pull Requests by label" src="https://img.shields.io/github/issues/sameerasw/essentials/bug?style=for-the-badge&logo=openbugbounty&logoColor=%23fff&label=bug%3F&labelColor=%232a6&color=%232a6">
-</a>
-  <a href="https://github.com/sameerasw/essentials/issues/new?template=feature_request.md"><img alt="GitHub Issues or Pull Requests by label" src="https://img.shields.io/github/issues/sameerasw/essentials/enhancement?style=for-the-badge&logo=apachespark&logoColor=%23fff&label=Feature%20request&labelColor=%23a26&color=%23a26">
-</a>
-  <a href="https://sameerasw.com"><img src="https://img.shields.io/badge/My%20website-orange?style=for-the-badge&logo=googlechrome&logoColor=%23000&labelColor=%233AFFB8&color=%233AFFB8" alt="My website" /></a>
-  <a href="https://t.me/tidwib"><img src="https://img.shields.io/badge/Community-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Community" /></a>
-</p>
 
 <h3 align="center">
 <strong>Featuring Essentials</strong>
@@ -38,6 +22,19 @@ Essential tools, mods and workarounds for Pixels and other Androids
   <a href="https://youtu.be/mDQ8o4JlXjM?si=kZsIxv37m7K1Gij2&t=780"><img align="top"  width="18%" alt="CleanShot-Helium-(1) HowToMen - YouTube-20260720-8  33 41@2x" src="https://github.com/user-attachments/assets/cac074da-8b15-44d3-a66c-3ac67316606d" /></a>
   <a href="https://youtu.be/HE0s76z4Afs"><img align="top"  width="18%" alt="Frame 7" src="https://github.com/user-attachments/assets/02643ad6-e221-4fcc-bd40-e0c100af3d69" /></a>
   <a href="https://www.androidauthority.com/good-lock-for-pixel-essentials-app-hands-on-3670994/"><img align="top"  width="18%" alt="Frame 7" src="https://github.com/user-attachments/assets/5469b309-6929-4775-93c5-7ee2f0d57ba1" /></a>
+</p>
+
+
+<br>
+
+<p align="center">
+  <a href="https://github.com/sameerasw/essentials/releases/latest"><img alt="GitHub Downloads (specific asset, all releases)" src="https://img.shields.io/github/downloads/sameerasw/essentials/app-release.apk?displayAssetName=false&style=for-the-badge&logo=android&logoColor=%23fff&labelColor=%2348C&color=%2348C">      
+</a>
+  <a href="https://github.com/sameerasw/essentials/issues/new?template=bug_report.md"><img alt="GitHub Issues or Pull Requests by label" src="https://img.shields.io/github/issues/sameerasw/essentials/bug?style=for-the-badge&logo=openbugbounty&logoColor=%23fff&label=bug%3F&labelColor=%232a6&color=%232a6">
+</a>
+  <a href="https://github.com/sameerasw/essentials/issues/new?template=feature_request.md"><img alt="GitHub Issues or Pull Requests by label" src="https://img.shields.io/github/issues/sameerasw/essentials/enhancement?style=for-the-badge&logo=apachespark&logoColor=%23fff&label=Feature%20request&labelColor=%23a26&color=%23a26">
+</a>
+  <a href="https://sameerasw.com/essentials"><img src="https://img.shields.io/badge/Website-orange?style=for-the-badge&logo=googlechrome&logoColor=%23000&labelColor=%233AFFB8&color=%233AFFB8" alt="Website" /></a>
 </p>
 
 ## Navigation
