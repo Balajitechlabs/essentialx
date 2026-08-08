@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: TileAuthActivity.kt
+ * Description: Activity component for TileAuthActivity.kt.
+ */
+
 package com.sameerasw.essentials.ui.activities
 
 import android.os.Bundle

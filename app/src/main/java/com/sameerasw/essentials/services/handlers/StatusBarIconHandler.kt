@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: StatusBarIconHandler.kt
+ * Description: Background service component for StatusBarIconHandler.kt.
+ */
+
 package com.sameerasw.essentials.services.handlers
 
 import android.content.BroadcastReceiver
@@ -11,7 +20,7 @@ import android.os.BatteryManager
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import com.sameerasw.essentials.domain.StatusBarIconRegistry
-import com.sameerasw.essentials.ui.components.pickers.NetworkType
+import com.sameerasw.essentials.ui.core.pickers.NetworkType
 import com.sameerasw.essentials.utils.updateIconBlacklistSetting
 import com.sameerasw.essentials.viewmodels.StatusBarIconViewModel
 import kotlinx.coroutines.CoroutineScope

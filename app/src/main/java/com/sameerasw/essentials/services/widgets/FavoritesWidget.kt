@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: FavoritesWidget.kt
+ * Description: Background service component for FavoritesWidget.kt.
+ */
+
 package com.sameerasw.essentials.services.widgets
 
 import android.content.Context
@@ -193,7 +202,11 @@ class FavoritesWidget : GlanceAppWidget() {
                                                                             .cornerRadius(
                                                                                 iconCornerRadius
                                                                             )
-                                                                            .background(ColorProvider(pastelColor)),
+                                                                            .background(
+                                                                                ColorProvider(
+                                                                                    pastelColor
+                                                                                )
+                                                                            ),
                                                                         contentAlignment = Alignment.Center
                                                                     ) {
                                                                         Image(
@@ -246,7 +259,11 @@ class FavoritesWidget : GlanceAppWidget() {
                                                                             .cornerRadius(
                                                                                 iconCornerRadius
                                                                             )
-                                                                            .background(ColorProvider(pastelColor)),
+                                                                            .background(
+                                                                                ColorProvider(
+                                                                                    pastelColor
+                                                                                )
+                                                                            ),
                                                                         contentAlignment = Alignment.Center
                                                                     ) {
                                                                         Image(

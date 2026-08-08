@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Data & Repository Layer
+ * File: UpdateRepository.kt
+ * Description: Data repository and storage component for UpdateRepository.kt.
+ */
+
 package com.sameerasw.essentials.data.repository
 
 import android.content.Context
@@ -134,6 +143,12 @@ class UpdateRepository {
         }
 
         companion object {
+            /**
+             * Executes the parse operation.
+             *
+             * @param versionInfo [String] Target version info.
+             * @return The resulting SemanticVersion data.
+             */
             fun parse(versionInfo: String): SemanticVersion {
                 try {
                     // Remove "v" prefix if present

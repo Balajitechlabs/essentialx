@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: GitHub OAuth Authentication
+ * File: GitHubAuthViewModel.kt
+ * Description: ViewModel managing GitHub OAuth device flow, access token storage,
+ * and user profile synchronization.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.content.Context

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: External
+ * File: ExternalActionReceiver.kt
+ * Description: Component file for ExternalActionReceiver.kt.
+ */
+
 package com.sameerasw.essentials.external
 
 import android.content.BroadcastReceiver

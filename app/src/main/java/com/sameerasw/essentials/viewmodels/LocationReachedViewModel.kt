@@ -1,3 +1,13 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Location Alarms & Geofencing
+ * File: LocationReachedViewModel.kt
+ * Description: ViewModel managing destination geofencing alarms, GPS location tracking,
+ * and background alarm service triggers.
+ */
+
 package com.sameerasw.essentials.viewmodels
 
 import android.app.Application
@@ -96,14 +106,29 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
+    /**
+     * Executes the set show bottom sheet operation.
+     *
+     * @param show [Boolean] Target show.
+     */
     fun setShowBottomSheet(show: Boolean) {
         repository.setShowBottomSheet(show)
     }
 
+    /**
+     * Executes the set temp alarm operation.
+     *
+     * @param alarm [LocationAlarm?] Target alarm.
+     */
     fun setTempAlarm(alarm: LocationAlarm?) {
         repository.setTempAlarm(alarm)
     }
 
+    /**
+     * Executes the save alarm operation.
+     *
+     * @param alarm [LocationAlarm] Target alarm.
+     */
     fun saveAlarm(alarm: LocationAlarm) {
         val currentList = savedAlarms.value.toMutableList()
         val index = currentList.indexOfFirst { it.id == alarm.id }
@@ -117,6 +142,11 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         repository.setTempAlarm(null)
     }
 
+    /**
+     * Executes the delete alarm operation.
+     *
+     * @param alarmId [String] Target alarm id.
+     */
     fun deleteAlarm(alarmId: String) {
         if (activeAlarmId.value == alarmId) {
             stopTracking()
@@ -125,6 +155,11 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         repository.saveAlarms(currentList)
     }
 
+    /**
+     * Executes the start tracking operation.
+     *
+     * @param alarmId [String] Target alarm id.
+     */
     fun startTracking(alarmId: String) {
         val alarm = savedAlarms.value.find { it.id == alarmId } ?: return
 
@@ -159,6 +194,9 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         repository.saveLastTrip(null)
     }
 
+    /**
+     * Executes the stop tracking operation.
+     */
     fun stopTracking() {
         val id = activeAlarmId.value ?: return
         val alarm = savedAlarms.value.find { it.id == id }
@@ -180,6 +218,9 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         startTime.value = 0L
     }
 
+    /**
+     * Executes the pause tracking operation.
+     */
     fun pauseTracking() {
         val id = activeAlarmId.value ?: return
         val intent = Intent(getApplication(), LocationReachedService::class.java).apply {
@@ -189,6 +230,9 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         repository.updatePausedState(id, true)
     }
 
+    /**
+     * Executes the resume tracking operation.
+     */
     fun resumeTracking() {
         val id = activeAlarmId.value ?: return
         val intent = Intent(getApplication(), LocationReachedService::class.java).apply {
@@ -201,6 +245,9 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
 
     private var distanceTrackingJob: kotlinx.coroutines.Job? = null
 
+    /**
+     * Executes the start ui tracking operation.
+     */
     fun startUiTracking() {
         if (distanceTrackingJob?.isActive == true) return
 
@@ -216,6 +263,9 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
+    /**
+     * Executes the stop ui tracking operation.
+     */
     fun stopUiTracking() {
         distanceTrackingJob?.cancel()
         distanceTrackingJob = null
@@ -227,6 +277,9 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
     }
 
     @android.annotation.SuppressLint("MissingPermission")
+            /**
+             * Executes the update current distance operation.
+             */
     fun updateCurrentDistance() {
         val id = activeAlarmId.value
         val activeAlarm = savedAlarms.value.find { it.id == id } ?: tempAlarm.value ?: return
@@ -266,6 +319,15 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         remainingTimeMinutes.value = (remainingMillis / 60000).toInt().coerceAtLeast(1)
     }
 
+    /**
+     * Executes the calculate distance operation.
+     *
+     * @param lat1 [Double] Target lat1.
+     * @param lon1 [Double] Target lon1.
+     * @param lat2 [Double] Target lat2.
+     * @param lon2 [Double] Target lon2.
+     * @return The resulting Float data.
+     */
     fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
         val r = 6371e3 // Earth's radius in meters
         val phi1 = lat1 * PI / 180
@@ -281,6 +343,12 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         return (r * c).toFloat()
     }
 
+    /**
+     * Executes the handle intent operation.
+     *
+     * @param intent [Intent] Target intent.
+     * @return The resulting Boolean data.
+     */
     fun handleIntent(intent: Intent): Boolean {
         val action = intent.action
         val type = intent.type

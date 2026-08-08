@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: PrivateDnsSettingsActivity.kt
+ * Description: Activity component for PrivateDnsSettingsActivity.kt.
+ */
+
 package com.sameerasw.essentials.ui.activities
 
 import android.os.Bundle
@@ -50,7 +59,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.HapticUtil
 
@@ -203,7 +212,7 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
             )
 
             RoundedCardContainer {
-                com.sameerasw.essentials.ui.components.pickers.SegmentedPicker(
+                com.sameerasw.essentials.ui.core.pickers.SegmentedPicker(
                     items = listOf(false, true),
                     selectedItem = isCycleMode,
                     onItemSelected = { isCycleMode = it },

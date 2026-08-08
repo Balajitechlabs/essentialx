@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: OpenWithFragment.kt
+ * Description: UI layout element for OpenWithFragment.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.linkActions
 
 import android.content.Intent
@@ -21,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 
 @Composable
 fun OpenWithContent(

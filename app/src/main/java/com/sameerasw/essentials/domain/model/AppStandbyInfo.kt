@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Domain Layer Models & Registries
+ * File: AppStandbyInfo.kt
+ * Description: Domain model and business logic entry for AppStandbyInfo.kt.
+ */
+
 package com.sameerasw.essentials.domain.model
 
 import android.graphics.drawable.Drawable

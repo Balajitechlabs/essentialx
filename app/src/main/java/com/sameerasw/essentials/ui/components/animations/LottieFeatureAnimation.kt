@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: LottieFeatureAnimation.kt
+ * Description: UI layout element for LottieFeatureAnimation.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.animations
 
 import androidx.compose.foundation.layout.Box

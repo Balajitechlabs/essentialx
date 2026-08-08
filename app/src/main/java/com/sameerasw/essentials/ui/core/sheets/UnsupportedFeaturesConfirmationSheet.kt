@@ -1,0 +1,92 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Core Components
+ * File: UnsupportedFeaturesConfirmationSheet.kt
+ * Description: Reusable core UI component for UnsupportedFeaturesConfirmationSheet.kt.
+ */
+
+package com.sameerasw.essentials.ui.core.sheets
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+
+@Composable
+fun UnsupportedFeaturesConfirmationSheet(
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit,
+    featureTitleResIds: List<Int>
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    EssentialsBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
+        ) {
+            Text(
+                text = "Enable unsupported features?",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = "These features may not work on every device and could require extra permissions or root access. Proceed with caution!",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            RoundedCardContainer(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    items(featureTitleResIds) { titleRes ->
+                        Text(
+                            text = stringResource(titleRes),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Enable anyway")
+            }
+            OutlinedButton(
+                onClick = onDismissRequest,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Cancel")
+            }
+        }
+    }
+}
+
+

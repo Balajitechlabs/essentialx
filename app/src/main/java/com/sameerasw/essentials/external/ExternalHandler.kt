@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: External
+ * File: ExternalHandler.kt
+ * Description: Component file for ExternalHandler.kt.
+ */
+
 package com.sameerasw.essentials.external
 
 import android.content.Context

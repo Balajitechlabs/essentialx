@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: CaffeinateTileService.kt
+ * Description: Background service component for CaffeinateTileService.kt.
+ */
+
 package com.sameerasw.essentials.services.tiles
 
 import android.app.ActivityManager

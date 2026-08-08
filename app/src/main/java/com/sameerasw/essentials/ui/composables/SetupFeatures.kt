@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: SetupFeatures.kt
+ * Description: UI layout element for SetupFeatures.kt.
+ */
+
 package com.sameerasw.essentials.ui.composables
 
 import android.app.Activity
@@ -82,11 +91,10 @@ import com.sameerasw.essentials.domain.registry.PermissionRegistry
 import com.sameerasw.essentials.ui.activities.YourAndroidActivity
 import com.sameerasw.essentials.ui.components.FavoriteCarousel
 import com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton
-import com.sameerasw.essentials.ui.components.cards.FeatureCard
-import com.sameerasw.essentials.ui.components.cards.IconToggleItem
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.components.sheets.PermissionItem
-import com.sameerasw.essentials.ui.components.sheets.PermissionsBottomSheet
+import com.sameerasw.essentials.ui.core.cards.FeatureCard
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.sheets.PermissionItem
+import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.utils.BiometricSecurityHelper
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.HapticUtil
@@ -849,13 +857,13 @@ fun SetupFeatures(
     var showInstructionsSheet by rememberSaveable { mutableStateOf(false) }
 
     if (showInstructionsSheet) {
-        com.sameerasw.essentials.ui.components.sheets.InstructionsBottomSheet(
+        com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet(
             onDismissRequest = { showInstructionsSheet = false }
         )
     }
 
     if (showHelpSheet && selectedHelpFeature != null) {
-        com.sameerasw.essentials.ui.components.sheets.FeatureHelpBottomSheet(
+        com.sameerasw.essentials.ui.core.sheets.FeatureHelpBottomSheet(
             onDismissRequest = {
                 showHelpSheet = false
                 selectedHelpFeature = null
@@ -1282,7 +1290,9 @@ fun SetupFeatures(
 
                 val sections = sectionFeatureIdsList.map { ids ->
                     ids.mapNotNull { featureMap[it] }
-                }.filter { it.isNotEmpty() } + if (unassignedFeatures.isNotEmpty()) listOf(unassignedFeatures) else emptyList()
+                }.filter { it.isNotEmpty() } + if (unassignedFeatures.isNotEmpty()) listOf(
+                    unassignedFeatures
+                ) else emptyList()
 
                 sections.forEachIndexed { sectionIndex, sectionFeatures ->
                     item {

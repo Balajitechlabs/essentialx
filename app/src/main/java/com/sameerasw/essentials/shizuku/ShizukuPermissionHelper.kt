@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Shizuku
+ * File: ShizukuPermissionHelper.kt
+ * Description: Component file for ShizukuPermissionHelper.kt.
+ */
+
 package com.sameerasw.essentials.shizuku
 
 import android.content.Context

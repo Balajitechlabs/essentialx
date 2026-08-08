@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: ScreenOffWidgetConfigureActivity.kt
+ * Description: Activity component for ScreenOffWidgetConfigureActivity.kt.
+ */
+
 package com.sameerasw.essentials.ui.activities
 
 import android.appwidget.AppWidgetManager
@@ -40,8 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.services.ScreenOffWidgetProvider
-import com.sameerasw.essentials.ui.components.cards.IconToggleItem
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.cards.IconToggleItem
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.HapticUtil
 

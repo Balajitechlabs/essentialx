@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Input
+ * File: InputEventModels.kt
+ * Description: Component file for InputEventModels.kt.
+ */
+
 package com.sameerasw.essentials.input
 
 

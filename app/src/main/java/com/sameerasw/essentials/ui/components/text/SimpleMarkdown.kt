@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: SimpleMarkdown.kt
+ * Description: UI layout element for SimpleMarkdown.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.text
 
 import androidx.compose.foundation.background

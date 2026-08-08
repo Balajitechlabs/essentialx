@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: YourAndroidActivity.kt
+ * Description: Activity component for YourAndroidActivity.kt.
+ */
+
 package com.sameerasw.essentials.ui.activities
 
 import android.os.Bundle
@@ -64,13 +73,13 @@ import com.sameerasw.essentials.ui.components.AppsActionButtons
 import com.sameerasw.essentials.ui.components.DeviceHeroCard
 import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.ImportExportButtons
-import com.sameerasw.essentials.ui.components.cards.TrackedRepoCard
-import com.sameerasw.essentials.ui.components.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
-import com.sameerasw.essentials.ui.components.sheets.AddRepoBottomSheet
-import com.sameerasw.essentials.ui.components.sheets.GitHubAuthSheet
-import com.sameerasw.essentials.ui.components.sheets.UpdateBottomSheet
+import com.sameerasw.essentials.ui.core.cards.TrackedRepoCard
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.sheets.AddRepoBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.GitHubAuthSheet
+import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.ui.theme.EssentialsTheme

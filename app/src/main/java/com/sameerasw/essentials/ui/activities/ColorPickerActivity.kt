@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Application Activities
+ * File: ColorPickerActivity.kt
+ * Description: Activity component for ColorPickerActivity.kt.
+ */
+
 package com.sameerasw.essentials.ui.activities
 
 import android.content.Intent
@@ -12,7 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.sheets.ColorPickerBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.ColorPickerBottomSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.HapticUtil
 

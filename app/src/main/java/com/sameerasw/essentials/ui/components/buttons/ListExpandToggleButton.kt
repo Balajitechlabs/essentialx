@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: UI Module
+ * File: ListExpandToggleButton.kt
+ * Description: UI layout element for ListExpandToggleButton.kt.
+ */
+
 package com.sameerasw.essentials.ui.components.buttons
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -96,7 +105,9 @@ fun ListExpandToggleButton(
             contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp)
         ) {
             Icon(
-                painter = painterResource(id = iconRes ?: R.drawable.rounded_keyboard_arrow_down_24),
+                painter = painterResource(
+                    id = iconRes ?: R.drawable.rounded_keyboard_arrow_down_24
+                ),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier

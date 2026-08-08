@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Utilities - General
+ * File: LanguageUtils.kt
+ * Description: Utility helper for LanguageUtils.kt.
+ */
+
 package com.sameerasw.essentials.utils
 
 import java.util.Locale

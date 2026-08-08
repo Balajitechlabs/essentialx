@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Domain Layer Models & Registries
+ * File: GenAIAutomationService.kt
+ * Description: Domain model and business logic entry for GenAIAutomationService.kt.
+ */
+
 package com.sameerasw.essentials.domain.genai
 
 import android.content.Context
@@ -36,6 +45,7 @@ object GenAIAutomationService {
                 FeatureStatus.UNAVAILABLE -> {
                     return@withContext Result.failure(IllegalStateException("GenAI feature is UNAVAILABLE on this device"))
                 }
+
                 FeatureStatus.DOWNLOADABLE -> {
                     Log.d(TAG, "Gemini Nano model is downloadable. Triggering download...")
                     var downloadFailedReason: String? = null
@@ -44,6 +54,7 @@ object GenAIAutomationService {
                             is com.google.mlkit.genai.common.DownloadStatus.DownloadFailed -> {
                                 downloadFailedReason = downloadStatus.e.message
                             }
+
                             else -> {}
                         }
                     }
@@ -51,10 +62,12 @@ object GenAIAutomationService {
                         return@withContext Result.failure(IllegalStateException("Gemini Nano download failed: $downloadFailedReason"))
                     }
                 }
+
                 FeatureStatus.DOWNLOADING -> {
                     Log.d(TAG, "Gemini Nano model is currently downloading...")
                     generativeModel.download().collect {}
                 }
+
                 FeatureStatus.AVAILABLE -> {
                     // Ready to proceed
                 }

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: RefreshRateTileService.kt
+ * Description: Background service component for RefreshRateTileService.kt.
+ */
+
 package com.sameerasw.essentials.services.tiles
 
 import android.content.Intent

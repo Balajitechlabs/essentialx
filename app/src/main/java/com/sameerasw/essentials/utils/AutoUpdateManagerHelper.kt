@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Utilities - General
+ * File: AutoUpdateManagerHelper.kt
+ * Description: Utility helper for AutoUpdateManagerHelper.kt.
+ */
+
 package com.sameerasw.essentials.utils
 
 import AutoUpdaterManager

@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: NotificationLightingService.kt
+ * Description: Background service component for NotificationLightingService.kt.
+ */
+
 package com.sameerasw.essentials.services
 
 import android.app.Notification

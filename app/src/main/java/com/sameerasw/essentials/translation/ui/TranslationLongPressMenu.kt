@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Translation
+ * File: TranslationLongPressMenu.kt
+ * Description: Component file for TranslationLongPressMenu.kt.
+ */
+
 package com.sameerasw.essentials.translation.ui
 
 import androidx.compose.foundation.layout.Column
@@ -38,9 +47,11 @@ fun TranslationLongPressMenu(
         // Info Header Entry with background matching SegmentedDropdownMenuItem
         SegmentedDropdownMenuItem(
             text = {
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 2.dp)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp)
+                ) {
                     Text(
                         text = fullText,
                         style = MaterialTheme.typography.bodySmall,

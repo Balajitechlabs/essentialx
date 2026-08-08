@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Background Services & Receivers
+ * File: CalendarSyncManager.kt
+ * Description: Background service component for CalendarSyncManager.kt.
+ */
+
 package com.sameerasw.essentials.services
 
 import android.content.Context

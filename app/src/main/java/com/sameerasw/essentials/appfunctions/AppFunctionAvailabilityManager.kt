@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2026 sameerasw.com
+ * License: MIT License
+ *
+ * Feature Module: Appfunctions
+ * File: AppFunctionAvailabilityManager.kt
+ * Description: Component file for AppFunctionAvailabilityManager.kt.
+ */
+
 package com.sameerasw.essentials.appfunctions
 
 import android.content.Context
