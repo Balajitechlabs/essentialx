@@ -37,6 +37,21 @@ Essential tools, mods and workarounds for Pixels and other Androids
   <a href="https://sameerasw.com/essentials"><img src="https://img.shields.io/badge/Website-orange?style=for-the-badge&logo=googlechrome&logoColor=%23000&labelColor=%233AFFB8&color=%233AFFB8" alt="Website" /></a>
 </p>
 
+---
+
+<h3 align="center">
+<a href="https://github.com/sameerasw/essentials-wear">
+<strong>Essentials WearOS</strong>
+</a>
+</h3>
+
+<p align="center">
+  <img width="24%" alt="watch_media_2026-07-26_00_09_24" src="https://github.com/user-attachments/assets/ccc55e85-daad-4017-941e-c74da7a5d7fe" />
+  <img width="24%" alt="watch_media_2026-07-26_00_08_58" src="https://github.com/user-attachments/assets/73383d7c-8b68-46e8-99a4-6c8d0b1fc452" />
+  <img width="24%" alt="watch_media_2026-07-26_00_09_43" src="https://github.com/user-attachments/assets/88b13df7-fd0e-4c18-b965-a73637b35aaa" />
+  <img width="24%" alt="watch_media_2026-07-26_00_08_40" src="https://github.com/user-attachments/assets/1ee13d5a-7cdc-4e56-a3c3-3b2b1d155912" />
+</p>
+
 ## Navigation
 
 - [Features](#features)
@@ -47,10 +62,6 @@ Essential tools, mods and workarounds for Pixels and other Androids
 - [Accessibility Permissions](#how-to-grant-accessibility-permissions)
 - [Localization](#localization)
 - [Contributing](#contributing)
-
-## Extension
-
-- [WearOS Companion app](https://github.com/sameerasw/essentials-wear)
 
 # Features
 
@@ -145,8 +156,8 @@ Essential tools, mods and workarounds for Pixels and other Androids
 - Android 8.0 or higher (Feature support may vary)
 - App permissions are optional, grant necessary permissions for each feature
 - Targetted for Google Pixel devices extending to other Androids
-- Tested on Google Pixel 7 (Android 17 beta program).
-- > Some features and functionalities might not work as expected on other OEMs. (Especially NothingOS and OneUI)
+- Tested on Google Pixel 6A, 7, 9 Pro (Android 17 beta program).
+- > Some features and functionalities might not work as expected on other OEMs.
 
 # Screenshots
 
