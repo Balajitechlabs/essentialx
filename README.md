@@ -227,6 +227,7 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 - [xav-ie/generate-kaomoji](https://github.com/xav-ie/generate-kaomoji) - Keyboard kaomojis
 - [TebbeUbben/ChargeQuickTile](https://github.com/TebbeUbben/ChargeQuickTile) - Pixel charging QS
 
+<!-- 
 # Stars <3
 
 <a href="https://star-history.com/#sameerasw/essentials&Date">
@@ -237,8 +238,10 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
  </picture>
 </a>
 
+-->
+
 ---
 
 <p align="center">
-  Last updated: 2026-07-25
+  Last updated: 2026-08-08
 </p>
