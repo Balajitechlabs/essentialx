@@ -1492,4 +1492,11 @@ Jeśli Twoje urządzenie nie obsługuje nakładek w trybie AOD, możesz wybrać 
     <string name="feat_power_battery_title">Moc i bateria </string>
     <string name="feat_power_battery_desc">Optymalizuj pobór energii </string>
     <string name="feat_power_saving_title">Oszczędzanie energii </string>
+    <string name="feat_pixel_searchbar_title">Zastąp pasek wyszukiwania </string>
+    <string name="feat_pixel_searchbar_desc">Zastąp domyślny pasem wyszukiwania w Pixel Launcher</string>
+    <string name="about_desc_pixel_searchbar">Zastąp domyślny pasek wyszukiwania Pixel Launcher na ekranie głównym. Możesz dostosować zawartość, aby nic nie wyświetlać (pusty) lub bieżącą datę.
+
+Pamiętaj, że włączenie tej opcji może spowodować awarię widżetów Pixel Launchera \"W Skrócie\" (takich jak widżety sportowe i finansowe).
+
+Aby ustawienie zadziałało, może być konieczne wielokrotne zastosowanie.</string>
 </resources>
