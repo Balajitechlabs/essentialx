@@ -217,6 +217,12 @@ class EssentialsWearableListenerService : WearableListenerService() {
                     }
                 }
             }
+            "/dismiss_phone_notification" -> {
+                val key = String(messageEvent.data ?: byteArrayOf())
+                if (key.isNotBlank()) {
+                    NotificationListener.instance?.cancelNotification(key)
+                }
+            }
         }
     }
 }

@@ -745,6 +745,7 @@ class NotificationListener : NotificationListenerService() {
             return
         }
         handleRespectNotifications(sbn)
+        WatchNotificationSyncManager.onNotificationPosted(applicationContext, sbn, isSilentNotification(sbn))
 
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         val isReallyLocked =
@@ -1062,6 +1063,7 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         unreadNotifications.remove(sbn.key)
+        WatchNotificationSyncManager.onNotificationRemoved(applicationContext, sbn.key)
 
         // Trigger refresh if something is playing
         try {

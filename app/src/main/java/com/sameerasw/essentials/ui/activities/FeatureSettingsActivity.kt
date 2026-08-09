@@ -98,7 +98,8 @@ import com.sameerasw.essentials.ui.features.system.StandbyAppsSettingsUI
 import com.sameerasw.essentials.ui.features.system.StatusBarIconSettingsUI
 import com.sameerasw.essentials.ui.features.system.TextAnimationsSettingsUI
 import com.sameerasw.essentials.ui.features.system.WatchControlsSettingsUI
-import com.sameerasw.essentials.ui.features.system.WatchSettingsUI
+import com.sameerasw.essentials.ui.features.watch.WatchNotificationSettingsUI
+import com.sameerasw.essentials.ui.features.watch.WatchSettingsUI
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
@@ -599,6 +600,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                         "Watch" -> listOf(
                                             listOf(
+                                                "Notification Sync",
                                                 "Watch Controls",
                                                 "Lock from Watch"
                                             ),
@@ -941,6 +943,12 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightKey = highlightSetting
+                                        )
+                                    }
+
+                                    "Notification Sync" -> {
+                                        WatchNotificationSettingsUI(
+                                            modifier = Modifier.padding(top = 16.dp)
                                         )
                                     }
 
