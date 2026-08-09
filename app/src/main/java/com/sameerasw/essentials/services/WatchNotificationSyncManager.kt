@@ -10,7 +10,9 @@
 package com.sameerasw.essentials.services
 
 import android.app.Notification
+import android.app.RemoteInput
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -22,10 +24,24 @@ object WatchNotificationSyncManager {
     private const val TAG = "WatchNotifSyncManager"
     const val PATH_WATCH_NOTIFICATION = "/watch_notification"
     const val PATH_WATCH_NOTIFICATION_REMOVED = "/watch_notification_removed"
+    const val PATH_WATCH_ACTIVE_NOTIFICATIONS_SYNC = "/watch_active_notifications_sync"
 
     fun isSyncEnabled(context: Context): Boolean {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         return prefs.getBoolean("watch_notif_sync_enabled", false)
+    }
+
+    fun ensureListenerServiceRunning(context: Context) {
+        if (NotificationListener.instance == null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            try {
+                android.service.notification.NotificationListenerService.requestRebind(
+                    android.content.ComponentName(context, NotificationListener::class.java)
+                )
+                Log.d(TAG, "Requested rebind for NotificationListenerService")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error requesting rebind for NotificationListenerService", e)
+            }
+        }
     }
 
     fun isSilentSyncEnabled(context: Context): Boolean {
@@ -55,7 +71,16 @@ object WatchNotificationSyncManager {
         return extras.containsKey(Notification.EXTRA_MEDIA_SESSION)
     }
 
+    private fun canReplyToNotification(sbn: StatusBarNotification): Boolean {
+        val actions = sbn.notification.actions ?: return false
+        for (action in actions) {
+            if (!action.remoteInputs.isNullOrEmpty()) return true
+        }
+        return false
+    }
+
     fun onNotificationPosted(context: Context, sbn: StatusBarNotification, isSilent: Boolean) {
+        ensureListenerServiceRunning(context)
         val enabled = isSyncEnabled(context)
         Log.d(TAG, "onNotificationPosted: pkg=${sbn.packageName}, isSyncEnabled=$enabled, isOngoing=${sbn.isOngoing}, isSilent=$isSilent")
         if (!enabled) return
@@ -114,13 +139,16 @@ object WatchNotificationSyncManager {
             return
         }
 
+        val postTime = if (sbn.postTime > 0) sbn.postTime else System.currentTimeMillis()
         val jsonObj = JSONObject().apply {
             put("key", sbn.key)
             put("packageName", sbn.packageName)
             put("appName", appName)
             put("title", title)
             put("text", text)
-            put("postTime", sbn.postTime)
+            put("postTime", postTime)
+            put("isMedia", isMedia)
+            put("canReply", canReplyToNotification(sbn))
         }
 
         Log.d(TAG, "Sending notification to watch: $jsonObj")
@@ -128,6 +156,102 @@ object WatchNotificationSyncManager {
 
         // Ensure app icon is synced to watch for this package
         syncAppIcons(context, setOf(sbn.packageName))
+    }
+
+    fun syncActiveNotifications(context: Context, activeNotifs: Array<StatusBarNotification>?): Int {
+        if (!isSyncEnabled(context) || activeNotifs == null) return 0
+        val allowedApps = getAllowedApps(context)
+        val jsonArray = org.json.JSONArray()
+        val pkgsToSync = mutableSetOf<String>()
+
+        for (sbn in activeNotifs) {
+            if (sbn.packageName == context.packageName) continue
+            if (allowedApps.isNotEmpty() && !allowedApps.contains(sbn.packageName)) continue
+
+            val extras = sbn.notification.extras ?: continue
+            var title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
+                ?: extras.getCharSequence("android.media.title")?.toString()
+                ?: ""
+            var text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+                ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
+                ?: extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
+                ?: extras.getCharSequence("android.artist")?.toString()
+                ?: extras.getCharSequence("android.album")?.toString()
+                ?: sbn.notification.tickerText?.toString()
+                ?: ""
+
+            if (title.isBlank() && text.isBlank()) {
+                val lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
+                if (!lines.isNullOrEmpty()) {
+                    text = lines.joinToString("\n")
+                }
+            }
+
+            val appName = try {
+                val pm = context.packageManager
+                val appInfo = pm.getApplicationInfo(sbn.packageName, 0)
+                pm.getApplicationLabel(appInfo).toString()
+            } catch (e: Exception) {
+                sbn.packageName
+            }
+
+            if (title.isBlank() && text.isNotBlank()) title = appName
+            else if (title.isNotBlank() && text.isBlank()) text = appName
+
+            if (title.isBlank() && text.isBlank()) continue
+
+            val isMedia = isMediaNotification(sbn)
+            val postTime = if (sbn.postTime > 0) sbn.postTime else System.currentTimeMillis()
+            val jsonObj = JSONObject().apply {
+                put("key", sbn.key)
+                put("packageName", sbn.packageName)
+                put("appName", appName)
+                put("title", title)
+                put("text", text)
+                put("postTime", postTime)
+                put("isMedia", isMedia)
+                put("canReply", canReplyToNotification(sbn))
+            }
+            jsonArray.put(jsonObj)
+            pkgsToSync.add(sbn.packageName)
+        }
+
+        Log.d(TAG, "Syncing ${jsonArray.length()} active notifications to watch")
+        sendMessageToWatch(context, PATH_WATCH_ACTIVE_NOTIFICATIONS_SYNC, jsonArray.toString().toByteArray())
+        if (pkgsToSync.isNotEmpty()) {
+            syncAppIcons(context, pkgsToSync)
+        }
+        return jsonArray.length()
+    }
+
+    fun handleReplyFromWatch(context: Context, jsonStr: String) {
+        try {
+            val jsonObj = JSONObject(jsonStr)
+            val key = jsonObj.optString("key")
+            val replyText = jsonObj.optString("replyText")
+            if (key.isBlank() || replyText.isBlank()) return
+
+            val listener = NotificationListener.instance ?: return
+            val sbn = listener.activeNotifications?.find { it.key == key } ?: return
+            val actions = sbn.notification.actions ?: return
+
+            for (action in actions) {
+                val remoteInputs = action.remoteInputs ?: continue
+                if (remoteInputs.isNotEmpty()) {
+                    val intent = Intent()
+                    val bundle = android.os.Bundle()
+                    for (remoteInput in remoteInputs) {
+                        bundle.putCharSequence(remoteInput.resultKey, replyText)
+                    }
+                    RemoteInput.addResultsToIntent(remoteInputs, intent, bundle)
+                    action.actionIntent.send(context, 0, intent)
+                    Log.d(TAG, "Successfully replied to notification $key: $replyText")
+                    break
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error handling notification reply from watch", e)
+        }
     }
 
     fun onNotificationRemoved(context: Context, key: String) {

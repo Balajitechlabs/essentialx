@@ -220,7 +220,24 @@ class EssentialsWearableListenerService : WearableListenerService() {
             "/dismiss_phone_notification" -> {
                 val key = String(messageEvent.data ?: byteArrayOf())
                 if (key.isNotBlank()) {
-                    NotificationListener.instance?.cancelNotification(key)
+                    try {
+                        val instance = NotificationListener.instance
+                        if (instance != null) {
+                            instance.cancelNotification(key)
+                        } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                            android.service.notification.NotificationListenerService.requestRebind(
+                                android.content.ComponentName(this, NotificationListener::class.java)
+                            )
+                        }
+                    } catch (e: Throwable) {
+                        android.util.Log.e("EssentialsWearable", "Error cancelling notification: $key", e)
+                    }
+                }
+            }
+            "/reply_phone_notification" -> {
+                val jsonStr = String(messageEvent.data ?: byteArrayOf())
+                if (jsonStr.isNotBlank()) {
+                    WatchNotificationSyncManager.handleReplyFromWatch(this, jsonStr)
                 }
             }
         }

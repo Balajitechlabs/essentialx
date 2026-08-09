@@ -106,10 +106,8 @@ fun WatchNotificationSettingsUI(
                         val listener = NotificationListener.instance
                         if (listener != null) {
                             val activeNotifs = listener.activeNotifications
-                            activeNotifs?.forEach { sbn ->
-                                WatchNotificationSyncManager.onNotificationPosted(context, sbn, isSilent = false)
-                            }
-                            android.widget.Toast.makeText(context, "Synced ${activeNotifs?.size ?: 0} notifications to watch", android.widget.Toast.LENGTH_SHORT).show()
+                            val count = WatchNotificationSyncManager.syncActiveNotifications(context, activeNotifs)
+                            android.widget.Toast.makeText(context, "Synced $count active notifications to watch", android.widget.Toast.LENGTH_SHORT).show()
                         } else {
                             android.widget.Toast.makeText(context, "Notification Listener Service not running", android.widget.Toast.LENGTH_SHORT).show()
                         }
