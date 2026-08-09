@@ -2063,6 +2063,8 @@
     <string name="watch_notif_app_picker_select_all">Select All</string>
     <string name="watch_notif_sync_now">Sync Active Notifications Now</string>
     <string name="watch_notif_sync_now_desc">Force sync all active phone notifications to watch launcher</string>
+    <string name="watch_notif_sync_icons">Sync App Icons</string>
+    <string name="watch_notif_sync_icons_desc">Sync app icons to watch launcher for notification display</string>
 </resources>
 
 

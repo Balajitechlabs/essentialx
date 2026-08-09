@@ -90,6 +90,7 @@ fun WatchNotificationSettingsUI(
                             prefs.edit().putBoolean("watch_notif_silent_enabled", checked).apply()
                         }
                     )
+
                 FeatureCard(
                     title = stringResource(R.string.watch_notif_sync_now),
                     description = stringResource(R.string.watch_notif_sync_now_desc),
@@ -112,7 +113,29 @@ fun WatchNotificationSettingsUI(
                         }
                     }
                 )
-            }
+
+                FeatureCard(
+                    title = stringResource(R.string.watch_notif_sync_icons),
+                    description = stringResource(R.string.watch_notif_sync_icons_desc),
+                    iconRes = R.drawable.rounded_apps_24,
+                    isEnabled = isSyncEnabled,
+                    showToggle = false,
+                    hasMoreSettings = false,
+                    onToggle = {},
+                    onClick = {
+                        HapticUtil.performUIHaptic(view)
+                        val allowedApps = com.sameerasw.essentials.services.WatchNotificationSyncManager.getAllowedApps(context)
+                        val pkgsToSync = if (allowedApps.isNotEmpty()) {
+                            allowedApps
+                        } else {
+                            val listener = com.sameerasw.essentials.services.NotificationListener.instance
+                            listener?.activeNotifications?.map { it.packageName }?.toSet() ?: emptySet()
+                        }
+                        val count = com.sameerasw.essentials.services.WatchNotificationSyncManager.syncAppIcons(context, pkgsToSync)
+                        android.widget.Toast.makeText(context, "Synced $count app icons to watch", android.widget.Toast.LENGTH_SHORT).show()
+                    }
+                )
+                }
             }
         }
     }

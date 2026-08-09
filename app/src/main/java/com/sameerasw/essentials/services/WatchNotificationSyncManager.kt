@@ -112,6 +112,49 @@ object WatchNotificationSyncManager {
         sendMessageToWatch(context, PATH_WATCH_NOTIFICATION_REMOVED, key.toByteArray())
     }
 
+    const val PATH_WATCH_APP_ICONS = "/watch_app_icons"
+
+    fun syncAppIcons(context: Context, packageNames: Set<String>): Int {
+        if (!isSyncEnabled(context)) return 0
+        val pm = context.packageManager
+        val iconsObj = JSONObject()
+        var count = 0
+
+        for (pkg in packageNames) {
+            try {
+                val appInfo = pm.getApplicationInfo(pkg, 0)
+                val drawable = pm.getApplicationIcon(appInfo)
+                val bitmap = if (drawable is android.graphics.drawable.BitmapDrawable) {
+                    drawable.bitmap
+                } else {
+                    val bmp = android.graphics.Bitmap.createBitmap(
+                        drawable.intrinsicWidth.coerceAtLeast(1),
+                        drawable.intrinsicHeight.coerceAtLeast(1),
+                        android.graphics.Bitmap.Config.ARGB_8888
+                    )
+                    val canvas = android.graphics.Canvas(bmp)
+                    drawable.setBounds(0, 0, canvas.width, canvas.height)
+                    drawable.draw(canvas)
+                    bmp
+                }
+                val stream = java.io.ByteArrayOutputStream()
+                val scaledBmp = android.graphics.Bitmap.createScaledBitmap(bitmap, 48, 48, true)
+                scaledBmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream)
+                val iconBase64 = android.util.Base64.encodeToString(stream.toByteArray(), android.util.Base64.NO_WRAP)
+                iconsObj.put(pkg, iconBase64)
+                count++
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to extract icon for $pkg", e)
+            }
+        }
+
+        if (count > 0) {
+            Log.d(TAG, "Syncing $count app icons to watch")
+            sendMessageToWatch(context, PATH_WATCH_APP_ICONS, iconsObj.toString().toByteArray())
+        }
+        return count
+    }
+
     private fun sendMessageToWatch(context: Context, path: String, data: ByteArray) {
         val nodeClient = Wearable.getNodeClient(context)
         nodeClient.connectedNodes.addOnSuccessListener { nodes ->
