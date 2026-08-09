@@ -54,8 +54,8 @@ Essential tools, mods and workarounds for Pixels and other Androids
 
 ## Navigation
 
-- [Features](#features)
-- [Requirements](#requirements)
+- [Features](https://github.com/sameerasw/essentials/wiki)
+- [Requirements](https://github.com/sameerasw/essentials/wiki/Installation#system-requirements)
 - [Screenshots](#screenshots)
 - [Installation](#installation)
 - [Shell Providers (Shizuku & Root)](#shell-providers-shizuku--root)
@@ -63,114 +63,17 @@ Essential tools, mods and workarounds for Pixels and other Androids
 - [Localization](#localization)
 - [Contributing](#contributing)
 
-# Features
-
-#### Sound and Haptics
-
-- Sound mode switcher
-- Ambient music glance - Media playback on AOD and screensaver
-- Call vibrations - For call accept, decline and ending
-
-#### Security and Privacy
-
-- Screen locked security - Disable QS tiles while locked
-- App lock
-
-#### Notifications and Alerts
-
-- Notification lighting - Edge lighting and more alerts for notifications
-- Flashlight pulse - Pulse flashlight for notifications
-- Snooze system notifications
-- Battery notification for all your connected devices
-
-#### Input and Actions
-
-- Link actions - Intercept and share links from default apps
-- Button remap
-- Keyboard
-- Circle to search automations
-
-#### Widgets
-
-- Screen off empty widget
-- Batteries
-
-#### Display
-
-- Customize statusbar icons and modules
-- Dynamic Always on Display
-- Caffeinate to keep screen awake
-- Dynamic night light - App based night light
-- Scale and animation adjustments
-- Glove mode
-- Hide gesture bar
-
-#### Watch
-
-- Sync all calendars to your WearOS watch periodically
-
-#### Other
-
-- Maps power saving mode - For not just Pixel 10, Any Android device
-- Are we there yet? - Get reminded when your stop is closeby
-- Watermark - Add EXIF data and logos to captured photos
-- Flashlight enhancements - With brightness controls and global fade-in-out effect
-- Private DNS - Pick your custom DNS or cycle through them easily
-- Your Android - Everything about your device in one place
-- Eye dropper - Android 17 color picker
-
-#### DIY
-
-- Automate things yourself and make custom triggers
-
-#### App Freezing
-
-- Save power and less distractions by freezing away rarely used apps
-
-#### App Updater
-
-- Check for sideloaded app updates directly from GitHub
-
-#### Quick Settings Tiles
-
-- Toggle UI blur
-- Toggle chat bubbles
-- Toggle sensitive content on lock screen
-- Toggle tap to wake
-- Toggle AOD
-- Caffeinate controls
-- Charging optimization (Pixel)
-- Sound mode switcher
-- Mono audio toggle
-- Flashlight controls and brightness adjustment
-- Stay awake
-- NFC toggle
-- Adaptive brightness toggle
-- Private DNS toggle
-- USB debugging toggle
-- Developer options toggle
-- Toggle other in-app features
-
-# Requirements
-
-- Android 8.0 or higher (Feature support may vary)
-- App permissions are optional, grant necessary permissions for each feature
-- Targetted for Google Pixel devices extending to other Androids
-- Tested on Google Pixel 6A, 7, 9 Pro (Android 17 beta program).
-- > Some features and functionalities might not work as expected on other OEMs.
 
 # Screenshots
 
 <p align="center">
-<img width="45%" alt="1" src="https://github.com/user-attachments/assets/d57ae349-b2f1-45a6-bd37-df17c7fbcbeb" />
+<img width="33%" alt="1" src="https://github.com/user-attachments/assets/d57ae349-b2f1-45a6-bd37-df17c7fbcbeb" />
+<img width="33%" alt="2" src="https://github.com/user-attachments/assets/3352826c-6bac-4f7a-b521-8d93e7f69da3" />
+<img width="33%" alt="3" src="https://github.com/user-attachments/assets/34b9d52b-4c7f-4dc8-9a71-4f167fdf88d2" />
 </p>
 <p align="center">
-<img width="45%" alt="2" src="https://github.com/user-attachments/assets/3352826c-6bac-4f7a-b521-8d93e7f69da3" />
-<img width="45%" alt="3" src="https://github.com/user-attachments/assets/34b9d52b-4c7f-4dc8-9a71-4f167fdf88d2" />
-</p>
-<p align="center">
-<img width="45%" alt="4" src="https://github.com/user-attachments/assets/81895104-0096-4294-b747-0421ca42b8d8" />
-<img width="45%" alt="5" src="https://github.com/user-attachments/assets/f8bbf05a-ff5c-4157-adb3-3990875f9500" />
+<img width="49%" alt="4" src="https://github.com/user-attachments/assets/81895104-0096-4294-b747-0421ca42b8d8" />
+<img width="49%" alt="5" src="https://github.com/user-attachments/assets/f8bbf05a-ff5c-4157-adb3-3990875f9500" />
 </p>
 
 # Installation
