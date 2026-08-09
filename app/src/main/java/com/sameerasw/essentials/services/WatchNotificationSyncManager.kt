@@ -25,6 +25,7 @@ object WatchNotificationSyncManager {
     const val PATH_WATCH_NOTIFICATION = "/watch_notification"
     const val PATH_WATCH_NOTIFICATION_REMOVED = "/watch_notification_removed"
     const val PATH_WATCH_ACTIVE_NOTIFICATIONS_SYNC = "/watch_active_notifications_sync"
+    const val PATH_WATCH_SET_NOTIFICATION_SOUND = "/set_notification_sound"
 
     fun isSyncEnabled(context: Context): Boolean {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
@@ -311,6 +312,11 @@ object WatchNotificationSyncManager {
             sendMessageToWatch(context, PATH_WATCH_APP_ICONS, iconsObj.toString().toByteArray())
         }
         return count
+    }
+
+    fun setWatchNotificationSound(context: Context, soundName: String) {
+        Log.d(TAG, "setWatchNotificationSound: $soundName")
+        sendMessageToWatch(context, PATH_WATCH_SET_NOTIFICATION_SOUND, soundName.toByteArray())
     }
 
     private fun sendMessageToWatch(context: Context, path: String, data: ByteArray) {

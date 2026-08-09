@@ -2065,6 +2065,12 @@
     <string name="watch_notif_sync_now_desc">Force sync all active phone notifications to watch launcher</string>
     <string name="watch_notif_sync_icons">Sync App Icons</string>
     <string name="watch_notif_sync_icons_desc">Sync app icons to watch launcher for notification display</string>
+    <string name="watch_notif_sound_title">Notification Sound</string>
+    <string name="watch_notif_sound_desc">Change the sound played on the watch</string>
+    <string name="watch_notif_sound_carmen_nexus">Nexus</string>
+    <string name="watch_notif_sound_google">Google</string>
+    <string name="watch_notif_sound_notification">Default</string>
+    <string name="watch_notif_sound_dock">Dock</string>
 </resources>
 
 
