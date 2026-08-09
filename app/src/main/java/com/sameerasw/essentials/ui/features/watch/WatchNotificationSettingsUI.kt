@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.AppSelection
+import com.sameerasw.essentials.services.NotificationListener
+import com.sameerasw.essentials.services.WatchNotificationSyncManager
 import com.sameerasw.essentials.ui.core.cards.FeatureCard
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
@@ -101,11 +103,11 @@ fun WatchNotificationSettingsUI(
                     onToggle = {},
                     onClick = {
                         HapticUtil.performUIHaptic(view)
-                        val listener = com.sameerasw.essentials.services.NotificationListener.instance
+                        val listener = NotificationListener.instance
                         if (listener != null) {
                             val activeNotifs = listener.activeNotifications
                             activeNotifs?.forEach { sbn ->
-                                com.sameerasw.essentials.services.WatchNotificationSyncManager.onNotificationPosted(context, sbn, isSilent = false)
+                                WatchNotificationSyncManager.onNotificationPosted(context, sbn, isSilent = false)
                             }
                             android.widget.Toast.makeText(context, "Synced ${activeNotifs?.size ?: 0} notifications to watch", android.widget.Toast.LENGTH_SHORT).show()
                         } else {
@@ -124,14 +126,14 @@ fun WatchNotificationSettingsUI(
                     onToggle = {},
                     onClick = {
                         HapticUtil.performUIHaptic(view)
-                        val allowedApps = com.sameerasw.essentials.services.WatchNotificationSyncManager.getAllowedApps(context)
+                        val allowedApps = WatchNotificationSyncManager.getAllowedApps(context)
                         val pkgsToSync = if (allowedApps.isNotEmpty()) {
                             allowedApps
                         } else {
-                            val listener = com.sameerasw.essentials.services.NotificationListener.instance
+                            val listener = NotificationListener.instance
                             listener?.activeNotifications?.map { it.packageName }?.toSet() ?: emptySet()
                         }
-                        val count = com.sameerasw.essentials.services.WatchNotificationSyncManager.syncAppIcons(context, pkgsToSync)
+                        val count = WatchNotificationSyncManager.syncAppIcons(context, pkgsToSync)
                         android.widget.Toast.makeText(context, "Synced $count app icons to watch", android.widget.Toast.LENGTH_SHORT).show()
                     }
                 )
@@ -164,6 +166,9 @@ fun WatchNotificationSettingsUI(
                     .edit()
                     .putString("watch_notif_allowed_apps", json)
                     .apply()
+                if (enabledPkgs.isNotEmpty()) {
+                    WatchNotificationSyncManager.syncAppIcons(ctx, enabledPkgs.toSet())
+                }
             }
         )
     }

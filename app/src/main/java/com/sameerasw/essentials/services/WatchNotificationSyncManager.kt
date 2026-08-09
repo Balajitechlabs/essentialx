@@ -9,6 +9,7 @@
 
 package com.sameerasw.essentials.services
 
+import android.app.Notification
 import android.content.Context
 import android.content.pm.PackageManager
 import android.service.notification.StatusBarNotification
@@ -42,19 +43,27 @@ object WatchNotificationSyncManager {
         }
     }
 
+    private fun isMediaNotification(sbn: StatusBarNotification): Boolean {
+        val category = sbn.notification.category
+        if (category == Notification.CATEGORY_TRANSPORT) return true
+
+        val extras = sbn.notification.extras ?: return false
+        val template = extras.getString(Notification.EXTRA_TEMPLATE)
+        if (template != null && (template.contains("MediaStyle") || template.contains("DecoratedMediaCustomViewStyle"))) {
+            return true
+        }
+        return extras.containsKey(Notification.EXTRA_MEDIA_SESSION)
+    }
+
     fun onNotificationPosted(context: Context, sbn: StatusBarNotification, isSilent: Boolean) {
         val enabled = isSyncEnabled(context)
         Log.d(TAG, "onNotificationPosted: pkg=${sbn.packageName}, isSyncEnabled=$enabled, isOngoing=${sbn.isOngoing}, isSilent=$isSilent")
         if (!enabled) return
 
-        // Skip ongoing notifications (e.g. active downloads, media players, ongoing calls)
-        if (sbn.isOngoing) {
-            Log.d(TAG, "Skipping ongoing notification from ${sbn.packageName}")
-            return
-        }
+        val isMedia = isMediaNotification(sbn)
 
-        // Skip silent notifications if not enabled
-        if (isSilent && !isSilentSyncEnabled(context)) {
+        // Skip silent notifications if not enabled, unless it's a media playback notification
+        if (isSilent && !isMedia && !isSilentSyncEnabled(context)) {
             Log.d(TAG, "Skipping silent notification from ${sbn.packageName}")
             return
         }
@@ -67,22 +76,23 @@ object WatchNotificationSyncManager {
         }
 
         val extras = sbn.notification.extras ?: return
-        var title = extras.getCharSequence("android.title")?.toString() ?: ""
-        var text = extras.getCharSequence("android.text")?.toString()
-            ?: extras.getCharSequence("android.bigText")?.toString()
+        var title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
+            ?: extras.getCharSequence("android.media.title")?.toString()
+            ?: ""
+
+        var text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+            ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
+            ?: extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
+            ?: extras.getCharSequence("android.artist")?.toString()
+            ?: extras.getCharSequence("android.album")?.toString()
             ?: sbn.notification.tickerText?.toString()
             ?: ""
 
         if (title.isBlank() && text.isBlank()) {
-            val lines = extras.getCharSequenceArray("android.textLines")
+            val lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
             if (!lines.isNullOrEmpty()) {
                 text = lines.joinToString("\n")
             }
-        }
-
-        if (title.isBlank() && text.isBlank()) {
-            Log.d(TAG, "Skipping notification from ${sbn.packageName} - title and text are blank")
-            return
         }
 
         val appName = try {
@@ -91,6 +101,17 @@ object WatchNotificationSyncManager {
             pm.getApplicationLabel(appInfo).toString()
         } catch (e: Exception) {
             sbn.packageName
+        }
+
+        if (title.isBlank() && text.isNotBlank()) {
+            title = appName
+        } else if (title.isNotBlank() && text.isBlank()) {
+            text = appName
+        }
+
+        if (title.isBlank() && text.isBlank()) {
+            Log.d(TAG, "Skipping notification from ${sbn.packageName} - title and text are blank")
+            return
         }
 
         val jsonObj = JSONObject().apply {
@@ -104,6 +125,9 @@ object WatchNotificationSyncManager {
 
         Log.d(TAG, "Sending notification to watch: $jsonObj")
         sendMessageToWatch(context, PATH_WATCH_NOTIFICATION, jsonObj.toString().toByteArray())
+
+        // Ensure app icon is synced to watch for this package
+        syncAppIcons(context, setOf(sbn.packageName))
     }
 
     fun onNotificationRemoved(context: Context, key: String) {

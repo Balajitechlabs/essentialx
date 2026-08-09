@@ -721,6 +721,7 @@ class NotificationListener : NotificationListenerService() {
 
                 if (eventType != null) {
                     triggerAmbientGlance(controller, eventType, isLiked, sbn = sbn)
+                    WatchNotificationSyncManager.onNotificationPosted(applicationContext, sbn, isSilent = false)
                 }
             }
         } catch (e: Exception) {
