@@ -64,14 +64,14 @@
     <string name="like_song_settings_desc">Diese Funktion erfordert Zugriff auf Benachrichtigungen, um die aktuell wiedergegebenen Medien zu erkennen und die entsprechende Aktion auszulösen. Bitte aktiviere diese Funktion unten.</string>
     <string name="like_song_toast_enabled">Toast-Nachricht anzeigen</string>
     <string name="like_song_aod_overlay_title">Overlay im AOD anzeigen</string>
-    <string name="feat_essentials_on_display_title">Essenzielle_Funktionen_im_Überblick_Titel</string>
+    <string name="feat_essentials_on_display_title">Essentials-on-Display</string>
     <string name="feat_essentials_on_display_desc">Medien und Informationen im AOD auf einen Blick</string>
     <string name="essentials_on_display_docked_mode_title">Docked mode</string>
     <string name="essentials_on_display_docked_mode_desc">Keep the overlay visible indefinitely while music is playing on AOD</string>
     <string name="essentials_on_display_respect_notifications_title">Respect new notifications</string>
     <string name="essentials_on_display_respect_notifications_desc">Briefly disable for new notifications</string>
-    <string name="essentials_on_display_random_shapes_title">Random shapes</string>
-    <string name="essentials_on_display_random_shapes_desc">Use various Material 3 shapes for the album art</string>
+    <string name="essentials_on_display_random_shapes_title">Zufällige Formen</string>
+    <string name="essentials_on_display_random_shapes_desc">Verwendet verschiedene Material 3 Formen für das Albumcover</string>
     <string name="essentials_on_display_album_art_title">Album art</string>
     <string name="essentials_on_display_clock_title">Clock</string>
     <string name="essentials_on_display_force_fill_while_charging_title">Always use while charging</string>
@@ -361,8 +361,8 @@
     <string name="feat_circle_to_search_gesture_desc">Long-press the bottom area to trigger Circle to Search</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
-    <string name="feat_other_customizations_title">Übersetze Zeichenfolge</string>
-    <string name="feat_other_customizations_desc">Zusätzliche Systemoptimierungen und änderungen</string>
+    <string name="feat_other_customizations_title">Weitere Anpassungen </string>
+    <string name="feat_other_customizations_desc">Zusätzliche Systemoptimierungen und Modifikationen</string>
     <string name="status_bar_icons_disclaimer">Bitte beachte, dass die Implementierung dieser Optionen vom OEM abhängen kann und einige möglicherweise überhaupt nicht funktionsfähig sind.</string>
     <!-- Network Type Picker -->
     <string name="network_type_other">Weitere</string>
@@ -389,9 +389,9 @@
     <!-- Features -->
     <string name="feat_screen_off_widget_title">Display-aus-Widget</string>
     <string name="feat_screen_off_widget_desc">Unsichtbares Widget um das Display auszuschalten</string>
-    <string name="feat_statusbar_icons_title">Funktion: Symbolleisten-Symbole-Titel</string>
+    <string name="feat_statusbar_icons_title">Symbolleisten-Symbole</string>
     <string name="feat_statusbar_icons_desc">Passt die Sichtbarkeit der Icons der Statusleiste an</string>
-    <string name="feat_caffeinate_title">Funktion_Koffein_Titel</string>
+    <string name="feat_caffeinate_title">Koffein</string>
     <string name="feat_caffeinate_desc">Hält das Display wach</string>
     <string name="feat_maps_power_saving_title">Maps-Energiesparmodus</string>
     <string name="feat_maps_power_saving_desc">Für jedes Android-Gerät</string>
@@ -399,7 +399,7 @@
     <string name="feat_notification_lighting_desc">Bei Benachrichtigungen aufleuchten</string>
     <string name="feat_flashlight_pulse_desc">Blitze bei Benachrichtigungen mit der Taschenlampe</string>
     <string name="feat_sound_mode_tile_title">Tonmodus-Kachel</string>
-    <string name="feat_call_vibrations_title">feat anruf vibrationen titel</string>
+    <string name="feat_call_vibrations_title">Anruf-Vibrationen</string>
     <string name="feat_call_vibrations_desc">Vibrieren bei Anrufaktionen</string>
     <string name="show_bluetooth_devices">Bluetooth-Geräte anzeigen</string>
     <string name="show_bluetooth_devices_summary">Zeige den Akkustand von verbundenen Bluetooth-Geräten</string>
@@ -441,8 +441,8 @@
     <string name="feat_watermark_desc">Fotos mit EXIF-Daten und Logos versehen</string>
     <string name="feat_always_on_display_title">Always-on-Display</string>
     <string name="feat_always_on_display_desc">Zeige Uhrzeit und Infos, während der Bildschirm ausgeschaltet ist</string>
-    <string name="feat_calendar_sync_title">Funktion Kalender-Synchronisierung</string>
-    <string name="feat_calendar_sync_desc">Funktion zum Synchronisieren des Kalenders Beschreibung</string>
+    <string name="feat_calendar_sync_title">Kalender-Synchronisierung</string>
+    <string name="feat_calendar_sync_desc">Synchronisiere deinen Handykalender mit deiner Smartwatch</string>
     <string name="feat_lock_from_watch_title">Sperre von der Uhr aus</string>
     <string name="feat_lock_from_watch_desc">Sperre dein Telefon aus der Ferne</string>
     <string name="remote_lock_mode_title">Lock Mode</string>
@@ -707,7 +707,7 @@
     <string name="unit_minute">1 minute</string>
     <string name="unit_minutes">%d Minuten</string>
     <string name="action_restart_systemui">Oberfläche Neustarten</string>
-    <string name="desc_restart_systemui">Kills and restarts SystemUI process to apply some changes immediately</string>
+    <string name="desc_restart_systemui">Beendet und startet den SystemUI-Prozess sofort neu, um einige Änderungen zu übernehmen</string>
     <string name="msg_error_load_release_notes">Die Änderungshinweise konnten nicht geladen werden</string>
     <string name="action_view_on_web">Im Web anzeigen</string>
     <string name="action_done">Fertig</string>
@@ -1267,7 +1267,7 @@ ADB-Debugging-Zugriff direkt über die Schnelleinstellungen aktivieren oder deak
     <string name="cat_interface">Benutzeroberfläche</string>
     <string name="cat_display">Display</string>
     <string name="cat_protection">Schutz</string>
-    <string name="cat_accessibility">Barrierefreiheit</string>
+    <string name="cat_accessibility">Bedienungshilfen</string>
     <string name="cat_connectivity">Verbindungen</string>
     <string name="cat_privacy">Privatsphäre</string>
     <string name="cat_utils">Dienstleistungen</string>
@@ -1322,9 +1322,9 @@ ADB-Debugging-Zugriff direkt über die Schnelleinstellungen aktivieren oder deak
     <string name="msg_import_failed">Import von Repositorys fehlgeschlagen</string>
     <string name="label_apps">Apps</string>
     <string name="feat_text_animations_title">Skalierung und Animationen</string>
-    <string name="feat_text_animations_desc">Funktionstext-Animationsbeschreibung</string>
+    <string name="feat_text_animations_desc">Systemskalierung und Animationen anpassen</string>
     <string name="feat_screen_refresh_rate_title">Bildwiederholrate</string>
-    <string name="feat_screen_refresh_rate_desc">Funktion_Bildschirm_Aktualisierungsrate_Beschreibung</string>
+    <string name="feat_screen_refresh_rate_desc">Lege eine feste oder eine variable Bildschirmaktualisierungsrate fest</string>
     <string name="settings_section_text">Text</string>
     <string name="label_font_scale">Schriftskalierung</string>
     <string name="label_font_weight">Schriftstärke</string>
@@ -1418,7 +1418,7 @@ ADB-Debugging-Zugriff direkt über die Schnelleinstellungen aktivieren oder deak
     <string name="feat_shut_up_desc">Ich weiß, was ich tue</string>
     <string name="shut_up_description">Shut-Up! bypasses app restrictions and checks for developer options, accessibility and debugging by dynamically hiding them when you launch sensitive apps. \n\nUse the custom shortcuts to ensure settings are hidden before the app launches.</string>
     <string name="shut_up_select_apps_title">Apps auswählen </string>
-    <string name="shut_up_select_apps_desc">Choose apps to apply Shut-Up! logic</string>
+    <string name="shut_up_select_apps_desc">Wähle Apps, auf welche die Halt-die-Klappe!-Logik angewendet werden sollen</string>
     <string name="shut_up_settings_title">Shut-Up! Settings</string>
     <string name="shut_up_per_app_settings">Shut-Up! Features</string>
     <string name="shut_up_disable_dev_options">Disable Developer Options</string>
@@ -1435,7 +1435,7 @@ ADB-Debugging-Zugriff direkt über die Schnelleinstellungen aktivieren oder deak
     <string name="shut_up_auto_archive_action_freeze">Freeze now</string>
     <string name="shut_up_auto_archive_action_abort">Abort</string>
     <!-- Lock Screen Clock -->
-    <string name="feat_lock_screen_clock_title">Funktion: Sperrbildschirmuhr-Titel</string>
+    <string name="feat_lock_screen_clock_title">Sperrbildschirmuhr</string>
     <string name="feat_lock_screen_clock_desc">Funktion: Sperrbildschirmuhr-Beschreibung</string>
     <string name="about_desc_lock_screen_clock">Change the lock screen clock style on Pixels. Select from the available clock faces provided by the System UI. Some old styles might not be available.</string>
     <string name="lock_screen_clock_bignum">Big Number</string>
@@ -1504,7 +1504,7 @@ ADB-Debugging-Zugriff direkt über die Schnelleinstellungen aktivieren oder deak
     <string name="setting_enable_unsupported_features_title">Nicht unterstützte Funktionen aktivieren</string>
     <string name="setting_enable_unsupported_features_desc">OEM-spezifische oder redundante Funktionen anzeigen, die standardmäßig ausgeblendet sind.</string>
     <string name="about_desc_safe_volume">Gemäß den europäischen Vorschriften müssen Smartphones eine Warnung ausgeben, sobald bestimmte Lautstärkepegel (85 dB) überschritten werden. Diese Warnung muss einmal nach jedem Neustart oder nach 20 Stunden ununterbrochener Musikwiedergabe angezeigt werden. Verwenden Sie diesen Schalter, um die Warnung dauerhaft zu deaktivieren.</string>
-    <string name="settings_translate_mode">Ünersetzungs Modus</string>
+    <string name="settings_translate_mode">Übersetzungsmodus</string>
     <string name="settings_translate_mode_desc">Halten Sie einen beliebigen Text gedrückt, um ihn zu übersetzen und zur Community beizutragen.</string>
     <string name="about_desc_restart_systemui_tile">Starten Sie SystemUl einfach direkt über Ihr Schnellzugriffsfeld neu. Hilfreich, um Fehler in der Statusleiste schnell zu beheben oder SystemUl-Änderungen sofort anzuwenden. Erfordert Root- oder Shizuku-Shell-Zugriff</string>
     <string name="label_enable_firewall">Firewall aktivieren</string>
@@ -1515,4 +1515,10 @@ ADB-Debugging-Zugriff direkt über die Schnelleinstellungen aktivieren oder deak
     <string name="label_snooze_default">Standard-Schlummerzeit</string>
     <string name="label_enable_brightness_adjustment">Helligkeitsreduzierung aktivieren</string>
     <string name="label_disable_launch_boost">Startboost deaktivieren</string>
+    <string name="shut_up_restore_delay_desc">Wartezeit, bis die Einstellungen nach dem Beenden einer definierten App wiederhergestellt werden</string>
+    <string name="feat_flashlight_title">Taschenlampe</string>
+    <string name="flashlight_pocket_title">Taschenerkennung</string>
+    <string name="flashlight_pocket_desc">Schaltet die Taschenlampe aus, wenn sich das Handy in einer Tasche befindet</string>
+    <string name="flashlight_overheat_title">Überhitzungsschutz</string>
+    <string name="flashlight_overheat_desc">Verringert die Helligkeit bei längerer Nutzung</string>
 </resources>
