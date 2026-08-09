@@ -174,7 +174,7 @@
     <string name="notification_lighting_skip_silent_title">Pomiń ciche powiadomienia</string>
     <string name="notification_lighting_skip_persistent_title">Pomiń ciągłe powiadomienia</string>
     <string name="settings_section_flashlight_pulse">Puls latarki</string>
-    <string name="flashlight_pulse_title">Impuls latarki</string>
+    <string name="flashlight_pulse_title">Pulsująca latarka</string>
     <string name="flashlight_pulse_facedown_title">Tylko twarzą w dół</string>
     <string name="flashlight_pulse_same_as_lighting_title">Te same aplikacje, co oświetlenie powiadomień</string>
     <string name="flashlight_pulse_max_brightness">Max brightness</string>
@@ -276,7 +276,7 @@
     <string name="warning_title">⚠️UWAGA</string>
     <string name="screen_locked_security_auth_enable">Uwierzytelnij, aby włączyć zabezpieczenie z blokadą ekranu</string>
     <string name="screen_locked_security_auth_disable">Uwierzytelnij, aby wyłączyć zabezpieczenie z blokadą ekranu</string>
-    <string name="screen_locked_security_desc">Disable quick setting tiles when the device is locked</string>
+    <string name="screen_locked_security_desc">Zablokuj dostęp do elementów sterowania (Wi-Fi, Bluetooth) na ekranie blokady. </string>
     <string name="search_disable_qs_locked_title">Disable QS Locked</string>
     <string name="search_disable_qs_locked_desc">Prevent expanding Quick Settings when device is locked</string>
     <!-- Sound Mode -->
@@ -353,16 +353,16 @@
     <string name="hide_clock_desc">Completely remove the clock from the status bar</string>
     <string name="hide_notification_icons_title">Hide notifications</string>
     <string name="hide_notification_icons_desc">Hide all incoming notification icons</string>
-    <string name="feat_hide_gesture_bar_title">Hide gesture bar</string>
-    <string name="feat_hide_gesture_bar_desc">In gesture navigation</string>
+    <string name="feat_hide_gesture_bar_title">Ukryj przycisk ekranu głównego</string>
+    <string name="feat_hide_gesture_bar_desc">Nawigacja gestami</string>
     <string name="feat_hide_gesture_bar_on_launcher_title">Show on launcher</string>
     <string name="feat_hide_gesture_bar_on_launcher_desc">Dynamically show the gesture bar only when on the home screen</string>
     <string name="feat_circle_to_search_gesture_title">Circle to Search gesture</string>
     <string name="feat_circle_to_search_gesture_desc">Long-press the bottom area to trigger Circle to Search</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
-    <string name="feat_other_customizations_title">Other customizations</string>
-    <string name="feat_other_customizations_desc">Additional system tweaks and modifications</string>
+    <string name="feat_other_customizations_title">Inne personalizacje</string>
+    <string name="feat_other_customizations_desc">Dodatkowe poprawki i modyfikacje systemu</string>
     <string name="status_bar_icons_disclaimer">Należy pamiętać, że wdrożenie tych opcji może zależeć od producenta OEM, a niektóre mogą w ogóle nie działać.</string>
     <!-- Network Type Picker -->
     <string name="network_type_other">Inny</string>
@@ -397,7 +397,7 @@
     <string name="feat_maps_power_saving_desc">Na dowolne urządzenie z Androidem</string>
     <string name="feat_notification_lighting_title">Oświetlenie powiadomień</string>
     <string name="feat_notification_lighting_desc">Podświetl powiadomienia</string>
-    <string name="feat_flashlight_pulse_desc">Pulsuj latarką, aby otrzymywać powiadomienia</string>
+    <string name="feat_flashlight_pulse_desc">Pulsująca latarka przy otrzymaniu powiadomień</string>
     <string name="feat_sound_mode_tile_title">Kafelek trybu dźwiękowego</string>
     <string name="feat_call_vibrations_title">Wibracje wywoławcze</string>
     <string name="feat_call_vibrations_desc">Wibracje w przypadku wykonywania połączeń</string>
@@ -694,14 +694,14 @@
     <string name="welcome_back_title">Welcome back to Essentials</string>
     <string name="action_see_whats_new">See what\'s new</string>
     <string name="label_mode_default">Default</string>
-    <string name="label_mode_glove">Glove mode</string>
+    <string name="label_mode_glove">Tryb rękawiczki</string>
     <string name="tile_scale_animations">Glove Mode</string>
     <string name="about_desc_scale_animations_tile">Quickly toggle between Default and Glove mode UI profiles</string>
-    <string name="label_increase_touch_sensitivity">Increase touch sensitivity</string>
-    <string name="desc_increase_touch_sensitivity">Improve touch screen responsiveness when using gloves or screen protectors</string>
-    <string name="label_auto_rotate">Auto rotate</string>
-    <string name="desc_auto_rotate">Automatically rotate the screen when the device is turned</string>
-    <string name="label_screen_timeout">Screen timeout</string>
+    <string name="label_increase_touch_sensitivity">Zwiększa czułość na dotyk</string>
+    <string name="desc_increase_touch_sensitivity">Zwiększa czułość na dotyk, gdy korzystasz z rękawiczek, bądź szkła ochronnego</string>
+    <string name="label_auto_rotate">Automatyczna orientacja</string>
+    <string name="desc_auto_rotate">Automatycznie obracają ekran, przy zmianie położenia telefonu</string>
+    <string name="label_screen_timeout">Czas przed wygaszeniem ekranu</string>
     <string name="desc_screen_timeout">How long the screen stays on before turning off automatically</string>
     <string name="unit_seconds">%d seconds</string>
     <string name="unit_minute">1 minute</string>
@@ -1440,7 +1440,7 @@
     <string name="label_color">Color</string>
     <string name="label_style_font">Style &amp; Font</string>
     <string name="about_title">About</string>
-    <string name="color_default">Default</string>
+    <string name="color_default">Domyślny</string>
     <string name="color_red">Red</string>
     <string name="color_green">Green</string>
     <string name="color_blue">Blue</string>
@@ -1462,6 +1462,10 @@
     <string name="feat_watch_wireless_debugging_title">Debugowanie bezprzewodowe </string>
     <string name="feat_watch_wireless_debugging_desc">Włącz zdalnie </string>
     <string name="feat_watch_controls_title">Dostosuj </string>
-    <string name="feat_pocket_mode_title">Tryb kieszeniowy </string>
-    <string name="feat_pocket_mode_desc">Zapobiegaj przypadkowym dotknięciom w kieszeni </string>
+    <string name="feat_pocket_mode_title">Tryb w kieszeni</string>
+    <string name="feat_pocket_mode_desc">Zapobiega przypadkowym interakcją, gdy telefon znajduje się w kieszeni</string>
+    <string name="feat_notification_snoozing_title">Uśpij powiadomienia</string>
+    <string name="feat_notification_snoozing_desc">Odrocz powiadomienia na później </string>
+    <string name="feat_safe_volume_title">Wyłącz komunikat o zbyt dużej głośności</string>
+    <string name="feat_safe_volume_desc">Wyłącz komunikat o za dużo głośności</string>
 </resources>
