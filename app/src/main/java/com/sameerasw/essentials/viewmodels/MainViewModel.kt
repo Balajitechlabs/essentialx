@@ -165,6 +165,7 @@ class MainViewModel : ViewModel() {
     val isHideGestureBarOnLauncherEnabled = mutableStateOf(false)
     val isCircleToSearchGestureEnabled = mutableStateOf(false)
     val circleToSearchGestureHeight = mutableFloatStateOf(48f)
+    val circleToSearchGestureWidth = mutableFloatStateOf(240f)
     val isCircleToSearchPreviewEnabled = mutableStateOf(false)
     val isDisableRotationSuggestionEnabled = mutableStateOf(false)
     val isAllowOverlaysInSettingsEnabled = mutableStateOf(false)
@@ -737,6 +738,11 @@ class MainViewModel : ViewModel() {
                             settingsRepository.getFloat(key, 48f)
                     }
 
+                    SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_WIDTH -> {
+                        circleToSearchGestureWidth.floatValue =
+                            settingsRepository.getFloat(key, 240f)
+                    }
+
                     SettingsRepository.KEY_CIRCLE_TO_SEARCH_PREVIEW_ENABLED -> {
                         isCircleToSearchPreviewEnabled.value = settingsRepository.getBoolean(key)
                     }
@@ -1070,6 +1076,8 @@ class MainViewModel : ViewModel() {
         )
         circleToSearchGestureHeight.floatValue =
             settingsRepository.getFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_HEIGHT, 48f)
+        circleToSearchGestureWidth.floatValue =
+            settingsRepository.getFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_WIDTH, 240f)
         isCircleToSearchPreviewEnabled.value = settingsRepository.getBoolean(
             SettingsRepository.KEY_CIRCLE_TO_SEARCH_PREVIEW_ENABLED,
             false
@@ -2501,6 +2509,16 @@ class MainViewModel : ViewModel() {
     fun setCircleToSearchGestureHeight(height: Float) {
         circleToSearchGestureHeight.floatValue = height
         settingsRepository.putFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_HEIGHT, height)
+    }
+
+    /**
+     * Executes the set circle to search gesture width operation.
+     *
+     * @param width [Float] Target width.
+     */
+    fun setCircleToSearchGestureWidth(width: Float) {
+        circleToSearchGestureWidth.floatValue = width
+        settingsRepository.putFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_WIDTH, width)
     }
 
     /**
