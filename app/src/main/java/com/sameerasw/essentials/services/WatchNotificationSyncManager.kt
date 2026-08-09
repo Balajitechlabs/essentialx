@@ -161,12 +161,23 @@ object WatchNotificationSyncManager {
     fun syncActiveNotifications(context: Context, activeNotifs: Array<StatusBarNotification>?): Int {
         if (!isSyncEnabled(context) || activeNotifs == null) return 0
         val allowedApps = getAllowedApps(context)
+        val silentSyncEnabled = isSilentSyncEnabled(context)
+        val listener = NotificationListener.instance
         val jsonArray = org.json.JSONArray()
         val pkgsToSync = mutableSetOf<String>()
 
         for (sbn in activeNotifs) {
             if (sbn.packageName == context.packageName) continue
             if (allowedApps.isNotEmpty() && !allowedApps.contains(sbn.packageName)) continue
+
+            val isMedia = isMediaNotification(sbn)
+            val isSilent = listener?.isSilentNotification(sbn) ?: false
+
+            // Skip silent notifications if not enabled, unless it's a media playback notification
+            if (isSilent && !isMedia && !silentSyncEnabled) {
+                Log.d(TAG, "Skipping silent notification from ${sbn.packageName} during manual sync")
+                continue
+            }
 
             val extras = sbn.notification.extras ?: continue
             var title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
@@ -200,7 +211,6 @@ object WatchNotificationSyncManager {
 
             if (title.isBlank() && text.isBlank()) continue
 
-            val isMedia = isMediaNotification(sbn)
             val postTime = if (sbn.postTime > 0) sbn.postTime else System.currentTimeMillis()
             val jsonObj = JSONObject().apply {
                 put("key", sbn.key)
