@@ -1,33 +1,17 @@
 # Essentials
 
 Essential tools, mods and workarounds for Pixels and other Androids
-## [sameerasw.com/essentials](https://sameerasw.com/essentials)
 
-<br>
 
 <p align="center">
 <img width="99%" src="https://github.com/user-attachments/assets/c0849951-4cf0-4a91-9964-f7c212977af1" />
 </p>
 
 <p align="center">
-  <a href="https://www.reddit.com/r/MadebySameerasw"><img  width="99%"  alt=" reddit-banner" src="https://github.com/user-attachments/assets/a5197458-d64a-4c6a-a6a3-9e1f36030205" /></a>
-</p>
-<p align="center">
-  <a href="https://t.me/tidwib"><img  width="99%"  alt=" telegram-banner" src="https://github.com/user-attachments/assets/425b3cc1-9ac6-46ec-8f48-71c7af9c9ca2" /></a>
+  <a href="https://www.reddit.com/r/MadebySameerasw"><img  width="49%"  alt=" reddit-banner" src="https://github.com/user-attachments/assets/a5197458-d64a-4c6a-a6a3-9e1f36030205" /></a>
+  <a href="https://t.me/tidwib"><img  width="49%"  alt=" telegram-banner" src="https://github.com/user-attachments/assets/425b3cc1-9ac6-46ec-8f48-71c7af9c9ca2" /></a>
 </p>
 
-<br>
-
-<p align="center">
-  <a href="https://github.com/sameerasw/essentials/releases/latest"><img alt="GitHub Downloads (specific asset, all releases)" src="https://img.shields.io/github/downloads/sameerasw/essentials/app-release.apk?displayAssetName=false&style=for-the-badge&logo=android&logoColor=%23fff&labelColor=%2348C&color=%2348C">      
-</a>
-  <a href="https://github.com/sameerasw/essentials/issues/new?template=bug_report.md"><img alt="GitHub Issues or Pull Requests by label" src="https://img.shields.io/github/issues/sameerasw/essentials/bug?style=for-the-badge&logo=openbugbounty&logoColor=%23fff&label=bug%3F&labelColor=%232a6&color=%232a6">
-</a>
-  <a href="https://github.com/sameerasw/essentials/issues/new?template=feature_request.md"><img alt="GitHub Issues or Pull Requests by label" src="https://img.shields.io/github/issues/sameerasw/essentials/enhancement?style=for-the-badge&logo=apachespark&logoColor=%23fff&label=Feature%20request&labelColor=%23a26&color=%23a26">
-</a>
-  <a href="https://sameerasw.com"><img src="https://img.shields.io/badge/My%20website-orange?style=for-the-badge&logo=googlechrome&logoColor=%23000&labelColor=%233AFFB8&color=%233AFFB8" alt="My website" /></a>
-  <a href="https://t.me/tidwib"><img src="https://img.shields.io/badge/Community-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Community" /></a>
-</p>
 
 <h3 align="center">
 <strong>Featuring Essentials</strong>
@@ -40,6 +24,34 @@ Essential tools, mods and workarounds for Pixels and other Androids
   <a href="https://www.androidauthority.com/good-lock-for-pixel-essentials-app-hands-on-3670994/"><img align="top"  width="18%" alt="Frame 7" src="https://github.com/user-attachments/assets/5469b309-6929-4775-93c5-7ee2f0d57ba1" /></a>
 </p>
 
+
+<br>
+
+<p align="center">
+  <a href="https://github.com/sameerasw/essentials/releases/latest"><img alt="GitHub Downloads (specific asset, all releases)" src="https://img.shields.io/github/downloads/sameerasw/essentials/app-release.apk?displayAssetName=false&style=for-the-badge&logo=android&logoColor=%23fff&labelColor=%2348C&color=%2348C">      
+</a>
+  <a href="https://github.com/sameerasw/essentials/issues/new?template=bug_report.md"><img alt="GitHub Issues or Pull Requests by label" src="https://img.shields.io/github/issues/sameerasw/essentials/bug?style=for-the-badge&logo=openbugbounty&logoColor=%23fff&label=bug%3F&labelColor=%232a6&color=%232a6">
+</a>
+  <a href="https://github.com/sameerasw/essentials/issues/new?template=feature_request.md"><img alt="GitHub Issues or Pull Requests by label" src="https://img.shields.io/github/issues/sameerasw/essentials/enhancement?style=for-the-badge&logo=apachespark&logoColor=%23fff&label=Feature%20request&labelColor=%23a26&color=%23a26">
+</a>
+  <a href="https://sameerasw.com/essentials"><img src="https://img.shields.io/badge/Website-orange?style=for-the-badge&logo=googlechrome&logoColor=%23000&labelColor=%233AFFB8&color=%233AFFB8" alt="Website" /></a>
+</p>
+
+---
+
+<h3 align="center">
+<a href="https://github.com/sameerasw/essentials-wear">
+<strong>Essentials WearOS</strong>
+</a>
+</h3>
+
+<p align="center">
+  <img width="24%" alt="watch_media_2026-07-26_00_09_24" src="https://github.com/user-attachments/assets/ccc55e85-daad-4017-941e-c74da7a5d7fe" />
+  <img width="24%" alt="watch_media_2026-07-26_00_08_58" src="https://github.com/user-attachments/assets/73383d7c-8b68-46e8-99a4-6c8d0b1fc452" />
+  <img width="24%" alt="watch_media_2026-07-26_00_09_43" src="https://github.com/user-attachments/assets/88b13df7-fd0e-4c18-b965-a73637b35aaa" />
+  <img width="24%" alt="watch_media_2026-07-26_00_08_40" src="https://github.com/user-attachments/assets/1ee13d5a-7cdc-4e56-a3c3-3b2b1d155912" />
+</p>
+
 ## Navigation
 
 - [Features](#features)
@@ -50,10 +62,6 @@ Essential tools, mods and workarounds for Pixels and other Androids
 - [Accessibility Permissions](#how-to-grant-accessibility-permissions)
 - [Localization](#localization)
 - [Contributing](#contributing)
-
-## Extension
-
-- [WearOS Companion app](https://github.com/sameerasw/essentials-wear)
 
 # Features
 
@@ -148,8 +156,8 @@ Essential tools, mods and workarounds for Pixels and other Androids
 - Android 8.0 or higher (Feature support may vary)
 - App permissions are optional, grant necessary permissions for each feature
 - Targetted for Google Pixel devices extending to other Androids
-- Tested on Google Pixel 7 (Android 17 beta program).
-- > Some features and functionalities might not work as expected on other OEMs. (Especially NothingOS and OneUI)
+- Tested on Google Pixel 6A, 7, 9 Pro (Android 17 beta program).
+- > Some features and functionalities might not work as expected on other OEMs.
 
 # Screenshots
 
@@ -227,6 +235,7 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 - [xav-ie/generate-kaomoji](https://github.com/xav-ie/generate-kaomoji) - Keyboard kaomojis
 - [TebbeUbben/ChargeQuickTile](https://github.com/TebbeUbben/ChargeQuickTile) - Pixel charging QS
 
+<!-- 
 # Stars <3
 
 <a href="https://star-history.com/#sameerasw/essentials&Date">
@@ -237,8 +246,10 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
  </picture>
 </a>
 
+-->
+
 ---
 
 <p align="center">
-  Last updated: 2026-07-25
+  Last updated: 2026-08-08
 </p>
