@@ -28,8 +28,8 @@
     <string name="app_lock_description">Beveilig je apps met biometrische authenticatie. Vergrendelde apps zullen authenticatie vereisen bij openen, blijft ontgrendeld totdat het scherm word uitgezet.</string>
     <string name="app_lock_warning">Wees er van bewust dat dit niet een robuuste oplossing is, omdat dit alleen maar een app van een derde partij is. Als je sterke beveiliging nodig hebt, probeer dan Privéruimte of andere dergelijke functies.</string>
     <string name="app_lock_biometric_note">Nog een opmerking: De biometrische authenticatie laat je alleen STERKE beveiligingsmethoden gebruiken. Gezichtsherkenning wordt als ZWAK gezien bij apparaten zoals de Pixel 7. Zulke apparaten zullen andere STERKE beveiligingsmethoden gebruiken zoals vingerafdruk of pincode.</string>
-    <string name="setting_use_usage_access_title">Use usage access</string>
-    <string name="setting_use_usage_access_desc">Instead of accessibility (Freeze, App Lock, Dynamic Night Light)</string>
+    <string name="setting_use_usage_access_title">Maak gebruik van gebruikstoegang</string>
+    <string name="setting_use_usage_access_desc">In plaats van toegankelijkheid (Freeze, App Lock, Dynamic Nacht Licht)</string>
     <!-- Button Remap -->
     <string name="button_remap_enable_title">Opnieuw toewijzen van fysieke knoppen inschakelen</string>
     <string name="button_remap_use_shizuku_title">Use Shizuku</string>
@@ -335,7 +335,7 @@
     <string name="stb_battery_percentage_never">Nooit</string>
     <string name="stb_privacy_chip">Indicatie van camera- en microfoongebruik</string>
     <string name="smart_data_title">Slimme data</string>
-    <string name="permission_read_phone_state_title">Telefoonstatus lezen</string>
+    <string name="permission_read_phone_state_title">Telefoonstatus uitlezen</string>
     <string name="permission_read_phone_state_desc">Vereist voor het detecteren van het netwerktype voor Slimme data</string>
     <string name="permission_read_phone_state_desc_call_vibrations">Vereist om veranderingen van oproepstatus te detecteren voor haptische feedback.</string>
     <string name="settings_section_smart_visibility">Slimme zichtbaarheid</string>
@@ -582,7 +582,7 @@
     <string name="req_shizuku">Vereist Shizuku of Root.</string>
     <string name="perm_root_title">Roottoegang</string>
     <string name="perm_root_desc">Machtigingen vereist voor systeemacties die rootprivileges gebruiken.</string>
-    <string name="perm_notif_listener_title">Meldingsluisteraar</string>
+    <string name="perm_notif_listener_title">Meldingen bekijken</string>
     <string name="perm_notif_listener_desc_maps">Vereist om te detecteren wanneer Maps navigeert.</string>
     <string name="perm_notif_listener_desc_lighting">Vereist om nieuwe meldingen te detecteren</string>
     <string name="perm_notif_listener_desc_snooze">Vereist om meldingen te detecteren en te dempen</string>
@@ -706,8 +706,8 @@
     <string name="unit_seconds">%d seconds</string>
     <string name="unit_minute">1 minute</string>
     <string name="unit_minutes">%d minutes</string>
-    <string name="action_restart_systemui">Restart SystemUI</string>
-    <string name="desc_restart_systemui">Kills and restarts SystemUI process to apply some changes immediately</string>
+    <string name="action_restart_systemui">Start SystemUI opnieuw op</string>
+    <string name="desc_restart_systemui">Stopt en herstart SystemUI proces om wijzigingen direct toe te kunnen passen</string>
     <string name="msg_error_load_release_notes">Couldn\'t load the release note</string>
     <string name="action_view_on_web">View on web</string>
     <string name="action_done">Klaar</string>
@@ -1517,4 +1517,24 @@
     <string name="pixel_searchbar_style_date">Datum</string>
     <string name="pixel_searchbar_background_pill_title">Achtergrond pil</string>
     <string name="pixel_searchbar_background_pill_desc">Zet de datum in een container</string>
+    <string name="settings_translated_texts">Vertaald</string>
+    <string name="settings_translated_texts_desc">%d wijzigingen — klik om te versturen of the verwijderen</string>
+    <string name="settings_translate_mode">Vertaal Modus</string>
+    <string name="settings_translate_mode_desc">Houd enige tekst lang ingedrukt om deze te vertalen en bij te dragen aan de community</string>
+    <string name="setting_enable_unsupported_features_title">Zet niet-ondersteunde functies aan</string>
+    <string name="setting_enable_unsupported_features_desc">Toon OEM-specifieke of niet-relavante functies die standaard verborgen zijn.</string>
+    <string name="feat_power_saving_title">Batterijbesparing</string>
+    <string name="feat_power_saving_desc">Configureer de batterijbesparingsinstellingen</string>
+    <string name="feat_standby_apps_desc">Optimaliseer achtergrondactiviteit van apps</string>
+    <string name="feat_networks_title">Netwerken</string>
+    <string name="feat_networks_desc">Stel radio\'s en netwerken in</string>
+    <string name="feat_network_download_rate_limit_title">Netwerk download snelheidsbeperking</string>
+    <string name="feat_network_download_rate_limit_desc">Beperk de systeemwijde downloadsnelheid</string>
+    <string name="feat_mobile_data_always_on_title">Mobiele data altijd aan</string>
+    <string name="feat_mobile_data_always_on_desc">Houd mobiele data altijd aan, ook wanneer Wi-Fi verbonden is</string>
+    <string name="feat_wireless_display_certification_title">Draadloze schermcertificering</string>
+    <string name="feat_wireless_display_certification_desc">Toon opties voor draadloze schermcertificering</string>
+    <string name="feat_smart_pixels_title">Slimme pixels</string>
+    <string name="feat_smart_pixels_desc">Zet pixels uit om batterij te besparen</string>
+    <string name="setting_swipe_tabs_desc">Op het startscherm</string>
 </resources>
