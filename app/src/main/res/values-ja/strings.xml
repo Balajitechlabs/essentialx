@@ -1584,4 +1584,10 @@
     <string name="feat_allow_overlays_in_settings_desc">アプリがシステム設定の上にオーバーレイを表示することを許可する</string>
     <string name="feat_prefer_gpu_composing_title">画面合成にGPUを優先する</string>
     <string name="feat_prefer_gpu_composing_desc">ハードウェアオーバーレイを無効にし、GPUによる画面合成を強制します。デバイスを再起動すると設定はリセットされます。</string>
+    <string name="search_smart_pixels_enable_title">スマートピクセルを有効にする</string>
+    <string name="smart_pixels_intensity_title">強度</string>
+    <string name="feat_power_saving_title">省電力</string>
+    <string name="feat_standby_apps_title">スタンバイアプリ</string>
+    <string name="feat_standby_apps_desc">アプリのバックグラウンド動作を最適化する</string>
+    <string name="feat_power_saving_desc">省電力ポリシーを構成する</string>
 </resources>
