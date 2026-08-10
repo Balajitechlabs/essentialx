@@ -1492,4 +1492,5 @@
     <string name="label_thermal_skin">Temperatura da Superfície</string>
     <string name="label_thermal_gpu">Temperatura da GPU</string>
     <string name="label_thermal_cpu">Temperatura da CPU</string>
+    <string name="feat_networks_title">Redes</string>
 </resources>
