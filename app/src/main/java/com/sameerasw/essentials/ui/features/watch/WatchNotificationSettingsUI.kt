@@ -57,6 +57,9 @@ fun WatchNotificationSettingsUI(
     var isSilentEnabled by remember {
         mutableStateOf(prefs.getBoolean("watch_notif_silent_enabled", false))
     }
+    var isMediaEnabled by remember {
+        mutableStateOf(prefs.getBoolean("watch_notif_media_enabled", true))
+    }
     var showAppPicker by remember { mutableStateOf(false) }
 
     Column(
@@ -113,6 +116,18 @@ fun WatchNotificationSettingsUI(
                             HapticUtil.performUIHaptic(view)
                             isSilentEnabled = checked
                             prefs.edit().putBoolean("watch_notif_silent_enabled", checked).apply()
+                        }
+                    )
+
+                    IconToggleItem(
+                        title = stringResource(R.string.watch_notif_sync_media_title),
+                        description = stringResource(R.string.watch_notif_sync_media_desc),
+                        iconRes = R.drawable.rounded_music_video_24,
+                        checked = isMediaEnabled,
+                        onCheckedChange = { checked ->
+                            HapticUtil.performUIHaptic(view)
+                            isMediaEnabled = checked
+                            prefs.edit().putBoolean("watch_notif_media_enabled", checked).apply()
                         }
                     )
                 }

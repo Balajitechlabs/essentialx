@@ -50,6 +50,11 @@ object WatchNotificationSyncManager {
         return prefs.getBoolean("watch_notif_silent_enabled", false)
     }
 
+    fun isMediaSyncEnabled(context: Context): Boolean {
+        val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+        return prefs.getBoolean("watch_notif_media_enabled", true)
+    }
+
     fun getAllowedApps(context: Context): Set<String> {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         val json = prefs.getString("watch_notif_allowed_apps", null) ?: return emptySet()
@@ -87,6 +92,11 @@ object WatchNotificationSyncManager {
         if (!enabled) return
 
         val isMedia = isMediaNotification(sbn)
+
+        if (isMedia && !isMediaSyncEnabled(context)) {
+            Log.d(TAG, "Skipping media notification from ${sbn.packageName} - media sync disabled")
+            return
+        }
 
         // Skip silent notifications if not enabled, unless it's a media playback notification
         if (isSilent && !isMedia && !isSilentSyncEnabled(context)) {
@@ -163,6 +173,7 @@ object WatchNotificationSyncManager {
         if (!isSyncEnabled(context) || activeNotifs == null) return 0
         val allowedApps = getAllowedApps(context)
         val silentSyncEnabled = isSilentSyncEnabled(context)
+        val mediaSyncEnabled = isMediaSyncEnabled(context)
         val listener = NotificationListener.instance
         val jsonArray = org.json.JSONArray()
         val pkgsToSync = mutableSetOf<String>()
@@ -172,6 +183,12 @@ object WatchNotificationSyncManager {
             if (allowedApps.isNotEmpty() && !allowedApps.contains(sbn.packageName)) continue
 
             val isMedia = isMediaNotification(sbn)
+
+            if (isMedia && !mediaSyncEnabled) {
+                Log.d(TAG, "Skipping media notification from ${sbn.packageName} during manual sync")
+                continue
+            }
+
             val isSilent = listener?.isSilentNotification(sbn) ?: false
 
             // Skip silent notifications if not enabled, unless it's a media playback notification
