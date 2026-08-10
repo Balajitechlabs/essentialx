@@ -353,12 +353,12 @@
     <string name="hide_clock_desc">Completely remove the clock from the status bar</string>
     <string name="hide_notification_icons_title">Hide notifications</string>
     <string name="hide_notification_icons_desc">Hide all incoming notification icons</string>
-    <string name="feat_hide_gesture_bar_title">Hide gesture bar</string>
-    <string name="feat_hide_gesture_bar_desc">In gesture navigation</string>
-    <string name="feat_hide_gesture_bar_on_launcher_title">Show on launcher</string>
-    <string name="feat_hide_gesture_bar_on_launcher_desc">Dynamically show the gesture bar only when on the home screen</string>
-    <string name="feat_circle_to_search_gesture_title">Circle to Search gesture</string>
-    <string name="feat_circle_to_search_gesture_desc">Long-press the bottom area to trigger Circle to Search</string>
+    <string name="feat_hide_gesture_bar_title">제스쳐 바 숨기기</string>
+    <string name="feat_hide_gesture_bar_desc">제스쳐 내비게이션일 경우</string>
+    <string name="feat_hide_gesture_bar_on_launcher_title">홈 화면에서 보이기</string>
+    <string name="feat_hide_gesture_bar_on_launcher_desc">홈 화면에 있을 때 제스쳐 바 표시</string>
+    <string name="feat_circle_to_search_gesture_title">서클 투 서치 제스쳐</string>
+    <string name="feat_circle_to_search_gesture_desc">가장자리 영역을 길게 눌러 서클 투 서치 실행</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
     <string name="feat_other_customizations_title">기타 개인화</string>
@@ -1516,4 +1516,12 @@
     <string name="shut_up_restore_delay_title">복구 딜레이</string>
     <string name="tile_lockdown_mode_desc">화면 끄기 빠른 설정 타일</string>
     <string name="tile_lockdown_mode">잠금</string>
+    <string name="settings_translated_texts">번역됨</string>
+    <string name="settings_translated_texts_desc">%d 개 번역 대기 중 — 탭하여 제출 또는 취소</string>
+    <string name="settings_translate_mode_desc">아무 텍스트나 길게 눌러 번역</string>
+    <string name="setting_enable_unsupported_features_title">지원되지 않는 기능 활성화</string>
+    <string name="setting_swipe_tabs_title">탭 간 스와이프</string>
+    <string name="setting_swipe_tabs_desc">홈 화면에서</string>
+    <string name="feat_transparent_navigation_bar_title">투명 내비게이션 바</string>
+    <string name="feat_transparent_navigation_bar_desc">시스템 내비게이션 바 배경 투명하게 하기</string>
 </resources>
