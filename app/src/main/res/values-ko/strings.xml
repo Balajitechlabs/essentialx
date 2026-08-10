@@ -1524,4 +1524,5 @@
     <string name="setting_swipe_tabs_desc">홈 화면에서</string>
     <string name="feat_transparent_navigation_bar_title">투명 내비게이션 바</string>
     <string name="feat_transparent_navigation_bar_desc">시스템 내비게이션 바 배경 투명하게 하기</string>
+    <string name="settings_translate_mode">번역 모드</string>
 </resources>
