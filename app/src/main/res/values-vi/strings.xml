@@ -1279,7 +1279,7 @@ Nếu thiết bị của bạn không hỗ trợ hiển thị lớp phủ đè l
     <string name="kaomoji_cat_hugging">Hugging</string>
     <string name="kaomoji_cat_indifference">Indifference</string>
     <string name="kaomoji_cat_magic">Magic</string>
-    <string name="kaomoji_cat_music">Music</string>
+    <string name="kaomoji_cat_music">Nhạc</string>
     <string name="kaomoji_cat_nosebleeding">Nosebleeding</string>
     <string name="kaomoji_cat_pain">Pain</string>
     <string name="kaomoji_cat_pig">Pig</string>
@@ -1598,4 +1598,6 @@ Cần có quyền quản trị thiết bị nếu sử dụng chế độ khóa.
     <string name="label_thermal_throttling_status">Trạng thái điều tiết</string>
     <string name="label_auto_reset_battery_stats_title">Tự động đặt lại</string>
     <string name="label_auto_reset_battery_stats_desc">Tự động đặt lại thống kê pin khi thiết bị được rút phích cắm khi dung lượng pin còn trên 90%.</string>
+    <string name="pixel_searchbar_style_empty">Không</string>
+    <string name="pixel_searchbar_style_date">Ngày</string>
 </resources>
