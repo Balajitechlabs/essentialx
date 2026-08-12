@@ -140,6 +140,10 @@ object QsTileRegistry {
                 R.drawable.rounded_link_24,
                 UrlShortenerTileService::class.java,
             ),
+            QsTileEntry(
+                R.drawable.rounded_contacts_product_24,
+                MeDropTileService::class.java,
+            ),
         )
 
     private val tilesMapByClassName: Map<String, QsTileEntry> by lazy {

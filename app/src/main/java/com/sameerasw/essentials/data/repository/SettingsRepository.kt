@@ -389,6 +389,9 @@ class SettingsRepository(
         const val KEY_TRANSLATION_MODE_DO_NOT_SHOW_WARNING = "translation_mode_do_not_show_warning"
 
         const val KEY_LOCKDOWN_MODE = "lockdown_mode"
+
+        const val KEY_MEDROP_CONTACT_JSON = "medrop_contact_json"
+        const val KEY_MEDROP_ALLOW_WHEN_LOCKED = "medrop_allow_when_locked"
     }
 
     /**
@@ -2925,6 +2928,14 @@ class SettingsRepository(
      * @param value [Int] Target value.
      */
     fun setLockScreenClockSeedColor(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_SEED_COLOR, value)
+
+    fun getMeDropContactJson(): String? = getString(KEY_MEDROP_CONTACT_JSON)
+
+    fun setMeDropContactJson(json: String?) = putString(KEY_MEDROP_CONTACT_JSON, json)
+
+    fun isMeDropAllowWhenLocked(): Boolean = getBoolean(KEY_MEDROP_ALLOW_WHEN_LOCKED, false)
+
+    fun setMeDropAllowWhenLocked(enabled: Boolean) = putBoolean(KEY_MEDROP_ALLOW_WHEN_LOCKED, enabled)
 
     fun getLocationReachedFullScreenAlarmEnabled(): Boolean = getBoolean(KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED, true)
 

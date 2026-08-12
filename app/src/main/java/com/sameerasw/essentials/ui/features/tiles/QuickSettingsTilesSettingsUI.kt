@@ -413,6 +413,14 @@ fun QuickSettingsTilesSettingsUI(
                 R.string.tile_url_shortener_subtitle,
                 R.string.cat_utils,
             ),
+            QSTileInfo(
+                R.string.feat_medrop_title,
+                R.drawable.rounded_contacts_product_24,
+                com.sameerasw.essentials.services.tiles.MeDropTileService::class.java,
+                emptyList(),
+                R.string.about_desc_medrop,
+                R.string.cat_utils,
+            ),
         )
 
     val tiles = allTiles.filter { tile -> tile.isSupported(context) || includeUnsupportedFeatures }
