@@ -1411,6 +1411,44 @@ object FeatureRegistry {
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
         },
         object : Feature(
+            id = "Notification Sync",
+            title = R.string.watch_notif_sync_title,
+            iconRes = R.drawable.rounded_notification_settings_24,
+            category = R.string.cat_tools,
+            description = R.string.watch_notif_sync_desc,
+            aboutDescription = R.string.watch_notif_sync_desc,
+            permissionKeys = listOf("NOTIFICATION_LISTENER"),
+            parentFeatureId = "Watch",
+            hasMoreSettings = true,
+            showToggle = true
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = viewModel.isNotificationSyncEnabled.value
+            override fun isToggleEnabled(viewModel: MainViewModel, context: Context) = viewModel.isNotificationListenerEnabled.value
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
+                viewModel.setNotificationSyncEnabled(enabled, context)
+        },
+        object : Feature(
+            id = "Call Sync",
+            title = R.string.watch_call_sync_title,
+            iconRes = R.drawable.rounded_call_24,
+            category = R.string.cat_tools,
+            description = R.string.watch_call_sync_desc,
+            aboutDescription = R.string.watch_call_sync_desc,
+            permissionKeys = listOf("READ_PHONE_STATE", "ANSWER_PHONE_CALLS", "READ_CONTACTS", "READ_CALL_LOG"),
+            parentFeatureId = "Watch",
+            hasMoreSettings = false,
+            showToggle = true
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.isCallSyncEnabled.value
+
+            override fun isToggleEnabled(viewModel: MainViewModel, context: Context) =
+                com.sameerasw.essentials.utils.PermissionUtils.hasCallPermissions(context)
+
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
+                viewModel.setCallSyncEnabled(enabled, context)
+        },
+        object : Feature(
             id = "Watch Wireless Debugging",
             title = R.string.feat_watch_wireless_debugging_title,
             iconRes = R.drawable.rounded_adb_24,

@@ -2053,6 +2053,31 @@
     <string name="feat_app_functions_title">AppFunctions AI (Gemini)</string>
     <string name="feat_app_functions_desc">Expose Essentials features to Gemini and Android AI assistants</string>
     <string name="about_desc_app_functions">Enables standard Android AppFunctions metadata so system AI assistants like Gemini can control flashlight, caffeinate, sound modes, automations, and display settings directly through voice or chat commands.</string>
+    <string name="watch_notif_sync_title">Notification Sync</string>
+    <string name="watch_notif_sync_desc">To Essentials launcher</string>
+    <string name="watch_notif_sync_choose_apps">Choose apps</string>
+    <string name="watch_notif_sync_choose_apps_desc">Only selected apps will be synced to watch</string>
+    <string name="watch_notif_sync_silent_title">Notify for silent notifications</string>
+    <string name="watch_notif_sync_silent_desc">Sync silent and low-priority notifications to watch</string>
+    <string name="watch_notif_app_picker_title">Select Apps for Watch Sync</string>
+    <string name="watch_notif_app_picker_select_all">Select All</string>
+    <string name="watch_notif_sync_now">Sync Active Notifications Now</string>
+    <string name="watch_notif_sync_now_desc">Force sync all active phone notifications to watch launcher</string>
+    <string name="watch_notif_sync_icons">Sync App Icons</string>
+    <string name="watch_notif_sync_icons_desc">Sync app icons to watch launcher for notification display</string>
+    <string name="watch_notif_sync_media_title">Sync media playback</string>
+    <string name="watch_notif_sync_media_desc">Sync media playback controls and notifications to watch</string>
+    <string name="watch_notif_sound_title">Notification Sound</string>
+    <string name="watch_notif_sound_desc">Change the sound played on the watch</string>
+    <string name="watch_notif_sound_carmen_nexus">Nexus</string>
+    <string name="watch_notif_sound_google">Google</string>
+    <string name="watch_notif_sound_notification">Default</string>
+    <string name="watch_notif_sound_dock">Dock</string>
+    <string name="watch_notif_synced_active_count">Synced %1$d active notifications to watch</string>
+    <string name="watch_notif_listener_not_running">Notification Listener Service not running</string>
+    <string name="watch_notif_synced_icons_count">Synced %1$d app icons to watch</string>
+    <string name="watch_call_sync_title">Sync calls</string>
+    <string name="watch_call_sync_desc">Sync and control calls from your watch</string>
 </resources>
 
 

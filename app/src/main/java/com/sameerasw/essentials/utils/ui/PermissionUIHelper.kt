@@ -338,6 +338,47 @@ object PermissionUIHelper {
                 )
             }
 
+            "READ_PHONE_STATE", "ANSWER_PHONE_CALLS", "READ_CONTACTS", "READ_CALL_LOG" -> {
+                val hasReadPhoneState = androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_PHONE_STATE) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                val hasAnswerCalls = Build.VERSION.SDK_INT < Build.VERSION_CODES.O || androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.ANSWER_PHONE_CALLS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                val hasContacts = androidx.core.content.ContextCompat.checkSelfPermission(context, android.Manifest.permission.READ_CONTACTS) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                val isGranted = hasReadPhoneState && hasAnswerCalls && hasContacts
+
+                var targetActivity: Activity? = activity
+                if (targetActivity == null) {
+                    var ctx: Context? = context
+                    while (ctx is android.content.ContextWrapper) {
+                        if (ctx is Activity) {
+                            targetActivity = ctx
+                            break
+                        }
+                        ctx = ctx.baseContext
+                    }
+                }
+
+                PermissionItem(
+                    iconRes = R.drawable.rounded_mobile_sound_24,
+                    title = R.string.watch_call_sync_title,
+                    description = R.string.watch_call_sync_desc,
+                    dependentFeatures = PermissionRegistry.getFeatures("READ_PHONE_STATE"),
+                    actionLabel = if (isGranted) R.string.perm_action_granted else R.string.perm_action_grant,
+                    action = {
+                        if (targetActivity != null) {
+                            val perms = mutableListOf(
+                                android.Manifest.permission.READ_PHONE_STATE,
+                                android.Manifest.permission.READ_CONTACTS,
+                                android.Manifest.permission.READ_CALL_LOG
+                            )
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                perms.add(android.Manifest.permission.ANSWER_PHONE_CALLS)
+                            }
+                            ActivityCompat.requestPermissions(targetActivity, perms.toTypedArray(), 109)
+                        }
+                    },
+                    isGranted = isGranted
+                )
+            }
+
             else -> null
         }
     }
@@ -348,6 +389,6 @@ object PermissionUIHelper {
         viewModel: MainViewModel,
         activity: Activity? = null
     ): List<PermissionItem> {
-        return keys.mapNotNull { getPermissionItem(it, context, viewModel, activity) }
+        return keys.mapNotNull { getPermissionItem(it, context, viewModel, activity) }.distinctBy { it.title }
     }
 }
