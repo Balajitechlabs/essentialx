@@ -37,17 +37,27 @@ import com.sameerasw.essentials.services.NotificationListener
 import com.sameerasw.essentials.services.WatchNotificationSyncManager
 import com.sameerasw.essentials.ui.core.cards.FeatureCard
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.AppSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.PermissionUIHelper
+import com.sameerasw.essentials.viewmodels.MainViewModel
 
 @Composable
 fun WatchNotificationSettingsUI(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: MainViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val view = LocalView.current
+    val activity = context as? Activity
     val prefs = remember {
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
     }
@@ -61,7 +71,38 @@ fun WatchNotificationSettingsUI(
     var isMediaEnabled by remember {
         mutableStateOf(prefs.getBoolean("watch_notif_media_enabled", true))
     }
+    var isCallSyncEnabled by remember {
+        mutableStateOf(prefs.getBoolean("watch_call_sync_enabled", true))
+    }
     var showAppPicker by remember { mutableStateOf(false) }
+    var showCallPermissionSheet by remember { mutableStateOf(false) }
+    var showNotifPermissionSheet by remember { mutableStateOf(false) }
+
+    val isCallSyncPermissionGranted = com.sameerasw.essentials.utils.PermissionUtils.hasCallPermissions(context)
+    val isNotifSyncPermissionGranted = viewModel.isNotificationListenerEnabled.value
+
+    val callPermissionLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+        contract = androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val allGranted = permissions.values.all { it }
+        if (allGranted) {
+            isCallSyncEnabled = true
+            prefs.edit().putBoolean("watch_call_sync_enabled", true).apply()
+            showCallPermissionSheet = false
+        }
+    }
+
+    val requestCallPermissions = {
+        val perms = mutableListOf(
+            android.Manifest.permission.READ_PHONE_STATE,
+            android.Manifest.permission.READ_CONTACTS,
+            android.Manifest.permission.READ_CALL_LOG
+        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            perms.add(android.Manifest.permission.ANSWER_PHONE_CALLS)
+        }
+        callPermissionLauncher.launch(perms.toTypedArray())
+    }
 
     Column(
         modifier = modifier
@@ -70,22 +111,49 @@ fun WatchNotificationSettingsUI(
     ) {
 
         RoundedCardContainer {
-            FeatureCard(
+            IconToggleItem(
+                title = stringResource(R.string.watch_call_sync_title),
+                description = stringResource(R.string.watch_call_sync_desc),
+                iconRes = R.drawable.rounded_mobile_sound_24,
+                isChecked = isCallSyncEnabled && isCallSyncPermissionGranted,
+                onCheckedChange = { checked ->
+                    HapticUtil.performUIHaptic(view)
+                    if (!isCallSyncPermissionGranted) {
+                        showCallPermissionSheet = true
+                        requestCallPermissions()
+                    } else {
+                        isCallSyncEnabled = checked
+                        prefs.edit().putBoolean("watch_call_sync_enabled", checked).apply()
+                    }
+                },
+                enabled = true,
+                onDisabledClick = {
+                    if (!isCallSyncPermissionGranted) {
+                        showCallPermissionSheet = true
+                        requestCallPermissions()
+                    }
+                }
+            )
+
+            IconToggleItem(
                 title = stringResource(R.string.watch_notif_sync_title),
                 description = stringResource(R.string.watch_notif_sync_desc),
                 iconRes = R.drawable.rounded_sync_24,
-                isEnabled = isSyncEnabled,
-                showToggle = true,
-                onToggle = { checked ->
+                isChecked = isSyncEnabled && isNotifSyncPermissionGranted,
+                onCheckedChange = { checked ->
                     HapticUtil.performUIHaptic(view)
-                    isSyncEnabled = checked
-                    prefs.edit().putBoolean("watch_notif_sync_enabled", checked).apply()
+                    if (!isNotifSyncPermissionGranted) {
+                        showNotifPermissionSheet = true
+                    } else {
+                        isSyncEnabled = checked
+                        prefs.edit().putBoolean("watch_notif_sync_enabled", checked).apply()
+                    }
                 },
-                onClick = {
-                    val next = !isSyncEnabled
-                    HapticUtil.performUIHaptic(view)
-                    isSyncEnabled = next
-                    prefs.edit().putBoolean("watch_notif_sync_enabled", next).apply()
+                enabled = true,
+                onDisabledClick = {
+                    if (!isNotifSyncPermissionGranted) {
+                        showNotifPermissionSheet = true
+                    }
                 }
             )
 
@@ -267,5 +335,39 @@ fun WatchNotificationSettingsUI(
                 }
             }
         )
+    }
+
+    if (showCallPermissionSheet) {
+        PermissionsBottomSheet(
+            onDismissRequest = { showCallPermissionSheet = false },
+            featureTitle = stringResource(R.string.watch_call_sync_title),
+            permissions = listOf(
+                com.sameerasw.essentials.ui.core.sheets.PermissionItem(
+                    iconRes = R.drawable.rounded_mobile_sound_24,
+                    title = stringResource(R.string.watch_call_sync_title),
+                    description = stringResource(R.string.watch_call_sync_desc),
+                    dependentFeatures = listOf(stringResource(R.string.watch_call_sync_title)),
+                    actionLabel = if (isCallSyncPermissionGranted) stringResource(R.string.perm_action_granted) else stringResource(R.string.perm_action_grant),
+                    action = { requestCallPermissions() },
+                    isGranted = isCallSyncPermissionGranted
+                )
+            )
+        )
+    }
+
+    if (showNotifPermissionSheet) {
+        val permissionItems = PermissionUIHelper.getPermissionItems(
+            listOf("NOTIFICATION_LISTENER"),
+            context,
+            viewModel,
+            activity
+        )
+        if (permissionItems.isNotEmpty()) {
+            PermissionsBottomSheet(
+                onDismissRequest = { showNotifPermissionSheet = false },
+                featureTitle = stringResource(R.string.watch_notif_sync_title),
+                permissions = permissionItems
+            )
+        }
     }
 }

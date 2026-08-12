@@ -240,6 +240,12 @@ class EssentialsWearableListenerService : WearableListenerService() {
                     WatchNotificationSyncManager.handleReplyFromWatch(this, jsonStr)
                 }
             }
+            WatchCallSyncManager.PATH_WATCH_CALL_ACTION -> {
+                val action = String(messageEvent.data ?: byteArrayOf())
+                if (action.isNotBlank()) {
+                    WatchCallSyncManager.handleCallAction(this, action)
+                }
+            }
         }
     }
 }

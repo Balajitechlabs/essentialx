@@ -81,6 +81,22 @@ object WatchNotificationSyncManager {
         return extras.containsKey(Notification.EXTRA_MEDIA_SESSION)
     }
 
+    private fun isCallNotification(sbn: StatusBarNotification): Boolean {
+        val category = sbn.notification.category
+        if (category == Notification.CATEGORY_CALL) return true
+
+        val extras = sbn.notification.extras
+        if (extras != null) {
+            val template = extras.getString(Notification.EXTRA_TEMPLATE)
+            if (template != null && (template.contains("CallStyle") || template.contains("IncomingCallStyle"))) {
+                return true
+            }
+        }
+
+        val pkg = sbn.packageName.lowercase()
+        return pkg.contains("dialer") || pkg.contains("incallui") || pkg.contains("telecom") || pkg.contains("telephony")
+    }
+
     private fun canReplyToNotification(sbn: StatusBarNotification): Boolean {
         val actions = sbn.notification.actions ?: return false
         for (action in actions) {
@@ -96,6 +112,11 @@ object WatchNotificationSyncManager {
         if (!enabled) return
 
         val isMedia = isMediaNotification(sbn)
+
+        if (isCallNotification(sbn) && WatchCallSyncManager.isCallSyncEnabled(context)) {
+            Log.d(TAG, "Skipping call notification from ${sbn.packageName} - handled via call sync")
+            return
+        }
 
         if (isMedia && !isMediaSyncEnabled(context)) {
             Log.d(TAG, "Skipping media notification from ${sbn.packageName} - media sync disabled")
@@ -187,6 +208,11 @@ object WatchNotificationSyncManager {
             if (allowedApps.isNotEmpty() && !allowedApps.contains(sbn.packageName)) continue
 
             val isMedia = isMediaNotification(sbn)
+
+            if (isCallNotification(sbn) && WatchCallSyncManager.isCallSyncEnabled(context)) {
+                Log.d(TAG, "Skipping call notification from ${sbn.packageName} during manual sync - handled via call sync")
+                continue
+            }
 
             if (isMedia && !mediaSyncEnabled) {
                 Log.d(TAG, "Skipping media notification from ${sbn.packageName} during manual sync")

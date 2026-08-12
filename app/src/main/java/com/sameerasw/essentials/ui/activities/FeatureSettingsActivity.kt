@@ -692,6 +692,9 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             context
                                                         )
 
+                                                        "Call Sync" -> !com.sameerasw.essentials.utils.PermissionUtils.hasCallPermissions(context)
+                                                        "Notification Sync" -> !viewModel.isNotificationListenerEnabled.value
+
                                                         "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
                                                         "Notification snoozing" -> !isWriteSecureSettingsEnabled
                                                         else -> false

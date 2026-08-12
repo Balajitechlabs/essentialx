@@ -276,6 +276,30 @@ object PermissionUtils {
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
     }
 
+    fun hasCallPermissions(context: Context): Boolean {
+        val hasPhoneState = androidx.core.content.ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.READ_PHONE_STATE
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        val hasAnswerCalls = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O || androidx.core.content.ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.ANSWER_PHONE_CALLS
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        val hasContacts = androidx.core.content.ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.READ_CONTACTS
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        val hasCallLog = androidx.core.content.ContextCompat.checkSelfPermission(
+            context,
+            android.Manifest.permission.READ_CALL_LOG
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+
+        return hasPhoneState && hasAnswerCalls && hasContacts && hasCallLog
+    }
+
     /**
      * Executes the has notification policy access operation.
      *
