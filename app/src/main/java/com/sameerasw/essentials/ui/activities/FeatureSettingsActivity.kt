@@ -601,6 +601,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         "Watch" -> listOf(
                                             listOf(
                                                 "Notification Sync",
+                                                "Call Sync",
                                                 "Watch Controls",
                                                 "Lock from Watch"
                                             ),

@@ -133,30 +133,6 @@ fun WatchNotificationSettingsUI(
                 }
             )
 
-            IconToggleItem(
-                title = stringResource(R.string.watch_call_sync_title),
-                description = stringResource(R.string.watch_call_sync_desc),
-                iconRes = R.drawable.rounded_call_24,
-                isChecked = isCallSyncEnabled && isCallSyncPermissionGranted,
-                onCheckedChange = { checked ->
-                    HapticUtil.performUIHaptic(view)
-                    if (!isCallSyncPermissionGranted) {
-                        showCallPermissionSheet = true
-                        requestCallPermissions()
-                    } else {
-                        isCallSyncEnabled = checked
-                        prefs.edit().putBoolean("watch_call_sync_enabled", checked).apply()
-                    }
-                },
-                enabled = true,
-                onDisabledClick = {
-                    if (!isCallSyncPermissionGranted) {
-                        showCallPermissionSheet = true
-                        requestCallPermissions()
-                    }
-                }
-            )
-
             FeatureCard(
                 title = stringResource(R.string.watch_notif_sync_choose_apps),
                 description = stringResource(R.string.watch_notif_sync_choose_apps_desc),
