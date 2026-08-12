@@ -11,13 +11,17 @@ package com.sameerasw.essentials.services
 
 import android.app.Notification
 import android.app.RemoteInput
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
+import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import com.google.android.gms.wearable.Wearable
 import com.google.gson.Gson
+import org.json.JSONArray
 import org.json.JSONObject
 
 object WatchNotificationSyncManager {
@@ -33,10 +37,10 @@ object WatchNotificationSyncManager {
     }
 
     fun ensureListenerServiceRunning(context: Context) {
-        if (NotificationListener.instance == null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+        if (NotificationListener.instance == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
-                android.service.notification.NotificationListenerService.requestRebind(
-                    android.content.ComponentName(context, NotificationListener::class.java)
+                NotificationListenerService.requestRebind(
+                    ComponentName(context, NotificationListener::class.java)
                 )
                 Log.d(TAG, "Requested rebind for NotificationListenerService")
             } catch (e: Exception) {
@@ -175,7 +179,7 @@ object WatchNotificationSyncManager {
         val silentSyncEnabled = isSilentSyncEnabled(context)
         val mediaSyncEnabled = isMediaSyncEnabled(context)
         val listener = NotificationListener.instance
-        val jsonArray = org.json.JSONArray()
+        val jsonArray = JSONArray()
         val pkgsToSync = mutableSetOf<String>()
 
         for (sbn in activeNotifs) {

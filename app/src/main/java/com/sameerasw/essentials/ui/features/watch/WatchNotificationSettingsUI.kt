@@ -10,6 +10,7 @@
 package com.sameerasw.essentials.ui.features.watch
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -96,7 +97,12 @@ fun WatchNotificationSettingsUI(
                 showToggle = false,
                 hasMoreSettings = true,
                 onToggle = {},
-                onClick = { if (isSyncEnabled) showAppPicker = true }
+                onClick = {
+                    if (isSyncEnabled) {
+                        HapticUtil.performUIHaptic(view)
+                        showAppPicker = true
+                    }
+                }
             )
         }
 
@@ -186,16 +192,16 @@ fun WatchNotificationSettingsUI(
                                     context,
                                     activeNotifs
                                 )
-                                android.widget.Toast.makeText(
+                                Toast.makeText(
                                     context,
-                                    "Synced $count active notifications to watch",
-                                    android.widget.Toast.LENGTH_SHORT
+                                    context.getString(R.string.watch_notif_synced_active_count, count),
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             } else {
-                                android.widget.Toast.makeText(
+                                Toast.makeText(
                                     context,
-                                    "Notification Listener Service not running",
-                                    android.widget.Toast.LENGTH_SHORT
+                                    context.getString(R.string.watch_notif_listener_not_running),
+                                    Toast.LENGTH_SHORT
                                 ).show()
                             }
                         }
@@ -220,10 +226,10 @@ fun WatchNotificationSettingsUI(
                                     ?: emptySet()
                             }
                             val count = WatchNotificationSyncManager.syncAppIcons(context, pkgsToSync)
-                            android.widget.Toast.makeText(
+                            Toast.makeText(
                                 context,
-                                "Synced $count app icons to watch",
-                                android.widget.Toast.LENGTH_SHORT
+                                context.getString(R.string.watch_notif_synced_icons_count, count),
+                                Toast.LENGTH_SHORT
                             ).show()
                         }
                     )

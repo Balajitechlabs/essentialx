@@ -2073,6 +2073,9 @@
     <string name="watch_notif_sound_google">Google</string>
     <string name="watch_notif_sound_notification">Default</string>
     <string name="watch_notif_sound_dock">Dock</string>
+    <string name="watch_notif_synced_active_count">Synced %1$d active notifications to watch</string>
+    <string name="watch_notif_listener_not_running">Notification Listener Service not running</string>
+    <string name="watch_notif_synced_icons_count">Synced %1$d app icons to watch</string>
 </resources>
 
 

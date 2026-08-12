@@ -1417,11 +1417,13 @@ object FeatureRegistry {
             category = R.string.cat_tools,
             description = R.string.watch_notif_sync_desc,
             aboutDescription = R.string.watch_notif_sync_desc,
+            permissionKeys = listOf("NOTIFICATION_LISTENER"),
             parentFeatureId = "Watch",
             hasMoreSettings = true,
             showToggle = true
         ) {
             override fun isEnabled(viewModel: MainViewModel) = viewModel.isNotificationSyncEnabled.value
+            override fun isToggleEnabled(viewModel: MainViewModel, context: Context) = viewModel.isNotificationListenerEnabled.value
             override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
                 viewModel.setNotificationSyncEnabled(enabled, context)
         },
