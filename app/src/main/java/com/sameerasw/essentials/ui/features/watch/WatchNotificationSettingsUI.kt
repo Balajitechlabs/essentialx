@@ -112,30 +112,6 @@ fun WatchNotificationSettingsUI(
 
         RoundedCardContainer {
             IconToggleItem(
-                title = stringResource(R.string.watch_call_sync_title),
-                description = stringResource(R.string.watch_call_sync_desc),
-                iconRes = R.drawable.rounded_mobile_sound_24,
-                isChecked = isCallSyncEnabled && isCallSyncPermissionGranted,
-                onCheckedChange = { checked ->
-                    HapticUtil.performUIHaptic(view)
-                    if (!isCallSyncPermissionGranted) {
-                        showCallPermissionSheet = true
-                        requestCallPermissions()
-                    } else {
-                        isCallSyncEnabled = checked
-                        prefs.edit().putBoolean("watch_call_sync_enabled", checked).apply()
-                    }
-                },
-                enabled = true,
-                onDisabledClick = {
-                    if (!isCallSyncPermissionGranted) {
-                        showCallPermissionSheet = true
-                        requestCallPermissions()
-                    }
-                }
-            )
-
-            IconToggleItem(
                 title = stringResource(R.string.watch_notif_sync_title),
                 description = stringResource(R.string.watch_notif_sync_desc),
                 iconRes = R.drawable.rounded_sync_24,
@@ -153,6 +129,30 @@ fun WatchNotificationSettingsUI(
                 onDisabledClick = {
                     if (!isNotifSyncPermissionGranted) {
                         showNotifPermissionSheet = true
+                    }
+                }
+            )
+
+            IconToggleItem(
+                title = stringResource(R.string.watch_call_sync_title),
+                description = stringResource(R.string.watch_call_sync_desc),
+                iconRes = R.drawable.rounded_call_24,
+                isChecked = isCallSyncEnabled && isCallSyncPermissionGranted,
+                onCheckedChange = { checked ->
+                    HapticUtil.performUIHaptic(view)
+                    if (!isCallSyncPermissionGranted) {
+                        showCallPermissionSheet = true
+                        requestCallPermissions()
+                    } else {
+                        isCallSyncEnabled = checked
+                        prefs.edit().putBoolean("watch_call_sync_enabled", checked).apply()
+                    }
+                },
+                enabled = true,
+                onDisabledClick = {
+                    if (!isCallSyncPermissionGranted) {
+                        showCallPermissionSheet = true
+                        requestCallPermissions()
                     }
                 }
             )

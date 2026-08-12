@@ -1430,7 +1430,7 @@ object FeatureRegistry {
         object : Feature(
             id = "Call Sync",
             title = R.string.watch_call_sync_title,
-            iconRes = R.drawable.rounded_mobile_sound_24,
+            iconRes = R.drawable.rounded_call_24,
             category = R.string.cat_tools,
             description = R.string.watch_call_sync_desc,
             aboutDescription = R.string.watch_call_sync_desc,
