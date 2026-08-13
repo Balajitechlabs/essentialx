@@ -145,6 +145,8 @@ class MainViewModel : ViewModel() {
     val isBluetoothDevicesEnabled = mutableStateOf(false)
     val isCallVibrationsEnabled = mutableStateOf(false)
     val isCalendarSyncEnabled = mutableStateOf(false)
+    val isNotificationSyncEnabled = mutableStateOf(false)
+    val isCallSyncEnabled = mutableStateOf(true)
     val isCalendarSyncPeriodicEnabled = mutableStateOf(false)
     val isBatteryNotificationEnabled = mutableStateOf(false)
     val isAodEnabled = mutableStateOf(false)
@@ -165,6 +167,7 @@ class MainViewModel : ViewModel() {
     val isHideGestureBarOnLauncherEnabled = mutableStateOf(false)
     val isCircleToSearchGestureEnabled = mutableStateOf(false)
     val circleToSearchGestureHeight = mutableFloatStateOf(48f)
+    val circleToSearchGestureWidth = mutableFloatStateOf(240f)
     val isCircleToSearchPreviewEnabled = mutableStateOf(false)
     val isDisableRotationSuggestionEnabled = mutableStateOf(false)
     val isAllowOverlaysInSettingsEnabled = mutableStateOf(false)
@@ -737,6 +740,11 @@ class MainViewModel : ViewModel() {
                             settingsRepository.getFloat(key, 48f)
                     }
 
+                    SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_WIDTH -> {
+                        circleToSearchGestureWidth.floatValue =
+                            settingsRepository.getFloat(key, 240f)
+                    }
+
                     SettingsRepository.KEY_CIRCLE_TO_SEARCH_PREVIEW_ENABLED -> {
                         isCircleToSearchPreviewEnabled.value = settingsRepository.getBoolean(key)
                     }
@@ -1070,6 +1078,8 @@ class MainViewModel : ViewModel() {
         )
         circleToSearchGestureHeight.floatValue =
             settingsRepository.getFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_HEIGHT, 48f)
+        circleToSearchGestureWidth.floatValue =
+            settingsRepository.getFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_WIDTH, 240f)
         isCircleToSearchPreviewEnabled.value = settingsRepository.getBoolean(
             SettingsRepository.KEY_CIRCLE_TO_SEARCH_PREVIEW_ENABLED,
             false
@@ -1762,6 +1772,10 @@ class MainViewModel : ViewModel() {
             settingsRepository.isAmbientMusicGlanceRespectNotificationsEnabled()
         isCalendarSyncEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_CALENDAR_SYNC_ENABLED, false)
+        isNotificationSyncEnabled.value =
+            settingsRepository.getBoolean("watch_notif_sync_enabled", false)
+        isCallSyncEnabled.value =
+            settingsRepository.getBoolean("watch_call_sync_enabled", true)
         isCalendarSyncPeriodicEnabled.value = settingsRepository.isCalendarSyncPeriodicEnabled()
         isBatteryNotificationEnabled.value = settingsRepository.isBatteryNotificationEnabled()
         selectedCalendarIds.value = settingsRepository.getCalendarSyncSelectedCalendars()
@@ -2501,6 +2515,16 @@ class MainViewModel : ViewModel() {
     fun setCircleToSearchGestureHeight(height: Float) {
         circleToSearchGestureHeight.floatValue = height
         settingsRepository.putFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_HEIGHT, height)
+    }
+
+    /**
+     * Executes the set circle to search gesture width operation.
+     *
+     * @param width [Float] Target width.
+     */
+    fun setCircleToSearchGestureWidth(width: Float) {
+        circleToSearchGestureWidth.floatValue = width
+        settingsRepository.putFloat(SettingsRepository.KEY_CIRCLE_TO_SEARCH_GESTURE_WIDTH, width)
     }
 
     /**
@@ -4208,6 +4232,16 @@ class MainViewModel : ViewModel() {
         } else {
             cancelPeriodicCalendarSync(context)
         }
+    }
+
+    fun setNotificationSyncEnabled(enabled: Boolean, context: Context) {
+        isNotificationSyncEnabled.value = enabled
+        settingsRepository.putBoolean("watch_notif_sync_enabled", enabled)
+    }
+
+    fun setCallSyncEnabled(enabled: Boolean, context: Context) {
+        isCallSyncEnabled.value = enabled
+        settingsRepository.putBoolean("watch_call_sync_enabled", enabled)
     }
 
     /**

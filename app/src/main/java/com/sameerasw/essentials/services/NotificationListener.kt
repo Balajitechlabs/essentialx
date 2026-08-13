@@ -91,13 +91,18 @@ class NotificationListener : NotificationListenerService() {
         return template != null && (template.contains("MediaStyle") || template.contains("DecoratedMediaCustomViewStyle"))
     }
 
-    private fun isSilentNotification(sbn: StatusBarNotification): Boolean {
+    fun isSilentNotification(sbn: StatusBarNotification, rankingMap: RankingMap? = null): Boolean {
         try {
-            val rankingMap = currentRanking ?: return false
-            val ranking = Ranking()
-            if (rankingMap.getRanking(sbn.key, ranking)) {
-                return ranking.importance < android.app.NotificationManager.IMPORTANCE_DEFAULT
+            val map = rankingMap ?: currentRanking
+            if (map != null) {
+                val ranking = Ranking()
+                if (map.getRanking(sbn.key, ranking)) {
+                    return ranking.importance < android.app.NotificationManager.IMPORTANCE_DEFAULT
+                }
             }
+            // Fallback: check notification priority if ranking map is unavailable
+            @Suppress("DEPRECATION")
+            return sbn.notification.priority < Notification.PRIORITY_DEFAULT
         } catch (_: Exception) {
         }
         return false
@@ -721,6 +726,7 @@ class NotificationListener : NotificationListenerService() {
 
                 if (eventType != null) {
                     triggerAmbientGlance(controller, eventType, isLiked, sbn = sbn)
+                    WatchNotificationSyncManager.onNotificationPosted(applicationContext, sbn, isSilent = false)
                 }
             }
         } catch (e: Exception) {
@@ -730,21 +736,22 @@ class NotificationListener : NotificationListenerService() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        onNotificationPostedInternal(sbn)
+        onNotificationPostedInternal(sbn, null)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onNotificationPosted(sbn: StatusBarNotification, rankingMap: RankingMap) {
-        onNotificationPostedInternal(sbn)
+        onNotificationPostedInternal(sbn, rankingMap)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun onNotificationPostedInternal(sbn: StatusBarNotification) {
+    private fun onNotificationPostedInternal(sbn: StatusBarNotification, rankingMap: RankingMap?) {
         // Skip our own app's notifications early to avoid flooding logs and redundant processing
         if (sbn.packageName == packageName) {
             return
         }
         handleRespectNotifications(sbn)
+        WatchNotificationSyncManager.onNotificationPosted(applicationContext, sbn, isSilentNotification(sbn, rankingMap))
 
         val pm = getSystemService(POWER_SERVICE) as PowerManager
         val isReallyLocked =
@@ -752,7 +759,7 @@ class NotificationListener : NotificationListenerService() {
 
         if (isReallyLocked && !sbn.isOngoing && sbn.packageName != packageName && !isMediaNotification(
                 sbn
-            ) && !isSilentNotification(sbn)
+            ) && !isSilentNotification(sbn, rankingMap)
         ) {
             unreadNotifications[sbn.key] = sbn.packageName
             // Trigger refresh if something is playing
@@ -1062,6 +1069,7 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         unreadNotifications.remove(sbn.key)
+        WatchNotificationSyncManager.onNotificationRemoved(applicationContext, sbn.key)
 
         // Trigger refresh if something is playing
         try {
