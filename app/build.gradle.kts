@@ -94,7 +94,7 @@ android {
 
         val whatsNewCounter = 2
         buildConfigField("int", "WHATS_NEW_COUNTER", whatsNewCounter.toString())
-        buildConfigField("int", "REQUIRED_WEAR_VERSION_CODE", "5")
+        buildConfigField("int", "REQUIRED_WEAR_VERSION_CODE", "6")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
