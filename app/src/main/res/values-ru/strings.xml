@@ -1526,4 +1526,10 @@
     <string name="flashlight_pulse_disable_on_dnd_title">Не использовать при включённом режиме \"Не беспокоить\"</string>
     <string name="pocket_mode_lock_screen_only_title">Только экран блокировки</string>
     <string name="pocket_mode_lock_screen_only_desc">Активировать режим \"В кармане\" только когда устройство заблокировано</string>
+    <string name="feat_smart_pixels_title">Умные пиксели</string>
+    <string name="feat_smart_pixels_desc">Чёрные пиксели для сохранения энергии</string>
+    <string name="search_smart_pixels_enable_title">Включить умные пиксели</string>
+    <string name="smart_pixels_intensity_title">Интенсивность</string>
+    <string name="about_desc_smart_pixels">Используйте службу специальных возможностей, чтобы сэкономить энергию на OLED-экране и наложить на него настраиваемый клетчатый узор из затемненных пикселей</string>
+    <string name="cat_navigation">Навигация</string>
 </resources>
