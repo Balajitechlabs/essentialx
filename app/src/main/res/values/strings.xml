@@ -298,7 +298,7 @@
     <string name="private_dns_mode_label">Mode</string>
     <string name="private_dns_mode_toggle">Toggle</string>
     <string name="private_dns_mode_cycle">Cycle</string>
-    <string name="tile_usb_debugging">USB Debugging</string>
+    <string name="tile_usb_debugging">Debugging</string>
     <string name="tile_color_picker">Color Picker</string>
     <string name="toast_eyedropper_failed">Are you sure you\'re on Android 17? (╯°_°）╯</string>
     <string name="subtitle_eye_dropper">Eye Dropper</string>
