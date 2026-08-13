@@ -280,6 +280,11 @@
     <string name="tile_essentials_on_display">Essentials on Display</string>
     <string name="tile_mono_audio">Mono Audio</string>
     <string name="tile_flashlight">Flashlight</string>
+    <string name="flashlight_mode_sos">SOS</string>
+    <string name="flashlight_mode_strobe">Strobe</string>
+    <string name="flashlight_speed_label">Speed</string>
+    <string name="flashlight_fade_label">Fade</string>
+    <string name="feature_flashlight_effects_title">Flashlight Effects</string>
     <string name="tile_app_freezing">App Freezing</string>
     <string name="tile_flashlight_pulse">Flashlight Pulse</string>
     <string name="tile_stay_awake">Stay awake</string>
