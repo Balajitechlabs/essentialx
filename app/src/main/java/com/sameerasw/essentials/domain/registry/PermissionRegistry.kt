@@ -139,5 +139,10 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_notification_snoozing_title)
 
     // Install unknown packages feature
-    PermissionRegistry.register("REQUEST_INSTALL_PACKAGES", R.string.tab_app_updates_title)
+    // Watch Call Sync & Notification Sync
+    PermissionRegistry.register("READ_PHONE_STATE", R.string.watch_call_sync_title)
+    PermissionRegistry.register("ANSWER_PHONE_CALLS", R.string.watch_call_sync_title)
+    PermissionRegistry.register("READ_CONTACTS", R.string.watch_call_sync_title)
+    PermissionRegistry.register("READ_CALL_LOG", R.string.watch_call_sync_title)
+    PermissionRegistry.register("NOTIFICATION_LISTENER", R.string.watch_notif_sync_title)
 }

@@ -98,7 +98,8 @@ import com.sameerasw.essentials.ui.features.system.StandbyAppsSettingsUI
 import com.sameerasw.essentials.ui.features.system.StatusBarIconSettingsUI
 import com.sameerasw.essentials.ui.features.system.TextAnimationsSettingsUI
 import com.sameerasw.essentials.ui.features.system.WatchControlsSettingsUI
-import com.sameerasw.essentials.ui.features.system.WatchSettingsUI
+import com.sameerasw.essentials.ui.features.watch.WatchNotificationSettingsUI
+import com.sameerasw.essentials.ui.features.watch.WatchSettingsUI
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
@@ -599,6 +600,8 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
                                         "Watch" -> listOf(
                                             listOf(
+                                                "Notification Sync",
+                                                "Call Sync",
                                                 "Watch Controls",
                                                 "Lock from Watch"
                                             ),
@@ -689,6 +692,9 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                         "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
                                                             context
                                                         )
+
+                                                        "Call Sync" -> !com.sameerasw.essentials.utils.PermissionUtils.hasCallPermissions(context)
+                                                        "Notification Sync" -> !viewModel.isNotificationListenerEnabled.value
 
                                                         "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
                                                         "Notification snoozing" -> !isWriteSecureSettingsEnabled
@@ -941,6 +947,12 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
                                             highlightKey = highlightSetting
+                                        )
+                                    }
+
+                                    "Notification Sync" -> {
+                                        WatchNotificationSettingsUI(
+                                            modifier = Modifier.padding(top = 16.dp)
                                         )
                                     }
 
