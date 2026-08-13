@@ -79,6 +79,7 @@ import com.sameerasw.essentials.services.tiles.RefreshRateTileService
 import com.sameerasw.essentials.services.tiles.RestartSystemUiTileService
 import com.sameerasw.essentials.services.tiles.ScaleAnimationsTileService
 import com.sameerasw.essentials.services.tiles.ScreenLockedSecurityTileService
+import com.sameerasw.essentials.services.tiles.SmartPixelsTileService
 import com.sameerasw.essentials.services.tiles.SoundModeTileService
 import com.sameerasw.essentials.services.tiles.StayAwakeTileService
 import com.sameerasw.essentials.services.tiles.TapToWakeTileService
@@ -365,6 +366,14 @@ fun QuickSettingsTilesSettingsUI(
             listOf("ACCESSIBILITY", "DEVICE_ADMIN"),
             R.string.tile_lockdown_mode_about_desc,
             R.string.cat_privacy
+        ),
+        QSTileInfo(
+            R.string.feat_smart_pixels_title,
+            R.drawable.rounded_grain_24,
+            SmartPixelsTileService::class.java,
+            listOf("ACCESSIBILITY"),
+            R.string.about_desc_smart_pixels,
+            R.string.cat_visuals
         )
     )
 
