@@ -52,6 +52,7 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
+import kotlinx.coroutines.delay
 
 class SmartPixelsIntensityActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +85,12 @@ fun SmartPixelsIntensityOverlay(
 
     var intensity by remember(viewModel.smartPixelsIntensity.floatValue) {
         mutableFloatStateOf(viewModel.smartPixelsIntensity.floatValue)
+    }
+
+    LaunchedEffect(Unit) {
+        delay(100)
+        // Automatically turn on Smart Pixels on long-press launch so intensity is previewed
+        viewModel.setSmartPixelsEnabled(context, true)
     }
 
     Box(
