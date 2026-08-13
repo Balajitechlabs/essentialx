@@ -144,6 +144,8 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
             "DeviceUnlock" -> Trigger.DeviceUnlock
             "ChargerConnected" -> Trigger.ChargerConnected
             "ChargerDisconnected" -> Trigger.ChargerDisconnected
+            "PowerSavingOn" -> Trigger.PowerSavingOn
+            "PowerSavingOff" -> Trigger.PowerSavingOff
             "Schedule" -> Trigger.Schedule(
                 hour = suggestion.hour ?: 0,
                 minute = suggestion.minute ?: 0
@@ -159,6 +161,7 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
         val state = when (suggestion.stateType) {
             "Charging" -> State.Charging
             "ScreenOn" -> State.ScreenOn
+            "PowerSaving" -> State.PowerSaving
             "TimePeriod" -> State.TimePeriod(
                 startHour = suggestion.hour ?: 0,
                 startMinute = suggestion.minute ?: 0,

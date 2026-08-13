@@ -538,6 +538,8 @@ class AutomationEditorActivity : ComponentActivity() {
                                                         Trigger.DeviceUnlock,
                                                         Trigger.ChargerConnected,
                                                         Trigger.ChargerDisconnected,
+                                                        Trigger.PowerSavingOn,
+                                                        Trigger.PowerSavingOff,
                                                         Trigger.Schedule(
                                                             hour = (selectedTrigger as? Trigger.Schedule)?.hour
                                                                 ?: 0,
@@ -596,6 +598,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                     val states = listOf(
                                                         DIYState.Charging,
                                                         DIYState.ScreenOn,
+                                                        DIYState.PowerSaving,
                                                         DIYState.TimePeriod(
                                                             startHour = (selectedState as? DIYState.TimePeriod)?.startHour
                                                                 ?: 0,

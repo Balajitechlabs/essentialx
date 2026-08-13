@@ -622,6 +622,9 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
             FlashlightActionReceiver.ACTION_OFF,
             FlashlightActionReceiver.ACTION_TOGGLE,
             FlashlightActionReceiver.ACTION_SET_INTENSITY,
+            FlashlightActionReceiver.ACTION_START_SOS,
+            FlashlightActionReceiver.ACTION_START_STROBE,
+            FlashlightActionReceiver.ACTION_STOP_SPECIAL_MODES,
             FlashlightActionReceiver.ACTION_PULSE_NOTIFICATION -> flashlightHandler.handleIntent(
                 intent
             )
