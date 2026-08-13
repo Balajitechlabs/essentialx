@@ -926,6 +926,8 @@
     <string name="diy_trigger_bluetooth_disconnected">Bluetooth Device Disconnected</string>
     <string name="diy_trigger_wifi_connected">Wi-Fi Network Connected</string>
     <string name="diy_trigger_wifi_disconnected">Wi-Fi Network Disconnected</string>
+    <string name="diy_trigger_power_saving_on">Power Saving On</string>
+    <string name="diy_trigger_power_saving_off">Power Saving Off</string>
     <string name="diy_select_bluetooth_device_title">Select Bluetooth Device</string>
     <string name="diy_bluetooth_permission_required">Bluetooth permission is required to list paired devices.</string>
     <string name="diy_no_paired_bluetooth_devices">No paired Bluetooth devices found. Pair a device first in system settings.</string>
@@ -942,6 +944,7 @@
 
     <string name="diy_state_charging">Charging</string>
     <string name="diy_state_screen_on">Screen On</string>
+    <string name="diy_state_power_saving">Power Saving</string>
 
     <string name="diy_action_haptic">Vibrate</string>
     <string name="diy_action_notification">Show Notification</string>
