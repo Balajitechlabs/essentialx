@@ -66,6 +66,7 @@ import com.sameerasw.essentials.services.tiles.CaffeinateTileService
 import com.sameerasw.essentials.services.tiles.ChargeQuickTileService
 import com.sameerasw.essentials.services.tiles.DeveloperOptionsTileService
 import com.sameerasw.essentials.services.tiles.DynamicNightLightTileService
+import com.sameerasw.essentials.services.tiles.EssentialsOnDisplayTileService
 import com.sameerasw.essentials.services.tiles.FlashlightPulseTileService
 import com.sameerasw.essentials.services.tiles.FlashlightTileService
 import com.sameerasw.essentials.services.tiles.LockdownTileService
@@ -373,6 +374,14 @@ fun QuickSettingsTilesSettingsUI(
             SmartPixelsTileService::class.java,
             listOf("ACCESSIBILITY"),
             R.string.about_desc_smart_pixels,
+            R.string.cat_visuals
+        ),
+        QSTileInfo(
+            R.string.feat_essentials_on_display_title,
+            R.drawable.rounded_live_tv_24,
+            EssentialsOnDisplayTileService::class.java,
+            listOf("ACCESSIBILITY", "NOTIFICATION_LISTENER"),
+            R.string.feat_essentials_on_display_desc,
             R.string.cat_visuals
         )
     )

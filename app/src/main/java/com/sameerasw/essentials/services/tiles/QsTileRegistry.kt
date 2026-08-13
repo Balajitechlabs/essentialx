@@ -154,6 +154,11 @@ object QsTileRegistry {
             R.string.feat_smart_pixels_title,
             R.drawable.rounded_grain_24,
             SmartPixelsTileService::class.java
+        ),
+        QsTileEntry(
+            R.string.tile_essentials_on_display,
+            R.drawable.rounded_live_tv_24,
+            EssentialsOnDisplayTileService::class.java
         )
     )
 

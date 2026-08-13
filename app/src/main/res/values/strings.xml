@@ -277,6 +277,7 @@
     <string name="tile_dynamic_night_light">Dynamic Night Light</string>
     <string name="tile_locked_security">Locked Security</string>
     <string name="tile_app_lock">App Lock</string>
+    <string name="tile_essentials_on_display">Essentials on Display</string>
     <string name="tile_mono_audio">Mono Audio</string>
     <string name="tile_flashlight">Flashlight</string>
     <string name="tile_app_freezing">App Freezing</string>
