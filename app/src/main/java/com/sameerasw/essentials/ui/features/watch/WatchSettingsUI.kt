@@ -7,7 +7,7 @@
  * Description: Composable screen for Smartwatch sync and remote lock options.
  */
 
-package com.sameerasw.essentials.ui.features.system
+package com.sameerasw.essentials.ui.features.watch
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -182,20 +182,6 @@ fun WatchSettingsUI(
                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
                         modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
                     )
-                    LocalContext.current
-                    /*
-                    Button(
-                        onClick = { viewModel.openPlayStoreOnWatch(context) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                            contentColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        Text(stringResource(R.string.watch_install_companion_action))
-                    }
-                    */
-
                     Button(
                         onClick = {
                             HapticUtil.performUIHaptic(view)

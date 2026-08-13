@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -264,10 +265,15 @@ fun FeatureCard(
                             Box(
                                 modifier = Modifier
                                     .matchParentSize()
-                                    .clickable {
+                                    .zIndex(1f)
+                                    .clickable(
+                                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                                        indication = null
+                                    ) {
                                         HapticUtil.performVirtualKeyHaptic(view)
                                         onDisabledToggleClick()
-                                    })
+                                    }
+                            )
                         }
                     }
                 }

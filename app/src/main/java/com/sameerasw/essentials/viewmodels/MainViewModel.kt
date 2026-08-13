@@ -145,6 +145,8 @@ class MainViewModel : ViewModel() {
     val isBluetoothDevicesEnabled = mutableStateOf(false)
     val isCallVibrationsEnabled = mutableStateOf(false)
     val isCalendarSyncEnabled = mutableStateOf(false)
+    val isNotificationSyncEnabled = mutableStateOf(false)
+    val isCallSyncEnabled = mutableStateOf(true)
     val isCalendarSyncPeriodicEnabled = mutableStateOf(false)
     val isBatteryNotificationEnabled = mutableStateOf(false)
     val isAodEnabled = mutableStateOf(false)
@@ -1770,6 +1772,10 @@ class MainViewModel : ViewModel() {
             settingsRepository.isAmbientMusicGlanceRespectNotificationsEnabled()
         isCalendarSyncEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_CALENDAR_SYNC_ENABLED, false)
+        isNotificationSyncEnabled.value =
+            settingsRepository.getBoolean("watch_notif_sync_enabled", false)
+        isCallSyncEnabled.value =
+            settingsRepository.getBoolean("watch_call_sync_enabled", true)
         isCalendarSyncPeriodicEnabled.value = settingsRepository.isCalendarSyncPeriodicEnabled()
         isBatteryNotificationEnabled.value = settingsRepository.isBatteryNotificationEnabled()
         selectedCalendarIds.value = settingsRepository.getCalendarSyncSelectedCalendars()
@@ -4226,6 +4232,16 @@ class MainViewModel : ViewModel() {
         } else {
             cancelPeriodicCalendarSync(context)
         }
+    }
+
+    fun setNotificationSyncEnabled(enabled: Boolean, context: Context) {
+        isNotificationSyncEnabled.value = enabled
+        settingsRepository.putBoolean("watch_notif_sync_enabled", enabled)
+    }
+
+    fun setCallSyncEnabled(enabled: Boolean, context: Context) {
+        isCallSyncEnabled.value = enabled
+        settingsRepository.putBoolean("watch_call_sync_enabled", enabled)
     }
 
     /**
