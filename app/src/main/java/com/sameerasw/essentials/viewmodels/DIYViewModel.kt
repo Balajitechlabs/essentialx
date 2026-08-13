@@ -73,6 +73,28 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Runs the automation's action(s) immediately, without waiting for its trigger/state.
+     *
+     * @param automation [Automation] Target automation.
+     */
+    fun testAutomation(automation: Automation) {
+        val context = getApplication<Application>().applicationContext
+        val actionsToTest = if (automation.type == Automation.Type.STATE || automation.type == Automation.Type.APP) {
+            listOfNotNull(automation.entryAction)
+        } else {
+            automation.actions
+        }
+        viewModelScope.launch {
+            actionsToTest.forEach { action ->
+                com.sameerasw.essentials.services.automation.executors.CombinedActionExecutor.execute(
+                    context,
+                    action
+                )
+            }
+        }
+    }
+
+    /**
      * Executes the request gen ai suggestion operation.
      *
      * @param description [String] Target description.
