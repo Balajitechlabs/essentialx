@@ -1563,4 +1563,8 @@ Ve ayarın etkili olması için birden fazla kez uygulanması gerekebilir.</stri
     <string name="watch_notif_sync_desc">Essentials başlatıcısına</string>
     <string name="watch_notif_sync_choose_apps">Uygulamaları seçin</string>
     <string name="watch_notif_sync_choose_apps_desc">Yalnızca seçili uygulamalar saate senkronize edilecektir</string>
+    <string name="label_battery_section_health">Sağlık</string>
+    <string name="label_battery_section_charging">Şarj</string>
+    <string name="label_battery_section_specs">Özellikler</string>
+    <string name="label_thermal_system_thermals">Sistem Sıcaklıkları</string>
 </resources>
