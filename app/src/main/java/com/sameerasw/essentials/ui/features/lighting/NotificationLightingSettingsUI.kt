@@ -286,7 +286,7 @@ fun NotificationLightingSettingsUI(
                             strokeThicknessDp
                         )
                     },
-                    valueRange = 0f..50f,
+                    valueRange = 0f..75f,
                     valueFormatter = { "%.1f".format(it) },
                     onValueChangeFinished = {
                         // Save the corner radius
