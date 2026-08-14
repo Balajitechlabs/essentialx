@@ -54,6 +54,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -104,6 +105,7 @@ import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.sameerasw.essentials.domain.diy.State as DIYState
 
@@ -168,6 +170,7 @@ class AutomationEditorActivity : ComponentActivity() {
             val isPitchBlackThemeEnabled by viewModel.isPitchBlackThemeEnabled
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 val view = LocalView.current
+                val coroutineScope = rememberCoroutineScope()
                 var carouselState = rememberCarouselState { 2 } // 0: Trigger/State, 1: Actions
 
                 // Haptic on carousel page change
@@ -499,6 +502,8 @@ class AutomationEditorActivity : ComponentActivity() {
                                     .clip(MaterialTheme.shapes.extraLarge)
                                     .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                             ) {
+                                val isCurrentSelected = carouselState.currentItem == index
+
                                 if (index == 0) {
                                     // PAGE 0: Trigger or State Picker
                                     if (automationType == Automation.Type.APP) {
@@ -1005,8 +1010,36 @@ class AutomationEditorActivity : ComponentActivity() {
                                         )
                                     }
                                 }
-                            }
-                        }
+
+                                if (!isCurrentSelected) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.85f))
+                                            .clickable {
+                                                HapticUtil.performUIHaptic(view)
+                                                coroutineScope.launch {
+                                                    carouselState.animateScrollToItem(index)
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(
+                                                id = if (index > carouselState.currentItem) {
+                                                    R.drawable.rounded_chevron_forward_24
+                                                } else {
+                                                    R.drawable.rounded_chevron_backward_24
+                                                }
+                                            ),
+                                            contentDescription = stringResource(R.string.action_expand),
+                                            tint = MaterialTheme.colorScheme.onPrimary,
+                                            modifier = Modifier.size(36.dp)
+                                         )
+                                     }
+                                 }
+                             }
+                         }
 
                         if (showTimeSettings) {
                             com.sameerasw.essentials.ui.core.sheets.TimeSelectionSheet(
