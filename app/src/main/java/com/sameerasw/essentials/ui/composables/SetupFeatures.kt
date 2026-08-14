@@ -1098,10 +1098,11 @@ fun SetupFeatures(
                                 label = "InstagramTitleSwap"
                             ) { isShowingInstagram ->
                                 if (isShowingInstagram) {
-                                    Image(
+                                    Icon(
                                         painter = painterResource(id = R.drawable.essentials_instagram),
                                         contentDescription = null,
-                                        modifier = Modifier.height(28.dp)
+                                        modifier = Modifier.height(28.dp),
+                                        tint = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                                     )
                                 } else {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
