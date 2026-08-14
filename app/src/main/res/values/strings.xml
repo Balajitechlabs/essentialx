@@ -994,7 +994,7 @@
     <string name="diy_action_circle_to_search">Circle to Search</string>
     <string name="diy_action_pin_app">Pin Foreground App</string>
     <string name="diy_action_sometimes_essentials">Sometimes Essential</string>
-    <string name="diy_action_freeze_tag">Freeze</string>
+    <string name="diy_action_freeze_tag">Freeze by Tags</string>
     <string name="diy_action_open_app">Open App</string>
     <string name="diy_action_hotspot_on">Turn On Hotspot</string>
     <string name="diy_action_hotspot_off">Turn Off Hotspot</string>
