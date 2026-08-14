@@ -950,6 +950,19 @@
     <string name="diy_end_time_label">End Time</string>
     <string name="diy_repeat_days_label">Repeat on</string>
 
+    <string name="diy_discard_warning_title">Discard changes?</string>
+    <string name="diy_discard_warning_desc">You have unsaved changes. Are you sure you want to exit without saving?</string>
+
+    <string name="diy_category_connectivity">Connectivity &amp; Network</string>
+    <string name="diy_category_display">Display &amp; Screen</string>
+    <string name="diy_category_apps">Apps</string>
+    <string name="diy_category_system">System</string>
+    <string name="diy_category_sound_media">Sound &amp; Media</string>
+    <string name="diy_category_essentials">Essentials Tweaks</string>
+    <string name="diy_category_system_screen">System &amp; Screen</string>
+    <string name="diy_category_battery_power">Battery &amp; Power</string>
+    <string name="diy_category_time_schedule">Time &amp; Schedule</string>
+
     <string name="diy_state_charging">Charging</string>
     <string name="diy_state_screen_on">Screen On</string>
     <string name="diy_state_power_saving">Power Saving</string>
@@ -962,6 +975,16 @@
     <string name="diy_action_flashlight_toggle">Toggle Flashlight</string>
     <string name="diy_action_low_power_on">Turn On Low Power Mode</string>
     <string name="diy_action_low_power_off">Turn Off Low Power Mode</string>
+    <string name="diy_action_wifi_on">Turn On WiFi</string>
+    <string name="diy_action_wifi_off">Turn Off WiFi</string>
+    <string name="diy_action_cellular_on">Turn On Cellular Data</string>
+    <string name="diy_action_cellular_off">Turn Off Cellular Data</string>
+    <string name="diy_action_auto_brightness_on">Turn On Auto Brightness</string>
+    <string name="diy_action_auto_brightness_off">Turn Off Auto Brightness</string>
+    <string name="diy_action_freeze_apps">Freeze Apps</string>
+    <string name="diy_action_unfreeze_apps">Unfreeze Apps</string>
+    <string name="diy_freeze_apps_desc">This action requires Shizuku or Root to freeze specific applications.</string>
+    <string name="diy_unfreeze_apps_desc">This action requires Shizuku or Root to unfreeze specific applications.</string>
     <string name="diy_action_dim_wallpaper">Dim Wallpaper</string>
     <string name="diy_action_screen_off">Screen Off</string>
     <string name="diy_action_media_play_pause">Media Play/Pause</string>
@@ -974,7 +997,7 @@
     <string name="diy_action_circle_to_search">Circle to Search</string>
     <string name="diy_action_pin_app">Pin Foreground App</string>
     <string name="diy_action_sometimes_essentials">Sometimes Essential</string>
-    <string name="diy_action_freeze_tag">Freeze</string>
+    <string name="diy_action_freeze_tag">Freeze by Tags</string>
     <string name="diy_action_open_app">Open App</string>
     <string name="diy_action_hotspot_on">Turn On Hotspot</string>
     <string name="diy_action_hotspot_off">Turn Off Hotspot</string>
