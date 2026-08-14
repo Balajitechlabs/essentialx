@@ -76,10 +76,20 @@ import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.Trigger
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.NotificationApp
+import androidx.activity.compose.BackHandler
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.zIndex
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.height
 import com.sameerasw.essentials.ui.components.CategoryExpandableSection
-import com.sameerasw.essentials.ui.components.ReusableTopAppBar
-import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
-import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
+import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
+import com.sameerasw.essentials.ui.modifiers.BlurDirection
+import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.ui.core.cards.AppToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
@@ -304,85 +314,175 @@ class AutomationEditorActivity : ComponentActivity() {
                     ) && isActionConfigured(selectedOutAction)
                 }
 
-                Scaffold(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    topBar = {
-                        ReusableTopAppBar(
-                            title = titleRes,
-                            hasBack = true,
-                            isSmall = true,
-                            onBackClick = { finish() },
-                            actions = {
-                                if (isEditMode) {
-                                    IconButton(onClick = { showMenu = true }) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.rounded_more_vert_24),
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurface
-                                        )
-                                    }
+                var showDiscardDialog by remember { mutableStateOf(false) }
+                val isBlurEnabled by viewModel.isBlurEnabled
 
-                                    SegmentedDropdownMenu(
-                                        expanded = showMenu,
-                                        onDismissRequest = { showMenu = false }
-                                    ) {
-                                        SegmentedDropdownMenuItem(
-                                            text = { Text(stringResource(R.string.action_delete)) },
-                                            onClick = {
-                                                showMenu = false
-                                                if (existingAutomation != null) {
-                                                    DIYRepository.removeAutomation(
-                                                        existingAutomation.id
-                                                    )
-                                                }
-                                                finish()
-                                            },
-                                            leadingIcon = {
-                                                Icon(
-                                                    painter = painterResource(R.drawable.rounded_delete_24),
-                                                    contentDescription = null
-                                                )
-                                            }
-                                        )
-                                    }
+                val handleBackClick = {
+                    showDiscardDialog = true
+                }
+
+                BackHandler {
+                    handleBackClick()
+                }
+
+                if (showDiscardDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showDiscardDialog = false },
+                        title = { Text(stringResource(R.string.diy_discard_warning_title)) },
+                        text = { Text(stringResource(R.string.diy_discard_warning_desc)) },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    showDiscardDialog = false
+                                    finish()
                                 }
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.translation_discard),
+                                    color = MaterialTheme.colorScheme.error
+                                )
                             }
-                        )
-                    }
-                ) { innerPadding ->
-                    val configuration = LocalConfiguration.current
-                    val screenWidth = configuration.screenWidthDp.dp
-
-
-                    // Haptic Connection for Swipe Texture
-                    val nestedScrollConnection = remember {
-                        object : NestedScrollConnection {
-                            var accumulatedScroll = 0f
-                            val threshold = 40f
-
-                            override fun onPreScroll(
-                                available: Offset,
-                                source: NestedScrollSource
-                            ): Offset {
-                                // Only handle drag (user interaction)
-                                if (source == NestedScrollSource.UserInput) {
-                                    accumulatedScroll += available.x
-
-                                    if (kotlin.math.abs(accumulatedScroll) >= threshold) {
-                                        HapticUtil.performSliderHaptic(view) // Subtle tick
-                                        accumulatedScroll = 0f
-                                    }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    showDiscardDialog = false
                                 }
-                                return Offset.Zero
+                            ) {
+                                Text(stringResource(R.string.action_cancel))
                             }
                         }
-                    }
+                    )
+                }
 
-                    Column(
+                fun getMissingPermissionsHelper(action: Action?): List<String> {
+                    if (action == null) return emptyList()
+                    val resolvedPermissions = action.permissions.map { permKey ->
+                        if (permKey == "SHIZUKU" || permKey == "ROOT") {
+                            if (com.sameerasw.essentials.utils.ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"
+                        } else {
+                            permKey
+                        }
+                    }.distinct()
+
+                    return resolvedPermissions.filter { permKey ->
+                        when (permKey) {
+                            "SHIZUKU" -> !viewModel.isShizukuPermissionGranted.value
+                            "ROOT" -> !viewModel.isRootPermissionGranted.value
+                            "WRITE_SETTINGS" -> !viewModel.isWriteSettingsEnabled.value
+                            "NOTIFICATION_POLICY" -> !viewModel.isNotificationPolicyAccessGranted.value
+                            "WRITE_SECURE_SETTINGS" -> !viewModel.isWriteSecureSettingsEnabled.value
+                            else -> false
+                        }
+                    }
+                }
+
+                val performSave = {
+                    val actionsToCheck = when (automationType) {
+                        Automation.Type.TRIGGER, Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> listOfNotNull(selectedAction)
+                        else -> listOfNotNull(selectedInAction, selectedOutAction)
+                    }
+                    val allMissingPermissions = actionsToCheck.flatMap { getMissingPermissionsHelper(it) }.distinct()
+                    if (allMissingPermissions.isNotEmpty()) {
+                        permissionKeysToShow = allMissingPermissions
+                        permissionFeatureTitle = R.string.tab_diy
+                        showPermissionSheet = true
+                    } else {
+                        if (automationType == Automation.Type.TRIGGER) {
+                            val newAutomation = Automation(
+                                id = if (isEditMode) existingAutomation.id else java.util.UUID.randomUUID().toString(),
+                                type = Automation.Type.TRIGGER,
+                                trigger = selectedTrigger,
+                                actions = listOfNotNull(selectedAction)
+                            )
+                            if (isEditMode) DIYRepository.updateAutomation(newAutomation) else DIYRepository.addAutomation(newAutomation)
+                        } else if (automationType == Automation.Type.ACTION_SHORTCUT || automationType == Automation.Type.PIXEL_SEARCHBAR) {
+                            val newAutomation = Automation(
+                                id = if (isEditMode) existingAutomation.id else java.util.UUID.randomUUID().toString(),
+                                type = automationType,
+                                actions = listOfNotNull(selectedAction)
+                            )
+                            if (isEditMode) DIYRepository.updateAutomation(newAutomation) else DIYRepository.addAutomation(newAutomation)
+                        } else if (automationType == Automation.Type.STATE) {
+                            val newAutomation = Automation(
+                                id = if (isEditMode) existingAutomation.id else java.util.UUID.randomUUID().toString(),
+                                type = Automation.Type.STATE,
+                                state = selectedState,
+                                entryAction = selectedInAction,
+                                exitAction = selectedOutAction
+                            )
+                            if (isEditMode) DIYRepository.updateAutomation(newAutomation) else DIYRepository.addAutomation(newAutomation)
+                        } else if (automationType == Automation.Type.APP) {
+                            val newAutomation = Automation(
+                                id = if (isEditMode) existingAutomation.id else java.util.UUID.randomUUID().toString(),
+                                type = Automation.Type.APP,
+                                selectedApps = selectedApps,
+                                entryAction = selectedInAction,
+                                exitAction = selectedOutAction
+                            )
+                            if (isEditMode) DIYRepository.updateAutomation(newAutomation) else DIYRepository.addAutomation(newAutomation)
+                        }
+                        finish()
+                    }
+                }
+
+                Scaffold(
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ) { _ ->
+                    val density = LocalDensity.current
+                    val statusBarHeightPx = with(density) {
+                        WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx()
+                    }
+                    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding)
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .progressiveBlur(
+                                blurRadius = if (isBlurEnabled) 40f else 0f,
+                                height = statusBarHeightPx * 1.15f,
+                                direction = BlurDirection.TOP
+                            )
                     ) {
+                        val configuration = LocalConfiguration.current
+                        val screenWidth = configuration.screenWidthDp.dp
+
+                        // Haptic Connection for Swipe Texture
+                        val nestedScrollConnection = remember {
+                            object : NestedScrollConnection {
+                                var accumulatedScroll = 0f
+                                val threshold = 40f
+
+                                override fun onPreScroll(
+                                    available: Offset,
+                                    source: NestedScrollSource
+                                ): Offset {
+                                    if (source == NestedScrollSource.UserInput) {
+                                        accumulatedScroll += available.x
+
+                                        if (kotlin.math.abs(accumulatedScroll) >= threshold) {
+                                            HapticUtil.performSliderHaptic(view)
+                                            accumulatedScroll = 0f
+                                        }
+                                    }
+                                    return Offset.Zero
+                                }
+                            }
+                        }
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .progressiveBlur(
+                                    blurRadius = if (isBlurEnabled) 40f else 0f,
+                                    height = with(density) { 150.dp.toPx() },
+                                    direction = BlurDirection.BOTTOM
+                                )
+                        ) {
                         HorizontalMultiBrowseCarousel(
                             state = carouselState,
                             preferredItemWidth = screenWidth,
@@ -408,6 +508,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 .padding(16.dp),
                                             verticalArrangement = Arrangement.spacedBy(16.dp)
                                         ) {
+                                            Spacer(modifier = Modifier.height(statusBarHeight + 4.dp))
                                             Text(
                                                 text = stringResource(R.string.diy_create_app_title),
                                                 style = MaterialTheme.typography.titleLarge,
@@ -478,7 +579,10 @@ class AutomationEditorActivity : ComponentActivity() {
                                                     modifier = Modifier
                                                         .weight(1f)
                                                         .clip(RoundedCornerShape(24.dp)),
-                                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                                                    contentPadding = PaddingValues(
+                                                        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 80.dp
+                                                    )
                                                 ) {
                                                     items(
                                                         filteredApps,
@@ -510,6 +614,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 .padding(16.dp),
                                             verticalArrangement = Arrangement.spacedBy(16.dp)
                                         ) {
+                                            Spacer(modifier = Modifier.height(statusBarHeight + 4.dp))
                                             Text(
                                                 text = stringResource(R.string.diy_select_trigger),
                                                 style = MaterialTheme.typography.titleLarge,
@@ -539,6 +644,11 @@ class AutomationEditorActivity : ComponentActivity() {
                                                     onClick = {}
                                                 )
                                             }
+                                            Spacer(
+                                                modifier = Modifier.height(
+                                                    WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 80.dp
+                                                )
+                                            )
                                         }
                                     } else {
                                         Column(
@@ -548,6 +658,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 .padding(16.dp),
                                             verticalArrangement = Arrangement.spacedBy(16.dp)
                                         ) {
+                                            Spacer(modifier = Modifier.height(statusBarHeight + 4.dp))
                                             Text(
                                                 text = stringResource(if (automationType == Automation.Type.TRIGGER) R.string.diy_select_trigger else R.string.diy_select_state),
                                                 style = MaterialTheme.typography.titleLarge,
@@ -690,6 +801,11 @@ class AutomationEditorActivity : ComponentActivity() {
                                                     }
                                                 }
                                             }
+                                            Spacer(
+                                                modifier = Modifier.height(
+                                                    WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 80.dp
+                                                )
+                                            )
                                         }
                                     }
                                 } else {
@@ -701,6 +817,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                             .padding(16.dp),
                                         verticalArrangement = Arrangement.spacedBy(16.dp)
                                     ) {
+                                        Spacer(modifier = Modifier.height(statusBarHeight + 4.dp))
                                         Text(
                                             text = stringResource(R.string.diy_select_action),
                                             style = MaterialTheme.typography.titleLarge,
@@ -849,7 +966,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                     else selectedOutAction = resolvedAction
                                                                 }
                                                             }
-                                                            val missing = getMissingPermissions(context, resolvedAction, viewModel)
+                                                            val missing = getMissingPermissionsHelper(resolvedAction)
                                                             if (missing.isNotEmpty()) {
                                                                 permissionKeysToShow = missing
                                                                 permissionFeatureTitle = resolvedAction.title
@@ -881,6 +998,11 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 }
                                             }
                                         }
+                                        Spacer(
+                                            modifier = Modifier.height(
+                                                WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 80.dp
+                                            )
+                                        )
                                     }
                                 }
                             }
@@ -1124,6 +1246,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                 excludePackages = if (automationType == Automation.Type.APP) selectedApps else emptyList()
                             )
                         }
+                        }
 
                         if (showPermissionSheet) {
                             val permissionItems = com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItems(
@@ -1144,136 +1267,21 @@ class AutomationEditorActivity : ComponentActivity() {
                             }
                         }
 
-                        // Bottom Actions
-                        Row(
+                        // Floating Bottom Toolbar
+                        EssentialsFloatingToolbar(
+                            title = stringResource(titleRes),
+                            onBackClick = handleBackClick,
+                            fabAction = if (isValid) {
+                                { performSave() }
+                            } else null,
+                            fabIconRes = R.drawable.rounded_check_24,
+                            fabContentDescription = stringResource(R.string.action_save),
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp, horizontal = 24.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Button(
-                                onClick = {
-                                    HapticUtil.performVirtualKeyHaptic(view)
-                                    finish()
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceBright,
-                                    contentColor = MaterialTheme.colorScheme.onSurface
-                                )
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_close_24),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.size(8.dp))
-                                Text(stringResource(R.string.action_cancel))
-                            }
-
-                            Button(
-                                onClick = {
-                                    HapticUtil.performVirtualKeyHaptic(view)
-                                    // Check for missing permissions before saving
-                                    val actionsToCheck = when (automationType) {
-                                        Automation.Type.TRIGGER, Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> listOfNotNull(selectedAction)
-                                        else -> listOfNotNull(selectedInAction, selectedOutAction)
-                                    }
-                                    val allMissingPermissions = actionsToCheck.flatMap { getMissingPermissions(context, it, viewModel) }.distinct()
-                                    if (allMissingPermissions.isNotEmpty()) {
-                                        permissionKeysToShow = allMissingPermissions
-                                        permissionFeatureTitle = R.string.tab_diy
-                                        showPermissionSheet = true
-                                        return@Button
-                                    }
-                                    if (automationType == Automation.Type.TRIGGER) {
-                                        val newAutomation = Automation(
-                                            id = if (isEditMode) existingAutomation.id else java.util.UUID.randomUUID()
-                                                .toString(),
-                                            type = Automation.Type.TRIGGER,
-                                            trigger = selectedTrigger,
-                                            actions = listOfNotNull(selectedAction)
-                                        )
-                                        if (isEditMode) DIYRepository.updateAutomation(newAutomation) else DIYRepository.addAutomation(
-                                            newAutomation
-                                        )
-                                    } else if (automationType == Automation.Type.ACTION_SHORTCUT || automationType == Automation.Type.PIXEL_SEARCHBAR) {
-                                        val newAutomation = Automation(
-                                            id = if (isEditMode) existingAutomation.id else java.util.UUID.randomUUID()
-                                                .toString(),
-                                            type = automationType,
-                                            actions = listOfNotNull(selectedAction)
-                                        )
-                                        if (isEditMode) DIYRepository.updateAutomation(newAutomation) else DIYRepository.addAutomation(
-                                            newAutomation
-                                        )
-                                    } else if (automationType == Automation.Type.STATE) {
-                                        val newAutomation = Automation(
-                                            id = if (isEditMode) existingAutomation.id else java.util.UUID.randomUUID()
-                                                .toString(),
-                                            type = Automation.Type.STATE,
-                                            state = selectedState,
-                                            entryAction = selectedInAction,
-                                            exitAction = selectedOutAction
-                                        )
-                                        if (isEditMode) DIYRepository.updateAutomation(newAutomation) else DIYRepository.addAutomation(
-                                            newAutomation
-                                        )
-                                    } else {
-                                        val newAutomation = Automation(
-                                            id = if (isEditMode) existingAutomation.id else java.util.UUID.randomUUID()
-                                                .toString(),
-                                            type = Automation.Type.APP,
-                                            selectedApps = selectedApps,
-                                            entryAction = selectedInAction,
-                                            exitAction = selectedOutAction
-                                        )
-                                        if (isEditMode) DIYRepository.updateAutomation(newAutomation) else DIYRepository.addAutomation(
-                                            newAutomation
-                                        )
-                                    }
-                                    finish()
-                                },
-                                modifier = Modifier.weight(1f),
-                                 enabled = isValid
-                             ) {
-                                 Icon(
-                                     painter = painterResource(id = R.drawable.rounded_check_24),
-                                     contentDescription = null,
-                                     modifier = Modifier.size(20.dp)
-                                 )
-                                 Spacer(modifier = Modifier.size(8.dp))
-                                 Text(stringResource(R.string.action_save))
-                             }
-                        }
+                                .align(Alignment.BottomCenter)
+                                .zIndex(1f)
+                        )
                     }
                 }
-            }
-        }
-    }
-
-    private fun getMissingPermissions(
-        context: Context,
-        action: Action?,
-        viewModel: com.sameerasw.essentials.viewmodels.MainViewModel
-    ): List<String> {
-        if (action == null) return emptyList()
-        val resolvedPermissions = action.permissions.map { permKey ->
-            if (permKey == "SHIZUKU" || permKey == "ROOT") {
-                if (com.sameerasw.essentials.utils.ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"
-            } else {
-                permKey
-            }
-        }.distinct()
-
-        return resolvedPermissions.filter { permKey ->
-            when (permKey) {
-                "SHIZUKU" -> !viewModel.isShizukuPermissionGranted.value
-                "ROOT" -> !viewModel.isRootPermissionGranted.value
-                "WRITE_SETTINGS" -> !viewModel.isWriteSettingsEnabled.value
-                "NOTIFICATION_POLICY" -> !viewModel.isNotificationPolicyAccessGranted.value
-                "WRITE_SECURE_SETTINGS" -> !viewModel.isWriteSecureSettingsEnabled.value
-                else -> false
             }
         }
     }

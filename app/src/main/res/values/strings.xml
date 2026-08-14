@@ -950,6 +950,9 @@
     <string name="diy_end_time_label">End Time</string>
     <string name="diy_repeat_days_label">Repeat on</string>
 
+    <string name="diy_discard_warning_title">Discard changes?</string>
+    <string name="diy_discard_warning_desc">You have unsaved changes. Are you sure you want to exit without saving?</string>
+
     <string name="diy_category_connectivity">Connectivity &amp; Network</string>
     <string name="diy_category_display">Display &amp; Screen</string>
     <string name="diy_category_apps">Apps</string>
