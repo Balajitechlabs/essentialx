@@ -100,9 +100,7 @@ android {
     }
 
     buildTypes {
-
 //        optimized dev build
-
 //           debug {
 //              isMinifyEnabled = true
 //              isShrinkResources = true
@@ -112,9 +110,7 @@ android {
 //                  "proguard-rules.pro"
 //              )
 //           }
-
-        // end
-
+//        end
 
         release {
             isMinifyEnabled = true
