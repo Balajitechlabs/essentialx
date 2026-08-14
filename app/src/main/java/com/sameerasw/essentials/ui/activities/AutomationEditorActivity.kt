@@ -76,6 +76,7 @@ import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.Trigger
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.NotificationApp
+import com.sameerasw.essentials.ui.components.CategoryExpandableSection
 import com.sameerasw.essentials.ui.components.ReusableTopAppBar
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
@@ -555,101 +556,137 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 modifier = Modifier.padding(horizontal = 12.dp)
                                             )
 
-                                            RoundedCardContainer(spacing = 2.dp) {
-                                                if (automationType == Automation.Type.TRIGGER) {
-                                                    val triggers = listOf(
-                                                        Trigger.ScreenOff,
-                                                        Trigger.ScreenOn,
-                                                        Trigger.DeviceUnlock,
-                                                        Trigger.ChargerConnected,
-                                                        Trigger.ChargerDisconnected,
-                                                        Trigger.PowerSavingOn,
-                                                        Trigger.PowerSavingOff,
-                                                        Trigger.Schedule(
-                                                            hour = (selectedTrigger as? Trigger.Schedule)?.hour
-                                                                ?: 0,
-                                                            minute = (selectedTrigger as? Trigger.Schedule)?.minute
-                                                                ?: 0,
-                                                            days = (selectedTrigger as? Trigger.Schedule)?.days
-                                                                ?: emptySet()
+                                            if (automationType == Automation.Type.TRIGGER) {
+                                                val triggerCategories = remember(selectedTrigger) {
+                                                    listOf(
+                                                        R.string.diy_category_system_screen to listOf(
+                                                            Trigger.ScreenOff,
+                                                            Trigger.ScreenOn,
+                                                            Trigger.DeviceUnlock
                                                         ),
-                                                        Trigger.BluetoothConnected(
-                                                            deviceAddress = (selectedTrigger as? Trigger.BluetoothConnected)?.deviceAddress
-                                                                ?: "",
-                                                            deviceName = (selectedTrigger as? Trigger.BluetoothConnected)?.deviceName
-                                                                ?: ""
+                                                        R.string.diy_category_battery_power to listOf(
+                                                            Trigger.ChargerConnected,
+                                                            Trigger.ChargerDisconnected,
+                                                            Trigger.PowerSavingOn,
+                                                            Trigger.PowerSavingOff
                                                         ),
-                                                        Trigger.BluetoothDisconnected(
-                                                            deviceAddress = (selectedTrigger as? Trigger.BluetoothDisconnected)?.deviceAddress
-                                                                ?: "",
-                                                            deviceName = (selectedTrigger as? Trigger.BluetoothDisconnected)?.deviceName
-                                                                ?: ""
+                                                        R.string.diy_category_connectivity to listOf(
+                                                            Trigger.BluetoothConnected(
+                                                                deviceAddress = (selectedTrigger as? Trigger.BluetoothConnected)?.deviceAddress ?: "",
+                                                                deviceName = (selectedTrigger as? Trigger.BluetoothConnected)?.deviceName ?: ""
+                                                            ),
+                                                            Trigger.BluetoothDisconnected(
+                                                                deviceAddress = (selectedTrigger as? Trigger.BluetoothDisconnected)?.deviceAddress ?: "",
+                                                                deviceName = (selectedTrigger as? Trigger.BluetoothDisconnected)?.deviceName ?: ""
+                                                            ),
+                                                            Trigger.WifiConnected(
+                                                                ssid = (selectedTrigger as? Trigger.WifiConnected)?.ssid ?: ""
+                                                            ),
+                                                            Trigger.WifiDisconnected(
+                                                                ssid = (selectedTrigger as? Trigger.WifiDisconnected)?.ssid ?: ""
+                                                            )
                                                         ),
-                                                        Trigger.WifiConnected(
-                                                            ssid = (selectedTrigger as? Trigger.WifiConnected)?.ssid
-                                                                ?: ""
-                                                        ),
-                                                        Trigger.WifiDisconnected(
-                                                            ssid = (selectedTrigger as? Trigger.WifiDisconnected)?.ssid
-                                                                ?: ""
+                                                        R.string.diy_category_time_schedule to listOf(
+                                                            Trigger.Schedule(
+                                                                hour = (selectedTrigger as? Trigger.Schedule)?.hour ?: 0,
+                                                                minute = (selectedTrigger as? Trigger.Schedule)?.minute ?: 0,
+                                                                days = (selectedTrigger as? Trigger.Schedule)?.days ?: emptySet()
+                                                            )
                                                         )
                                                     )
-                                                    triggers.forEach { trigger ->
-                                                        EditorActionItem(
-                                                            title = stringResource(trigger.title),
-                                                            iconRes = trigger.icon,
-                                                            isSelected = selectedTrigger == trigger,
-                                                            isConfigurable = trigger.isConfigurable,
-                                                            onClick = { selectedTrigger = trigger },
-                                                            onSettingsClick = {
-                                                                when (trigger) {
-                                                                    is Trigger.Schedule -> showTimeSettings =
-                                                                        true
+                                                }
 
-                                                                    is Trigger.BluetoothConnected,
-                                                                    is Trigger.BluetoothDisconnected -> showBluetoothSettings =
-                                                                        true
+                                                var expandedTriggerCategory by remember {
+                                                    mutableStateOf<Int?>(
+                                                        triggerCategories.firstOrNull { (_, list) ->
+                                                            list.any { selectedTrigger != null && it::class == selectedTrigger!!::class }
+                                                        }?.first ?: triggerCategories.firstOrNull()?.first
+                                                    )
+                                                }
 
-                                                                    is Trigger.WifiConnected,
-                                                                    is Trigger.WifiDisconnected -> showWifiSettings =
-                                                                        true
-
-                                                                    else -> {}
+                                                triggerCategories.forEach { (categoryTitleRes, triggerList) ->
+                                                    CategoryExpandableSection(
+                                                        title = stringResource(categoryTitleRes),
+                                                        itemCount = triggerList.size,
+                                                        isExpanded = expandedTriggerCategory == categoryTitleRes,
+                                                        onToggleExpand = {
+                                                            expandedTriggerCategory = if (expandedTriggerCategory == categoryTitleRes) null else categoryTitleRes
+                                                        }
+                                                    ) {
+                                                        triggerList.forEach { trigger ->
+                                                            val isSelected = selectedTrigger != null && selectedTrigger!!::class == trigger::class
+                                                            EditorActionItem(
+                                                                title = stringResource(trigger.title),
+                                                                iconRes = trigger.icon,
+                                                                isSelected = isSelected,
+                                                                isConfigurable = trigger.isConfigurable,
+                                                                onClick = { selectedTrigger = trigger },
+                                                                onSettingsClick = {
+                                                                    when (trigger) {
+                                                                        is Trigger.Schedule -> showTimeSettings = true
+                                                                        is Trigger.BluetoothConnected, is Trigger.BluetoothDisconnected -> showBluetoothSettings = true
+                                                                        is Trigger.WifiConnected, is Trigger.WifiDisconnected -> showWifiSettings = true
+                                                                        else -> {}
+                                                                    }
                                                                 }
-                                                            }
-                                                        )
+                                                            )
+                                                        }
                                                     }
-                                                } else {
-                                                    val states = listOf(
-                                                        DIYState.Charging,
-                                                        DIYState.ScreenOn,
-                                                        DIYState.PowerSaving,
-                                                        DIYState.TimePeriod(
-                                                            startHour = (selectedState as? DIYState.TimePeriod)?.startHour
-                                                                ?: 0,
-                                                            startMinute = (selectedState as? DIYState.TimePeriod)?.startMinute
-                                                                ?: 0,
-                                                            endHour = (selectedState as? DIYState.TimePeriod)?.endHour
-                                                                ?: 0,
-                                                            endMinute = (selectedState as? DIYState.TimePeriod)?.endMinute
-                                                                ?: 0,
-                                                            days = (selectedState as? DIYState.TimePeriod)?.days
-                                                                ?: emptySet()
+                                                }
+                                            } else {
+                                                val stateCategories = remember(selectedState) {
+                                                    listOf(
+                                                        R.string.diy_category_battery_power to listOf(
+                                                            DIYState.Charging,
+                                                            DIYState.PowerSaving
+                                                        ),
+                                                        R.string.diy_category_system_screen to listOf(
+                                                            DIYState.ScreenOn
+                                                        ),
+                                                        R.string.diy_category_time_schedule to listOf(
+                                                            DIYState.TimePeriod(
+                                                                startHour = (selectedState as? DIYState.TimePeriod)?.startHour ?: 0,
+                                                                startMinute = (selectedState as? DIYState.TimePeriod)?.startMinute ?: 0,
+                                                                endHour = (selectedState as? DIYState.TimePeriod)?.endHour ?: 0,
+                                                                endMinute = (selectedState as? DIYState.TimePeriod)?.endMinute ?: 0,
+                                                                days = (selectedState as? DIYState.TimePeriod)?.days ?: emptySet()
+                                                            )
                                                         )
                                                     )
-                                                    states.forEach { state ->
-                                                        EditorActionItem(
-                                                            title = stringResource(state.title),
-                                                            iconRes = state.icon,
-                                                            isSelected = selectedState == state,
-                                                            onClick = { selectedState = state },
-                                                            isConfigurable = state is DIYState.TimePeriod,
-                                                            onSettingsClick = {
-                                                                if (state is DIYState.TimePeriod) {
-                                                                    showTimeSettings = true
+                                                }
+
+                                                var expandedStateCategory by remember {
+                                                    mutableStateOf<Int?>(
+                                                        stateCategories.firstOrNull { (_, list) ->
+                                                            list.any { selectedState != null && it::class == selectedState!!::class }
+                                                        }?.first ?: stateCategories.firstOrNull()?.first
+                                                    )
+                                                }
+
+                                                stateCategories.forEach { (categoryTitleRes, stateList) ->
+                                                    CategoryExpandableSection(
+                                                        title = stringResource(categoryTitleRes),
+                                                        itemCount = stateList.size,
+                                                        isExpanded = expandedStateCategory == categoryTitleRes,
+                                                        onToggleExpand = {
+                                                            expandedStateCategory = if (expandedStateCategory == categoryTitleRes) null else categoryTitleRes
+                                                        }
+                                                    ) {
+                                                        stateList.forEach { state ->
+                                                            val isSelected = selectedState != null && selectedState!!::class == state::class
+                                                            EditorActionItem(
+                                                                title = stringResource(state.title),
+                                                                iconRes = state.icon,
+                                                                isSelected = isSelected,
+                                                                onClick = { selectedState = state },
+                                                                isConfigurable = state is DIYState.TimePeriod,
+                                                                onSettingsClick = {
+                                                                    if (state is DIYState.TimePeriod) {
+                                                                        showTimeSettings = true
+                                                                    }
                                                                 }
-                                                            }
-                                                        )
+                                                            )
+                                                        }
                                                     }
                                                 }
                                             }
@@ -687,136 +724,161 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 },
                                                 labelProvider = { it },
                                                 modifier = Modifier.fillMaxWidth(),
-                                                cornerShape = MaterialTheme.shapes.extraExtraLarge.bottomEnd
+                                                        cornerShape = MaterialTheme.shapes.extraExtraLarge.bottomEnd
                                             )
                                         }
 
+                                        val currentSelection = when (automationType) {
+                                            Automation.Type.TRIGGER -> selectedAction
+                                            Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction
+                                            Automation.Type.STATE -> if (selectedActionTab == 0) selectedInAction else selectedOutAction
+                                            Automation.Type.APP -> if (selectedActionTab == 0) selectedInAction else selectedOutAction
+                                        }
+
+                                        // None option
                                         RoundedCardContainer(spacing = 2.dp) {
-                                            val actions = mutableListOf(
-                                                Action.TurnOnFlashlight,
-                                                Action.TurnOffFlashlight,
-                                                Action.ToggleFlashlight,
-                                                Action.HapticVibration,
-                                                Action.DimWallpaper(),
-                                                Action.ScreenOff(),
-                                                Action.SoundMode(),
-                                                Action.SometimesEssentials(),
-                                                Action.FreezeTag(),
-                                                Action.TurnOnLowPower,
-                                                Action.TurnOnWifi,
-                                                Action.TurnOffWifi,
-                                                Action.TurnOnCellularData,
-                                                Action.TurnOffCellularData,
-                                                Action.TurnOnAutoBrightness,
-                                                Action.TurnOffAutoBrightness,
-                                                Action.FreezeApps(),
-                                                Action.UnfreezeApps(),
-                                                Action.TurnOffLowPower,
-                                                Action.MediaPlayPause,
-                                                Action.MediaNext,
-                                                Action.MediaPrevious,
-                                                Action.AIAssistant,
-                                                Action.TakeScreenshot,
-                                                Action.ToggleMediaVolume,
-                                                Action.LikeCurrentSong,
-                                                Action.CircleToSearch,
-                                                Action.PinApp,
-                                                Action.OpenApp(),
-                                                Action.TurnOnHotspot,
-                                                Action.TurnOffHotspot,
-                                                Action.ToggleHotspot
-                                            )
-                                            // Only show Device Effects on Android 15+ 
-                                            actions.add(Action.DeviceEffects())
-
-
-                                            val currentSelection = when (automationType) {
-                                                Automation.Type.TRIGGER -> selectedAction
-                                                Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction
-                                                Automation.Type.STATE -> if (selectedActionTab == 0) selectedInAction else selectedOutAction
-                                                Automation.Type.APP -> if (selectedActionTab == 0) selectedInAction else selectedOutAction
-                                            }
-
-                                            // None option
                                             EditorActionItem(
                                                 title = stringResource(R.string.haptic_none),
                                                 iconRes = R.drawable.rounded_do_not_disturb_on_24,
                                                 isSelected = currentSelection == null,
                                                 onClick = {
                                                     when (automationType) {
-                                                        Automation.Type.TRIGGER -> selectedAction =
-                                                            null
-
-                                                        Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction =
-                                                            null
-
+                                                        Automation.Type.TRIGGER -> selectedAction = null
+                                                        Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction = null
                                                         Automation.Type.STATE, Automation.Type.APP -> {
-                                                            if (selectedActionTab == 0) selectedInAction =
-                                                                null
+                                                            if (selectedActionTab == 0) selectedInAction = null
                                                             else selectedOutAction = null
                                                         }
                                                     }
                                                 }
                                             )
+                                        }
 
-                                            actions.forEach { action ->
-                                                // Check if the current selection matches this action type and update 'action' with the selected values if so
-                                                val resolvedAction =
-                                                    if (currentSelection != null && currentSelection::class == action::class) currentSelection else action
+                                        val actionCategories = remember(currentSelection) {
+                                            val connectivityActions = listOf(
+                                                Action.TurnOnWifi,
+                                                Action.TurnOffWifi,
+                                                Action.TurnOnCellularData,
+                                                Action.TurnOffCellularData,
+                                                Action.TurnOnHotspot,
+                                                Action.TurnOffHotspot,
+                                                Action.ToggleHotspot
+                                            )
+                                            val displayActions = mutableListOf<Action>(
+                                                Action.TurnOnAutoBrightness,
+                                                Action.TurnOffAutoBrightness,
+                                                Action.DimWallpaper(),
+                                                Action.ScreenOff()
+                                            ).apply {
+                                                if (android.os.Build.VERSION.SDK_INT >= 35) {
+                                                    add(Action.DeviceEffects())
+                                                }
+                                            }
+                                            val appsActions = listOf(
+                                                Action.OpenApp(),
+                                                Action.AIAssistant,
+                                                Action.FreezeApps(),
+                                                Action.UnfreezeApps(),
+                                                Action.FreezeTag(),
+                                                Action.PinApp
+                                            )
+                                            val systemActions = listOf(
+                                                Action.TurnOnFlashlight,
+                                                Action.TurnOffFlashlight,
+                                                Action.ToggleFlashlight,
+                                                Action.TurnOnLowPower,
+                                                Action.TurnOffLowPower,
+                                                Action.CircleToSearch,
+                                                Action.TakeScreenshot,
+                                                Action.ShowNotification,
+                                                Action.RemoveNotification
+                                            )
+                                            val soundMediaActions = listOf(
+                                                Action.SoundMode(),
+                                                Action.HapticVibration,
+                                                Action.ToggleMediaVolume,
+                                                Action.MediaPlayPause,
+                                                Action.MediaNext,
+                                                Action.MediaPrevious,
+                                                Action.LikeCurrentSong
+                                            )
+                                            val essentialsActions = listOf(
+                                                Action.SometimesEssentials()
+                                            )
 
-                                                EditorActionItem(
-                                                    title = stringResource(resolvedAction.title),
-                                                    iconRes = resolvedAction.icon,
-                                                    isSelected = currentSelection != null && currentSelection::class == resolvedAction::class,
-                                                    isConfigurable = resolvedAction.isConfigurable,
-                                                    onClick = {
-                                                        when (automationType) {
-                                                            Automation.Type.TRIGGER -> selectedAction =
-                                                                resolvedAction
+                                            listOf(
+                                                R.string.diy_category_connectivity to connectivityActions,
+                                                R.string.diy_category_display to displayActions,
+                                                R.string.diy_category_apps to appsActions,
+                                                R.string.diy_category_system to systemActions,
+                                                R.string.diy_category_sound_media to soundMediaActions,
+                                                R.string.diy_category_essentials to essentialsActions
+                                            )
+                                        }
 
-                                                            Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction =
-                                                                resolvedAction
+                                        var expandedActionCategory by remember {
+                                            mutableStateOf<Int?>(
+                                                actionCategories.firstOrNull { (_, list) ->
+                                                    list.any { currentSelection != null && it::class == currentSelection::class }
+                                                }?.first ?: actionCategories.firstOrNull()?.first
+                                            )
+                                        }
 
-                                                            Automation.Type.STATE, Automation.Type.APP -> {
-                                                                if (selectedActionTab == 0) selectedInAction =
-                                                                    resolvedAction
-                                                                else selectedOutAction =
-                                                                    resolvedAction
+                                        actionCategories.forEach { (categoryTitleRes, actions) ->
+                                            CategoryExpandableSection(
+                                                title = stringResource(categoryTitleRes),
+                                                itemCount = actions.size,
+                                                isExpanded = expandedActionCategory == categoryTitleRes,
+                                                onToggleExpand = {
+                                                    expandedActionCategory = if (expandedActionCategory == categoryTitleRes) null else categoryTitleRes
+                                                }
+                                            ) {
+                                                actions.forEach { action ->
+                                                    val resolvedAction = if (currentSelection != null && currentSelection::class == action::class) currentSelection else action
+                                                    EditorActionItem(
+                                                        title = stringResource(resolvedAction.title),
+                                                        iconRes = resolvedAction.icon,
+                                                        isSelected = currentSelection != null && currentSelection::class == resolvedAction::class,
+                                                        isConfigurable = resolvedAction.isConfigurable,
+                                                        onClick = {
+                                                            when (automationType) {
+                                                                Automation.Type.TRIGGER -> selectedAction = resolvedAction
+                                                                Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction = resolvedAction
+                                                                Automation.Type.STATE, Automation.Type.APP -> {
+                                                                    if (selectedActionTab == 0) selectedInAction = resolvedAction
+                                                                    else selectedOutAction = resolvedAction
+                                                                }
+                                                            }
+                                                            val missing = getMissingPermissions(context, resolvedAction, viewModel)
+                                                            if (missing.isNotEmpty()) {
+                                                                permissionKeysToShow = missing
+                                                                permissionFeatureTitle = resolvedAction.title
+                                                                showPermissionSheet = true
+                                                            }
+                                                        },
+                                                        onSettingsClick = {
+                                                            configAction = resolvedAction
+                                                            when (resolvedAction) {
+                                                                is Action.DimWallpaper -> showDimSettings = true
+                                                                is Action.ScreenOff -> showScreenOffSettings = true
+                                                                is Action.DeviceEffects -> showDeviceEffectsSettings = true
+                                                                is Action.SoundMode -> showSoundModeSettings = true
+                                                                is Action.SometimesEssentials -> showSometimesEssentialsSettings = true
+                                                                is Action.FreezeTag -> showFreezeTagSettings = true
+                                                                is Action.OpenApp -> showOpenAppSettings = true
+                                                                is Action.FreezeApps -> {
+                                                                    temporarySelectedAppsForAction = resolvedAction.packageNames
+                                                                    showFreezeAppsSettings = true
+                                                                }
+                                                                is Action.UnfreezeApps -> {
+                                                                    temporarySelectedAppsForAction = resolvedAction.packageNames
+                                                                    showFreezeAppsSettings = true
+                                                                }
+                                                                else -> {}
                                                             }
                                                         }
-                                                        // Check permissions immediately on selection
-                                                        val missing = getMissingPermissions(context, resolvedAction, viewModel)
-                                                        if (missing.isNotEmpty()) {
-                                                            permissionKeysToShow = missing
-                                                            permissionFeatureTitle = resolvedAction.title
-                                                            showPermissionSheet = true
-                                                        }
-                                                    },
-                                                    onSettingsClick = {
-                                                        configAction = resolvedAction
-                                                        if (resolvedAction is Action.DimWallpaper) {
-                                                            showDimSettings = true
-                                                        } else if (resolvedAction is Action.ScreenOff) {
-                                                            showScreenOffSettings = true
-                                                        } else if (resolvedAction is Action.DeviceEffects) {
-                                                            showDeviceEffectsSettings = true
-                                                        } else if (resolvedAction is Action.SoundMode) {
-                                                            showSoundModeSettings = true
-                                                        } else if (resolvedAction is Action.SometimesEssentials) {
-                                                            showSometimesEssentialsSettings = true
-                                                        } else if (resolvedAction is Action.FreezeTag) {
-                                                            showFreezeTagSettings = true
-                                                        } else if (resolvedAction is Action.OpenApp) {
-                                                            showOpenAppSettings = true
-                                                        } else if (resolvedAction is Action.FreezeApps) {
-                                                            temporarySelectedAppsForAction = resolvedAction.packageNames
-                                                            showFreezeAppsSettings = true
-                                                        } else if (resolvedAction is Action.UnfreezeApps) {
-                                                            temporarySelectedAppsForAction = resolvedAction.packageNames
-                                                            showFreezeAppsSettings = true
-                                                        }
-                                                    }
-                                                )
+                                                    )
+                                                }
                                             }
                                         }
                                     }

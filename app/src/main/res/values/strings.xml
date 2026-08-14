@@ -950,6 +950,16 @@
     <string name="diy_end_time_label">End Time</string>
     <string name="diy_repeat_days_label">Repeat on</string>
 
+    <string name="diy_category_connectivity">Connectivity &amp; Network</string>
+    <string name="diy_category_display">Display &amp; Screen</string>
+    <string name="diy_category_apps">Apps</string>
+    <string name="diy_category_system">System</string>
+    <string name="diy_category_sound_media">Sound &amp; Media</string>
+    <string name="diy_category_essentials">Essentials Tweaks</string>
+    <string name="diy_category_system_screen">System &amp; Screen</string>
+    <string name="diy_category_battery_power">Battery &amp; Power</string>
+    <string name="diy_category_time_schedule">Time &amp; Schedule</string>
+
     <string name="diy_state_charging">Charging</string>
     <string name="diy_state_screen_on">Screen On</string>
     <string name="diy_state_power_saving">Power Saving</string>
