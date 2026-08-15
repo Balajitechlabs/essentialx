@@ -78,4 +78,6 @@
     <locale android:name="zh" />
     <locale android:name="zh-CN" />
     <locale android:name="zh-TW" />
+    <locale android:name="kk" />
+    <locale android:name="kk-KZ" />
 </locale-config>
