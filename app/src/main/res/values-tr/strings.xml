@@ -390,7 +390,7 @@
     <string name="feat_screen_off_widget_title">Ekran kapatma widget\'ı</string>
     <string name="feat_screen_off_widget_desc">Ekranı kapatmak için görünmez widget</string>
     <string name="feat_statusbar_icons_title">Durum çubuğu simgeleri</string>
-    <string name="feat_statusbar_icons_desc">Durum çubuğu simgelerinin görünürlüğünü kontrol etme</string>
+    <string name="feat_statusbar_icons_desc">Durum çubuğu simgelerinin görünürlüğünü kontrol edin</string>
     <string name="feat_caffeinate_title">Kafein</string>
     <string name="feat_caffeinate_desc">Ekranı uyanık tutun</string>
     <string name="feat_maps_power_saving_title">Haritalar güç tasarrufu modu</string>
