@@ -1114,7 +1114,7 @@
     <string name="bug_report_email_subject">تقرير الأخطاء الأساسية</string>
     <string name="bug_report_send_via">يرجى تفعيل خاصية الإبلاغ عن الأعطال، حيث ستقوم هذه الخاصية بالإبلاغ تلقائياً عن التفاصيل التي من شأنها المساعدة في حل المشكلات.</string>
     <!-- Location Reached -->
-    <string name="feat_location_reached_title">هل نحن هناك بعد؟</string>
+    <string name="feat_location_reached_title">هل وصلنا بعد؟</string>
     <string name="feat_location_reached_desc">تنبيهات الوجهة القريبة</string>
     <string name="location_reached_how_to">افتح خرائط Google، واختر موقعًا، وشاركه على Essentials.</string>
     <string name="location_reached_radius_title">نصف قطر التنبيه:  %d m</string>
@@ -1576,4 +1576,10 @@
     <string name="settings_translate_mode">وضع الترجمة</string>
     <string name="settings_translate_mode_desc">اضغط على أي نص طويل للترجمة والمساهمة في المجتمع</string>
     <string name="settings_translated_texts">المتَرجم</string>
+    <string name="watch_call_sync_desc">مزامنة المكالمات والتحكم بها من ساعتك</string>
+    <string name="watch_call_sync_title">مزامنة المكالمات</string>
+    <string name="watch_notif_sync_title">مزامنة الاشعارات</string>
+    <string name="watch_notif_sync_desc">الى مشغل Essentials</string>
+    <string name="feat_pixel_searchbar_title">استبدال شريط البحث</string>
+    <string name="feat_pixel_searchbar_desc">استبدال مشغل Pixel الافتراضيsearchbar</string>
 </resources>
