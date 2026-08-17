@@ -1477,7 +1477,7 @@
     <string name="feat_safe_volume_title">Desativar aviso de volume seguro</string>
     <string name="feat_safe_volume_desc">Suprimir diálogo de volume alto</string>
     <string name="settings_translate_mode">Modo de Tradução</string>
-    <string name="settings_translate_mode_desc">Pressione e segure qualquer texto para traduzir e contribuir com a comunidade</string>
+    <string name="settings_translate_mode_desc">Pressione e segure qualquer texto para traduzir e contribuir com a comunidade. </string>
     <string name="settings_translated_texts">Traduzido</string>
     <string name="settings_translated_texts_desc">%d edições pendentes - toque para enviar ou descartar</string>
     <string name="setting_enable_unsupported_features_title">Ativar recursos não compatíveis</string>
