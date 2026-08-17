@@ -1533,4 +1533,9 @@
     <string name="feat_circle_to_search_gesture_title">画圈搜索手势</string>
     <string name="feat_lock_from_watch_title">通过手表锁定</string>
     <string name="settings_translated_texts_desc">有 %d 项编辑待处理 — 点击提交或放弃</string>
+    <string name="about_desc_networks">配置网络下载速度限制，保持移动数据在连接Wi-Fi时持续开启，并启用无线显示认证设置。</string>
+    <string name="feat_wireless_display_certification_title">无线显示认证</string>
+    <string name="feat_wireless_display_certification_desc">显示无线显示认证选项</string>
+    <string name="feat_mobile_data_always_on_title">移动数据始终开启</string>
+    <string name="feat_mobile_data_always_on_desc">即使已连接 Wi-Fi，也要保持移动数据开启状态</string>
 </resources>
