@@ -28,7 +28,7 @@
     <string name="app_lock_description">Proteja seus aplicativos com autenticação biométrica. Os aplicativos bloqueados exigirão autenticação ao serem iniciados. Permanecem desbloqueados até que a tela seja desligada.</string>
     <string name="app_lock_warning">Esteja ciente de que esta não é uma solução robusta, pois é apenas um aplicativo de terceiros. Se você precisar de segurança forte, considere usar o Private Space ou outros recursos semelhantes.</string>
     <string name="app_lock_biometric_note">Outra observação: o prompt de autenticação biométrica só permite usar métodos de classe seguros FORTES. Os métodos de segurança de desbloqueio facial na classe FRACA em dispositivos como o Pixel 7 só poderão utilizar os outros métodos de autenticação STRONG disponíveis, como impressão digital ou PIN.</string>
-    <string name="setting_use_usage_access_title">Usar acesso de uso</string>
+    <string name="setting_use_usage_access_title">Acesso ao uso</string>
     <string name="setting_use_usage_access_desc">Em vez de acessibilidade (Congelar, Bloqueio de Aplicativos, Luz Noturna Dinâmica)</string>
     <!-- Button Remap -->
     <string name="button_remap_enable_title">Ativar remapeamento de botão</string>
