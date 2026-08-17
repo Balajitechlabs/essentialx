@@ -65,9 +65,9 @@
     <string name="like_song_toast_enabled">Toast-Nachricht anzeigen</string>
     <string name="like_song_aod_overlay_title">Overlay im AOD anzeigen</string>
     <string name="feat_essentials_on_display_title">Essentials-on-Display</string>
-    <string name="feat_essentials_on_display_desc">Medien und Informationen im AOD auf einen Blick</string>
-    <string name="essentials_on_display_docked_mode_title">Docked mode</string>
-    <string name="essentials_on_display_docked_mode_desc">Keep the overlay visible indefinitely while music is playing on AOD</string>
+    <string name="feat_essentials_on_display_desc">Medien und Informationen im Always-on-Display auf einen Blick</string>
+    <string name="essentials_on_display_docked_mode_title">Dock-Modus</string>
+    <string name="essentials_on_display_docked_mode_desc">Das Overlay dauerhaft eingeblendet lassen, während Musik auf dem Always-on-Display läuft</string>
     <string name="essentials_on_display_respect_notifications_title">Respect new notifications</string>
     <string name="essentials_on_display_respect_notifications_desc">Briefly disable for new notifications</string>
     <string name="essentials_on_display_random_shapes_title">Zufällige Formen</string>
@@ -451,7 +451,7 @@
     <string name="remote_lock_mode_admin_note">Using device admin lock will disable biometrics</string>
     <string name="watch_connected_status">Connected</string>
     <string name="watch_unknown_name">Unknown Watch</string>
-    <string name="watermark_style_overlay">Overlay</string>
+    <string name="watermark_style_overlay">Überlagerung</string>
     <string name="watermark_style_frame">Rahmen</string>
     <string name="watermark_show_brand">Gerätemarke</string>
     <string name="watermark_show_exif">EXIF-Daten</string>
@@ -1442,7 +1442,7 @@ Für Anpassungen der Skalierung sind möglicherweise zusätzlich Shizuku- oder R
     <string name="shut_up_auto_archive_action_abort">Abort</string>
     <!-- Lock Screen Clock -->
     <string name="feat_lock_screen_clock_title">Sperrbildschirmuhr</string>
-    <string name="feat_lock_screen_clock_desc">Funktion: Sperrbildschirmuhr-Beschreibung</string>
+    <string name="feat_lock_screen_clock_desc">Uhr auf dem Sperrbildschirm von Pixel-Geräten anpassen</string>
     <string name="about_desc_lock_screen_clock">Ändere den Stil der Sperrbildschirm-Uhr auf Pixel-Geräten. Wähle aus den vom System-UI bereitgestellten Uhrendesigns aus. Einige ältere Stile sind möglicherweise nicht verfügbar.</string>
     <string name="lock_screen_clock_bignum">Big Number</string>
     <string name="lock_screen_clock_calligraphy">Calligraphy</string>
@@ -1467,7 +1467,7 @@ Für Anpassungen der Skalierung sind möglicherweise zusätzlich Shizuku- oder R
     <string name="label_variation">Variation</string>
     <string name="label_color">Color</string>
     <string name="label_style_font">Style &amp; Font</string>
-    <string name="about_title">About</string>
+    <string name="about_title">Über</string>
     <string name="color_default">Standard</string>
     <string name="color_red">Red</string>
     <string name="color_green">Green</string>
@@ -1621,4 +1621,15 @@ Bitte beachte, dass die Aktivierung dieser Funktion dazu führen kann, dass die 
 
 Zudem muss die Einstellung unter Umständen mehrfach angewendet werden, damit sie wirksam wird.</string>
     <string name="about_desc_networks">Konfiguriere Geschwindigkeitsbegrenzungen für Netzwerk-Downloads, lasse die mobilen Daten auch bei bestehender WLAN-Verbindung dauerhaft aktiviert und aktiviere die Einstellungen für die Zertifizierung drahtloser Displays.</string>
+    <string name="pixel_searchbar_settings_title">Anpassung der Pixel-Suchleiste</string>
+    <string name="freeze_tag_color_coded_title">Farbkodierte Tags</string>
+    <string name="action_lock_auto_freeze">Kein automatisches Einfrieren</string>
+    <string name="freeze_tag_never_auto_freeze_desc">Apps mit diesem Tag werden vor dem automatischen Einfrieren geschützt</string>
+    <string name="freeze_tag_color_coded_desc">Tag-Farben im App-Raster anzeigen</string>
+    <string name="watch_notif_sync_title">Benachrichtigungen synchronisieren</string>
+    <string name="watch_notif_sync_desc">Zum Essentials-Launcher</string>
+    <string name="watch_call_sync_title">Anrufe synchronisieren</string>
+    <string name="watch_call_sync_desc">Anrufe mit deiner Smartwatch synchronisieren und steuern</string>
+    <string name="watch_notif_sync_choose_apps">Apps auswählen</string>
+    <string name="watch_notif_sync_choose_apps_desc">Nur ausgewählte Apps werden mit der Smartwatch synchronisiert</string>
 </resources>
