@@ -359,8 +359,8 @@
     <string name="feat_hide_gesture_bar_on_launcher_desc">Hiển thị thanh cử chỉ một cách linh hoạt chỉ khi đang ở màn hình chính</string>
     <string name="feat_circle_to_search_gesture_title">Cử chỉ Khoanh tròn vùng tìm kiếm</string>
     <string name="feat_circle_to_search_gesture_desc">Nhấn giữ vùng dưới cùng để kích hoạt tính năng Khoanh tròn vùng tìm kiếm</string>
-    <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
-    <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
+    <string name="feat_circle_to_search_gesture_height_title">Chiều cao vùng cử chỉ</string>
+    <string name="feat_circle_to_search_gesture_height_desc">Điều chỉnh độ cao của vùng cảm ứng ở phía dưới</string>
     <string name="feat_other_customizations_title">Các tùy chỉnh khác</string>
     <string name="feat_other_customizations_desc">Các tinh chỉnh và sửa đổi hệ thống bổ sung</string>
     <string name="status_bar_icons_disclaimer">Xin lưu ý rằng việc triển khai các tùy chọn này có thể phụ thuộc vào OEM và một số tùy chọn có thể không hoạt động.</string>
@@ -1437,7 +1437,7 @@ Nếu thiết bị của bạn không hỗ trợ hiển thị lớp phủ đè l
     <string name="label_width">Chiều rộng</string>
     <string name="label_grade">Grade</string>
     <string name="label_roundness">Độ tròn</string>
-    <string name="label_color_tone">Lightness</string>
+    <string name="label_color_tone">Ánh sáng</string>
     <string name="label_variation">Variation</string>
     <string name="label_color">Color</string>
     <string name="label_style_font">Style &amp; Font</string>
@@ -1600,4 +1600,15 @@ Cần có quyền quản trị thiết bị nếu sử dụng chế độ khóa.
     <string name="label_auto_reset_battery_stats_desc">Tự động đặt lại thống kê pin khi thiết bị được rút phích cắm khi dung lượng pin còn trên 90%.</string>
     <string name="pixel_searchbar_style_empty">Không</string>
     <string name="pixel_searchbar_style_date">Ngày</string>
+    <string name="pixel_searchbar_background_pill_desc">Hiển thị ngày tháng bên trong một vùng chứa.</string>
+    <string name="watch_notif_sync_title">Đồng bộ hóa thông báo</string>
+    <string name="watch_notif_sync_desc">Tới trình khởi chạy Essentials</string>
+    <string name="watch_notif_sync_choose_apps">Chọn ứng dụng</string>
+    <string name="watch_notif_sync_choose_apps_desc">Chỉ những ứng dụng được chọn mới được đồng bộ hóa với đồng hồ</string>
+    <string name="watch_call_sync_title">Đồng bộ hoá cuộc gọi</string>
+    <string name="watch_call_sync_desc">Đồng bộ hóa và điều khiển cuộc gọi từ đồng hồ của bạn</string>
+    <string name="feat_circle_to_search_gesture_width_title">Chiều rộng vùng cử chỉ</string>
+    <string name="feat_circle_to_search_gesture_width_desc">Điều chỉnh độ rộng của vùng cảm ứng ở phía dưới</string>
+    <string name="flashlight_pulse_disable_on_dnd_title">Không kích hoạt chế độ Không làm phiền (DND)</string>
+    <string name="diy_category_apps">Ứng dụng</string>
 </resources>

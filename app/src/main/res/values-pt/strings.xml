@@ -28,7 +28,7 @@
     <string name="app_lock_description">Proteja seus aplicativos com autenticação biométrica. Os aplicativos bloqueados exigirão autenticação ao serem iniciados. Permanecem desbloqueados até que a tela seja desligada.</string>
     <string name="app_lock_warning">Esteja ciente de que esta não é uma solução robusta, pois é apenas um aplicativo de terceiros. Se você precisar de segurança forte, considere usar o Private Space ou outros recursos semelhantes.</string>
     <string name="app_lock_biometric_note">Outra observação: o prompt de autenticação biométrica só permite usar métodos de classe seguros FORTES. Os métodos de segurança de desbloqueio facial na classe FRACA em dispositivos como o Pixel 7 só poderão utilizar os outros métodos de autenticação STRONG disponíveis, como impressão digital ou PIN.</string>
-    <string name="setting_use_usage_access_title">Usar acesso de uso</string>
+    <string name="setting_use_usage_access_title">Acesso ao uso</string>
     <string name="setting_use_usage_access_desc">Em vez de acessibilidade (Congelar, Bloqueio de Aplicativos, Luz Noturna Dinâmica)</string>
     <!-- Button Remap -->
     <string name="button_remap_enable_title">Ativar remapeamento de botão</string>
@@ -1477,7 +1477,7 @@
     <string name="feat_safe_volume_title">Desativar aviso de volume seguro</string>
     <string name="feat_safe_volume_desc">Suprimir diálogo de volume alto</string>
     <string name="settings_translate_mode">Modo de Tradução</string>
-    <string name="settings_translate_mode_desc">Pressione e segure qualquer texto para traduzir e contribuir com a comunidade</string>
+    <string name="settings_translate_mode_desc">Pressione e segure qualquer texto para traduzir e contribuir com a comunidade. </string>
     <string name="settings_translated_texts">Traduzido</string>
     <string name="settings_translated_texts_desc">%d edições pendentes - toque para enviar ou descartar</string>
     <string name="setting_enable_unsupported_features_title">Ativar recursos não compatíveis</string>
@@ -1493,4 +1493,12 @@
     <string name="label_thermal_gpu">Temperatura da GPU</string>
     <string name="label_thermal_cpu">Temperatura da CPU</string>
     <string name="feat_networks_title">Redes</string>
+    <string name="feat_networks_desc">Controle radios e redes</string>
+    <string name="feat_standby_apps_title">Aplicativos em segundo plano</string>
+    <string name="feat_standby_apps_desc">Otimize atividades de aplicativos em segundo plano</string>
+    <string name="feat_power_saving_title">Economia de bateria</string>
+    <string name="feat_power_saving_desc">Configure as politicas de economia de energia</string>
+    <string name="feat_smart_pixels_title">Pixeis inteligentes </string>
+    <string name="feat_smart_pixels_desc">Desligue pixeis para economizar energia</string>
+    <string name="tile_lockdown_mode_desc">Desligue a tela com configuração rápida </string>
 </resources>
