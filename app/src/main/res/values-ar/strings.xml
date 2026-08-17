@@ -1582,4 +1582,9 @@
     <string name="watch_notif_sync_desc">الى مشغل Essentials</string>
     <string name="feat_pixel_searchbar_title">استبدال شريط البحث</string>
     <string name="feat_pixel_searchbar_desc">استبدال مشغل Pixel الافتراضيsearchbar</string>
+    <string name="label_snooze_default">وقت الغفوة الافتراضي</string>
+    <string name="label_snooze_option_1">الخيار الاول</string>
+    <string name="label_snooze_option_2">الخيار الثاني</string>
+    <string name="label_snooze_option_3">الخيار الثالث</string>
+    <string name="label_snooze_option_4">الخيار الرابع</string>
 </resources>
