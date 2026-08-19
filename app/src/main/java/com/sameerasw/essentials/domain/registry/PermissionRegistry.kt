@@ -135,9 +135,6 @@ fun initPermissionRegistry() {
     // Safe Volume Warning feature
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_safe_volume_title)
 
-    // Notification Snoozing feature
-    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_notification_snoozing_title)
-
     // Install unknown packages feature
     // Watch Call Sync & Notification Sync
     PermissionRegistry.register("READ_PHONE_STATE", R.string.watch_call_sync_title)
@@ -145,4 +142,8 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("READ_CONTACTS", R.string.watch_call_sync_title)
     PermissionRegistry.register("READ_CALL_LOG", R.string.watch_call_sync_title)
     PermissionRegistry.register("NOTIFICATION_LISTENER", R.string.watch_notif_sync_title)
+
+    // DIY Automations feature
+    PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.tab_diy)
+    PermissionRegistry.register("WRITE_SETTINGS", R.string.tab_diy)
 }

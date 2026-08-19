@@ -96,6 +96,7 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.AppSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.BluetoothDeviceSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.CustomSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.DimWallpaperSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.ScreenOffSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.SingleAppSelectionSheet
@@ -265,6 +266,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showTimeSettings by remember { mutableStateOf(false) }
                 var showBluetoothSettings by remember { mutableStateOf(false) }
                 var showWifiSettings by remember { mutableStateOf(false) }
+                var showCustomSettingsSettings by remember { mutableStateOf(false) }
                 var configAction by remember { mutableStateOf<Action?>(null) } // Generic config action
 
                 val isTriggerConfigured = when (val trigger = selectedTrigger) {
@@ -295,6 +297,7 @@ class AutomationEditorActivity : ComponentActivity() {
 
                 fun isActionConfigured(action: Action?): Boolean = when (action) {
                     is Action.OpenApp -> action.packageName.isNotBlank()
+                    is Action.CustomSettings -> action.entries.isNotEmpty()
                     else -> true
                 }
 
@@ -910,6 +913,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 Action.ToggleFlashlight,
                                                 Action.TurnOnLowPower,
                                                 Action.TurnOffLowPower,
+                                                Action.CustomSettings(),
                                                 Action.CircleToSearch,
                                                 Action.TakeScreenshot,
                                                 Action.ShowNotification,
@@ -996,6 +1000,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                     temporarySelectedAppsForAction = resolvedAction.packageNames
                                                                     showFreezeAppsSettings = true
                                                                 }
+                                                                is Action.CustomSettings -> showCustomSettingsSettings = true
                                                                 else -> {}
                                                             }
                                                         }
@@ -1277,6 +1282,27 @@ class AutomationEditorActivity : ComponentActivity() {
                                     temporarySelectedAppsForAction = selections.filter { it.isEnabled }.map { it.packageName }
                                 },
                                 excludePackages = if (automationType == Automation.Type.APP) selectedApps else emptyList()
+                            )
+                        }
+
+                        if (showCustomSettingsSettings && configAction is Action.CustomSettings) {
+                            CustomSettingsSheet(
+                                initialAction = configAction as Action.CustomSettings,
+                                onDismiss = { showCustomSettingsSettings = false },
+                                onSave = { newAction ->
+                                    showCustomSettingsSettings = false
+                                    when (automationType) {
+                                        Automation.Type.TRIGGER -> selectedAction = newAction
+                                        Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction =
+                                            newAction
+
+                                        Automation.Type.STATE, Automation.Type.APP -> {
+                                            if (selectedActionTab == 0) selectedInAction = newAction
+                                            else selectedOutAction = newAction
+                                        }
+                                    }
+                                    configAction = null
+                                }
                             )
                         }
                         }
