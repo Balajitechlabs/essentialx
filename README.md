@@ -138,7 +138,6 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 - [xav-ie/generate-kaomoji](https://github.com/xav-ie/generate-kaomoji) - Keyboard kaomojis
 - [TebbeUbben/ChargeQuickTile](https://github.com/TebbeUbben/ChargeQuickTile) - Pixel charging QS
 
-<!-- 
 # Stars <3
 
 <a href="https://star-history.dera.page/#sameerasw/essentials&Date">
@@ -149,7 +148,6 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
  </picture>
 </a>
 
--->
 
 ---
 
