@@ -16,10 +16,9 @@ import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlin.math.abs
-import kotlin.math.roundToInt
-import kotlin.math.roundToLong
+import kotlinx.coroutines.withContext
 
 object FlashlightUtil {
     private const val TAG = "FlashlightUtil"
@@ -120,7 +119,7 @@ object FlashlightUtil {
         toLevel: Int,
         durationMs: Long = 250L,
         steps: Int = 10
-    ): Boolean {
+    ): Boolean = withContext(Dispatchers.Default) {
         Log.d(
             TAG,
             "fadeFlashlight: from=$fromLevel, to=$toLevel, duration=${durationMs}ms, steps=$steps"
@@ -128,43 +127,29 @@ object FlashlightUtil {
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || DeviceUtils.isMediatekDevice()) {
-            return safeSetTorchMode(cameraManager, cameraId, toLevel > 0)
+            return@withContext safeSetTorchMode(cameraManager, cameraId, toLevel > 0)
         }
 
-        val effectiveSteps = maxOf(
-            steps,
-            (durationMs / 16L).toInt().coerceAtLeast(1),
-            abs(toLevel - fromLevel).coerceAtLeast(1) * 8
-        )
-        val delayPerStep = (durationMs.toDouble() / effectiveSteps).coerceAtLeast(1.0)
+        val effectiveSteps = steps.coerceAtLeast(1)
+        val delayPerStep = (durationMs / effectiveSteps).coerceAtLeast(10L)
         try {
-            val minLevel = minOf(fromLevel, toLevel)
-            val maxLevel = maxOf(fromLevel, toLevel)
-            var lastAppliedLevel = Int.MIN_VALUE
-
+            var success = true
             for (i in 1..effectiveSteps) {
-                val progress = i.toDouble() / effectiveSteps
-                val easedProgress = progress * progress * (3.0 - 2.0 * progress)
-                val level = (fromLevel + ((toLevel - fromLevel) * easedProgress)).roundToInt()
-                    .coerceIn(minLevel, maxLevel)
-
-                val success = when {
-                    level <= 0 && i < effectiveSteps -> true
-                    level == lastAppliedLevel -> true
-                    level > 0 -> safeSetTorchStrength(cameraManager, cameraId, level)
-                    else -> safeSetTorchMode(cameraManager, cameraId, false)
+                val level = fromLevel + ((toLevel - fromLevel) * i / effectiveSteps)
+                success = if (level > 0) {
+                    safeSetTorchStrength(cameraManager, cameraId, level)
+                } else if (i == effectiveSteps) {
+                    safeSetTorchMode(cameraManager, cameraId, false)
+                } else {
+                    true
                 }
 
-                if (!success) return false
+                if (!success) return@withContext false
 
-                if (level != lastAppliedLevel) {
-                    lastAppliedLevel = level
-                }
-
-                delay(delayPerStep.roundToLong())
+                delay(delayPerStep)
             }
 
-            return if (toLevel > 0) {
+            if (toLevel > 0) {
                 safeSetTorchStrength(cameraManager, cameraId, toLevel)
             } else {
                 safeSetTorchMode(cameraManager, cameraId, false)
@@ -174,9 +159,9 @@ object FlashlightUtil {
         } catch (e: Exception) {
             if (e !is CameraAccessException || e.reason != CameraAccessException.CAMERA_IN_USE) {
                 Log.e(TAG, "Error during flashlight fade", e)
-                return safeSetTorchMode(cameraManager, cameraId, toLevel > 0)
+                return@withContext safeSetTorchMode(cameraManager, cameraId, toLevel > 0)
             }
-            return false
+            false
         }
     }
 
