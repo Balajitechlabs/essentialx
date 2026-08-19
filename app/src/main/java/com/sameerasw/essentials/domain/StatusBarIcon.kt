@@ -283,7 +283,7 @@ object StatusBarIconRegistry {
             displayNameRes = R.string.icon_network_speed,
             blacklistNames = listOf("network_speed"),
             categoryRes = CAT_SYSTEM_STATUS,
-            iconRes = null
+            iconRes = R.drawable.rounded_shutter_speed_24
         ),
 
         // --- OEM Specific ---
@@ -312,21 +312,21 @@ object StatusBarIconRegistry {
             displayNameRes = R.string.icon_glove_mode,
             blacklistNames = listOf("glove_mode", "glove"),
             categoryRes = CAT_OEM_SPECIFIC,
-            iconRes = null
+            iconRes = R.drawable.rounded_touch_app_24
         ),
         StatusBarIcon(
             id = "frame_rate",
             displayNameRes = R.string.icon_frame_rate,
             blacklistNames = listOf("frame_rate_mode"),
             categoryRes = CAT_OEM_SPECIFIC,
-            iconRes = null
+            iconRes = R.drawable.rounded_shutter_speed_24
         ),
         StatusBarIcon(
             id = "no_sim",
             displayNameRes = R.string.icon_no_sim,
             blacklistNames = listOf("nosim"),
             categoryRes = CAT_PHONE_NETWORK,
-            iconRes = null
+            iconRes = R.drawable.rounded_signal_cellular_alt_24
         ),
         StatusBarIcon(
             id = "samsung_services",
