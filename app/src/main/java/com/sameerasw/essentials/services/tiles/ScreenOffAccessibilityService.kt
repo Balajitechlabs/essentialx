@@ -270,6 +270,7 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
                         if (prefs.getBoolean("pocket_mode_lock_screen_only", false)) {
                             pocketModeHandler.onScreenOff() // cancel pending timer + remove overlay
                         }
+                        updateOmniOverlay()
                     }
 
                     InputEventListenerService.ACTION_VOLUME_LONG_PRESSED -> {
@@ -365,7 +366,8 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
             240f
         }
         val isPreview = prefs.getBoolean("circle_to_search_preview_enabled", false)
-        omniGestureOverlayHandler.updateOverlay(isGestureEnabled, height, width, isPreview)
+        val shouldShow = isGestureEnabled && isScreenOn && !keyguardManager.isKeyguardLocked
+        omniGestureOverlayHandler.updateOverlay(shouldShow, height, width, isPreview)
     }
 
     override fun onDestroy() {
