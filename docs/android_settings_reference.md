@@ -1,4 +1,4 @@
-# Comprehensive Android Settings Reference Guide
+# Android Settings Reference Guide
 
 This document contains **EVERY SINGLE SETTING** extracted directly from Android source code (`Settings.java`).
 It covers all **1,310 settings** across `Settings.System`, `Settings.Secure`, and `Settings.Global`.
