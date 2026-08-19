@@ -43,7 +43,7 @@ Anda dapat menyesuaikan gaya animasi, warna, dan perilakunya. Fitur ini berfungs
     <string name="sentry_mode_auto">Otomatis </string>
     <string name="setting_swipe_tabs_title">Geser antar tab</string>
     <string name="setting_swipe_tabs_desc">Di layar utama</string>
-    <string name="label_haptic_feedback">Umpan Balik Haptik</string>
+    <string name="label_haptic_feedback">Umpan balik haptik</string>
     <string name="desc_use_blur">Aktifkan efek blur progresif pada elemen di seluruh antarmuka pengguna.</string>
     <string name="setting_use_usage_access_desc">Alih-alih fitur aksesibilitas (Bekukan, Kunci Aplikasi, Lampu Malam Dinamis)</string>
     <string name="setting_enable_unsupported_features_title">Aktifkan fitur yang tidak didukung</string>
@@ -51,4 +51,6 @@ Anda dapat menyesuaikan gaya animasi, warna, dan perilakunya. Fitur ini berfungs
     <string name="settings_translate_mode">Mode translasi </string>
     <string name="settings_translate_mode_desc">Tekan lama teks mana pun untuk menerjemahkan dan berkontribusi pada komunitas.</string>
     <string name="cat_accessibility">Aksesibilitas</string>
+    <string name="feat_auto_accessibility_title">Aksesibilitas otomatis </string>
+    <string name="feat_auto_accessibility_desc">Secara otomatis memberikan izin aksesibilitas saat aplikasi diluncurkan jika izin tersebut hilang menggunakan WRITE_SECURE_SETTINGS.</string>
 </resources>
