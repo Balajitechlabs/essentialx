@@ -1036,6 +1036,23 @@
     <string name="diy_device_effects_disabled">Disabled</string>
     <string name="diy_action_sound_mode">Sound Mode</string>
     <string name="diy_sound_mode_desc">This action allows switching between Sound, Vibrate, and Silent modes based on triggers. It requires Do Not Disturb access.</string>
+    <string name="diy_action_custom_settings">Custom Settings</string>
+    <string name="diy_custom_settings_desc">Capture Android system settings changes and replay them automatically as an action.</string>
+    <string name="diy_custom_settings_how_it_works">How it works</string>
+    <string name="diy_custom_settings_how_to">Tap Start Recording, adjust any system setting. And then return and tap Stop Recording. Review and edit the detected changes below.</string>
+    <string name="diy_custom_settings_start_recording">Start Recording</string>
+    <string name="diy_custom_settings_stop_recording">Stop Recording</string>
+    <string name="diy_custom_settings_recording_status">Recording active…</string>
+    <string name="diy_custom_settings_no_entries">Nothing captured yet</string>
+    <string name="diy_custom_settings_no_changes_detected">No settings changes detected during the recording session.</string>
+    <string name="diy_custom_settings_limit_reached">Maximum limit of 20 settings reached.</string>
+    <string name="diy_custom_settings_warning_title">Warning</string>
+    <string name="diy_custom_settings_warning_desc">Some captured keys might affect system behavior or require Write Secure Settings permissions. Modify with caution.</string>
+    <string name="diy_custom_settings_table_system">System</string>
+    <string name="diy_custom_settings_table_secure">Secure</string>
+    <string name="diy_custom_settings_table_global">Global</string>
+    <string name="diy_custom_settings_key_label">Setting Key</string>
+    <string name="diy_custom_settings_value_label">Value</string>
 
     <!-- About Section -->
     <string name="app_developer_name">Sameera Wijerathna</string>

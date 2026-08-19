@@ -1626,10 +1626,10 @@ Zudem muss die Einstellung unter Umständen mehrfach angewendet werden, damit si
     <string name="action_lock_auto_freeze">Kein automatisches Einfrieren</string>
     <string name="freeze_tag_never_auto_freeze_desc">Apps mit diesem Tag werden vor dem automatischen Einfrieren geschützt</string>
     <string name="freeze_tag_color_coded_desc">Tag-Farben im App-Raster anzeigen</string>
-    <string name="watch_notif_sync_title">Benachrichtigungen synchronisieren</string>
-    <string name="watch_notif_sync_desc">Zum Essentials-Launcher</string>
+    <string name="watch_notif_sync_title">Benachrichtigungssynchronisierung</string>
+    <string name="watch_notif_sync_desc">Zum Essentials Launcher</string>
     <string name="watch_call_sync_title">Anrufe synchronisieren</string>
-    <string name="watch_call_sync_desc">Anrufe mit deiner Smartwatch synchronisieren und steuern</string>
+    <string name="watch_call_sync_desc">Anrufe von Ihrer Uhr synchronisieren und steuern</string>
     <string name="watch_notif_sync_choose_apps">Apps auswählen</string>
     <string name="watch_notif_sync_choose_apps_desc">Nur ausgewählte Apps werden mit der Smartwatch synchronisiert</string>
 </resources>

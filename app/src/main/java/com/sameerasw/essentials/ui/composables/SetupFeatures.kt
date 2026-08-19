@@ -16,16 +16,12 @@ import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -1047,14 +1043,6 @@ fun SetupFeatures(
         val isSearchingViewModel = viewModel.isSearching.value
         val recentSearches by viewModel.recentSearches
 
-        var showInstagramGraphic by rememberSaveable { mutableStateOf(true) }
-        LaunchedEffect(Unit) {
-            if (showInstagramGraphic) {
-                delay(5000)
-                showInstagramGraphic = false
-            }
-        }
-
         LazyColumn(
             state = lazyListState,
             modifier = modifier.fillMaxSize(),
@@ -1090,55 +1078,38 @@ fun SetupFeatures(
                             verticalArrangement = Arrangement.Center
                         ) {
                             Spacer(modifier = Modifier.height(statusBarPadding))
-                            AnimatedContent(
-                                targetState = showInstagramGraphic,
-                                transitionSpec = {
-                                    fadeIn(animationSpec = tween(600)) togetherWith fadeOut(animationSpec = tween(600))
-                                },
-                                label = "InstagramTitleSwap"
-                            ) { isShowingInstagram ->
-                                if (isShowingInstagram) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.essentials_instagram),
-                                        contentDescription = null,
-                                        modifier = Modifier.height(28.dp),
-                                        tint = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                                    )
-                                } else {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .width(chevronWidth)
+                                        .graphicsLayer { alpha = chevronAlpha }
+                                ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Box(
+                                        Icon(
+                                            imageVector = Icons.Rounded.KeyboardArrowDown,
+                                            contentDescription = null,
                                             modifier = Modifier
-                                                .width(chevronWidth)
-                                                .graphicsLayer { alpha = chevronAlpha }
-                                        ) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                Icon(
-                                                    imageVector = Icons.Rounded.KeyboardArrowDown,
-                                                    contentDescription = null,
-                                                    modifier = Modifier
-                                                        .size(24.dp)
-                                                        .graphicsLayer {
-                                                            rotationZ =
-                                                                (displayFraction * 180f).coerceIn(0f, 180f)
-                                                        },
-                                                    tint = contentColor
-                                                )
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                            }
-                                        }
-                                        Text(
-                                            text = deviceInfo.deviceName,
-                                            style = MaterialTheme.typography.titleMedium.copy(
-                                                fontFamily = fontFamily
-                                            ),
-                                            modifier = Modifier.graphicsLayer {
-                                                scaleX = textScale
-                                                scaleY = textScale
-                                            },
-                                            color = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                                .size(24.dp)
+                                                .graphicsLayer {
+                                                    rotationZ =
+                                                        (displayFraction * 180f).coerceIn(0f, 180f)
+                                                },
+                                            tint = contentColor
                                         )
+                                        Spacer(modifier = Modifier.width(8.dp))
                                     }
                                 }
+                                Text(
+                                    text = deviceInfo.deviceName,
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontFamily = fontFamily
+                                    ),
+                                    modifier = Modifier.graphicsLayer {
+                                        scaleX = textScale
+                                        scaleY = textScale
+                                    },
+                                    color = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                )
                             }
                         }
                     }
