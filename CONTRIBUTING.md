@@ -1,89 +1,128 @@
 # Contributing to Essentials
 
-Thank you for your interest in contributing to Essentials! This guide details the development setup, architecture conventions, UI component reuse rules, and feature implementation guidelines.
+Thank you for your interest in contributing to Essentials! This guide details the development setup, architectural conventions, state management patterns, UI component reuse guidelines, service decoupling practices, and pull request workflows.
 
 ---
 
 ## Environment Setup
 
-1. **Android Studio**: Install the latest stable release of [Android Studio](https://developer.android.com/studio).
-2. **JDK**: JDK 17 or higher is required.
+1. **Android Studio**: Use the latest stable release of [Android Studio](https://developer.android.com/studio).
+2. **JDK**: Use JDK 17 or higher.
 3. **Clone Repository**:
    ```bash
    git clone https://github.com/sameerasw/essentials.git
    ```
-4. **Target Branch**: All branches and pull requests must be based on and targeted to merge back into **`develop`**.
+4. **Target Branch**: Ensure all branches and pull requests are based on and targeted to merge back into **`develop`**.
 5. **Shizuku / Root**: Many privileged features require [Shizuku](https://shizuku.rikka.app/) or Root for testing on your device or emulator.
 
 ---
 
-## Core Development Guidelines & Principles
+## Core Architectural & Development Principles
 
-### 1. Component Reuse (Always Prefer Existing Components)
-Before writing custom composables, check the existing design system library in `app/src/main/java/com/sameerasw/essentials/ui/core/`:
+### 1. State Management & ViewModel Integration
+- **Complete End-to-End Pipeline**: Ensure any new UI control or `FeatureRegistry.kt` entry is backed by a complete state flow:
+  - Provide typed getter and setter methods in [`SettingsRepository`](file:///Users/sameerasandakelum/GIT/essentials/app/src/main/java/com/sameerasw/essentials/data/repository/SettingsRepository.kt).
+  - Expose reactive state (`mutableStateOf`) and mutator functions in the corresponding ViewModel (e.g. `MainViewModel`, `NetworksViewModel`).
+  - Connect the UI composable and `FeatureRegistry.onToggle` directly to these ViewModel methods.
+- **Centralized Preference Keys**: Define all preference keys and helper accessors inside `SettingsRepository` to keep keys uniform and discoverable.
+- **Database & Persistent Properties**: Maintain clean migrations for persistent properties to preserve built-in configuration export and import integrity.
+
+---
+
+### 2. Service Decoupling & Modularity
+- **Preserve Shared Services**: Keep shared background services (such as `ScreenOffAccessibilityService`) lightweight and focused on their core responsibilities.
+- **Use Dedicated Handlers & Controllers**:
+  - Encapsulate feature-specific listeners (e.g. connectivity changes, sensor observers, audio events) in dedicated controllers or handlers under `domain/controller/` or `services/handlers/`.
+  - Connect external events to shared services through clean adapters or listeners to maintain clear separation of concerns.
+
+---
+
+### 3. Privileged Execution & Error Feedback
+- **Transparent Execution**: When executing shell commands (`ShellUtils.runCommand`), system APIs, or Shizuku binders:
+  - Check command return codes and handle permission exceptions gracefully.
+  - Provide clear UI feedback (such as guidance sheets, permission cards, or status indicators) if privileged execution cannot be completed.
+- **Pre-Flight Permission Checks**: Verify required permissions (`WRITE_SECURE_SETTINGS`, Shizuku, Root, Accessibility) before initiating restricted actions.
+
+---
+
+### 4. Component Reuse & Design System
+Leverage the rich design system components in `app/src/main/java/com/sameerasw/essentials/ui/core/` to maintain a consistent Material 3 Expressive interface:
 - **Containers (`ui/core/containers/`)**:
-  - `RoundedCardContainer`: Outer container for grouped settings cards (24.dp corner radius, `surfaceContainer` background).
-  - `RoundedCardLazyContainer`: Container for lazy-scrolling lists.
-- **Settings List Items & Cards (`ui/core/cards/`)**:
-  - `IconToggleItem`: Preferred for settings rows with an icon, title, subtitle/description, and switch. Always pass `index` and `count` for automatic segmented corner morphing.
-  - `ConfigPickerItem`: For dropdown or modal picker items inside containers.
-  - `FeatureCard`: High-level feature banner/cards with pastel backgrounds (`ColorUtil.getPastelColorFor`) and vibrant icons (`ColorUtil.getVibrantColorFor`).
-  - `PermissionCard`: Standardized permission status card with action buttons.
+  - `RoundedCardContainer`: Use for grouping related settings items.
+  - `RoundedCardLazyContainer`: Use for scrolling list containers.
+- **Cards & Settings Items (`ui/core/cards/`)**:
+  - `IconToggleItem`: Use for standard toggle rows with an icon, title, description, and switch. Always supply `index` and `count` for seamless shape morphing.
+  - `ConfigPickerItem`: Use for settings rows opening picker dialogs or bottom sheets.
+  - `FeatureCard`: Use for highlighted feature banners using pastel background palettes (`ColorUtil.getPastelColorFor`) and vibrant icons (`ColorUtil.getVibrantColorFor`).
+  - `PermissionCard`: Use for consistent permission status displays and action triggers.
 - **Pickers (`ui/core/pickers/`)**:
-  - `SegmentedPicker`, `MultiSegmentedPicker`: Connected button group pickers with haptic feedback.
+  - `SegmentedPicker`, `MultiSegmentedPicker`: Use for connected button groups with built-in tactile feedback.
 - **Bottom Sheets (`ui/core/sheets/`)**:
-  - `EssentialsBottomSheet`, `PermissionsBottomSheet`, `FeatureHelpBottomSheet`.
+  - `EssentialsBottomSheet`, `PermissionsBottomSheet`, `FeatureHelpBottomSheet`: Use for modal sheets and feature guidance.
 
-> [!IMPORTANT]
-> Do NOT create duplicate ad-hoc cards, custom switches, or non-standard list rows when standard `ui/core/` components already exist.
+> [!TIP]
+> Always check `ui/core/` before creating custom cards, list items, or containers to ensure visual harmony and maintainability.
 
 ---
 
-### 2. Jetpack Compose & Material 3 Expressive Rules
-- **No Inline Package Imports**: Always import classes at the top of the file. Never write inline package paths like `com.sameerasw.essentials.ui.core.cards.IconToggleItem(...)`.
-- **Containers & Segmenting**: Group related settings into `RoundedCardContainer`. Never use bare uncontained list items.
+### 5. Jetpack Compose & Material 3 Expressive Conventions
+- **Top-Level Package Imports**: Place all class and symbol imports at the top of the file and reference items by their simple names.
+- **Structured Grouping**: Group related settings into `RoundedCardContainer` blocks to maintain visual hierarchy.
 - **Material 3 Expressive Theming**:
-  - Main containers use `surfaceContainer` and `24.dp` rounded corners.
-  - Sheet dialogs use `surfaceContainerHigh` or `surfaceContainer`.
-  - Supports dynamic coloring and Pitch Black (pure `#000000` AMOLED) overrides.
-- **Disabled State Guidance**: When a feature is disabled or missing permissions, use the `enabled = false` pattern with `onDisabledClick` to launch a guidance sheet rather than hiding controls silently.
+  - Use `surfaceContainer` for outer card containers and `surfaceContainerHigh` for modal bottom sheets.
+  - Ensure compatibility with Dynamic Color and Pitch Black (pure `#000000` AMOLED) token palettes.
+- **Supportive Disabled States**: When a feature is inactive or missing requirements, use `enabled = false` paired with `onDisabledClick` to present an explanatory guidance sheet.
 
 ---
 
-### 3. Iconography & Strings Localization
-- **No Hardcoded Strings**: Never hardcode user-facing strings in UI code. Always add entries to `app/src/main/res/values/strings.xml` and use `stringResource(R.string...)` or `context.getString(R.string...)`. Check before adding to avoid duplicates.
-- **Resource Icons**: Always prefer rounded drawable resource icons (`R.drawable.rounded_*`) over vector imports. If an icon is missing during implementation, use the expected `R.drawable.rounded_*` reference.
+### 6. Iconography & String Localization
+- **String Resources**: Place all user-visible text in `app/src/main/res/values/strings.xml` and access them via `stringResource(R.string...)` or `context.getString(R.string...)`. Check existing entries first to avoid duplicates.
+- **Drawable Resources**: Use rounded drawable resources (`R.drawable.rounded_*`) across UI elements and Quick Settings tiles.
 
 ---
 
-### 4. Mandatory Haptics (`HapticUtil`)
-- Add haptic feedback on all interactive elements (buttons, switches, sliders, segment pickers, and tiles) using `HapticUtil` (`performUIHaptic`, `performVirtualKeyHaptic`, `performHeavyHaptic`, `performLightHaptic`).
-- For background services and Quick Settings tiles, use `HapticUtil.performHapticForService(context)`.
+### 7. Tactile Haptic Feedback (`HapticUtil`)
+- **Interactive UI Feedback**: Integrate appropriate haptic responses on buttons, switches, sliders, segment pickers, and tiles using `HapticUtil` (`performUIHaptic`, `performVirtualKeyHaptic`, `performHeavyHaptic`, `performLightHaptic`).
+- **Background & Tile Actions**: Use `HapticUtil.performHapticForService(context)` inside background services and QS tile interactions.
+- **Feature Haptic Preferences**: Respect user-configured haptic profiles when available.
 
 ---
 
-### 5. Quick Settings Tiles
-- When implementing new Quick Settings tiles, refer to the dedicated guide: [ADD_QS_TILE.md](file:///Users/sameerasandakelum/GIT/essentials/docs/ADD_QS_TILE.md).
-- Ensure the tile is declared in `AndroidManifest.xml`, registered in `QsTileRegistry.kt`, supported headlessly in `QsTileActionRouter.kt`, added to `QuickSettingsTilesSettingsUI.kt`, and validated on the **Favorite QS Tiles Glance Widget**.
+### 8. Quick Settings Tile Integration
+- Follow the step-by-step developer guide in [ADD_QS_TILE.md](file:///Users/sameerasandakelum/GIT/essentials/docs/ADD_QS_TILE.md) when adding new tiles.
+- Declare the service in `AndroidManifest.xml`, register in `QsTileRegistry.kt`, support headless execution in `QsTileActionRouter.kt`, list in `QuickSettingsTilesSettingsUI.kt`, and test on the **Favorite QS Tiles Glance Widget**.
 
 ---
 
-### 6. Search Integration (`FeatureRegistry.kt`)
-- All user-facing settings and toggles must be indexed in `FeatureRegistry.kt` using `SearchSetting(...)` entries.
-- UI elements must attach `Modifier.highlight(highlightSetting == "key")` so that universal search results smoothly navigate and highlight the target control.
+### 9. Universal Search Integration (`FeatureRegistry.kt`)
+- Register configurable settings in `FeatureRegistry.kt` using `SearchSetting(...)` entries.
+- Attach `Modifier.highlight(highlightSetting == "key")` to composables so universal search can smoothly navigate to and highlight target items.
 
 ---
 
-### 7. Code Cleanliness & Comments
-- Write clean, idiomatic Kotlin code.
-- Avoid conversational, repetitive, or redundant comments. Use concise technical comments only where non-obvious architecture or hardware logic requires explanation.
+### 10. Code Style & Technical Documentation
+- Write clean, concise, and idiomatic Kotlin.
+- Use clear, technical comments where complex architecture, system settings, or low-level hardware interactions benefit from explanation.
+
+---
+
+## Best Practices Reference
+
+| Area | Recommended Pattern | Context |
+| :--- | :--- | :--- |
+| **ViewModel State** | Expose reactive states via `SettingsRepository` and ViewModel methods | Ensures clean compilation, predictable state flow, and working search toggles. |
+| **Background Logic** | Encapsulate features in modular handlers under `domain/controller/` | Keeps shared services (e.g. accessibility service) clean and isolated. |
+| **Import Hygiene** | Place all package imports at the top of the file | Keeps code readable and conforms to project styling conventions. |
+| **Preferences** | Store and access keys through constants in `SettingsRepository` | Prevents typos and centralizes data contracts. |
+| **Privilege Feedback** | Validate permissions and provide clear UI feedback on failures | Keeps users informed when elevated permissions are needed. |
+| **UI Components** | Use `RoundedCardContainer`, `IconToggleItem`, and `ui/core/` composables | Preserves design consistency and built-in shape morphing across all screens. |
 
 ---
 
 ## Pull Request Workflow
 
-1. **Branching**: Create a branch off `develop` (e.g. `feature/my-feature` or `fix/issue-description`).
-2. **Target**: Pull requests must target the `develop` branch.
-3. **Atomic Scope**: Keep PRs focused on a single feature or bug fix.
-4. **Local Verification**: Ensure the project compiles cleanly (`./gradlew assembleDebug`) and passes testing on a physical device or emulator.
-5. **PR Description**: Detail the rationale, changes made, and include screenshots or screen recordings for any UI changes.
+1. **Branching**: Create a feature or fix branch from `develop` (e.g. `feature/my-feature` or `fix/issue-description`).
+2. **Target**: Point all pull requests to the `develop` branch.
+3. **Focused Scope**: Keep changes cohesive and centered around a single feature or bug fix.
+4. **Local Verification**: Verify the build compiles smoothly (`./gradlew assembleDebug`) and test functionality on a physical device or emulator.
+5. **PR Description**: Include a clear summary of changes, rationale, and screenshots/recordings for any UI updates.
