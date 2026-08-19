@@ -23,3 +23,10 @@ This document outlines background services, Quick Settings tiles, and system per
 - **`WRITE_SECURE_SETTINGS`**: Granted via ADB (`adb shell pm grant com.sameerasw.essentials android.permission.WRITE_SECURE_SETTINGS`). Allows modifying system secure settings.
 - **`Shizuku` Binder Interface**: Enables executing privileged system API calls without full root access.
 - **`Root` (`su`)**: Used for direct kernel sysfs writes (e.g. charging current control, SurfaceFlinger adjustments).
+
+---
+
+## Developer Guide
+
+For instructions on adding and registering new Quick Settings tiles, refer to [ADD_QS_TILE.md](file:///Users/sameerasandakelum/GIT/essentials/docs/ADD_QS_TILE.md).
+
