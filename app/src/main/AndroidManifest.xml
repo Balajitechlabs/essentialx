@@ -1278,4 +1278,9 @@
 
     </application>
 
+    <instrumentation
+        android:name=".shizuku.CarrierConfigModifier"
+        android:label="CarrierConfigModifier"
+        android:targetPackage="${applicationId}" />
+
 </manifest>
