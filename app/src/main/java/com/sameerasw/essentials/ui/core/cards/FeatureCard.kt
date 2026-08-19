@@ -122,7 +122,11 @@ fun FeatureCard(
     androidx.compose.material3.ListItem(
         onClick = {
             HapticUtil.performVirtualKeyHaptic(view)
-            onClick()
+            if (!isToggleEnabled && !hasMoreSettings && onDisabledToggleClick != null) {
+                onDisabledToggleClick()
+            } else {
+                onClick()
+            }
         },
         onLongClick = {
             HapticUtil.performVirtualKeyHaptic(view)

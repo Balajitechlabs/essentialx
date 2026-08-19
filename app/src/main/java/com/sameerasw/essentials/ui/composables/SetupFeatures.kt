@@ -102,7 +102,6 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val FEATURE_MAPS_POWER_SAVING = R.string.feat_maps_power_saving_title
 
 @Composable
 fun SetupFeatures(
@@ -131,77 +130,6 @@ fun SetupFeatures(
     val pinnedFeatureKeys by viewModel.pinnedFeatureKeys
     val context = LocalContext.current
 
-    fun buildMapsPowerSavingPermissionItems(): List<PermissionItem> {
-        val items = mutableListOf<PermissionItem>()
-
-        if (isRootEnabled) {
-            if (!isRootPermissionGranted) {
-                items.add(
-                    PermissionItem(
-                        iconRes = R.drawable.rounded_security_24,
-                        title = R.string.perm_root_title,
-                        description = R.string.perm_root_desc,
-                        dependentFeatures = PermissionRegistry.getFeatures("ROOT"),
-                        actionLabel = R.string.perm_action_grant,
-                        action = {
-                            viewModel.isRootPermissionGranted.value =
-                                com.sameerasw.essentials.utils.RootUtils.isRootPermissionGranted()
-                        },
-                        isGranted = isRootPermissionGranted
-                    )
-                )
-            }
-        } else {
-            if (!isShizukuAvailable) {
-                items.add(
-                    PermissionItem(
-                        iconRes = R.drawable.rounded_adb_24,
-                        title = R.string.perm_shizuku_title,
-                        description = R.string.perm_shizuku_desc,
-                        dependentFeatures = PermissionRegistry.getFeatures("SHIZUKU"),
-                        actionLabel = R.string.perm_shizuku_install_action,
-                        action = {
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api".toUri()
-                            )
-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                            context.startActivity(intent)
-                        },
-                        isGranted = isShizukuAvailable
-                    )
-                )
-            } else if (!isShizukuPermissionGranted) {
-                items.add(
-                    PermissionItem(
-                        iconRes = R.drawable.rounded_adb_24,
-                        title = R.string.perm_shizuku_grant_title,
-                        description = R.string.perm_shizuku_grant_desc,
-                        dependentFeatures = PermissionRegistry.getFeatures("SHIZUKU"),
-                        actionLabel = R.string.perm_action_grant,
-                        action = { viewModel.requestShizukuPermission() },
-                        isGranted = isShizukuPermissionGranted
-                    )
-                )
-            }
-        }
-
-        if (!isNotificationListenerEnabled) {
-            items.add(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_notifications_unread_24,
-                    title = R.string.perm_notif_listener_title,
-                    description = R.string.perm_notif_listener_desc_maps,
-                    dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
-                    actionLabel = R.string.perm_action_grant,
-                    action = { viewModel.requestNotificationListenerPermission(context) },
-                    isGranted = isNotificationListenerEnabled
-                )
-            )
-        }
-
-        return items
-    }
 
     var showSheet by remember { mutableStateOf(false) }
     var currentFeature by remember { mutableStateOf<Int?>(null) }
@@ -237,6 +165,8 @@ fun SetupFeatures(
         isWriteSettingsEnabled,
         isShizukuAvailable,
         isShizukuPermissionGranted,
+        isRootEnabled,
+        isRootPermissionGranted,
         isNotificationListenerEnabled,
         isOverlayPermissionGranted,
         isNotificationLightingAccessibilityEnabled,
@@ -291,9 +221,6 @@ fun SetupFeatures(
                     }
                 }
 
-                FEATURE_MAPS_POWER_SAVING -> {
-                    missing.addAll(buildMapsPowerSavingPermissionItems())
-                }
 
                 R.string.feat_notification_lighting_title -> {
                     if (!isOverlayPermissionGranted) {
@@ -626,7 +553,6 @@ fun SetupFeatures(
                 )
             )
 
-            FEATURE_MAPS_POWER_SAVING -> buildMapsPowerSavingPermissionItems()
             R.string.feat_notification_lighting_title -> listOf(
                 PermissionItem(
                     iconRes = R.drawable.rounded_magnify_fullscreen_24,
