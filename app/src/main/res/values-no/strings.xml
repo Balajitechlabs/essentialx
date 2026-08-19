@@ -1531,4 +1531,6 @@ Aktiver eller deaktiver alltid på-skjermen raskt for å se informasjon med et �
     <string name="feat_mobile_data_always_on_desc">La mobildata være aktiv selv når Wi-Fi er tilkoblet</string>
     <string name="feat_wireless_display_certification_title">Trådløs skjermsertifisering</string>
     <string name="feat_wireless_display_certification_desc">Vis alternativer for trådløs skjermsertifisering</string>
+    <string name="label_auto_reset_battery_stats_title">Tilbakestill automatisk</string>
+    <string name="label_auto_reset_battery_stats_desc">Tilbakestill automatisk batteristatistikk når enheten er koblet fra laderen og har over 90 % strøm.</string>
 </resources>

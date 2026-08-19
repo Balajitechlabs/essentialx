@@ -1,102 +1,128 @@
 # Contributing to Essentials
 
-Thank you for your interest in contributing to Essentials! This guide will help you set up your development environment and understand the architecture of the project.
+Thank you for your interest in contributing to Essentials! This guide details the development setup, architectural conventions, state management patterns, UI component reuse guidelines, service decoupling practices, and pull request workflows.
+
+---
 
 ## Environment Setup
 
-1. **Android Studio**: Download and install the latest version of [Android Studio](https://developer.android.com/studio).
-2. **JDK**: Ensure you have JDK 17 or higher installed.
-3. **Clone the project**:
+1. **Android Studio**: Use the latest stable release of [Android Studio](https://developer.android.com/studio).
+2. **JDK**: Use JDK 17 or higher.
+3. **Clone Repository**:
    ```bash
    git clone https://github.com/sameerasw/essentials.git
    ```
-4. **Open in Android Studio**: Open the project and wait for Gradle to sync.
-5. **Shizuku**: Many features require [Shizuku](https://shizuku.rikka.app/). Install it on your device for testing.
+4. **Target Branch**: Ensure all branches and pull requests are based on and targeted to merge back into **`develop`**.
+5. **Shizuku / Root**: Many privileged features require [Shizuku](https://shizuku.rikka.app/) or Root for testing on your device or emulator.
 
-## Architecture Overview
+---
 
-Essentials follows a modern Android architecture:
+## Core Architectural & Development Principles
 
-- **Language**: Kotlin
-- **UI Framework**: Jetpack Compose
-- **Pattern**: MVVM (Model-View-ViewModel)
-- **Dependency Injection**: Manual injection (view models are managed by `MainViewModel` or passed through activities).
+### 1. State Management & ViewModel Integration
+- **Complete End-to-End Pipeline**: Ensure any new UI control or `FeatureRegistry.kt` entry is backed by a complete state flow:
+  - Provide typed getter and setter methods in [`SettingsRepository`](file:///Users/sameerasandakelum/GIT/essentials/app/src/main/java/com/sameerasw/essentials/data/repository/SettingsRepository.kt).
+  - Expose reactive state (`mutableStateOf`) and mutator functions in the corresponding ViewModel (e.g. `MainViewModel`, `NetworksViewModel`).
+  - Connect the UI composable and `FeatureRegistry.onToggle` directly to these ViewModel methods.
+- **Centralized Preference Keys**: Define all preference keys and helper accessors inside `SettingsRepository` to keep keys uniform and discoverable.
+- **Database & Persistent Properties**: Maintain clean migrations for persistent properties to preserve built-in configuration export and import integrity.
 
-## Feature Implementation Workflow
+---
 
-Adding a new feature involves three main steps:
+### 2. Service Decoupling & Modularity
+- **Preserve Shared Services**: Keep shared background services (such as `ScreenOffAccessibilityService`) lightweight and focused on their core responsibilities.
+- **Use Dedicated Handlers & Controllers**:
+  - Encapsulate feature-specific listeners (e.g. connectivity changes, sensor observers, audio events) in dedicated controllers or handlers under `domain/controller/` or `services/handlers/`.
+  - Connect external events to shared services through clean adapters or listeners to maintain clear separation of concerns.
 
-### 1. Define Metadata in `FeatureRegistry.kt`
+---
 
-All features must be registered in the `FeatureRegistry` object. This centralizes metadata and enables automated search indexing.
+### 3. Privileged Execution & Error Feedback
+- **Transparent Execution**: When executing shell commands (`ShellUtils.runCommand`), system APIs, or Shizuku binders:
+  - Check command return codes and handle permission exceptions gracefully.
+  - Provide clear UI feedback (such as guidance sheets, permission cards, or status indicators) if privileged execution cannot be completed.
+- **Pre-Flight Permission Checks**: Verify required permissions (`WRITE_SECURE_SETTINGS`, Shizuku, Root, Accessibility) before initiating restricted actions.
 
-```kotlin
-object : Feature(
-    id = "MyNewFeature",
-    title = "My New Feature",
-    iconRes = R.drawable.my_feature_icon,
-    category = "Tools",
-    description = "A short description of the feature",
-    permissionKeys = listOf("ACCESSIBILITY"), // Optional
-    searchableSettings = listOf(
-        SearchSetting("Option Title", "Description", "highlight_key", listOf("keyword1", "keyword2"))
-    )
-) {
-    override fun isEnabled(viewModel: MainViewModel) = viewModel.isMyFeatureEnabled.value
-    override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {
-        viewModel.setMyFeatureEnabled(enabled, context)
-    }
-}
-```
+---
 
-### 2. Create the Settings UI
+### 4. Component Reuse & Design System
+Leverage the rich design system components in `app/src/main/java/com/sameerasw/essentials/ui/core/` to maintain a consistent Material 3 Expressive interface:
+- **Containers (`ui/core/containers/`)**:
+  - `RoundedCardContainer`: Use for grouping related settings items.
+  - `RoundedCardLazyContainer`: Use for scrolling list containers.
+- **Cards & Settings Items (`ui/core/cards/`)**:
+  - `IconToggleItem`: Use for standard toggle rows with an icon, title, description, and switch. Always supply `index` and `count` for seamless shape morphing.
+  - `ConfigPickerItem`: Use for settings rows opening picker dialogs or bottom sheets.
+  - `FeatureCard`: Use for highlighted feature banners using pastel background palettes (`ColorUtil.getPastelColorFor`) and vibrant icons (`ColorUtil.getVibrantColorFor`).
+  - `PermissionCard`: Use for consistent permission status displays and action triggers.
+- **Pickers (`ui/core/pickers/`)**:
+  - `SegmentedPicker`, `MultiSegmentedPicker`: Use for connected button groups with built-in tactile feedback.
+- **Bottom Sheets (`ui/core/sheets/`)**:
+  - `EssentialsBottomSheet`, `PermissionsBottomSheet`, `FeatureHelpBottomSheet`: Use for modal sheets and feature guidance.
 
-Create a new composable in `app/src/main/java/com/sameerasw/essentials/ui/composables/configs/`.
+> [!TIP]
+> Always check `ui/core/` before creating custom cards, list items, or containers to ensure visual harmony and maintainability.
 
-- Use `RoundedCardContainer` for grouped items.
-- Use `IconToggleItem` or `SimpleToggleItem` for toggles.
-- Use `Modifier.highlight(highlightSetting == "key")` to support search highlighting.
+---
 
-### 3. Register in `FeatureSettingsActivity.kt`
+### 5. Jetpack Compose & Material 3 Expressive Conventions
+- **Top-Level Package Imports**: Place all class and symbol imports at the top of the file and reference items by their simple names.
+- **Structured Grouping**: Group related settings into `RoundedCardContainer` blocks to maintain visual hierarchy.
+- **Material 3 Expressive Theming**:
+  - Use `surfaceContainer` for outer card containers and `surfaceContainerHigh` for modal bottom sheets.
+  - Ensure compatibility with Dynamic Color and Pitch Black (pure `#000000` AMOLED) token palettes.
+- **Supportive Disabled States**: When a feature is inactive or missing requirements, use `enabled = false` paired with `onDisabledClick` to present an explanatory guidance sheet.
 
-Add your new UI to the `when(feature)` block in `FeatureSettingsActivity.kt` to link it to the registration ID.
+---
 
-```kotlin
-"MyNewFeature" -> {
-    MyNewFeatureSettingsUI(
-        viewModel = viewModel,
-        modifier = Modifier.padding(top = 16.dp),
-        highlightSetting = highlightSetting
-    )
-}
-```
+### 6. Iconography & String Localization
+- **String Resources**: Place all user-visible text in `app/src/main/res/values/strings.xml` and access them via `stringResource(R.string...)` or `context.getString(R.string...)`. Check existing entries first to avoid duplicates.
+- **Drawable Resources**: Use rounded drawable resources (`R.drawable.rounded_*`) across UI elements and Quick Settings tiles.
 
-## Search System
+---
 
-The search system is fully automated. By adding `SearchSetting` objects to your feature in `FeatureRegistry.kt`, they will automatically:
+### 7. Tactile Haptic Feedback (`HapticUtil`)
+- **Interactive UI Feedback**: Integrate appropriate haptic responses on buttons, switches, sliders, segment pickers, and tiles using `HapticUtil` (`performUIHaptic`, `performVirtualKeyHaptic`, `performHeavyHaptic`, `performLightHaptic`).
+- **Background & Tile Actions**: Use `HapticUtil.performHapticForService(context)` inside background services and QS tile interactions.
+- **Feature Haptic Preferences**: Respect user-configured haptic profiles when available.
 
-1. Appear in the universal search results.
-2. Navigate the user to the correct feature screen.
-3. Trigger a pulse animation on the target item via the `highlight` modifier.
+---
 
-## Code Style
+### 8. Quick Settings Tile Integration
+- Follow the step-by-step developer guide in [ADD_QS_TILE.md](file:///Users/sameerasandakelum/GIT/essentials/docs/ADD_QS_TILE.md) when adding new tiles.
+- Declare the service in `AndroidManifest.xml`, register in `QsTileRegistry.kt`, support headless execution in `QsTileActionRouter.kt`, list in `QuickSettingsTilesSettingsUI.kt`, and test on the **Favorite QS Tiles Glance Widget**.
 
-- Use **PascalCase** for Composables.
-- Use **camelCase** for variables and functions.
-- Prefer **functional components** and avoid heavy logic in the UI layer.
+---
 
-## Pull Requests
+### 9. Universal Search Integration (`FeatureRegistry.kt`)
+- Register configurable settings in `FeatureRegistry.kt` using `SearchSetting(...)` entries.
+- Attach `Modifier.highlight(highlightSetting == "key")` to composables so universal search can smoothly navigate to and highlight target items.
 
-We welcome pull requests! To ensure a smooth review process, please follow these guidelines:
+---
 
-1.  **Create a Branch**: Create a new branch for your feature or bugfix (e.g., `feature/my-new-feature` or `fix/issue-description`).
-2.  **Keep it Focused**: A PR should ideally do one thing. If you have multiple unrelated changes, please separate them into multiple PRs.
-3.  **Test Your Changes**: Before submitting, ensure that your changes build correctly and that you've tested them on a physical device or emulator.
-4.  **Describe Your Work**: In your PR description, explain _what_ you changed and _why_. If your change affects the UI, please include screenshots or a screen recording.
-5.  **Code Style**: Ensure your code follows the existing style of the project.
-6.  **Update Documentation**: If you've added a new feature, ensure you've registered it in `FeatureRegistry.kt` as described above so it's searchable.
-7. **All to develop**: Please make sure your branches are based on `develop` and also they are set to merge back to `develop` as well.
+### 10. Code Style & Technical Documentation
+- Write clean, concise, and idiomatic Kotlin.
+- Use clear, technical comments where complex architecture, system settings, or low-level hardware interactions benefit from explanation.
 
-## Questions?
+---
 
-If you have any questions or need help, feel free to open an issue or reach out in our community channels.
+## Best Practices Reference
+
+| Area | Recommended Pattern | Context |
+| :--- | :--- | :--- |
+| **ViewModel State** | Expose reactive states via `SettingsRepository` and ViewModel methods | Ensures clean compilation, predictable state flow, and working search toggles. |
+| **Background Logic** | Encapsulate features in modular handlers under `domain/controller/` | Keeps shared services (e.g. accessibility service) clean and isolated. |
+| **Import Hygiene** | Place all package imports at the top of the file | Keeps code readable and conforms to project styling conventions. |
+| **Preferences** | Store and access keys through constants in `SettingsRepository` | Prevents typos and centralizes data contracts. |
+| **Privilege Feedback** | Validate permissions and provide clear UI feedback on failures | Keeps users informed when elevated permissions are needed. |
+| **UI Components** | Use `RoundedCardContainer`, `IconToggleItem`, and `ui/core/` composables | Preserves design consistency and built-in shape morphing across all screens. |
+
+---
+
+## Pull Request Workflow
+
+1. **Branching**: Create a feature or fix branch from `develop` (e.g. `feature/my-feature` or `fix/issue-description`).
+2. **Target**: Point all pull requests to the `develop` branch.
+3. **Focused Scope**: Keep changes cohesive and centered around a single feature or bug fix.
+4. **Local Verification**: Verify the build compiles smoothly (`./gradlew assembleDebug`) and test functionality on a physical device or emulator.
+5. **PR Description**: Include a clear summary of changes, rationale, and screenshots/recordings for any UI updates.

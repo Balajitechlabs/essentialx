@@ -16,7 +16,7 @@
     <string name="flashlight_pulse_tile_label">Zseblámpa pulzus</string>
     <string name="check_pre_releases_label">Ellenőrizze az előzetes kiadásokat</string>
     <string name="check_pre_releases_desc">Lehet, hogy instabil</string>
-    <string name="label_default_tab">Default tab</string>
+    <string name="label_default_tab">Alapértelmezett oldal</string>
     <!-- App Lock -->
     <string name="settings_section_security">Biztonság</string>
     <string name="app_lock_enable_title">Alkalmazászár engedélyezése</string>
@@ -89,7 +89,7 @@
     <string name="flashlight_fade_title">Be- és elhalványul</string>
     <string name="flashlight_fade_desc">Zökkenőmentesen kapcsolható zseblámpa</string>
     <string name="flashlight_global_title">Globális ellenőrzések</string>
-    <string name="flashlight_global_desc">Világosodó zseblámpa világszerte</string>
+    <string name="flashlight_global_desc">Világosodó zseblámpa mindenhol</string>
     <string name="flashlight_adjust_intensity_title">Állítsa be az intenzitást</string>
     <string name="flashlight_adjust_intensity_desc">Hangerő + - beállítja a zseblámpa intenzitását</string>
     <string name="flashlight_live_update_title">Élő frissítés</string>
@@ -687,14 +687,14 @@
     <string name="label_app_language">Nyelv</string>
     <string name="label_haptic_feedback">Haptikus visszajelzés</string>
     <string name="label_updates">Updates</string>
-    <string name="label_auto_check_updates">Auto check for updates</string>
+    <string name="label_auto_check_updates">Frissítések automatikus keresése</string>
     <string name="desc_auto_check_updates">Check for updates at app launch</string>
     <string name="action_all_set">All Set</string>
     <string name="action_check_whats_new">Check What\'s New?</string>
     <string name="welcome_back_title">Welcome back to Essentials</string>
     <string name="action_see_whats_new">See what\'s new</string>
     <string name="label_mode_default">Default</string>
-    <string name="label_mode_glove">Glove mode</string>
+    <string name="label_mode_glove">Kesztyűs mód</string>
     <string name="tile_scale_animations">Glove Mode</string>
     <string name="about_desc_scale_animations_tile">Quickly toggle between Default and Glove mode UI profiles</string>
     <string name="label_increase_touch_sensitivity">Increase touch sensitivity</string>
@@ -1413,8 +1413,8 @@
     <string name="shut_up_auto_archive_action_freeze">Freeze now</string>
     <string name="shut_up_auto_archive_action_abort">Abort</string>
     <!-- Lock Screen Clock -->
-    <string name="feat_lock_screen_clock_title">Lock screen clock</string>
-    <string name="feat_lock_screen_clock_desc">Customize lock screen clock on Pixels</string>
+    <string name="feat_lock_screen_clock_title">Zárolt képernyő óra</string>
+    <string name="feat_lock_screen_clock_desc">Szabd személyre az órát a zárolt képernyőn Pixel telefonokon</string>
     <string name="about_desc_lock_screen_clock">Change the lock screen clock style on Pixels. Select from the available clock faces provided by the System UI. Some old styles might not be available.</string>
     <string name="lock_screen_clock_bignum">Big Number</string>
     <string name="lock_screen_clock_calligraphy">Calligraphy</string>
@@ -1440,7 +1440,7 @@
     <string name="label_color">Color</string>
     <string name="label_style_font">Style &amp; Font</string>
     <string name="about_title">About</string>
-    <string name="color_default">Default</string>
+    <string name="color_default">Alapértelmezett</string>
     <string name="color_red">Red</string>
     <string name="color_green">Green</string>
     <string name="color_blue">Blue</string>
@@ -1466,4 +1466,13 @@
     <string name="feat_mobile_data_always_on_desc">Tartsd bekapcsolva a mobiladatot Wi-Fi mellett</string>
     <string name="feat_sync_location_reached_title">ott vagyunk már Státusz szinkronizálása</string>
     <string name="feat_watch_controls_title">Testreszabás</string>
+    <string name="settings_translate_mode">Fordító mód</string>
+    <string name="setting_enable_unsupported_features_title">Nem támogatott funkciók engedélyezése</string>
+    <string name="cat_navigation">Navigáció</string>
+    <string name="feat_smart_pixels_title">Okos pixelek</string>
+    <string name="watch_call_sync_title">Hívások szinkronizálása</string>
+    <string name="watch_notif_sync_title">Értesítések szinkronizálása</string>
+    <string name="flashlight_pocket_desc">Kapcsold ki a vakut, ha a telefon a zsebedben van</string>
+    <string name="search_smart_pixels_enable_title">Okos pixelek engedélyezése</string>
+    <string name="smart_pixels_intensity_title">Intenzitás</string>
 </resources>
