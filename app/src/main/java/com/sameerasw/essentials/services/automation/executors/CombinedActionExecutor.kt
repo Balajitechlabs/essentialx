@@ -16,12 +16,14 @@ import android.hardware.camera2.CameraManager
 import android.media.AudioManager
 import android.net.wifi.WifiManager
 import android.os.Build
+import android.provider.Settings
 import android.view.KeyEvent
 import android.widget.Toast
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 import com.sameerasw.essentials.utils.DeviceLockUtils
+import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.performHapticFeedback
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
@@ -648,6 +650,29 @@ object CombinedActionExecutor {
                 is Action.UnfreezeApps -> {
                     action.packageNames.forEach { pkg ->
                         com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(context, pkg)
+                    }
+                }
+                is Action.CustomSettings -> {
+                    val resolver = context.contentResolver
+                    for (entry in action.entries) {
+                        val success = try {
+                            when (entry.table) {
+                                Action.SettingsTable.SYSTEM -> Settings.System.putString(resolver, entry.key, entry.value)
+                                Action.SettingsTable.SECURE -> Settings.Secure.putString(resolver, entry.key, entry.value)
+                                Action.SettingsTable.GLOBAL -> Settings.Global.putString(resolver, entry.key, entry.value)
+                            }
+                        } catch (e: Exception) {
+                            false
+                        }
+                        if (!success) {
+                            val tableArg = when (entry.table) {
+                                Action.SettingsTable.SYSTEM -> "system"
+                                Action.SettingsTable.SECURE -> "secure"
+                                Action.SettingsTable.GLOBAL -> "global"
+                            }
+                            val safeValue = if (entry.value.contains(" ")) "\"${entry.value}\"" else entry.value
+                            ShellUtils.runCommand(context, "settings put $tableArg ${entry.key} $safeValue")
+                        }
                     }
                 }
             }

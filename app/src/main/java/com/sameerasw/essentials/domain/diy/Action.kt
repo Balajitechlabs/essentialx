@@ -336,5 +336,46 @@ sealed interface Action {
         override val permissions: List<String> = listOf("SHIZUKU", "ROOT")
         override val isConfigurable: Boolean = true
     }
+
+    @Keep
+    enum class SettingsTable {
+        @SerializedName("SYSTEM")
+        SYSTEM,
+
+        @SerializedName("SECURE")
+        SECURE,
+
+        @SerializedName("GLOBAL")
+        GLOBAL
+    }
+
+    @Keep
+    data class SettingsEntry(
+        @SerializedName("table") val table: SettingsTable = SettingsTable.SYSTEM,
+        @SerializedName("key") val key: String = "",
+        @SerializedName("value") val value: String = ""
+    )
+
+    @Keep
+    data class CustomSettings(
+        @SerializedName("entries") val entries: List<SettingsEntry> = emptyList()
+    ) : Action {
+        override val title: Int get() = R.string.diy_action_custom_settings
+        override val icon: Int get() = R.drawable.rounded_settings_24
+        override val isConfigurable: Boolean = true
+        override val permissions: List<String>
+            get() {
+                val perms = mutableSetOf<String>()
+                for (entry in entries) {
+                    when (entry.table) {
+                        SettingsTable.SYSTEM -> perms.add("WRITE_SETTINGS")
+                        SettingsTable.SECURE -> perms.add("WRITE_SECURE_SETTINGS")
+                        SettingsTable.GLOBAL -> perms.add("WRITE_SECURE_SETTINGS")
+                    }
+                }
+                return perms.toList()
+            }
+    }
 }
+
 
