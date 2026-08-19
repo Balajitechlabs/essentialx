@@ -1072,6 +1072,12 @@ object FeatureRegistry {
                     R.string.search_smart_pixels_intensity_title,
                     R.string.search_smart_pixels_intensity_desc,
                     "smart_pixels_intensity_slider"
+                ),
+                SearchSetting(
+                    R.string.smart_pixels_disable_on_cast_title,
+                    R.string.smart_pixels_disable_on_cast_desc,
+                    "smart_pixels_disable_on_cast_toggle",
+                    R.array.keywords_switch_master
                 )
             ),
             showToggle = true,

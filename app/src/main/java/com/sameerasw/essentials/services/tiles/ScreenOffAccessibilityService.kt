@@ -211,7 +211,10 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
                 updatePocketModeSensors()
             } else if (key == "pocket_mode_excluded_apps") {
                 updatePocketModeExcludedAppsSet()
-            } else if (key == SettingsRepository.KEY_SMART_PIXELS_ENABLED || key == SettingsRepository.KEY_SMART_PIXELS_INTENSITY) {
+            } else if (key == SettingsRepository.KEY_SMART_PIXELS_ENABLED ||
+                key == SettingsRepository.KEY_SMART_PIXELS_INTENSITY ||
+                key == SettingsRepository.KEY_SMART_PIXELS_DISABLE_ON_CAST
+            ) {
                 smartPixelsHandler.updateState()
             }
         }
@@ -667,5 +670,9 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
 
     companion object {
         var instance: ScreenOffAccessibilityService? = null
+
+        fun updateSmartPixelsState() {
+            instance?.smartPixelsHandler?.updateState()
+        }
     }
 }

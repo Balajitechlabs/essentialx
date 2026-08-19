@@ -117,6 +117,7 @@ class MainViewModel : ViewModel() {
     val isDynamicNightLightEnabled = mutableStateOf(false)
     val isSmartPixelsEnabled = mutableStateOf(false)
     val smartPixelsIntensity = mutableFloatStateOf(50f)
+    val isSmartPixelsDisableOnCastEnabled = mutableStateOf(true)
     val snoozeChannels =
         mutableStateOf<List<com.sameerasw.essentials.domain.model.SnoozeChannel>>(emptyList())
     val mapsChannels =
@@ -468,6 +469,9 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_SMART_PIXELS_INTENSITY -> smartPixelsIntensity.floatValue =
                         settingsRepository.getFloat(key, 50f)
+
+                    SettingsRepository.KEY_SMART_PIXELS_DISABLE_ON_CAST -> isSmartPixelsDisableOnCastEnabled.value =
+                        settingsRepository.getBoolean(key, true)
 
                     SettingsRepository.KEY_SCREEN_LOCKED_SECURITY_ENABLED -> isScreenLockedSecurityEnabled.value =
                         settingsRepository.getBoolean(key)
@@ -1565,6 +1569,8 @@ class MainViewModel : ViewModel() {
             settingsRepository.getBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED)
         smartPixelsIntensity.floatValue =
             settingsRepository.getFloat(SettingsRepository.KEY_SMART_PIXELS_INTENSITY, 50f)
+        isSmartPixelsDisableOnCastEnabled.value =
+            settingsRepository.getBoolean(SettingsRepository.KEY_SMART_PIXELS_DISABLE_ON_CAST, true)
         loadSnoozeChannels(context)
         loadMapsChannels(context)
         isSnoozeHeadsUpEnabled.value =
@@ -3616,6 +3622,17 @@ class MainViewModel : ViewModel() {
     fun setSmartPixelsIntensity(context: Context, intensity: Float) {
         smartPixelsIntensity.floatValue = intensity
         settingsRepository.putFloat(SettingsRepository.KEY_SMART_PIXELS_INTENSITY, intensity)
+    }
+
+    /**
+     * Executes the set smart pixels disable on cast enabled operation.
+     *
+     * @param context [Context] Target context.
+     * @param enabled [Boolean] Target enabled.
+     */
+    fun setSmartPixelsDisableOnCastEnabled(context: Context, enabled: Boolean) {
+        isSmartPixelsDisableOnCastEnabled.value = enabled
+        settingsRepository.putBoolean(SettingsRepository.KEY_SMART_PIXELS_DISABLE_ON_CAST, enabled)
     }
 
     /**
