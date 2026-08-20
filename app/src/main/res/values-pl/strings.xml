@@ -14,9 +14,9 @@
     <string name="screen_off_widget_label">Widget wyłączający pusty ekran</string>
     <string name="app_freezing_tile_label">Zamrożenie aplikacji</string>
     <string name="flashlight_pulse_tile_label">Puls latarki</string>
-    <string name="check_pre_releases_label">Sprawdź wersje wstępne</string>
-    <string name="check_pre_releases_desc">Może być niestabilny</string>
-    <string name="label_default_tab">Default tab</string>
+    <string name="check_pre_releases_label">Sprawdź wersje beta </string>
+    <string name="check_pre_releases_desc">Mogą być niestabilne </string>
+    <string name="label_default_tab">Domyślna karta </string>
     <!-- App Lock -->
     <string name="settings_section_security">Bezpieczeństwo</string>
     <string name="app_lock_enable_title">Włącz blokadę aplikacji</string>
@@ -28,8 +28,8 @@
     <string name="app_lock_description">Zabezpiecz swoje aplikacje za pomocą uwierzytelniania biometrycznego. Zablokowane aplikacje będą wymagały uwierzytelnienia podczas uruchamiania. Pozostaną odblokowane do momentu wyłączenia ekranu.</string>
     <string name="app_lock_warning">Pamiętaj, że nie jest to niezawodne rozwiązanie, ponieważ jest to tylko aplikacja innej firmy. Jeśli potrzebujesz silnego bezpieczeństwa, rozważ skorzystanie z przestrzeni prywatnej lub innych podobnych funkcji.</string>
     <string name="app_lock_biometric_note">Kolejna uwaga: monit o uwierzytelnienie biometryczne pozwala używać tylko metod bezpiecznej klasy STRONG. Metody zabezpieczeń odblokowywania twarzą w klasie SŁABY w urządzeniach takich jak Pixel 7 będą mogły wykorzystywać tylko dostępne inne SILNE metody uwierzytelniania, takie jak odcisk palca lub PIN.</string>
-    <string name="setting_use_usage_access_title">Use usage access</string>
-    <string name="setting_use_usage_access_desc">Instead of accessibility (Freeze, App Lock, Dynamic Night Light)</string>
+    <string name="setting_use_usage_access_title">Użyj Dostępu do danych o użyciu </string>
+    <string name="setting_use_usage_access_desc">Zamiast usług dostępu (Zamrażanie, App Lock, Dynamic Night Light)</string>
     <!-- Button Remap -->
     <string name="button_remap_enable_title">Włącz ponowne mapowanie przycisków</string>
     <string name="button_remap_use_shizuku_title">Użyj Shizuku lub Root lub Root</string>
@@ -68,8 +68,8 @@
     <string name="feat_essentials_on_display_desc">Rzuć okiem na multimedia i informacje na ekranie AOD (zawsze włączonym).</string>
     <string name="essentials_on_display_docked_mode_title">Docked mode</string>
     <string name="essentials_on_display_docked_mode_desc">Keep the overlay visible indefinitely while music is playing on AOD</string>
-    <string name="essentials_on_display_respect_notifications_title">Respect new notifications</string>
-    <string name="essentials_on_display_respect_notifications_desc">Briefly disable for new notifications</string>
+    <string name="essentials_on_display_respect_notifications_title">Uwzględniaj nowe powiadomienia </string>
+    <string name="essentials_on_display_respect_notifications_desc">Krótkotrwałe wyłączenie w przypadku nowych powiadomień</string>
     <string name="essentials_on_display_random_shapes_title">Random shapes</string>
     <string name="essentials_on_display_random_shapes_desc">Use various Material 3 shapes for the album art</string>
     <string name="essentials_on_display_album_art_title">Album art</string>
@@ -358,7 +358,7 @@
     <string name="feat_hide_gesture_bar_on_launcher_title">Pokaż w launcherze</string>
     <string name="feat_hide_gesture_bar_on_launcher_desc">Dynamicznie pokazuj pasek gestów tylko na ekranie głównym</string>
     <string name="feat_circle_to_search_gesture_title">Gest \"Zakreśl, aby wyszukać\" </string>
-    <string name="feat_circle_to_search_gesture_desc">Przytrzymaj dłużej dolny obszar ekranu by aktywować funkcję \"Zakreśl, aby wyszukać\" </string>
+    <string name="feat_circle_to_search_gesture_desc">Przytrzymaj dłużej dolny obszar ekran, by aktywować funkcję \"Zakreśl, aby wyszukać\"</string>
     <string name="feat_circle_to_search_gesture_height_title">Gesture zone height</string>
     <string name="feat_circle_to_search_gesture_height_desc">Adjust the height of the touch area at the bottom</string>
     <string name="feat_other_customizations_title">Inne personalizacje</string>
@@ -439,12 +439,12 @@
     <string name="feat_freeze_desc">Wyłącz rzadko używane aplikacje</string>
     <string name="feat_watermark_title">Filigran</string>
     <string name="feat_watermark_desc">Dodaj dane EXIF ​​i logo do zdjęć</string>
-    <string name="feat_always_on_display_title">Zawsze na wyświetlaczu</string>
+    <string name="feat_always_on_display_title">Ekran zawsze włączony </string>
     <string name="feat_always_on_display_desc">Pokazuj godzinę i informacje, gdy ekran jest wyłączony</string>
     <string name="feat_calendar_sync_title">Synchronizacja kalendarza</string>
-    <string name="feat_calendar_sync_desc">Synchronizuj kalendarz z telefonu z zegarkiem </string>
+    <string name="feat_calendar_sync_desc">Synchronizuj kalendarz telefonu z zegarkiem</string>
     <string name="feat_lock_from_watch_title">Zablokuj z poziomu zegarka </string>
-    <string name="feat_lock_from_watch_desc">Zablokuj swoi telefon z poziomu zegarka </string>
+    <string name="feat_lock_from_watch_desc">Zablokuj swój telefon z poziomu zegarka</string>
     <string name="remote_lock_mode_title">Lock Mode</string>
     <string name="remote_lock_mode_screen_off">Wyłączenie ekranu </string>
     <string name="remote_lock_mode_lock">Zablokuj </string>
@@ -612,9 +612,9 @@
     <string name="perm_battery_optimization_title">Optymalizacja baterii</string>
     <string name="perm_battery_optimization_desc">Aby oszczędzać energię, upewnij się, że usługa nie zostanie zatrzymana przez system.</string>
     <!-- Tabs -->
-    <string name="tab_essentials">Elementy zasadnicze</string>
+    <string name="tab_essentials">Essentials </string>
     <string name="tab_freeze">Zamrażać</string>
-    <string name="tab_freeze_title">Mrożony</string>
+    <string name="tab_freeze_title">Zamrażanie </string>
     <string name="tab_diy">Zrób to sam</string>
     <string name="tab_apps">Aplikacje</string>
     <string name="tab_freeze_subtitle">Wyłączone aplikacje</string>
@@ -664,9 +664,9 @@
     <string name="label_settings">Ustawienia</string>
     <string name="action_report_bug">Zgłoś błąd</string>
     <!-- Sentry Crash Reporting -->
-    <string name="sentry_report_mode_title">Crash reporting</string>
-    <string name="sentry_mode_off">Off</string>
-    <string name="sentry_mode_auto">Auto</string>
+    <string name="sentry_report_mode_title">Raportowanie błędów </string>
+    <string name="sentry_mode_off">Wyłączone </string>
+    <string name="sentry_mode_auto">Automatycznie </string>
     <string name="sentry_crash_toast">Essentials crashed, Report sent</string>
     <string name="simulate_crash">Simulate crash</string>
     <string name="welcome_title">Welcome to Essentials</string>
@@ -684,11 +684,11 @@
     <string name="preferences_title">Preferences</string>
     <string name="preferences_desc">Configure some basic settings to get started.</string>
     <string name="label_app_settings">App Settings</string>
-    <string name="label_app_language">Language</string>
-    <string name="label_haptic_feedback">Haptic Feedback</string>
+    <string name="label_app_language">Język </string>
+    <string name="label_haptic_feedback">Wibracje haptyczne </string>
     <string name="label_updates">Updates</string>
-    <string name="label_auto_check_updates">Auto check for updates</string>
-    <string name="desc_auto_check_updates">Check for updates at app launch</string>
+    <string name="label_auto_check_updates">Automatycznie sprawdzaj aktualizacje </string>
+    <string name="desc_auto_check_updates">Sprawdzaj aktualizacje po uruchomieniu aplikacji </string>
     <string name="action_all_set">All Set</string>
     <string name="action_check_whats_new">Check What\'s New?</string>
     <string name="welcome_back_title">Welcome back to Essentials</string>
@@ -707,7 +707,7 @@
     <string name="unit_minute">1 minute</string>
     <string name="unit_minutes">%d minutes</string>
     <string name="action_restart_systemui">Restart SystemUI</string>
-    <string name="desc_restart_systemui">Kills and restarts SystemUI process to apply some changes immediately</string>
+    <string name="desc_restart_systemui">Restartuje interfejs uzytkownika, aby natychmiast zastosować niektóre zmiany</string>
     <string name="msg_error_load_release_notes">Couldn\'t load the release note</string>
     <string name="action_view_on_web">View on web</string>
     <string name="action_done">Zrobione</string>
@@ -1228,10 +1228,10 @@ Jeśli Twoje urządzenie nie obsługuje nakładek w trybie AOD, możesz wybrać 
     <string name="feat_security_privacy_desc">Chroń i zabezpiecz swoje urządzenie</string>
     <string name="feat_notifications_alerts_title">Powiadomienia i alerty</string>
     <string name="feat_notifications_alerts_desc">Nigdy nie zapominaj o swoich priorytetach</string>
-    <string name="feat_input_actions_title">Dane wejściowe i działania</string>
+    <string name="feat_input_actions_title">Dotyk i Akcje </string>
     <string name="feat_input_actions_desc">Steruj swoim urządzeniem z łatwością</string>
     <string name="feat_widgets_title">Widżety</string>
-    <string name="feat_widgets_desc">Rzut oka na ekran główny</string>
+    <string name="feat_widgets_desc">Szybki podgląd na ekranie głównym </string>
     <string name="feat_display_visuals_title">Wyświetlacz</string>
     <string name="feat_display_visuals_desc">Wizualizacje poprawiające wrażenia</string>
     <string name="feat_watch_title">Zegarek </string>
@@ -1395,10 +1395,12 @@ Jeśli Twoje urządzenie nie obsługuje nakładek w trybie AOD, możesz wybrać 
     <string name="about_desc_live_wallpaper">Set your favorite video as your home screen wallpaper. Choose between triggering the animation upon unlocking or simply whenever the screen turns on for a dynamic experience.</string>
     <!-- Shut-Up! Feature -->
     <string name="feat_shut_up_title">Shut-Up!</string>
-    <string name="feat_shut_up_desc">I know what I\'m doing</string>
-    <string name="shut_up_description">Shut-Up! bypasses app restrictions and checks for developer options, accessibility and debugging by dynamically hiding them when you launch sensitive apps. \n\nUse the custom shortcuts to ensure settings are hidden before the app launches.</string>
-    <string name="shut_up_select_apps_title">Select Apps</string>
-    <string name="shut_up_select_apps_desc">Choose apps to apply Shut-Up! logic</string>
+    <string name="feat_shut_up_desc">Wiem co robię </string>
+    <string name="shut_up_description">Shut-Up! omija ograniczenia aplikacji i sprawdza opcje programistyczne, ułatwienia dostępu i debugowanie, dynamicznie je ukrywając podczas uruchamiania wrażliwych aplikacji.
+
+Użyj niestandardowych skrótów, aby upewnić się, że ustawienia są ukryte przed uruchomieniem aplikacji.</string>
+    <string name="shut_up_select_apps_title">Wybierz aplikacje </string>
+    <string name="shut_up_select_apps_desc">Wybierz aplikacje, w których użyć Shut-Up! </string>
     <string name="shut_up_settings_title">Shut-Up! Settings</string>
     <string name="shut_up_per_app_settings">Shut-Up! Features</string>
     <string name="shut_up_disable_dev_options">Disable Developer Options</string>
@@ -1442,7 +1444,7 @@ Jeśli Twoje urządzenie nie obsługuje nakładek w trybie AOD, możesz wybrać 
     <string name="label_color">Color</string>
     <string name="label_style_font">Style &amp; Font</string>
     <string name="about_title">O funkcji </string>
-    <string name="color_default">Domyślny</string>
+    <string name="color_default">Domyślny tryb </string>
     <string name="color_red">Red</string>
     <string name="color_green">Green</string>
     <string name="color_blue">Blue</string>
@@ -1464,8 +1466,8 @@ Jeśli Twoje urządzenie nie obsługuje nakładek w trybie AOD, możesz wybrać 
     <string name="feat_watch_wireless_debugging_title">Debugowanie bezprzewodowe </string>
     <string name="feat_watch_wireless_debugging_desc">Włącz zdalnie </string>
     <string name="feat_watch_controls_title">Dostosuj </string>
-    <string name="feat_pocket_mode_title">Tryb w kieszeni</string>
-    <string name="feat_pocket_mode_desc">Zapobiega przypadkowym interakcją, gdy telefon znajduje się w kieszeni</string>
+    <string name="feat_pocket_mode_title">Tryb kieszonkowy </string>
+    <string name="feat_pocket_mode_desc">Zapobiega przypadkowym interakcjom, gdy telefon znajduje się w kieszeni</string>
     <string name="feat_notification_snoozing_title">Uśpij powiadomienia</string>
     <string name="feat_notification_snoozing_desc">Odrocz powiadomienia na później </string>
     <string name="feat_safe_volume_title">Wyłącz komunikat o zbyt dużej głośności</string>
@@ -1493,10 +1495,44 @@ Jeśli Twoje urządzenie nie obsługuje nakładek w trybie AOD, możesz wybrać 
     <string name="feat_power_battery_desc">Optymalizuj pobór energii </string>
     <string name="feat_power_saving_title">Oszczędzanie energii </string>
     <string name="feat_pixel_searchbar_title">Zastąp pasek wyszukiwania </string>
-    <string name="feat_pixel_searchbar_desc">Zastąp domyślny pasem wyszukiwania w Pixel Launcher</string>
+    <string name="feat_pixel_searchbar_desc">Zastąp domyślny pasek wyszukiwania w Pixel Launcher</string>
     <string name="about_desc_pixel_searchbar">Zastąp domyślny pasek wyszukiwania Pixel Launcher na ekranie głównym. Możesz dostosować zawartość, aby nic nie wyświetlać (pusty) lub bieżącą datę.
 
 Pamiętaj, że włączenie tej opcji może spowodować awarię widżetów Pixel Launchera \"W Skrócie\" (takich jak widżety sportowe i finansowe).
 
 Aby ustawienie zadziałało, może być konieczne wielokrotne zastosowanie.</string>
+    <string name="setting_swipe_tabs_title">Przesuwaj między kartami </string>
+    <string name="setting_swipe_tabs_desc">Na głównym ekranie </string>
+    <string name="setting_enable_unsupported_features_title">Włącz niewspierane opcje </string>
+    <string name="settings_translated_texts">Przetłumaczone </string>
+    <string name="settings_translated_texts_desc">%d edycji oczekujących — naciśnij by wysłać lub je odrzucić </string>
+    <string name="settings_translate_mode">Tryb tlumaczenia </string>
+    <string name="settings_translate_mode_desc">Naciśnij i przytrzymaj dowolny tekst, aby go przetłumaczyć i przyczynić się do rozwoju społeczności</string>
+    <string name="setting_enable_unsupported_features_desc">Pokaż funkcje specyficzne dla producenta telefonu lub zbędne, które są domyślnie ukryte</string>
+    <string name="label_snooze_default">Domyślny czas drzemki </string>
+    <string name="label_snooze_option_1">Opcja 1 </string>
+    <string name="label_snooze_option_2">Opcja 2 </string>
+    <string name="label_snooze_option_3">Opcja 3</string>
+    <string name="label_snooze_option_4">Opcja 4</string>
+    <string name="pocket_mode_use_light_title">Użyj czujnika światła </string>
+    <string name="pocket_mode_use_light_desc">Użyj czujnika oświetlenia i czujnika odległosci dla lepszej dokładności </string>
+    <string name="pocket_mode_trigger_delay_title">Opóźnienie wyzwolenia trybu </string>
+    <string name="pocket_mode_lock_screen_only_title">Tylko na zablokowanym ekranie</string>
+    <string name="pocket_mode_lock_screen_only_desc">Tryb kieszonkowy włącza się tylko wtedy, gdy urządzenie jest zablokowane</string>
+    <string name="feat_networks_title">Dane mobilne </string>
+    <string name="tile_lockdown_mode_desc">Kafelek QS wyłączenia ekranu </string>
+    <string name="watch_notif_sync_title">Synchronizacja powiadomień </string>
+    <string name="watch_notif_sync_desc">Dla launchera Essentials </string>
+    <string name="watch_notif_sync_choose_apps">Wybierz aplikacje </string>
+    <string name="watch_notif_sync_choose_apps_desc">Tylko wybrane aplikacje będą zsynchronizowane z zegarkiem </string>
+    <string name="watch_call_sync_title">Synchronizuj połączenia </string>
+    <string name="watch_call_sync_desc">Synchronizuj i kontroluj połączenia z zegarka </string>
+    <string name="feat_watch_controls_desc">Dostosuj sterowanie aplikacjami WearOS</string>
+    <string name="feat_sync_location_reached_desc">Do wyświetlenia w kafelku urządzenia</string>
+    <string name="shut_up_restore_delay_title">Opóźnienie wyłączenia </string>
+    <string name="feat_standby_apps_title">Aplikacje w trybie gotowości </string>
+    <string name="about_desc_standby_apps">Zarządzaj trybami gotowości aplikacji Android (Aktywny, Działający, Częsty, Rzadki, Ograniczony), aby kontrolować uruchamianie aplikacji w tle, użycie sieci i zużycie baterii.</string>
+    <string name="feat_power_saving_desc">Konfiguruj politykę oszczędzania energii </string>
+    <string name="feat_standby_apps_desc">Optymalizuj aktywność w tle aplikacji </string>
+    <string name="label_low_power_trigger_level">Niestandardowy poziom wyzwolenia </string>
 </resources>
