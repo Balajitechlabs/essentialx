@@ -1467,7 +1467,7 @@
     <string name="feat_pocket_mode_title">Mode poche</string>
     <string name="feat_smart_pixels_desc">Éteignez des pixels pour économiser de l\'énergie</string>
     <string name="feat_power_saving_title">Économiseur d\'énergie </string>
-    <string name="feat_power_saving_desc">Configurer les paramètres d\'économie d\'énergie</string>
+    <string name="feat_power_saving_desc">Configurez les paramètres de l\'économiseur d\'énergie </string>
     <string name="feat_standby_apps_title">Applications en veille</string>
     <string name="feat_standby_apps_desc">Optimiser les activités en arrière-plan des applications </string>
     <string name="feat_mobile_data_always_on_title">Données mobiles toujours activées</string>
