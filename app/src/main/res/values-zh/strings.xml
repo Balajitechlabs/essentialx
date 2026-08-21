@@ -1542,4 +1542,18 @@
     <string name="feat_networks_desc">控制频率和网络</string>
     <string name="feat_network_download_rate_limit_title">限制网络下载速率</string>
     <string name="feat_network_download_rate_limit_desc">限制全局网络下载速度</string>
+    <string name="label_battery_tab_info">信息</string>
+    <string name="diy_category_apps">应用</string>
+    <string name="label_battery_health">电池健康</string>
+    <string name="label_battery_temperature">电池温度</string>
+    <string name="label_battery_cycle_count">循环充电次数</string>
+    <string name="label_battery_mode">充电模式</string>
+    <string name="label_battery_voltage">电压</string>
+    <string name="label_battery_technology">供应商</string>
+    <string name="label_battery_charge_counter">目前电量</string>
+    <string name="label_thermal_cpu">CPU温度</string>
+    <string name="label_thermal_gpu">GPU温度</string>
+    <string name="label_battery_current_now">实时电流</string>
+    <string name="label_auto_reset_battery_stats_title">自动重置</string>
+    <string name="label_auto_reset_battery_stats_desc">当电池电量在90%以上且未充电时自动重置电池状态</string>
 </resources>
