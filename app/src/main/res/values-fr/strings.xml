@@ -65,7 +65,7 @@
     <string name="like_song_toast_enabled">Afficher un message toast</string>
     <string name="like_song_aod_overlay_title">Afficher en superposition sur le mode Always-on</string>
     <string name="feat_essentials_on_display_title">Essentials On Display</string>
-    <string name="feat_essentials_on_display_desc">Glance at media and info on AOD</string>
+    <string name="feat_essentials_on_display_desc">Aperçu des médias et des Aperçu des médias et des informations sur AOD </string>
     <string name="essentials_on_display_docked_mode_title">Docked mode</string>
     <string name="essentials_on_display_docked_mode_desc">Keep the overlay visible indefinitely while music is playing on AOD</string>
     <string name="essentials_on_display_respect_notifications_title">Respect new notifications</string>
@@ -1301,8 +1301,8 @@
     <string name="label_apps">Applis</string>
     <string name="feat_text_animations_title">Échelles et animations</string>
     <string name="feat_text_animations_desc">Ajustez les échelles et animations système</string>
-    <string name="feat_screen_refresh_rate_title">Screen Refresh Rate</string>
-    <string name="feat_screen_refresh_rate_desc">Set a fixed or ranged screen refresh rate</string>
+    <string name="feat_screen_refresh_rate_title">Taux de rafraîchissement de l\'écran</string>
+    <string name="feat_screen_refresh_rate_desc">Définissez une fréquence de rafraîchissement d\'écran fixe ou variable.</string>
     <string name="settings_section_text">Texte</string>
     <string name="label_font_scale">Taille de la police </string>
     <string name="label_font_weight">Épaisseur de la police </string>
@@ -1413,8 +1413,8 @@
     <string name="shut_up_auto_archive_action_freeze">Freeze now</string>
     <string name="shut_up_auto_archive_action_abort">Abort</string>
     <!-- Lock Screen Clock -->
-    <string name="feat_lock_screen_clock_title">Lock screen clock</string>
-    <string name="feat_lock_screen_clock_desc">Customize lock screen clock on Pixels</string>
+    <string name="feat_lock_screen_clock_title">Horloge de l\'écran de verrouillage </string>
+    <string name="feat_lock_screen_clock_desc">Personnalisez l\'horloge de l\'écran de verrouillage des Pixels</string>
     <string name="about_desc_lock_screen_clock">Change the lock screen clock style on Pixels. Select from the available clock faces provided by the System UI. Some old styles might not be available.</string>
     <string name="lock_screen_clock_bignum">Big Number</string>
     <string name="lock_screen_clock_calligraphy">Calligraphy</string>
@@ -1465,4 +1465,11 @@
     <string name="feat_pixel_searchbar_title">Remplacer la barre de recherche</string>
     <string name="feat_pixel_searchbar_desc">Remplacer la barre de recherche par défaut de Pixel Launcher.</string>
     <string name="feat_pocket_mode_title">Mode poche</string>
+    <string name="feat_smart_pixels_desc">Éteignez des pixels pour économiser de l\'énergie</string>
+    <string name="feat_power_saving_title">Économiseur d\'énergie </string>
+    <string name="feat_power_saving_desc">Configurez les paramètres de l\'économiseur d\'énergie </string>
+    <string name="feat_standby_apps_title">Applications en veille</string>
+    <string name="feat_standby_apps_desc">Optimiser les activités en arrière-plan des applications </string>
+    <string name="feat_mobile_data_always_on_title">Données mobiles toujours activées</string>
+    <string name="feat_mobile_data_always_on_desc">Gardez les données mobiles actives même lorsque le Wi-Fi est connecté.</string>
 </resources>
