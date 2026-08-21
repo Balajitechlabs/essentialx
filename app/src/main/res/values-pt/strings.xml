@@ -1455,7 +1455,7 @@
     <string name="whats_new_apps_title">App Updates Migrated</string>
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
     <string name="feat_daily_wallpaper_title">Papel de parede</string>
-    <string name="feat_daily_wallpaper_desc">Papel de parede selecionado diariamente</string>
+    <string name="feat_daily_wallpaper_desc">Papéis de parede animados e selecionados diariamente.</string>
     <string name="feat_watch_controls_title">Personalizar</string>
     <string name="feat_watch_controls_desc">Personalize os controles do app WearOS</string>
     <string name="feat_watch_wireless_debugging_title">Depuração sem fio</string>
@@ -1493,7 +1493,7 @@
     <string name="label_thermal_gpu">Temperatura da GPU</string>
     <string name="label_thermal_cpu">Temperatura da CPU</string>
     <string name="feat_networks_title">Redes</string>
-    <string name="feat_networks_desc">Controle radios e redes</string>
+    <string name="feat_networks_desc">Controle de redes e conexões</string>
     <string name="feat_standby_apps_title">Aplicativos em segundo plano</string>
     <string name="feat_standby_apps_desc">Otimize atividades de aplicativos em segundo plano</string>
     <string name="feat_power_saving_title">Economia de bateria</string>
