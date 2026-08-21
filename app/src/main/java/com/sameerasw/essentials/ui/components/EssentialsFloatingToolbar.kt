@@ -58,7 +58,7 @@ data class ToolbarItem(
     val iconRes: Int,
     val labelRes: Int,
     val onClick: () -> Unit,
-    val hasBadge: Boolean = false
+    val hasBadge: Boolean = false,
 )
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -80,7 +80,7 @@ fun EssentialsFloatingToolbar(
     // Slots for custom logic
     floatingActionButton: (@Composable () -> Unit)? = null,
     scrollBehavior: FloatingToolbarScrollBehavior? = null,
-    expanded: Boolean = true
+    expanded: Boolean = true,
 ) {
     val view = LocalView.current
     val configuration = LocalConfiguration.current
@@ -93,62 +93,65 @@ fun EssentialsFloatingToolbar(
 
     val shouldHideLabel = isLargeFont || (isCompactScreen && items.size > 3)
 
-    val finalFab: (@Composable () -> Unit)? = when {
-        floatingActionButton != null -> floatingActionButton
-        onHelpClick != null && fabAction == null -> {
-            {
-                FloatingActionButton(
-                    onClick = {
-                        HapticUtil.performUIHaptic(view)
-                        onHelpClick()
-                    },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    shape = MaterialTheme.shapes.large,
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.rounded_help_24),
-                        contentDescription = stringResource(R.string.action_help_guide)
-                    )
+    val finalFab: (@Composable () -> Unit)? =
+        when {
+            floatingActionButton != null -> floatingActionButton
+            onHelpClick != null && fabAction == null -> {
+                {
+                    FloatingActionButton(
+                        onClick = {
+                            HapticUtil.performUIHaptic(view)
+                            onHelpClick()
+                        },
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shape = MaterialTheme.shapes.large,
+                        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_help_24),
+                            contentDescription = stringResource(R.string.action_help_guide),
+                        )
+                    }
                 }
             }
-        }
 
-        fabAction != null && fabIconRes != null -> {
-            {
-                FloatingActionButton(
-                    onClick = {
-                        HapticUtil.performUIHaptic(view)
-                        fabAction()
-                    },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    shape = MaterialTheme.shapes.large,
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = fabIconRes),
-                        contentDescription = fabContentDescription
-                    )
+            fabAction != null && fabIconRes != null -> {
+                {
+                    FloatingActionButton(
+                        onClick = {
+                            HapticUtil.performUIHaptic(view)
+                            fabAction()
+                        },
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shape = MaterialTheme.shapes.large,
+                        elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
+                    ) {
+                        Icon(
+                            painter = painterResource(id = fabIconRes),
+                            contentDescription = fabContentDescription,
+                        )
+                    }
                 }
             }
-        }
 
-        else -> null
-    }
+            else -> null
+        }
 
     HorizontalFloatingToolbar(
-        modifier = modifier
-            .windowInsetsPadding(WindowInsets.navigationBars)
-            .padding(start = 16.dp, end = 16.dp, bottom = 0.dp),
+        modifier =
+            modifier
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(start = 16.dp, end = 16.dp, bottom = 0.dp),
         expanded = expanded,
         floatingActionButton = finalFab ?: {},
         scrollBehavior = scrollBehavior,
-        colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(
-            toolbarContentColor = MaterialTheme.colorScheme.onSurface,
-            toolbarContainerColor = MaterialTheme.colorScheme.primary,
-        ),
+        colors =
+            FloatingToolbarDefaults.vibrantFloatingToolbarColors(
+                toolbarContentColor = MaterialTheme.colorScheme.onSurface,
+                toolbarContainerColor = MaterialTheme.colorScheme.primary,
+            ),
         content = {
             if (onBackClick != null) {
                 // BACK BUTTON - Unified with Tabbed style (pop-out effect)
@@ -158,15 +161,16 @@ fun EssentialsFloatingToolbar(
                         onBackClick()
                     },
                     modifier = Modifier.size(48.dp),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary,
-                        containerColor = MaterialTheme.colorScheme.background
-                    )
+                    colors =
+                        IconButtonDefaults.filledIconButtonColors(
+                            contentColor = MaterialTheme.colorScheme.primary,
+                            containerColor = MaterialTheme.colorScheme.background,
+                        ),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_arrow_back_24),
                         contentDescription = stringResource(R.string.content_desc_back),
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
 
@@ -175,32 +179,35 @@ fun EssentialsFloatingToolbar(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .widthIn(min = 100.dp, max = 250.dp)
-                            .padding(horizontal = 8.dp)
-                            .align(Alignment.CenterVertically)
+                        modifier =
+                            Modifier
+                                .widthIn(min = 100.dp, max = 250.dp)
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterVertically),
                     ) {
                         Text(
                             text = title,
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.background,
                             maxLines = 1,
-                            modifier = Modifier
-                                .basicMarquee()
-                                .weight(1f, fill = false)
+                            modifier =
+                                Modifier
+                                    .basicMarquee()
+                                    .weight(1f, fill = false),
                         )
                         if (isBeta) {
                             Card(
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.background
-                                ),
-                                shape = MaterialTheme.shapes.extraSmall
+                                colors =
+                                    CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.background,
+                                    ),
+                                shape = MaterialTheme.shapes.extraSmall,
                             ) {
                                 Text(
                                     text = stringResource(R.string.label_beta),
                                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.primary,
                                 )
                             }
                         }
@@ -213,29 +220,32 @@ fun EssentialsFloatingToolbar(
 
                     val itemWidth by animateDpAsState(
                         targetValue = if (expanded || isSelected) 48.dp else 0.dp,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        ),
-                        label = "item_width_$index"
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow,
+                            ),
+                        label = "item_width_$index",
                     )
 
                     val labelWidth by animateDpAsState(
                         targetValue = if (isSelected && !shouldHideLabel) 80.dp else 0.dp,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        ),
-                        label = "label_width_$index"
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow,
+                            ),
+                        label = "label_width_$index",
                     )
 
                     val spacerWidth by animateDpAsState(
                         targetValue = if (index < items.size - 1) 8.dp else 0.dp,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                            stiffness = Spring.StiffnessLow
-                        ),
-                        label = "spacer_width_$index"
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow,
+                            ),
+                        label = "spacer_width_$index",
                     )
 
                     if (itemWidth > 0.dp || isSelected) {
@@ -244,42 +254,46 @@ fun EssentialsFloatingToolbar(
                                 HapticUtil.performVirtualKeyHaptic(view)
                                 item.onClick()
                             },
-                            modifier = Modifier
-                                .width(itemWidth + labelWidth)
-                                .height(48.dp),
-                            colors = if (isSelected) {
-                                IconButtonDefaults.filledIconButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.primary,
-                                    containerColor = MaterialTheme.colorScheme.background
-                                )
-                            } else {
-                                IconButtonDefaults.iconButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.background,
-                                    containerColor = MaterialTheme.colorScheme.primary
-                                )
-                            }
+                            modifier =
+                                Modifier
+                                    .width(itemWidth + labelWidth)
+                                    .height(48.dp),
+                            colors =
+                                if (isSelected) {
+                                    IconButtonDefaults.filledIconButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.primary,
+                                        containerColor = MaterialTheme.colorScheme.background,
+                                    )
+                                } else {
+                                    IconButtonDefaults.iconButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.background,
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                    )
+                                },
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center,
-                                modifier = Modifier.padding(horizontal = 8.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp),
                             ) {
                                 Box {
                                     Icon(
                                         painter = painterResource(id = item.iconRes),
                                         contentDescription = stringResource(id = item.labelRes),
-                                        tint = if (isSelected) {
-                                            MaterialTheme.colorScheme.primary
-                                        } else {
-                                            MaterialTheme.colorScheme.background
-                                        },
-                                        modifier = Modifier.size(24.dp)
+                                        tint =
+                                            if (isSelected) {
+                                                MaterialTheme.colorScheme.primary
+                                            } else {
+                                                MaterialTheme.colorScheme.background
+                                            },
+                                        modifier = Modifier.size(24.dp),
                                     )
                                     if (item.hasBadge) {
                                         Canvas(
-                                            modifier = Modifier
-                                                .size(8.dp)
-                                                .align(Alignment.TopEnd)
+                                            modifier =
+                                                Modifier
+                                                    .size(8.dp)
+                                                    .align(Alignment.TopEnd),
                                         ) {
                                             drawCircle(
                                                 color = Color.Red,
@@ -294,7 +308,7 @@ fun EssentialsFloatingToolbar(
                                         style = MaterialTheme.typography.labelLarge,
                                         maxLines = 1,
                                         color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.basicMarquee()
+                                        modifier = Modifier.basicMarquee(),
                                     )
                                 }
                             }
@@ -307,7 +321,6 @@ fun EssentialsFloatingToolbar(
                     }
                 }
             }
-        }
+        },
     )
 }
-

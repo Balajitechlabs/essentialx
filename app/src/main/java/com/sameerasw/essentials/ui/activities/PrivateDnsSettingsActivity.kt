@@ -69,7 +69,8 @@ class PrivateDnsSettingsActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val context = LocalContext.current
             LaunchedEffect(Unit) {
                 viewModel.check(context)
@@ -88,7 +89,8 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
     val context = LocalContext.current
     val view = LocalView.current
     val viewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-        androidx.lifecycle.viewmodel.compose.viewModel()
+        androidx.lifecycle.viewmodel.compose
+            .viewModel()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val PRIVATE_DNS_MODE = "private_dns_mode"
@@ -96,16 +98,20 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
 
     var showAddDialog by remember { mutableStateOf(false) }
 
-    val currentMode = remember {
-        Settings.Global.getString(context.contentResolver, PRIVATE_DNS_MODE) ?: "off"
-    }
-    val currentHostname = remember {
-        Settings.Global.getString(context.contentResolver, PRIVATE_DNS_SPECIFIER) ?: ""
-    }
+    val currentMode =
+        remember {
+            Settings.Global.getString(context.contentResolver, PRIVATE_DNS_MODE) ?: "off"
+        }
+    val currentHostname =
+        remember {
+            Settings.Global.getString(context.contentResolver, PRIVATE_DNS_SPECIFIER) ?: ""
+        }
 
-    val settingsRepository = remember {
-        com.sameerasw.essentials.data.repository.SettingsRepository(context)
-    }
+    val settingsRepository =
+        remember {
+            com.sameerasw.essentials.data.repository
+                .SettingsRepository(context)
+        }
     var cycleAuto by remember {
         mutableStateOf(settingsRepository.getBoolean("private_dns_cycle_auto", true))
     }
@@ -119,38 +125,40 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Header
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.router_24px),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     Text(
                         text = stringResource(R.string.tile_private_dns),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.SemiBold,
                     )
                 }
 
@@ -161,13 +169,13 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                                 Settings.Global.putString(
                                     context.contentResolver,
                                     PRIVATE_DNS_MODE,
-                                    selectedMode
+                                    selectedMode,
                                 )
                                 if (selectedMode == "hostname") {
                                     Settings.Global.putString(
                                         context.contentResolver,
                                         PRIVATE_DNS_SPECIFIER,
-                                        customHostname
+                                        customHostname,
                                     )
                                 }
                             }
@@ -180,27 +188,29 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                         }
                     },
                     modifier = Modifier.height(36.dp),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                        horizontal = 12.dp,
-                        vertical = 0.dp
-                    ),
+                    contentPadding =
+                        androidx.compose.foundation.layout.PaddingValues(
+                            horizontal = 12.dp,
+                            vertical = 0.dp,
+                        ),
                     shape = RoundedCornerShape(18.dp),
-                    border = androidx.compose.foundation.BorderStroke(
-                        1.dp,
-                        MaterialTheme.colorScheme.primary
-                    )
+                    border =
+                        androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary,
+                        ),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_check_24),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = stringResource(R.string.action_save),
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
@@ -208,7 +218,7 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                 text = stringResource(R.string.private_dns_mode_label),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
 
             RoundedCardContainer {
@@ -217,17 +227,20 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                     selectedItem = isCycleMode,
                     onItemSelected = { isCycleMode = it },
                     labelProvider = { cycle ->
-                        if (cycle) context.getString(R.string.private_dns_mode_cycle)
-                        else context.getString(R.string.private_dns_mode_toggle)
+                        if (cycle) {
+                            context.getString(R.string.private_dns_mode_cycle)
+                        } else {
+                            context.getString(R.string.private_dns_mode_toggle)
+                        }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
             AnimatedVisibility(
                 visible = !isCycleMode,
                 enter = expandVertically(),
-                exit = shrinkVertically()
+                exit = shrinkVertically(),
             ) {
                 // Mode Selection Container
                 RoundedCardContainer {
@@ -237,7 +250,7 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                         onClick = {
                             selectedMode = "off"
                             HapticUtil.performUIHaptic(view)
-                        }
+                        },
                     )
                     DnsSegmentedItem(
                         label = stringResource(R.string.tile_private_dns_auto),
@@ -252,9 +265,9 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                                 onCheckedChange = { checked ->
                                     cycleAuto = checked
                                     HapticUtil.performUIHaptic(view)
-                                }
+                                },
                             )
-                        }
+                        },
                     )
                     DnsSegmentedItem(
                         label = stringResource(R.string.private_dns_custom_title),
@@ -262,7 +275,7 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                         onClick = {
                             selectedMode = "hostname"
                             HapticUtil.performUIHaptic(view)
-                        }
+                        },
                     )
                 }
             }
@@ -270,44 +283,47 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
             AnimatedVisibility(
                 visible = isCycleMode || selectedMode == "hostname",
                 enter = expandVertically(),
-                exit = shrinkVertically()
+                exit = shrinkVertically(),
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     if (!isCycleMode) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(24.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceBright
-                            )
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                ),
                         ) {
                             OutlinedTextField(
                                 value = customHostname,
                                 onValueChange = { customHostname = it },
                                 label = { Text(stringResource(R.string.private_dns_hostname_label)) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
                                 singleLine = true,
-                                shape = RoundedCornerShape(16.dp)
+                                shape = RoundedCornerShape(16.dp),
                             )
                         }
                     }
 
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(R.string.private_dns_presets_title),
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedButton(
@@ -316,15 +332,16 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                                     HapticUtil.performUIHaptic(view)
                                 },
                                 modifier = Modifier.height(32.dp),
-                                contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                                    horizontal = 12.dp,
-                                    vertical = 0.dp
-                                ),
-                                shape = RoundedCornerShape(16.dp)
+                                contentPadding =
+                                    androidx.compose.foundation.layout.PaddingValues(
+                                        horizontal = 12.dp,
+                                        vertical = 0.dp,
+                                    ),
+                                shape = RoundedCornerShape(16.dp),
                             ) {
                                 Text(
                                     text = stringResource(R.string.dns_preset_reset_action),
-                                    style = MaterialTheme.typography.labelMedium
+                                    style = MaterialTheme.typography.labelMedium,
                                 )
                             }
                             Button(
@@ -333,21 +350,22 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                                     HapticUtil.performUIHaptic(view)
                                 },
                                 modifier = Modifier.height(32.dp),
-                                contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                                    horizontal = 12.dp,
-                                    vertical = 0.dp
-                                ),
-                                shape = RoundedCornerShape(16.dp)
+                                contentPadding =
+                                    androidx.compose.foundation.layout.PaddingValues(
+                                        horizontal = 12.dp,
+                                        vertical = 0.dp,
+                                    ),
+                                shape = RoundedCornerShape(16.dp),
                             ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_add_24),
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(16.dp),
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = stringResource(R.string.action_add),
-                                    style = MaterialTheme.typography.labelMedium
+                                    style = MaterialTheme.typography.labelMedium,
                                 )
                             }
                         }
@@ -359,11 +377,11 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                             onConfirm = { name, host ->
                                 viewModel.addDnsPreset(
                                     name,
-                                    host
+                                    host,
                                 )
                                 showAddDialog = false
                                 HapticUtil.performUIHaptic(view)
-                            }
+                            },
                         )
                     }
 
@@ -384,16 +402,15 @@ fun PrivateDnsSettingsOverlay(onDismiss: () -> Unit) {
                                 },
                                 onDelete = {
                                     viewModel.removeDnsPreset(
-                                        preset
+                                        preset,
                                     )
                                     HapticUtil.performUIHaptic(view)
-                                }
+                                },
                             )
                         }
                     }
                 }
             }
-
         }
     }
 }
@@ -403,33 +420,36 @@ fun DnsSegmentedItem(
     label: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    trailingContent: @Composable (() -> Unit)? = null
+    trailingContent: @Composable (() -> Unit)? = null,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
         shape = MaterialTheme.shapes.extraSmall,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 RadioButton(selected = isSelected, onClick = onClick)
                 Text(
                     text = label,
                     style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.padding(start = 12.dp)
+                    modifier = Modifier.padding(start = 12.dp),
                 )
             }
             if (trailingContent != null) {
@@ -445,35 +465,45 @@ fun DnsPresetItem(
     hostname: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
         shape = MaterialTheme.shapes.extraSmall,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = name,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = hostname,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
+                    color =
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.primary.copy(
+                                alpha = 0.8f,
+                            )
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -482,7 +512,7 @@ fun DnsPresetItem(
                         painter = painterResource(id = R.drawable.rounded_check_24),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                 }
@@ -490,9 +520,10 @@ fun DnsPresetItem(
                     painter = painterResource(id = R.drawable.rounded_delete_24),
                     contentDescription = stringResource(R.string.dns_preset_delete_content_description),
                     tint = MaterialTheme.colorScheme.error.copy(alpha = 0.6f),
-                    modifier = Modifier
-                        .size(20.dp)
-                        .clickable { onDelete() }
+                    modifier =
+                        Modifier
+                            .size(20.dp)
+                            .clickable { onDelete() },
                 )
             }
         }
@@ -502,7 +533,7 @@ fun DnsPresetItem(
 @Composable
 fun AddDnsPresetDialog(
     onDismiss: () -> Unit,
-    onConfirm: (String, String) -> Unit
+    onConfirm: (String, String) -> Unit,
 ) {
     var name by remember { mutableStateOf("") }
     var hostname by remember { mutableStateOf("") }
@@ -517,26 +548,28 @@ fun AddDnsPresetDialog(
                     onValueChange = { name = it },
                     label = { Text(stringResource(R.string.dns_preset_name_label)) },
                     singleLine = true,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
                 )
                 OutlinedTextField(
                     value = hostname,
                     onValueChange = { hostname = it },
                     label = { Text(stringResource(R.string.private_dns_hostname_label)) },
                     singleLine = true,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
                 )
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    if (name.isNotBlank() && hostname.isNotBlank()) onConfirm(
-                        name,
-                        hostname
-                    )
+                    if (name.isNotBlank() && hostname.isNotBlank()) {
+                        onConfirm(
+                            name,
+                            hostname,
+                        )
+                    }
                 },
-                enabled = name.isNotBlank() && hostname.isNotBlank()
+                enabled = name.isNotBlank() && hostname.isNotBlank(),
             ) {
                 Text(stringResource(R.string.action_add))
             }
@@ -547,6 +580,6 @@ fun AddDnsPresetDialog(
             }
         },
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = RoundedCornerShape(28.dp)
+        shape = RoundedCornerShape(28.dp),
     )
 }

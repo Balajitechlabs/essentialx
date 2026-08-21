@@ -13,13 +13,18 @@ import android.graphics.Color
 import androidx.core.graphics.ColorUtils as AndroidColorUtils
 
 object ColorFormatUtils {
-
     enum class ColorFormat {
-        HEX, RGB, HSL, HSV
+        HEX,
+        RGB,
+        HSL,
+        HSV,
     }
 
-    fun formatColor(color: Int, format: ColorFormat): String {
-        return when (format) {
+    fun formatColor(
+        color: Int,
+        format: ColorFormat,
+    ): String =
+        when (format) {
             ColorFormat.HEX -> String.format("#%06X", 0xFFFFFF and color)
             ColorFormat.RGB -> {
                 val r = Color.red(color)
@@ -40,5 +45,4 @@ object ColorFormatUtils {
                 String.format("hsv(%.0f, %.0f%%, %.0f%%)", hsv[0], hsv[1] * 100, hsv[2] * 100)
             }
         }
-    }
 }

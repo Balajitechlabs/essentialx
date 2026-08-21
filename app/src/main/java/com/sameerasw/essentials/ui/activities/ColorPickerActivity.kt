@@ -26,19 +26,19 @@ import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.HapticUtil
 
 class ColorPickerActivity : ComponentActivity() {
-
     private var pickedColor by mutableStateOf<Int?>(null)
     private var showBottomSheet by mutableStateOf(false)
 
     private val eyeDropperLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
-                val color = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    result.data?.getIntExtra("android.intent.extra.COLOR", Color.BLACK)
-                        ?: Color.BLACK
-                } else {
-                    Color.BLACK
-                }
+                val color =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        result.data?.getIntExtra("android.intent.extra.COLOR", Color.BLACK)
+                            ?: Color.BLACK
+                    } else {
+                        Color.BLACK
+                    }
 
                 pickedColor = color
                 showBottomSheet = true
@@ -65,7 +65,7 @@ class ColorPickerActivity : ComponentActivity() {
                         },
                         onDismissRequest = {
                             finish()
-                        }
+                        },
                     )
                 }
             }
@@ -81,7 +81,8 @@ class ColorPickerActivity : ComponentActivity() {
             val intent = Intent("android.intent.action.OPEN_EYE_DROPPER")
             eyeDropperLauncher.launch(intent)
         } catch (e: Exception) {
-            Toast.makeText(this, getString(R.string.toast_eyedropper_failed), Toast.LENGTH_SHORT)
+            Toast
+                .makeText(this, getString(R.string.toast_eyedropper_failed), Toast.LENGTH_SHORT)
                 .show()
             finish()
         }

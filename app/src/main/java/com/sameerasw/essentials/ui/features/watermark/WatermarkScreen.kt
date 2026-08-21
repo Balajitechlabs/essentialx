@@ -61,7 +61,7 @@ fun WatermarkScreen(
     initialUri: Uri?,
     onPickImage: () -> Unit,
     onBack: () -> Unit,
-    viewModel: WatermarkViewModel
+    viewModel: WatermarkViewModel,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -71,20 +71,22 @@ fun WatermarkScreen(
     val options by viewModel.options.collectAsState()
     val previewState by viewModel.previewUiState.collectAsState()
 
-    val isShowingHdrContent = remember(previewState) {
-        val successState = previewState as? WatermarkUiState.Success
-        val bitmap = successState?.bitmap
-        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE && bitmap?.hasGainmap() == true
-    }
+    val isShowingHdrContent =
+        remember(previewState) {
+            val successState = previewState as? WatermarkUiState.Success
+            val bitmap = successState?.bitmap
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE && bitmap?.hasGainmap() == true
+        }
 
     DisposableEffect(isShowingHdrContent) {
         val activity = context as? Activity
         if (activity != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            activity.window.colorMode = if (isShowingHdrContent) {
-                ActivityInfo.COLOR_MODE_HDR
-            } else {
-                ActivityInfo.COLOR_MODE_DEFAULT
-            }
+            activity.window.colorMode =
+                if (isShowingHdrContent) {
+                    ActivityInfo.COLOR_MODE_HDR
+                } else {
+                    ActivityInfo.COLOR_MODE_DEFAULT
+                }
             if (android.os.Build.VERSION.SDK_INT >= 35) {
                 activity.window.desiredHdrHeadroom = if (isShowingHdrContent) 5.0f else 1.0f
             }
@@ -112,11 +114,12 @@ fun WatermarkScreen(
             }
 
             is WatermarkUiState.Error -> {
-                Toast.makeText(
-                    context,
-                    (saveState as WatermarkUiState.Error).message,
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast
+                    .makeText(
+                        context,
+                        (saveState as WatermarkUiState.Error).message,
+                        Toast.LENGTH_SHORT,
+                    ).show()
                 viewModel.resetState()
             }
 
@@ -144,23 +147,24 @@ fun WatermarkScreen(
                         onShareClick = {
                             initialUri?.let { uri ->
                                 viewModel.shareImage(uri) { sharedUri ->
-                                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                        type = "image/jpeg"
-                                        putExtra(Intent.EXTRA_STREAM, sharedUri)
-                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    }
+                                    val shareIntent =
+                                        Intent(Intent.ACTION_SEND).apply {
+                                            type = "image/jpeg"
+                                            putExtra(Intent.EXTRA_STREAM, sharedUri)
+                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        }
                                     context.startActivity(
                                         Intent.createChooser(
                                             shareIntent,
-                                            context.getString(R.string.action_share)
-                                        )
+                                            context.getString(R.string.action_share),
+                                        ),
                                     )
                                 }
                             }
                         },
-                        onSaveClick = { initialUri?.let { viewModel.saveImage(it) } }
+                        onSaveClick = { initialUri?.let { viewModel.saveImage(it) } },
                     )
-                }
+                },
             )
         },
         floatingActionButton = {
@@ -173,28 +177,29 @@ fun WatermarkScreen(
                     modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    elevation = androidx.compose.material3.FloatingActionButtonDefaults.elevation(
-                        0.dp,
-                        0.dp,
-                        0.dp,
-                        0.dp
-                    )
+                    elevation =
+                        androidx.compose.material3.FloatingActionButtonDefaults.elevation(
+                            0.dp,
+                            0.dp,
+                            0.dp,
+                            0.dp,
+                        ),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.rounded_edit_24),
-                        contentDescription = stringResource(R.string.action_edit)
+                        contentDescription = stringResource(R.string.action_edit),
                     )
                 }
             }
         },
-        containerColor = MaterialTheme.colorScheme.surfaceContainer
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
     ) { padding ->
         WatermarkPreviewArea(
             initialUri = initialUri,
             previewState = previewState,
             onPickImage = onPickImage,
             onRotate = { viewModel.rotate(it) },
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(padding),
         ) {
             WatermarkControls(
                 options = options,
@@ -213,7 +218,7 @@ fun WatermarkScreen(
                 onBorderStrokeChange = { viewModel.setBorderStroke(it) },
                 onBorderCornerChange = { viewModel.setBorderCorner(it) },
                 onColorModeChange = { viewModel.setColorMode(it) },
-                onShowExifClick = { showExifSheet = true }
+                onShowExifClick = { showExifSheet = true },
             )
         }
     }
@@ -223,7 +228,7 @@ fun WatermarkScreen(
             options = options,
             onDismissRequest = { showExifSheet = false },
             onShowExifChange = { viewModel.setShowExif(it) },
-            onExifSettingsChange = { f, a, i, s, d -> viewModel.setExifSettings(f, a, i, s, d) }
+            onExifSettingsChange = { f, a, i, s, d -> viewModel.setExifSettings(f, a, i, s, d) },
         )
     }
 
@@ -239,7 +244,7 @@ fun WatermarkScreen(
                 viewModel.setShowBrand(showBrand)
                 viewModel.updateOverriddenTexts(brand, custom, date)
                 showEditSheet = false
-            }
+            },
         )
     }
 }
@@ -250,7 +255,7 @@ private fun WatermarkActions(
     saveState: WatermarkUiState,
     onPickImage: () -> Unit,
     onShareClick: () -> Unit,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
 ) {
     val view = LocalView.current
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
@@ -262,7 +267,7 @@ private fun WatermarkActions(
                 Icon(
                     painter = painterResource(R.drawable.rounded_add_photo_alternate_24),
                     contentDescription = stringResource(R.string.watermark_pick_image),
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
                 Spacer(Modifier.size(8.dp))
                 Text(stringResource(R.string.watermark_pick_image))
@@ -275,7 +280,7 @@ private fun WatermarkActions(
                 Icon(
                     painter = painterResource(R.drawable.rounded_add_photo_alternate_24),
                     contentDescription = stringResource(R.string.watermark_pick_image),
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
             }
 
@@ -290,7 +295,7 @@ private fun WatermarkActions(
                     Icon(
                         painter = painterResource(R.drawable.rounded_save_24),
                         contentDescription = stringResource(R.string.action_save),
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(Modifier.size(8.dp))
                     Text(stringResource(R.string.action_save))
@@ -306,14 +311,14 @@ private fun WatermarkActions(
                             Icon(
                                 painter = painterResource(R.drawable.rounded_share_24),
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                         },
                         onClick = {
                             showMenu = false
                             onShareClick()
                         },
-                        enabled = saveState !is WatermarkUiState.Processing
+                        enabled = saveState !is WatermarkUiState.Processing,
                     )
 
                     SegmentedDropdownMenuItem(
@@ -322,14 +327,14 @@ private fun WatermarkActions(
                             Icon(
                                 painter = painterResource(R.drawable.rounded_save_24),
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                         },
                         onClick = {
                             showMenu = false
                             onSaveClick()
                         },
-                        enabled = saveState !is WatermarkUiState.Processing
+                        enabled = saveState !is WatermarkUiState.Processing,
                     )
                 }
             }

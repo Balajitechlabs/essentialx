@@ -22,18 +22,17 @@ data class BatteryUsageApp(
     val powerMah: Double,
     val fgTimeMs: Long,
     val bgTimeMs: Long,
-    val icon: Drawable?
+    val icon: Drawable?,
 )
 
 data class CpuWakeupItem(
     val timeAgo: String,
     val subsystem: String,
     val attribution: String,
-    val iconRes: Int
+    val iconRes: Int,
 )
 
 object BatteryStatsUtil {
-
     fun resetStats(context: Context): Boolean {
         val res1 = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --reset")
         ShellUtils.runCommand(context, "cmd battery reset")
@@ -46,8 +45,9 @@ object BatteryStatsUtil {
     }
 
     fun parseUsageApps(context: Context): List<BatteryUsageApp> {
-        val output = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --usage")
-            ?: return emptyList()
+        val output =
+            ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --usage")
+                ?: return emptyList()
 
         val pm = context.packageManager
         val list = mutableListOf<BatteryUsageApp>()
@@ -57,8 +57,11 @@ object BatteryStatsUtil {
         var currentFg = 0L
         var currentBg = 0L
 
-        fun getSystemUidLabel(uid: Int, pkg: String?): String {
-            return when (uid) {
+        fun getSystemUidLabel(
+            uid: Int,
+            pkg: String?,
+        ): String =
+            when (uid) {
                 -5 -> "Tethering & Hotspot"
                 0 -> "Root / Kernel"
                 1001 -> "Telephony"
@@ -87,7 +90,6 @@ object BatteryStatsUtil {
                 1092 -> "PRNG Seeder"
                 else -> pkg?.let { getAppName(pm, it) } ?: "System ($uid)"
             }
-        }
 
         output.lines().forEach { line ->
             val trimmed = line.trim()
@@ -105,20 +107,26 @@ object BatteryStatsUtil {
                             currentMah,
                             currentFg,
                             currentBg,
-                            drawable
-                        )
+                            drawable,
+                        ),
                     )
                 }
                 val parts = trimmed.split(":")
-                currentUid = parts[0].removePrefix("UID ").trim().let { uStr ->
-                    if (uStr.startsWith("u0a")) {
-                        10000 + (uStr.removePrefix("u0a").toIntOrNull() ?: 0)
-                    } else {
-                        uStr.toIntOrNull()
+                currentUid =
+                    parts[0].removePrefix("UID ").trim().let { uStr ->
+                        if (uStr.startsWith("u0a")) {
+                            10000 + (uStr.removePrefix("u0a").toIntOrNull() ?: 0)
+                        } else {
+                            uStr.toIntOrNull()
+                        }
                     }
-                }
                 currentMah =
-                    parts.getOrNull(1)?.trim()?.split(" ")?.firstOrNull()?.toDoubleOrNull() ?: 0.0
+                    parts
+                        .getOrNull(1)
+                        ?.trim()
+                        ?.split(" ")
+                        ?.firstOrNull()
+                        ?.toDoubleOrNull() ?: 0.0
                 currentFg = 0L
                 currentBg = 0L
             } else if (currentUid != null && trimmed.startsWith("cpu=")) {
@@ -139,8 +147,8 @@ object BatteryStatsUtil {
                     currentMah,
                     currentFg,
                     currentBg,
-                    drawable
-                )
+                    drawable,
+                ),
             )
         }
 
@@ -148,8 +156,9 @@ object BatteryStatsUtil {
     }
 
     fun parseWakeupHistory(context: Context): List<CpuWakeupItem> {
-        val output = ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --wakeups")
-            ?: return emptyList()
+        val output =
+            ShellUtils.runCommandWithOutput(context, "dumpsys batterystats --wakeups")
+                ?: return emptyList()
 
         val list = mutableListOf<CpuWakeupItem>()
         var currentTimeAgo = ""
@@ -161,20 +170,22 @@ object BatteryStatsUtil {
                 currentTimeAgo = formatReadableDuration(rawTime)
             } else if (trimmed.startsWith("Attribution:")) {
                 val attr = trimmed.removePrefix("Attribution:").trim()
-                val subsystem = when {
-                    attr.contains("Alarm", ignoreCase = true) -> "Alarm"
-                    attr.contains("Wifi", ignoreCase = true) -> "Wi-Fi"
-                    attr.contains("Sensor", ignoreCase = true) -> "Sensor"
-                    attr.contains("Cellular", ignoreCase = true) -> "Cellular Data"
-                    else -> "Subsystem"
-                }
-                val icon = when (subsystem) {
-                    "Alarm" -> R.drawable.rounded_info_24
-                    "Wi-Fi" -> R.drawable.rounded_info_24
-                    "Sensor" -> R.drawable.rounded_device_thermostat_24
-                    "Cellular Data" -> R.drawable.rounded_cable_24
-                    else -> R.drawable.rounded_info_24
-                }
+                val subsystem =
+                    when {
+                        attr.contains("Alarm", ignoreCase = true) -> "Alarm"
+                        attr.contains("Wifi", ignoreCase = true) -> "Wi-Fi"
+                        attr.contains("Sensor", ignoreCase = true) -> "Sensor"
+                        attr.contains("Cellular", ignoreCase = true) -> "Cellular Data"
+                        else -> "Subsystem"
+                    }
+                val icon =
+                    when (subsystem) {
+                        "Alarm" -> R.drawable.rounded_info_24
+                        "Wi-Fi" -> R.drawable.rounded_info_24
+                        "Sensor" -> R.drawable.rounded_device_thermostat_24
+                        "Cellular Data" -> R.drawable.rounded_cable_24
+                        else -> R.drawable.rounded_info_24
+                    }
                 list.add(CpuWakeupItem(currentTimeAgo, subsystem, attr, icon))
             }
         }
@@ -189,20 +200,24 @@ object BatteryStatsUtil {
         return "$str ago"
     }
 
-    private fun getAppName(pm: PackageManager, packageName: String): String {
-        return try {
+    private fun getAppName(
+        pm: PackageManager,
+        packageName: String,
+    ): String =
+        try {
             val appInfo = pm.getApplicationInfo(packageName, 0)
             pm.getApplicationLabel(appInfo).toString()
         } catch (e: Exception) {
             packageName
         }
-    }
 
-    private fun getAppIcon(pm: PackageManager, packageName: String): Drawable? {
-        return try {
+    private fun getAppIcon(
+        pm: PackageManager,
+        packageName: String,
+    ): Drawable? =
+        try {
             pm.getApplicationIcon(packageName)
         } catch (e: Exception) {
             null
         }
-    }
 }

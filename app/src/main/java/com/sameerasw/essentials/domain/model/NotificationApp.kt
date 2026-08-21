@@ -19,5 +19,5 @@ data class NotificationApp(
     val isEnabled: Boolean,
     val icon: ImageBitmap,
     val isSystemApp: Boolean,
-    val lastUpdated: Long
+    val lastUpdated: Long,
 )

@@ -48,7 +48,7 @@ import kotlinx.coroutines.withContext
 
 data class ResolvedAppInfo(
     val resolveInfo: ResolveInfo,
-    val label: String
+    val label: String,
 )
 
 @Composable
@@ -58,7 +58,7 @@ fun AppPickerItem(
     togglePin: (String) -> Unit,
     pinnedPackages: Set<String>,
     demo: Boolean = false,
-    onTapAction: (() -> Unit)? = null
+    onTapAction: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
@@ -77,50 +77,49 @@ fun AppPickerItem(
     }
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = {
-                    if (demo) {
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    } else {
-                        onTapAction?.invoke()
-                    }
-                },
-                onLongClick = {
-                    togglePin(packageName)
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
-            )
-            .background(
-                color = MaterialTheme.colorScheme.surfaceBright,
-                shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-            )
-            .padding(12.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = {
+                        if (demo) {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        } else {
+                            onTapAction?.invoke()
+                        }
+                    },
+                    onLongClick = {
+                        togglePin(packageName)
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    },
+                ).background(
+                    color = MaterialTheme.colorScheme.surfaceBright,
+                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                ).padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-
         AsyncImage(
             model = icon,
             contentDescription = "App icon",
-            modifier = Modifier
-                .size(48.dp)
-                .clip(RoundedCornerShape(8.dp))
+            modifier =
+                Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(8.dp)),
         )
-
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = info.label,
-                modifier = Modifier
-                    .padding(start = 16.dp),
+                modifier =
+                    Modifier
+                        .padding(start = 16.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
 
@@ -129,7 +128,7 @@ fun AppPickerItem(
                 painter = painterResource(id = R.drawable.rounded_bookmark_24),
                 contentDescription = "Pinned",
                 modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.primary,
             )
             Spacer(Modifier.padding())
         }

@@ -18,7 +18,11 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 class SettingsExternalHandler : ExternalHandler {
     override val path: String = "settings"
 
-    override fun onQuery(context: Context, remainingPath: String, extras: Bundle?): Cursor? {
+    override fun onQuery(
+        context: Context,
+        remainingPath: String,
+        extras: Bundle?,
+    ): Cursor? {
         val key = remainingPath
         val prefs =
             context.getSharedPreferences(SettingsRepository.PREFS_NAME, Context.MODE_PRIVATE)
@@ -34,7 +38,7 @@ class SettingsExternalHandler : ExternalHandler {
         context: Context,
         remainingPath: String,
         value: String?,
-        extras: Bundle?
+        extras: Bundle?,
     ): Boolean {
         val key = remainingPath
         val prefs =
@@ -63,7 +67,7 @@ class SettingsExternalHandler : ExternalHandler {
         context: Context,
         remainingPath: String,
         action: String?,
-        extras: Bundle?
+        extras: Bundle?,
     ): Bundle? {
         if (action == "toggle") {
             val key = remainingPath

@@ -36,7 +36,8 @@ class BatteryViewModel : ViewModel() {
         val details = BatteryInfoUtil.getBasicDetails(context)
         batteryPercentage.value = details.level
         isCharging.value =
-            details.plugged != 0 || details.status == android.os.BatteryManager.BATTERY_STATUS_CHARGING
+            details.plugged != 0 ||
+            details.status == android.os.BatteryManager.BATTERY_STATUS_CHARGING
     }
 
     /**
@@ -45,7 +46,10 @@ class BatteryViewModel : ViewModel() {
      * @param context [Context] Application context for persistence.
      * @param enabled [Boolean] True if maps power saving mode should be active.
      */
-    fun setMapsPowerSavingEnabled(context: Context, enabled: Boolean) {
+    fun setMapsPowerSavingEnabled(
+        context: Context,
+        enabled: Boolean,
+    ) {
         isMapsPowerSavingEnabled.value = enabled
         SettingsRepository(context).putBoolean("maps_power_saving_enabled", enabled)
     }

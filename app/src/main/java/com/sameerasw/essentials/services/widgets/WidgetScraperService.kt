@@ -39,16 +39,18 @@ import java.io.File
 import java.io.FileOutputStream
 
 class WidgetScraperService : Service() {
+    private inner class ScrapingHostView(
+        context: Context,
+    ) : AppWidgetHostView(context) {
+        private val drawListener =
+            ViewTreeObserver.OnDrawListener {
+                notifyWidgetChanged()
+            }
 
-    private inner class ScrapingHostView(context: Context) : AppWidgetHostView(context) {
-
-        private val drawListener = ViewTreeObserver.OnDrawListener {
-            notifyWidgetChanged()
-        }
-
-        private val layoutListener = ViewTreeObserver.OnGlobalLayoutListener {
-            notifyWidgetChanged()
-        }
+        private val layoutListener =
+            ViewTreeObserver.OnGlobalLayoutListener {
+                notifyWidgetChanged()
+            }
 
         override fun updateAppWidget(remoteViews: RemoteViews?) {
             super.updateAppWidget(remoteViews)
@@ -59,15 +61,23 @@ class WidgetScraperService : Service() {
             super.onAttachedToWindow()
             viewTreeObserver.addOnDrawListener(drawListener)
             viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
-            setOnHierarchyChangeListener(object : OnHierarchyChangeListener {
-                override fun onChildViewAdded(parent: View?, child: View?) {
-                    notifyWidgetChanged()
-                }
+            setOnHierarchyChangeListener(
+                object : OnHierarchyChangeListener {
+                    override fun onChildViewAdded(
+                        parent: View?,
+                        child: View?,
+                    ) {
+                        notifyWidgetChanged()
+                    }
 
-                override fun onChildViewRemoved(parent: View?, child: View?) {
-                    notifyWidgetChanged()
-                }
-            })
+                    override fun onChildViewRemoved(
+                        parent: View?,
+                        child: View?,
+                    ) {
+                        notifyWidgetChanged()
+                    }
+                },
+            )
         }
 
         override fun onDetachedFromWindow() {
@@ -78,12 +88,14 @@ class WidgetScraperService : Service() {
         }
     }
 
-    private inner class ScrapingWidgetHost(context: Context, hostId: Int) :
-        AppWidgetHost(context, hostId) {
+    private inner class ScrapingWidgetHost(
+        context: Context,
+        hostId: Int,
+    ) : AppWidgetHost(context, hostId) {
         override fun onCreateView(
             context: Context,
             appWidgetId: Int,
-            appWidget: AppWidgetProviderInfo?
+            appWidget: AppWidgetProviderInfo?,
         ): AppWidgetHostView = ScrapingHostView(context)
     }
 
@@ -113,15 +125,16 @@ class WidgetScraperService : Service() {
     private var currentController: MediaController? = null
     private var musicBroadcastReceiver: MusicBroadcastReceiver? = null
 
-    private val mediaCallback = object : MediaController.Callback() {
-        override fun onMetadataChanged(metadata: MediaMetadata?) {
-            updateMediaMetadata(currentController)
-        }
+    private val mediaCallback =
+        object : MediaController.Callback() {
+            override fun onMetadataChanged(metadata: MediaMetadata?) {
+                updateMediaMetadata(currentController)
+            }
 
-        override fun onPlaybackStateChanged(state: PlaybackState?) {
-            updateMediaMetadata(currentController)
+            override fun onPlaybackStateChanged(state: PlaybackState?) {
+                updateMediaMetadata(currentController)
+            }
         }
-    }
 
     private val activeSessionsListener =
         MediaSessionManager.OnActiveSessionsChangedListener { controllers ->
@@ -133,7 +146,11 @@ class WidgetScraperService : Service() {
         settingsRepository = SettingsRepository(this)
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         val type = settingsRepository.getPixelSearchbarType()
         if (type == "widget") {
             bindAndListenWidget()
@@ -151,7 +168,8 @@ class WidgetScraperService : Service() {
 
         val widgetId = settingsRepository.getPixelSearchbarWidgetId()
         if (widgetId == AppWidgetManager.INVALID_APPWIDGET_ID) {
-            stopSelf(); return
+            stopSelf()
+            return
         }
 
         val awm = AppWidgetManager.getInstance(this)
@@ -159,7 +177,11 @@ class WidgetScraperService : Service() {
         appWidgetHost = host
         host.startListening()
 
-        val info = awm.getAppWidgetInfo(widgetId) ?: run { stopSelf(); return }
+        val info =
+            awm.getAppWidgetInfo(widgetId) ?: run {
+                stopSelf()
+                return
+            }
 
         handler.post { host.createView(this, widgetId, info) }
     }
@@ -185,25 +207,26 @@ class WidgetScraperService : Service() {
             if (musicBroadcastReceiver == null) {
                 val receiver = MusicBroadcastReceiver()
                 musicBroadcastReceiver = receiver
-                val filter = android.content.IntentFilter().apply {
-                    addAction("com.android.music.metadatachanged")
-                    addAction("com.android.music.playstatechanged")
-                    addAction("com.android.music.playbackcomplete")
-                    addAction("com.android.music.queuechanged")
-                    addAction("com.spotify.music.metadatachanged")
-                    addAction("com.spotify.music.playbackstatechanged")
-                    addAction("com.htc.music.metadatachanged")
-                    addAction("com.real.music.metadatachanged")
-                    addAction("com.sonyericsson.music.metadatachanged")
-                    addAction("com.sec.android.app.music.metadatachanged")
-                    addAction("com.sec.android.app.music.playstatechanged")
-                    addAction("com.miui.player.metadatachanged")
-                }
+                val filter =
+                    android.content.IntentFilter().apply {
+                        addAction("com.android.music.metadatachanged")
+                        addAction("com.android.music.playstatechanged")
+                        addAction("com.android.music.playbackcomplete")
+                        addAction("com.android.music.queuechanged")
+                        addAction("com.spotify.music.metadatachanged")
+                        addAction("com.spotify.music.playbackstatechanged")
+                        addAction("com.htc.music.metadatachanged")
+                        addAction("com.real.music.metadatachanged")
+                        addAction("com.sonyericsson.music.metadatachanged")
+                        addAction("com.sec.android.app.music.metadatachanged")
+                        addAction("com.sec.android.app.music.playstatechanged")
+                        addAction("com.miui.player.metadatachanged")
+                    }
                 androidx.core.content.ContextCompat.registerReceiver(
                     this,
                     receiver,
                     filter,
-                    androidx.core.content.ContextCompat.RECEIVER_EXPORTED
+                    androidx.core.content.ContextCompat.RECEIVER_EXPORTED,
                 )
             }
         } catch (_: Exception) {
@@ -211,15 +234,17 @@ class WidgetScraperService : Service() {
     }
 
     private fun updateActiveSession(controllers: List<MediaController>?) {
-        val active = controllers?.sortedWith(
-            compareByDescending<MediaController> {
-                val state = it.playbackState?.state
-                state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING
-            }.thenByDescending {
-                val state = it.playbackState?.state
-                state == PlaybackState.STATE_PAUSED
-            }
-        )?.firstOrNull()
+        val active =
+            controllers
+                ?.sortedWith(
+                    compareByDescending<MediaController> {
+                        val state = it.playbackState?.state
+                        state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING
+                    }.thenByDescending {
+                        val state = it.playbackState?.state
+                        state == PlaybackState.STATE_PAUSED
+                    },
+                )?.firstOrNull()
 
         if (active != currentController) {
             currentController?.unregisterCallback(mediaCallback)
@@ -236,9 +261,10 @@ class WidgetScraperService : Service() {
         val artist = metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: ""
         val packageName = controller.packageName
 
-        val artwork = metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
-            ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART)
-            ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
+        val artwork =
+            metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+                ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART)
+                ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
 
         val filesDirFile = File(filesDir, "music_artwork.png")
         if (artwork != null) {
@@ -264,6 +290,7 @@ class WidgetScraperService : Service() {
     }
 
     private var updatePending = false
+
     private fun notifyWidgetChanged() {
         if (updatePending) return
         updatePending = true

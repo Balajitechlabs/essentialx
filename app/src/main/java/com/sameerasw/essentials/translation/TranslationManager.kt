@@ -26,7 +26,12 @@ object TranslationManager {
     val activeTargetKey = mutableStateOf<String?>(null)
     val activeTargetText = mutableStateOf<String?>(null)
 
-    fun addEdit(key: String, locale: String, originalValue: String, newValue: String) {
+    fun addEdit(
+        key: String,
+        locale: String,
+        originalValue: String,
+        newValue: String,
+    ) {
         if (newValue.trim() == originalValue.trim() || newValue.isBlank()) {
             removeEdit(key, locale)
             return
@@ -36,8 +41,10 @@ object TranslationManager {
         liveOverrides[Pair(key, locale)] = newValue
     }
 
-
-    fun removeEdit(key: String, locale: String) {
+    fun removeEdit(
+        key: String,
+        locale: String,
+    ) {
         session.remove(key, locale)
         liveOverrides.remove(Pair(key, locale))
     }
@@ -47,11 +54,16 @@ object TranslationManager {
         liveOverrides.clear()
     }
 
-    fun getOverriddenText(key: String, locale: String, fallback: String): String {
-        return liveOverrides[Pair(key, locale)] ?: fallback
-    }
+    fun getOverriddenText(
+        key: String,
+        locale: String,
+        fallback: String,
+    ): String = liveOverrides[Pair(key, locale)] ?: fallback
 
-    fun resolveKey(context: Context, resOrText: Any?): String? {
+    fun resolveKey(
+        context: Context,
+        resOrText: Any?,
+    ): String? {
         if (resOrText == null) return null
         if (resOrText is Int && resOrText != 0) {
             return try {
@@ -68,7 +80,8 @@ object TranslationManager {
                 return trimmed
             }
 
-            session.edits.firstOrNull { it.newValue.trim() == trimmed || it.originalValue.trim() == trimmed }
+            session.edits
+                .firstOrNull { it.newValue.trim() == trimmed || it.originalValue.trim() == trimmed }
                 ?.let {
                     return it.key
                 }
@@ -77,29 +90,32 @@ object TranslationManager {
             }
 
             // Exact match in translations
-            all.entries.firstOrNull { (_, map) ->
-                map.values.any { it == resOrText || it.trim() == trimmed }
-            }?.let { return it.key }
+            all.entries
+                .firstOrNull { (_, map) ->
+                    map.values.any { it == resOrText || it.trim() == trimmed }
+                }?.let { return it.key }
 
             // Case-insensitive exact match
-            all.entries.firstOrNull { (_, map) ->
-                map.values.any { it.trim().equals(trimmed, ignoreCase = true) }
-            }?.let { return it.key }
+            all.entries
+                .firstOrNull { (_, map) ->
+                    map.values.any { it.trim().equals(trimmed, ignoreCase = true) }
+                }?.let { return it.key }
 
             // Formatting pattern match (e.g. %1$s)
-            all.entries.firstOrNull { (_, map) ->
-                map.values.any { v ->
-                    if (!v.contains("%")) return@any false
-                    val parts = v.split(Regex("%[0-9]*\\$?[a-zA-Z]"))
-                    if (parts.all { it.isEmpty() }) return@any false
-                    val regexPattern = "^" + parts.joinToString(".*?") { Regex.escape(it) } + "$"
-                    try {
-                        Regex(regexPattern, RegexOption.IGNORE_CASE).matches(trimmed)
-                    } catch (e: Exception) {
-                        false
+            all.entries
+                .firstOrNull { (_, map) ->
+                    map.values.any { v ->
+                        if (!v.contains("%")) return@any false
+                        val parts = v.split(Regex("%[0-9]*\\$?[a-zA-Z]"))
+                        if (parts.all { it.isEmpty() }) return@any false
+                        val regexPattern = "^" + parts.joinToString(".*?") { Regex.escape(it) } + "$"
+                        try {
+                            Regex(regexPattern, RegexOption.IGNORE_CASE).matches(trimmed)
+                        } catch (e: Exception) {
+                            false
+                        }
                     }
-                }
-            }?.let { return it.key }
+                }?.let { return it.key }
         }
         return null
     }

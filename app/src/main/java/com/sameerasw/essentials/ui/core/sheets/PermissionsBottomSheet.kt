@@ -39,7 +39,7 @@ data class PermissionItem(
     val shizukuActionLabel: Any? = null,
     val shizukuActionEnabled: Boolean = false,
     val shizukuAction: (() -> Unit)? = null,
-    val instructions: Any? = null
+    val instructions: Any? = null,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,34 +48,37 @@ fun PermissionsBottomSheet(
     onDismissRequest: () -> Unit,
     featureTitle: Any, // Can be Int (Resource ID) or String
     permissions: List<PermissionItem>,
-    onHelpClick: () -> Unit = {}
+    onHelpClick: () -> Unit = {},
 ) {
-    val resolvedTitle = when (featureTitle) {
-        is Int -> stringResource(id = featureTitle)
-        is String -> featureTitle
-        else -> ""
-    }
+    val resolvedTitle =
+        when (featureTitle) {
+            is Int -> stringResource(id = featureTitle)
+            is String -> featureTitle
+            else -> ""
+        }
     EssentialsBottomSheet(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = stringResource(
-                        id = R.string.requires_following_permissions,
-                        resolvedTitle
-                    ),
+                    text =
+                        stringResource(
+                            id = R.string.requires_following_permissions,
+                            resolvedTitle,
+                        ),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
             }
 
@@ -94,7 +97,7 @@ fun PermissionsBottomSheet(
                         shizukuActionEnabled = perm.shizukuActionEnabled,
                         onShizukuActionClick = { perm.shizukuAction?.invoke() },
                         instructions = perm.instructions,
-                        description = perm.description
+                        description = perm.description,
                     )
                 }
             }

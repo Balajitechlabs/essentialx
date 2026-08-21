@@ -66,7 +66,7 @@ class TimeModule : AutomationModule {
                             schedule.hour,
                             schedule.minute,
                             schedule.days,
-                            true
+                            true,
                         )
                     }
                 }
@@ -79,7 +79,7 @@ class TimeModule : AutomationModule {
                             period.startHour,
                             period.startMinute,
                             period.days,
-                            true
+                            true,
                         )
                         scheduleAlarm(
                             context,
@@ -87,7 +87,7 @@ class TimeModule : AutomationModule {
                             period.endHour,
                             period.endMinute,
                             period.days,
-                            false
+                            false,
                         )
                     }
                 }
@@ -103,27 +103,29 @@ class TimeModule : AutomationModule {
         hour: Int,
         minute: Int,
         days: Set<Int>,
-        isEntry: Boolean
+        isEntry: Boolean,
     ) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, TimeAutomationReceiver::class.java).apply {
-            action = TimeAutomationReceiver.ACTION_TRIGGER
-            putExtra(TimeAutomationReceiver.EXTRA_AUTOMATION_ID, id)
-            putExtra(TimeAutomationReceiver.EXTRA_IS_ENTRY, isEntry)
-        }
+        val intent =
+            Intent(context, TimeAutomationReceiver::class.java).apply {
+                action = TimeAutomationReceiver.ACTION_TRIGGER
+                putExtra(TimeAutomationReceiver.EXTRA_AUTOMATION_ID, id)
+                putExtra(TimeAutomationReceiver.EXTRA_IS_ENTRY, isEntry)
+            }
 
         val requestCode = (id + isEntry.toString()).hashCode()
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            requestCode,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val pendingIntent =
+            PendingIntent.getBroadcast(
+                context,
+                requestCode,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
         val calendar = calculateNextOccurrence(hour, minute, days)
         Log.d(
             ID,
-            "Scheduling alarm for automation $id (entry=$isEntry) at ${calendar.time}"
+            "Scheduling alarm for automation $id (entry=$isEntry) at ${calendar.time}",
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -133,28 +135,28 @@ class TimeModule : AutomationModule {
                         alarmManager.setExactAndAllowWhileIdle(
                             AlarmManager.RTC_WAKEUP,
                             calendar.timeInMillis,
-                            pendingIntent
+                            pendingIntent,
                         )
                     } else {
                         // Fallback to inexact
                         alarmManager.setAndAllowWhileIdle(
                             AlarmManager.RTC_WAKEUP,
                             calendar.timeInMillis,
-                            pendingIntent
+                            pendingIntent,
                         )
                     }
                 } else {
                     alarmManager.setExactAndAllowWhileIdle(
                         AlarmManager.RTC_WAKEUP,
                         calendar.timeInMillis,
-                        pendingIntent
+                        pendingIntent,
                     )
                 }
             } catch (e: SecurityException) {
                 alarmManager.setAndAllowWhileIdle(
                     AlarmManager.RTC_WAKEUP,
                     calendar.timeInMillis,
-                    pendingIntent
+                    pendingIntent,
                 )
             }
         } else {
@@ -165,42 +167,50 @@ class TimeModule : AutomationModule {
     private fun cancelAllAlarms(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         automations.forEach { automation ->
-            val intent = Intent(context, TimeAutomationReceiver::class.java).apply {
-                action = TimeAutomationReceiver.ACTION_TRIGGER
-            }
+            val intent =
+                Intent(context, TimeAutomationReceiver::class.java).apply {
+                    action = TimeAutomationReceiver.ACTION_TRIGGER
+                }
 
             val rc1 = (automation.id + "true").hashCode()
-            PendingIntent.getBroadcast(
-                context,
-                rc1,
-                intent,
-                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-            )?.let {
-                alarmManager.cancel(it)
-                it.cancel()
-            }
+            PendingIntent
+                .getBroadcast(
+                    context,
+                    rc1,
+                    intent,
+                    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+                )?.let {
+                    alarmManager.cancel(it)
+                    it.cancel()
+                }
 
             val rc2 = (automation.id + "false").hashCode()
-            PendingIntent.getBroadcast(
-                context,
-                rc2,
-                intent,
-                PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
-            )?.let {
-                alarmManager.cancel(it)
-                it.cancel()
-            }
+            PendingIntent
+                .getBroadcast(
+                    context,
+                    rc2,
+                    intent,
+                    PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE,
+                )?.let {
+                    alarmManager.cancel(it)
+                    it.cancel()
+                }
         }
     }
 
-    private fun calculateNextOccurrence(hour: Int, minute: Int, days: Set<Int>): Calendar {
+    private fun calculateNextOccurrence(
+        hour: Int,
+        minute: Int,
+        days: Set<Int>,
+    ): Calendar {
         val now = Calendar.getInstance()
-        val target = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
+        val target =
+            Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, hour)
+                set(Calendar.MINUTE, minute)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
 
         if (target.before(now)) {
             target.add(Calendar.DAY_OF_YEAR, 1)
@@ -226,10 +236,11 @@ class TimeModule : AutomationModule {
 
             Log.d(
                 ID,
-                "Checking current states at $currentHour:$currentMinute on day $currentDay"
+                "Checking current states at $currentHour:$currentMinute on day $currentDay",
             )
 
-            automations.filter { it.type == Automation.Type.STATE && it.isEnabled }
+            automations
+                .filter { it.type == Automation.Type.STATE && it.isEnabled }
                 .forEach { automation ->
                     (automation.state as? DIYState.TimePeriod)?.let { period ->
                         if (period.days.isEmpty() || period.days.contains(currentDay)) {
@@ -237,36 +248,37 @@ class TimeModule : AutomationModule {
                             val endTime = period.endHour * 60 + period.endMinute
                             val currentTime = currentHour * 60 + currentMinute
 
-                            val isActive = if (startTime < endTime) {
-                                currentTime in startTime until endTime
-                            } else {
-                                currentTime >= startTime || currentTime < endTime
-                            }
+                            val isActive =
+                                if (startTime < endTime) {
+                                    currentTime in startTime until endTime
+                                } else {
+                                    currentTime >= startTime || currentTime < endTime
+                                }
 
                             val wasActive = activeStateAutomations.contains(automation.id)
 
                             if (isActive && !wasActive) {
                                 Log.d(
                                     ID,
-                                    "State ${automation.id} became active. Executing entry actions."
+                                    "State ${automation.id} became active. Executing entry actions.",
                                 )
                                 activeStateAutomations.add(automation.id)
                                 automation.entryAction?.let {
                                     CombinedActionExecutor.execute(
                                         context,
-                                        it
+                                        it,
                                     )
                                 }
                             } else if (!isActive && wasActive) {
                                 Log.d(
                                     ID,
-                                    "State ${automation.id} became inactive. Executing exit actions."
+                                    "State ${automation.id} became inactive. Executing exit actions.",
                                 )
                                 activeStateAutomations.remove(automation.id)
                                 automation.exitAction?.let {
                                     CombinedActionExecutor.execute(
                                         context,
-                                        it
+                                        it,
                                     )
                                 }
                             }

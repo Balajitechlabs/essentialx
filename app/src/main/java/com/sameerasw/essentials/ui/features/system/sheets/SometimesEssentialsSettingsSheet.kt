@@ -46,7 +46,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun SometimesEssentialsSettingsSheet(
     initialAction: Action.SometimesEssentials,
     onDismiss: () -> Unit,
-    onSave: (Action.SometimesEssentials) -> Unit
+    onSave: (Action.SometimesEssentials) -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -79,42 +79,45 @@ fun SometimesEssentialsSettingsSheet(
     var changeSmartPixels by remember { mutableStateOf(initialAction.changeSmartPixels) }
     var smartPixelsEnabled by remember { mutableStateOf(initialAction.smartPixelsEnabled) }
 
-    val clockOptions = remember {
-        listOf(
-            "DEFAULT" to R.string.lock_screen_clock_default,
-            "ANALOG_CLOCK_BIGNUM" to R.string.lock_screen_clock_bignum,
-            "DIGITAL_CLOCK_CALLIGRAPHY" to R.string.lock_screen_clock_calligraphy,
-            "DIGITAL_CLOCK_GROWTH" to R.string.lock_screen_clock_growth,
-            "DIGITAL_CLOCK_HANDWRITTEN" to R.string.lock_screen_clock_handwritten,
-            "DIGITAL_CLOCK_INFLATE" to R.string.lock_screen_clock_inflate,
-            "DIGITAL_CLOCK_METRO" to R.string.lock_screen_clock_metro,
-            "DIGITAL_CLOCK_NUMBEROVERLAP" to R.string.lock_screen_clock_numoverlap,
-            "DIGITAL_CLOCK_WEATHER" to R.string.lock_screen_clock_weather
-        )
-    }
+    val clockOptions =
+        remember {
+            listOf(
+                "DEFAULT" to R.string.lock_screen_clock_default,
+                "ANALOG_CLOCK_BIGNUM" to R.string.lock_screen_clock_bignum,
+                "DIGITAL_CLOCK_CALLIGRAPHY" to R.string.lock_screen_clock_calligraphy,
+                "DIGITAL_CLOCK_GROWTH" to R.string.lock_screen_clock_growth,
+                "DIGITAL_CLOCK_HANDWRITTEN" to R.string.lock_screen_clock_handwritten,
+                "DIGITAL_CLOCK_INFLATE" to R.string.lock_screen_clock_inflate,
+                "DIGITAL_CLOCK_METRO" to R.string.lock_screen_clock_metro,
+                "DIGITAL_CLOCK_NUMBEROVERLAP" to R.string.lock_screen_clock_numoverlap,
+                "DIGITAL_CLOCK_WEATHER" to R.string.lock_screen_clock_weather,
+            )
+        }
 
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        dragHandle = null
+        dragHandle = null,
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.diy_action_sometimes_essentials),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Column(
-                modifier = Modifier
-                    .weight(1f, fill = false)
-                    .verticalScroll(rememberScrollState())
+                modifier =
+                    Modifier
+                        .weight(1f, fill = false)
+                        .verticalScroll(rememberScrollState()),
             ) {
                 RoundedCardContainer(spacing = 2.dp) {
                     FeatureToggleRow(
@@ -129,7 +132,7 @@ fun SometimesEssentialsSettingsSheet(
                         onSwitchChange = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             notificationLightingEnabled = it
-                        }
+                        },
                     )
 
                     FeatureToggleRow(
@@ -144,7 +147,7 @@ fun SometimesEssentialsSettingsSheet(
                         onSwitchChange = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             flashlightPulseEnabled = it
-                        }
+                        },
                     )
 
                     FeatureToggleRow(
@@ -159,7 +162,7 @@ fun SometimesEssentialsSettingsSheet(
                         onSwitchChange = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             batteryNotificationEnabled = it
-                        }
+                        },
                     )
 
                     FeatureDropdownRow(
@@ -176,7 +179,7 @@ fun SometimesEssentialsSettingsSheet(
                         onOptionSelected = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             essentialsOnDisplayMode = it
-                        }
+                        },
                     )
 
                     FeatureDropdownRow(
@@ -193,7 +196,7 @@ fun SometimesEssentialsSettingsSheet(
                         onOptionSelected = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             alwaysOnDisplayMode = it
-                        }
+                        },
                     )
 
                     FeatureToggleRow(
@@ -208,7 +211,7 @@ fun SometimesEssentialsSettingsSheet(
                         onSwitchChange = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             gloveModeEnabled = it
-                        }
+                        },
                     )
 
                     val currentClockLabel =
@@ -232,7 +235,7 @@ fun SometimesEssentialsSettingsSheet(
                         onOptionSelected = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             lockScreenClockStyle = it
-                        }
+                        },
                     )
 
                     FeatureToggleRow(
@@ -247,7 +250,7 @@ fun SometimesEssentialsSettingsSheet(
                         onSwitchChange = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             syncSoundModeWatchEnabled = it
-                        }
+                        },
                     )
 
                     FeatureToggleRow(
@@ -262,14 +265,14 @@ fun SometimesEssentialsSettingsSheet(
                         onSwitchChange = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             smartPixelsEnabled = it
-                        }
+                        },
                     )
                 }
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
             ) {
                 Button(
                     onClick = {
@@ -293,18 +296,19 @@ fun SometimesEssentialsSettingsSheet(
                                 changeSyncSoundModeWatch = changeSyncSoundModeWatch,
                                 syncSoundModeWatchEnabled = syncSoundModeWatchEnabled,
                                 changeSmartPixels = changeSmartPixels,
-                                smartPixelsEnabled = smartPixelsEnabled
-                            )
+                                smartPixelsEnabled = smartPixelsEnabled,
+                            ),
                         )
                     },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    ),
-                    shape = RoundedCornerShape(24.dp)
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                        ),
+                    shape = RoundedCornerShape(24.dp),
                 ) {
                     Text(
                         text = stringResource(R.string.action_save),
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }

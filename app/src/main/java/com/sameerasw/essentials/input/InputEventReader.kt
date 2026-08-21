@@ -13,7 +13,9 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class InputEventReader(private val devicePath: String) {
+class InputEventReader(
+    private val devicePath: String,
+) {
     companion object {
         const val INPUT_EVENT_SIZE = 24
         const val EV_KEY = 1
@@ -25,17 +27,19 @@ class InputEventReader(private val devicePath: String) {
     private var inputStream: InputStream? = null
     private val buffer = ByteArray(INPUT_EVENT_SIZE)
 
-    fun open(): Boolean = try {
-        process = com.sameerasw.essentials.utils.ShellUtils.newProcess(
-            com.sameerasw.essentials.EssentialsApp.context,
-            arrayOf("cat", devicePath)
-        )
-        inputStream = process?.inputStream
-        inputStream != null
-    } catch (e: Exception) {
-        e.printStackTrace()
-        false
-    }
+    fun open(): Boolean =
+        try {
+            process =
+                com.sameerasw.essentials.utils.ShellUtils.newProcess(
+                    com.sameerasw.essentials.EssentialsApp.context,
+                    arrayOf("cat", devicePath),
+                )
+            inputStream = process?.inputStream
+            inputStream != null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
 
     fun readEvent(): InputEvent? {
         return try {
@@ -54,7 +58,7 @@ class InputEventReader(private val devicePath: String) {
                 timeMicro = bb.long,
                 type = bb.short.toInt() and 0xFFFF,
                 code = bb.short.toInt() and 0xFFFF,
-                value = bb.int
+                value = bb.int,
             )
         } catch (e: Exception) {
             null

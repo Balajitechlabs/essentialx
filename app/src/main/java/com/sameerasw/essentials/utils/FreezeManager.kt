@@ -32,7 +32,10 @@ object FreezeManager {
      * Freeze an application using Shizuku or Root.
      * Uses either 'pm disable-user' or 'pm suspend' based on configuration.
      */
-    fun freezeApp(context: Context, packageName: String): Boolean {
+    fun freezeApp(
+        context: Context,
+        packageName: String,
+    ): Boolean {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         val mode = prefs.getInt("freeze_mode", 0) // 0: FREEZE, 1: SUSPEND
 
@@ -42,7 +45,7 @@ object FreezeManager {
             setApplicationEnabledSetting(
                 context,
                 packageName,
-                COMPONENT_ENABLED_STATE_DISABLED_USER
+                COMPONENT_ENABLED_STATE_DISABLED_USER,
             )
         }
     }
@@ -51,7 +54,10 @@ object FreezeManager {
      * Unfreeze an application using Shizuku or Root.
      * Uses either 'pm enable' or 'pm unsuspend' based on configuration.
      */
-    fun unfreezeApp(context: Context, packageName: String): Boolean {
+    fun unfreezeApp(
+        context: Context,
+        packageName: String,
+    ): Boolean {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         val mode = prefs.getInt("freeze_mode", 0)
 
@@ -75,13 +81,17 @@ object FreezeManager {
             val gson = com.google.gson.Gson()
             try {
                 val apps: List<com.sameerasw.essentials.domain.model.AppSelection> =
-                    gson.fromJson(
-                        json,
-                        Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java
-                    ).toList()
-                val excludedSet: Set<String> = if (excludedJson != null) {
-                    gson.fromJson(excludedJson, Array<String>::class.java).toSet()
-                } else emptySet()
+                    gson
+                        .fromJson(
+                            json,
+                            Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java,
+                        ).toList()
+                val excludedSet: Set<String> =
+                    if (excludedJson != null) {
+                        gson.fromJson(excludedJson, Array<String>::class.java).toSet()
+                    } else {
+                        emptySet()
+                    }
 
                 apps.forEach { app ->
                     // Freezing happens if it's in the list AND not excluded
@@ -104,7 +114,10 @@ object FreezeManager {
      * @param packageName [String] Target package name.
      * @return The resulting Boolean data.
      */
-    fun isAppActive(context: Context, packageName: String): Boolean {
+    fun isAppActive(
+        context: Context,
+        packageName: String,
+    ): Boolean {
         // 1. Check Foreground
         if (isAppInForeground(context, packageName)) return true
 
@@ -117,13 +130,18 @@ object FreezeManager {
         return false
     }
 
-    private fun isAppInForeground(context: Context, packageName: String): Boolean {
+    private fun isAppInForeground(
+        context: Context,
+        packageName: String,
+    ): Boolean {
         try {
             val usageStatsManager =
                 context.getSystemService(Context.USAGE_STATS_SERVICE) as android.app.usage.UsageStatsManager
             val time = System.currentTimeMillis()
             val events = usageStatsManager.queryEvents(time - 10 * 1000, time)
-            val event = android.app.usage.UsageEvents.Event()
+            val event =
+                android.app.usage.UsageEvents
+                    .Event()
             var lastEvent = -1
 
             while (events.hasNextEvent()) {
@@ -133,13 +151,16 @@ object FreezeManager {
                 }
             }
             return lastEvent == android.app.usage.UsageEvents.Event.ACTIVITY_RESUMED ||
-                    lastEvent == android.app.usage.UsageEvents.Event.USER_INTERACTION
+                lastEvent == android.app.usage.UsageEvents.Event.USER_INTERACTION
         } catch (_: Exception) {
             return false
         }
     }
 
-    private fun isAppStreamingMedia(context: Context, packageName: String): Boolean {
+    private fun isAppStreamingMedia(
+        context: Context,
+        packageName: String,
+    ): Boolean {
         try {
             // Check AudioManager first for general music playback
             val audioManager =
@@ -149,19 +170,26 @@ object FreezeManager {
             // Check Media Sessions for specific package
             val mediaSessionManager =
                 context.getSystemService(Context.MEDIA_SESSION_SERVICE) as android.media.session.MediaSessionManager
-            val componentName = android.content.ComponentName(
-                context,
-                "com.sameerasw.essentials.services.NotificationListener"
-            )
+            val componentName =
+                android.content.ComponentName(
+                    context,
+                    "com.sameerasw.essentials.services.NotificationListener",
+                )
             val sessions = mediaSessionManager.getActiveSessions(componentName)
 
-            return sessions.any { it.packageName == packageName && it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING }
+            return sessions.any {
+                it.packageName == packageName &&
+                    it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
+            }
         } catch (_: Exception) {
             return false
         }
     }
 
-    private fun hasOngoingNotification(context: Context, packageName: String): Boolean {
+    private fun hasOngoingNotification(
+        context: Context,
+        packageName: String,
+    ): Boolean {
         try {
             val notificationManager =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -184,10 +212,11 @@ object FreezeManager {
             val gson = com.google.gson.Gson()
             try {
                 val apps: List<com.sameerasw.essentials.domain.model.AppSelection> =
-                    gson.fromJson(
-                        json,
-                        Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java
-                    ).toList()
+                    gson
+                        .fromJson(
+                            json,
+                            Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java,
+                        ).toList()
                 apps.forEach { app ->
                     freezeApp(context, app.packageName)
                 }
@@ -209,13 +238,17 @@ object FreezeManager {
             val gson = com.google.gson.Gson()
             try {
                 val apps: List<com.sameerasw.essentials.domain.model.AppSelection> =
-                    gson.fromJson(
-                        json,
-                        Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java
-                    ).toList()
-                val excludedSet: Set<String> = if (excludedJson != null) {
-                    gson.fromJson(excludedJson, Array<String>::class.java).toSet()
-                } else emptySet()
+                    gson
+                        .fromJson(
+                            json,
+                            Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java,
+                        ).toList()
+                val excludedSet: Set<String> =
+                    if (excludedJson != null) {
+                        gson.fromJson(excludedJson, Array<String>::class.java).toSet()
+                    } else {
+                        emptySet()
+                    }
 
                 apps.forEach { app ->
                     if (!excludedSet.contains(app.packageName)) {
@@ -238,10 +271,11 @@ object FreezeManager {
             val gson = com.google.gson.Gson()
             try {
                 val apps: List<com.sameerasw.essentials.domain.model.AppSelection> =
-                    gson.fromJson(
-                        json,
-                        Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java
-                    ).toList()
+                    gson
+                        .fromJson(
+                            json,
+                            Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java,
+                        ).toList()
                 apps.forEach { app ->
                     unfreezeApp(context, app.packageName)
                 }
@@ -254,17 +288,22 @@ object FreezeManager {
     /**
      * Check if an application is currently frozen/disabled/suspended.
      */
-    fun isAppFrozen(context: Context, packageName: String): Boolean {
-        return try {
+    fun isAppFrozen(
+        context: Context,
+        packageName: String,
+    ): Boolean =
+        try {
             val state = context.packageManager.getApplicationEnabledSetting(packageName)
             val isSuspended = context.packageManager.isPackageSuspended(packageName)
             state == COMPONENT_ENABLED_STATE_DISABLED_USER || state == COMPONENT_ENABLED_STATE_DISABLED || isSuspended
         } catch (e: Exception) {
             false
         }
-    }
 
-    private fun suspendApp(context: Context, packageName: String): Boolean {
+    private fun suspendApp(
+        context: Context,
+        packageName: String,
+    ): Boolean {
         if (ShizukuUtils.isShizukuAvailable() && ShizukuUtils.hasPermission()) {
             if (setAppSuspendedWithShizuku(packageName, true)) return true
         }
@@ -279,7 +318,10 @@ object FreezeManager {
         }
     }
 
-    private fun unsuspendApp(context: Context, packageName: String): Boolean {
+    private fun unsuspendApp(
+        context: Context,
+        packageName: String,
+    ): Boolean {
         if (ShizukuUtils.isShizukuAvailable() && ShizukuUtils.hasPermission()) {
             if (setAppSuspendedWithShizuku(packageName, false)) return true
         }
@@ -294,7 +336,10 @@ object FreezeManager {
         }
     }
 
-    private fun setAppSuspendedWithShizuku(packageName: String, suspended: Boolean): Boolean {
+    private fun setAppSuspendedWithShizuku(
+        packageName: String,
+        suspended: Boolean,
+    ): Boolean {
         return try {
             if (suspended) forceStopAppWithShizuku(packageName)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -306,17 +351,20 @@ object FreezeManager {
             val callerPackage = getSuspenderPackage()
             val userId = getUserId()
 
-            val dialogInfo = if (suspended) {
-                val builderClass = Class.forName("android.content.pm.SuspendDialogInfo\$Builder")
-                val builder = HiddenApiBypass.newInstance(builderClass)
-                HiddenApiBypass.invoke(
-                    builderClass,
-                    builder,
-                    "setNeutralButtonAction",
-                    1 /*BUTTON_ACTION_UNSUSPEND*/
-                )
-                HiddenApiBypass.invoke(builderClass, builder, "build")
-            } else null
+            val dialogInfo =
+                if (suspended) {
+                    val builderClass = Class.forName("android.content.pm.SuspendDialogInfo\$Builder")
+                    val builder = HiddenApiBypass.newInstance(builderClass)
+                    HiddenApiBypass.invoke(
+                        builderClass,
+                        builder,
+                        "setNeutralButtonAction",
+                        1, // BUTTON_ACTION_UNSUSPEND
+                    )
+                    HiddenApiBypass.invoke(builderClass, builder, "build")
+                } else {
+                    null
+                }
 
             /**
              * Executes the call set packages suspended operation.
@@ -324,66 +372,80 @@ object FreezeManager {
              * @param version [Int] Target version.
              * @return The resulting Array< data.
              */
-            fun callSetPackagesSuspended(version: Int): Array<*>? {
-                return try {
+            fun callSetPackagesSuspended(version: Int): Array<*>? =
+                try {
                     when (version) {
-                        0 -> HiddenApiBypass.invoke(
-                            pm.javaClass,
-                            pm,
-                            "setPackagesSuspendedAsUser",
-                            arrayOf(packageName),
-                            suspended,
-                            null,
-                            null,
-                            dialogInfo,
-                            0,
-                            callerPackage,
-                            userId,
-                            userId
-                        ) as? Array<*>
+                        0 ->
+                            HiddenApiBypass.invoke(
+                                pm.javaClass,
+                                pm,
+                                "setPackagesSuspendedAsUser",
+                                arrayOf(packageName),
+                                suspended,
+                                null,
+                                null,
+                                dialogInfo,
+                                0,
+                                callerPackage,
+                                userId,
+                                userId,
+                            ) as? Array<*>
 
-                        1 -> HiddenApiBypass.invoke(
-                            pm.javaClass,
-                            pm,
-                            "setPackagesSuspendedAsUser",
-                            arrayOf(packageName),
-                            suspended,
-                            null,
-                            null,
-                            dialogInfo,
-                            callerPackage,
-                            userId
-                        ) as? Array<*>
+                        1 ->
+                            HiddenApiBypass.invoke(
+                                pm.javaClass,
+                                pm,
+                                "setPackagesSuspendedAsUser",
+                                arrayOf(packageName),
+                                suspended,
+                                null,
+                                null,
+                                dialogInfo,
+                                callerPackage,
+                                userId,
+                            ) as? Array<*>
 
-                        2 -> HiddenApiBypass.invoke(
-                            pm.javaClass, pm, "setPackagesSuspendedAsUser",
-                            arrayOf(packageName), suspended, null, null, null, callerPackage, userId
-                        ) as? Array<*>
+                        2 ->
+                            HiddenApiBypass.invoke(
+                                pm.javaClass,
+                                pm,
+                                "setPackagesSuspendedAsUser",
+                                arrayOf(packageName),
+                                suspended,
+                                null,
+                                null,
+                                null,
+                                callerPackage,
+                                userId,
+                            ) as? Array<*>
 
-                        else -> pm.javaClass.getMethod(
-                            "setPackagesSuspendedAsUser",
-                            Array<String>::class.java,
-                            Boolean::class.javaPrimitiveType,
-                            Int::class.javaPrimitiveType
-                        )
-                            .invoke(pm, arrayOf(packageName), suspended, userId) as? Array<*>
+                        else ->
+                            pm.javaClass
+                                .getMethod(
+                                    "setPackagesSuspendedAsUser",
+                                    Array<String>::class.java,
+                                    Boolean::class.javaPrimitiveType,
+                                    Int::class.javaPrimitiveType,
+                                ).invoke(pm, arrayOf(packageName), suspended, userId) as? Array<*>
                     }
                 } catch (_: Exception) {
                     null
                 }
-            }
 
-            val result = when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> callSetPackagesSuspended(
-                    0
-                ) ?: callSetPackagesSuspended(1)
+            val result =
+                when {
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE ->
+                        callSetPackagesSuspended(
+                            0,
+                        ) ?: callSetPackagesSuspended(1)
 
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> callSetPackagesSuspended(1)
-                    ?: callSetPackagesSuspended(2)
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
+                        callSetPackagesSuspended(1)
+                            ?: callSetPackagesSuspended(2)
 
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> callSetPackagesSuspended(2)
-                else -> callSetPackagesSuspended(3)
-            }
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> callSetPackagesSuspended(2)
+                    else -> callSetPackagesSuspended(3)
+                }
 
             result?.isEmpty() ?: false
         } catch (e: Exception) {
@@ -402,21 +464,25 @@ object FreezeManager {
         }
     }
 
-    private fun setAppRestrictedWithShizuku(packageName: String, restricted: Boolean) {
+    private fun setAppRestrictedWithShizuku(
+        packageName: String,
+        restricted: Boolean,
+    ) {
         val appops =
             getService(Context.APP_OPS_SERVICE, "com.android.internal.app.IAppOpsService\$Stub")
                 ?: return
         try {
             val appOpsManagerClass = Class.forName("android.app.AppOpsManager")
-            val op = HiddenApiBypass.invoke(
-                appOpsManagerClass,
-                null,
-                "strOpToOp",
-                "android:run_any_in_background"
-            ) as Int
+            val op =
+                HiddenApiBypass.invoke(
+                    appOpsManagerClass,
+                    null,
+                    "strOpToOp",
+                    "android:run_any_in_background",
+                ) as Int
             val uid = getPackageUid(packageName)
             if (uid != -1) {
-                val mode = if (restricted) 1 /*MODE_IGNORED*/ else 0 /*MODE_ALLOWED*/
+                val mode = if (restricted) 1 /*MODE_IGNORED*/ else 0 // MODE_ALLOWED
                 HiddenApiBypass.invoke(
                     appops.javaClass,
                     appops,
@@ -424,7 +490,7 @@ object FreezeManager {
                     op,
                     uid,
                     packageName,
-                    mode
+                    mode,
                 )
             }
         } catch (e: Exception) {
@@ -442,14 +508,18 @@ object FreezeManager {
         }
     }
 
-    private fun getService(serviceName: String, stubClassName: String): Any? {
+    private fun getService(
+        serviceName: String,
+        stubClassName: String,
+    ): Any? {
         return try {
             val binder = SystemServiceHelper.getSystemService(serviceName) ?: return null
             val stubClass = Class.forName(stubClassName)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 HiddenApiBypass.invoke(stubClass, null, "asInterface", ShizukuBinderWrapper(binder))
             } else {
-                stubClass.getMethod("asInterface", IBinder::class.java)
+                stubClass
+                    .getMethod("asInterface", IBinder::class.java)
                     .invoke(null, ShizukuBinderWrapper(binder))
             }
         } catch (_: Exception) {
@@ -457,23 +527,21 @@ object FreezeManager {
         }
     }
 
-    private fun getSuspenderPackage(): String =
-        if (Shizuku.getUid() == 0) "com.sameerasw.essentials" else "com.android.shell"
+    private fun getSuspenderPackage(): String = if (Shizuku.getUid() == 0) "com.sameerasw.essentials" else "com.android.shell"
 
-    private fun getUserId(): Int {
-        return try {
+    private fun getUserId(): Int =
+        try {
             val userHandle = android.os.Process.myUserHandle()
             val method = userHandle.javaClass.getMethod("getIdentifier")
             method.invoke(userHandle) as Int
         } catch (_: Exception) {
             0
         }
-    }
 
     private fun setApplicationEnabledSetting(
         context: Context,
         packageName: String,
-        newState: Int
+        newState: Int,
     ): Boolean {
         // 1. Try Shizuku first
         if (ShizukuUtils.isShizukuAvailable() && ShizukuUtils.hasPermission()) {
@@ -483,11 +551,17 @@ object FreezeManager {
                     val userId = getUserId()
                     Log.d(
                         "FreezeManager",
-                        "Shizuku: setting $packageName to $newState for user $userId"
+                        "Shizuku: setting $packageName to $newState for user $userId",
                     )
                     HiddenApiBypass.invoke(
-                        pm.javaClass, pm, "setApplicationEnabledSetting",
-                        packageName, newState, 0, userId, "android"
+                        pm.javaClass,
+                        pm,
+                        "setApplicationEnabledSetting",
+                        packageName,
+                        newState,
+                        0,
+                        userId,
+                        "android",
                     )
                     return true
                 }
@@ -499,11 +573,12 @@ object FreezeManager {
         // 2. Fallback to Shell (Root)
         if (!ShellUtils.hasPermission(context)) return false
 
-        val cmd = when (newState) {
-            COMPONENT_ENABLED_STATE_DISABLED_USER -> "pm disable-user --user 0 $packageName"
-            COMPONENT_ENABLED_STATE_ENABLED -> "pm enable $packageName"
-            else -> return false
-        }
+        val cmd =
+            when (newState) {
+                COMPONENT_ENABLED_STATE_DISABLED_USER -> "pm disable-user --user 0 $packageName"
+                COMPONENT_ENABLED_STATE_ENABLED -> "pm enable $packageName"
+                else -> return false
+            }
 
         return try {
             ShellUtils.runCommand(context, cmd)

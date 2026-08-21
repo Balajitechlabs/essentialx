@@ -18,5 +18,5 @@ data class WallpaperInfo(
     val authorUsername: String,
     val authorLink: String,
     val photoLink: String,
-    val updatedAt: String
+    val updatedAt: String,
 )

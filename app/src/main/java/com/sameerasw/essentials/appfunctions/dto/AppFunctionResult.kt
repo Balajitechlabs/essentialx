@@ -22,5 +22,5 @@ import androidx.appfunctions.AppFunctionSerializable
 @AppFunctionSerializable(isDescribedByKDoc = true)
 data class AppFunctionResult(
     val success: Boolean,
-    val message: String
+    val message: String,
 )

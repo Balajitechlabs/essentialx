@@ -13,7 +13,6 @@ import android.content.Context
 import androidx.core.content.edit
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
-
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.ScreenOffMethod
 import com.sameerasw.essentials.utils.DeviceLockUtils
@@ -33,46 +32,54 @@ class EssentialsWearableListenerService : WearableListenerService() {
             }
 
             "/toggle_flashlight" -> {
-                val intent = android.content.Intent(
-                    this,
-                    com.sameerasw.essentials.services.receivers.FlashlightActionReceiver::class.java
-                ).apply {
-                    action =
-                        com.sameerasw.essentials.services.receivers.FlashlightActionReceiver.ACTION_TOGGLE
-                }
+                val intent =
+                    android.content
+                        .Intent(
+                            this,
+                            com.sameerasw.essentials.services.receivers.FlashlightActionReceiver::class.java,
+                        ).apply {
+                            action =
+                                com.sameerasw.essentials.services.receivers.FlashlightActionReceiver.ACTION_TOGGLE
+                        }
                 sendBroadcast(intent)
             }
 
             "/set_flashlight_intensity" -> {
-                val intensity = try {
-                    String(messageEvent.data).toInt()
-                } catch (e: Exception) {
-                    1
-                }
-                val intent = android.content.Intent(
-                    this,
-                    com.sameerasw.essentials.services.receivers.FlashlightActionReceiver::class.java
-                ).apply {
-                    action =
-                        com.sameerasw.essentials.services.receivers.FlashlightActionReceiver.ACTION_SET_INTENSITY
-                    putExtra(
-                        com.sameerasw.essentials.services.receivers.FlashlightActionReceiver.EXTRA_INTENSITY,
-                        intensity
-                    )
-                }
+                val intensity =
+                    try {
+                        String(messageEvent.data).toInt()
+                    } catch (e: Exception) {
+                        1
+                    }
+                val intent =
+                    android.content
+                        .Intent(
+                            this,
+                            com.sameerasw.essentials.services.receivers.FlashlightActionReceiver::class.java,
+                        ).apply {
+                            action =
+                                com.sameerasw.essentials.services.receivers.FlashlightActionReceiver.ACTION_SET_INTENSITY
+                            putExtra(
+                                com.sameerasw.essentials.services.receivers.FlashlightActionReceiver.EXTRA_INTENSITY,
+                                intensity,
+                            )
+                        }
                 sendBroadcast(intent)
             }
 
             "/toggle_sound_mode" -> {
-                com.sameerasw.essentials.services.handlers.SoundModeHandler(this).cycleNextMode()
+                com.sameerasw.essentials.services.handlers
+                    .SoundModeHandler(this)
+                    .cycleNextMode()
             }
 
             "/lock_device" -> {
                 val repository = SettingsRepository(this)
-                val mode = repository.getInt(
-                    SettingsRepository.KEY_REMOTE_LOCK_MODE,
-                    0
-                )
+                val mode =
+                    repository.getInt(
+                        SettingsRepository.KEY_REMOTE_LOCK_MODE,
+                        0,
+                    )
                 val method =
                     if (mode == 1) ScreenOffMethod.DEVICE_ADMIN else ScreenOffMethod.ACCESSIBILITY
                 DeviceLockUtils.lockDevice(this, method)
@@ -89,11 +96,12 @@ class EssentialsWearableListenerService : WearableListenerService() {
             "/toggle_aod" -> {
                 val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
                 val isGlanceEnabled = prefs.getBoolean("notification_glance_enabled", false)
-                val isAodEnabled = android.provider.Settings.Secure.getInt(
-                    contentResolver,
-                    "doze_always_on",
-                    0
-                ) == 1
+                val isAodEnabled =
+                    android.provider.Settings.Secure.getInt(
+                        contentResolver,
+                        "doze_always_on",
+                        0,
+                    ) == 1
 
                 when {
                     isGlanceEnabled -> {
@@ -104,12 +112,12 @@ class EssentialsWearableListenerService : WearableListenerService() {
                             android.provider.Settings.Secure.putInt(
                                 contentResolver,
                                 "doze_always_on",
-                                1
+                                1,
                             )
                         } catch (_: Exception) {
                             com.sameerasw.essentials.utils.ShellUtils.runCommand(
                                 this,
-                                "settings put secure doze_always_on 1"
+                                "settings put secure doze_always_on 1",
                             )
                         }
                     }
@@ -119,12 +127,12 @@ class EssentialsWearableListenerService : WearableListenerService() {
                             android.provider.Settings.Secure.putInt(
                                 contentResolver,
                                 "doze_always_on",
-                                0
+                                0,
                             )
                         } catch (_: Exception) {
                             com.sameerasw.essentials.utils.ShellUtils.runCommand(
                                 this,
-                                "settings put secure doze_always_on 0"
+                                "settings put secure doze_always_on 0",
                             )
                         }
                         prefs.edit(commit = true) {
@@ -140,12 +148,12 @@ class EssentialsWearableListenerService : WearableListenerService() {
                             android.provider.Settings.Secure.putInt(
                                 contentResolver,
                                 "doze_always_on",
-                                0
+                                0,
                             )
                         } catch (_: Exception) {
                             com.sameerasw.essentials.utils.ShellUtils.runCommand(
                                 this,
-                                "settings put secure doze_always_on 0"
+                                "settings put secure doze_always_on 0",
                             )
                         }
                     }
@@ -153,22 +161,23 @@ class EssentialsWearableListenerService : WearableListenerService() {
             }
 
             "/toggle_tap_to_wake" -> {
-                val isEnabled = android.provider.Settings.Secure.getInt(
-                    contentResolver,
-                    "doze_tap_gesture",
-                    1
-                ) == 1
+                val isEnabled =
+                    android.provider.Settings.Secure.getInt(
+                        contentResolver,
+                        "doze_tap_gesture",
+                        1,
+                    ) == 1
                 val newState = if (isEnabled) 0 else 1
                 try {
                     android.provider.Settings.Secure.putInt(
                         contentResolver,
                         "doze_tap_gesture",
-                        newState
+                        newState,
                     )
                 } catch (_: Exception) {
                     com.sameerasw.essentials.utils.ShellUtils.runCommand(
                         this,
-                        "settings put secure doze_tap_gesture $newState"
+                        "settings put secure doze_tap_gesture $newState",
                     )
                 }
             }
@@ -226,7 +235,7 @@ class EssentialsWearableListenerService : WearableListenerService() {
                             instance.cancelNotification(key)
                         } else if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                             android.service.notification.NotificationListenerService.requestRebind(
-                                android.content.ComponentName(this, NotificationListener::class.java)
+                                android.content.ComponentName(this, NotificationListener::class.java),
                             )
                         }
                     } catch (e: Throwable) {

@@ -47,107 +47,112 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun FeatureHelpBottomSheet(
     onDismissRequest: () -> Unit,
     feature: Feature,
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     EssentialsBottomSheet(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-
             // Header with Icon and Title
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            color = ColorUtil.getPastelColorFor(stringResource(feature.title)),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(40.dp)
+                            .background(
+                                color = ColorUtil.getPastelColorFor(stringResource(feature.title)),
+                                shape = CircleShape,
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(id = feature.iconRes),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = ColorUtil.getVibrantColorFor(stringResource(feature.title))
+                        tint = ColorUtil.getVibrantColorFor(stringResource(feature.title)),
                     )
                 }
 
                 Column {
                     com.sameerasw.essentials.translation.TranslatableText(
                         stringResId = feature.title,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
                 }
             }
 
             // Description Body
             RoundedCardContainer(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     val descRes = feature.aboutDescription ?: feature.description
 
                     com.sameerasw.essentials.translation.TranslatableText(
                         stringResId = descRes,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             }
 
-
             // Permissions
             if (feature.permissionKeys.isNotEmpty()) {
-                val permissions = PermissionUIHelper.getPermissionItems(
-                    feature.permissionKeys,
-                    context,
-                    viewModel
-                )
+                val permissions =
+                    PermissionUIHelper.getPermissionItems(
+                        feature.permissionKeys,
+                        context,
+                        viewModel,
+                    )
                 if (permissions.isNotEmpty()) {
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
                     ) {
                         items(permissions) { permission ->
                             AssistChip(
                                 onClick = { },
                                 label = {
-                                    val titleText = when (val t = permission.title) {
-                                        is Int -> stringResource(t)
-                                        is String -> t
-                                        else -> ""
-                                    }
+                                    val titleText =
+                                        when (val t = permission.title) {
+                                            is Int -> stringResource(t)
+                                            is String -> t
+                                            else -> ""
+                                        }
                                     Text(
                                         text = titleText,
-                                        style = MaterialTheme.typography.labelMedium
+                                        style = MaterialTheme.typography.labelMedium,
                                     )
                                 },
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(id = permission.iconRes),
                                         contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(18.dp),
                                     )
                                 },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                    labelColor = MaterialTheme.colorScheme.onSurface,
-                                    leadingIconContentColor = MaterialTheme.colorScheme.primary
-                                ),
-                                border = AssistChipDefaults.assistChipBorder(true)
+                                colors =
+                                    AssistChipDefaults.assistChipColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                        labelColor = MaterialTheme.colorScheme.onSurface,
+                                        leadingIconContentColor = MaterialTheme.colorScheme.primary,
+                                    ),
+                                border = AssistChipDefaults.assistChipBorder(true),
                             )
                         }
                     }

@@ -38,7 +38,6 @@ import java.io.File
 import java.io.FileOutputStream
 
 class NotificationListener : NotificationListenerService() {
-
     companion object {
         const val ACTION_LIKE_CURRENT_SONG = "com.sameerasw.essentials.ACTION_LIKE_CURRENT_SONG"
         const val ACTION_REQUEST_AMBIENT_GLANCE =
@@ -49,13 +48,14 @@ class NotificationListener : NotificationListenerService() {
 
         var instance: NotificationListener? = null
 
-        fun getCachedBitmap(hash: Long): Bitmap? {
-            return if (latestArtHash == hash) latestArtBitmap else null
-        }
+        fun getCachedBitmap(hash: Long): Bitmap? = if (latestArtHash == hash) latestArtBitmap else null
 
-        fun getUnreadPackages(): List<String> {
-            return instance?.unreadNotifications?.values?.distinct()?.toList() ?: emptyList()
-        }
+        fun getUnreadPackages(): List<String> =
+            instance
+                ?.unreadNotifications
+                ?.values
+                ?.distinct()
+                ?.toList() ?: emptyList()
 
         fun clearUnreadNotifications() {
             instance?.unreadNotifications?.clear()
@@ -80,12 +80,14 @@ class NotificationListener : NotificationListenerService() {
             val channelId = notif.channelId?.lowercase() ?: ""
             val tag = (sbn.tag ?: "").lowercase()
 
-            val isCapturePkg = pkg == "com.android.systemui" ||
+            val isCapturePkg =
+                pkg == "com.android.systemui" ||
                     pkg == "android" ||
                     pkg.contains("screenrecord") ||
                     pkg.contains("screencast")
 
-            val isCaptureChannelOrTag = channelId.contains("screen_record") ||
+            val isCaptureChannelOrTag =
+                channelId.contains("screen_record") ||
                     channelId.contains("screenrecord") ||
                     channelId.contains("screen_cast") ||
                     channelId.contains("cast") ||
@@ -94,18 +96,26 @@ class NotificationListener : NotificationListenerService() {
 
             if (isCapturePkg && isCaptureChannelOrTag) return true
 
-            val title = notif.extras?.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.lowercase() ?: ""
-            val text = notif.extras?.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.lowercase() ?: ""
+            val title =
+                notif.extras
+                    ?.getCharSequence(Notification.EXTRA_TITLE)
+                    ?.toString()
+                    ?.lowercase() ?: ""
+            val text =
+                notif.extras
+                    ?.getCharSequence(Notification.EXTRA_TEXT)
+                    ?.toString()
+                    ?.lowercase() ?: ""
 
             return title.contains("screen record") ||
-                    title.contains("recording screen") ||
-                    title.contains("screen cast") ||
-                    title.contains("casting screen") ||
-                    title.contains("screen share") ||
-                    title.contains("sharing screen") ||
-                    text.contains("screen record") ||
-                    text.contains("recording screen") ||
-                    text.contains("casting screen")
+                title.contains("recording screen") ||
+                title.contains("screen cast") ||
+                title.contains("casting screen") ||
+                title.contains("screen share") ||
+                title.contains("sharing screen") ||
+                text.contains("screen record") ||
+                text.contains("recording screen") ||
+                text.contains("casting screen")
         }
     }
 
@@ -113,22 +123,26 @@ class NotificationListener : NotificationListenerService() {
     private val unreadNotifications = mutableMapOf<String, String>() // key -> package name
     private var isScreenLocked = false
 
-    private val likeActionReceiver = object : android.content.BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == ACTION_LIKE_CURRENT_SONG) {
-                handleLikeSongAction()
-            } else if (intent?.action == ACTION_REQUEST_AMBIENT_GLANCE) {
-                populateActiveUnreadNotifications()
-                handleRequestAmbientGlance()
-            } else if (intent?.action == Intent.ACTION_SCREEN_OFF) {
-                isScreenLocked = true
-                populateActiveUnreadNotifications()
-            } else if (intent?.action == Intent.ACTION_USER_PRESENT) {
-                isScreenLocked = false
-                unreadNotifications.clear()
+    private val likeActionReceiver =
+        object : android.content.BroadcastReceiver() {
+            override fun onReceive(
+                context: Context?,
+                intent: Intent?,
+            ) {
+                if (intent?.action == ACTION_LIKE_CURRENT_SONG) {
+                    handleLikeSongAction()
+                } else if (intent?.action == ACTION_REQUEST_AMBIENT_GLANCE) {
+                    populateActiveUnreadNotifications()
+                    handleRequestAmbientGlance()
+                } else if (intent?.action == Intent.ACTION_SCREEN_OFF) {
+                    isScreenLocked = true
+                    populateActiveUnreadNotifications()
+                } else if (intent?.action == Intent.ACTION_USER_PRESENT) {
+                    isScreenLocked = false
+                    unreadNotifications.clear()
+                }
             }
         }
-    }
 
     private fun isMediaNotification(sbn: StatusBarNotification): Boolean {
         val category = sbn.notification.category
@@ -138,7 +152,10 @@ class NotificationListener : NotificationListenerService() {
         return template != null && (template.contains("MediaStyle") || template.contains("DecoratedMediaCustomViewStyle"))
     }
 
-    fun isSilentNotification(sbn: StatusBarNotification, rankingMap: RankingMap? = null): Boolean {
+    fun isSilentNotification(
+        sbn: StatusBarNotification,
+        rankingMap: RankingMap? = null,
+    ): Boolean {
         try {
             val map = rankingMap ?: currentRanking
             if (map != null) {
@@ -159,8 +176,11 @@ class NotificationListener : NotificationListenerService() {
         unreadNotifications.clear()
         try {
             activeNotifications?.forEach { sbn ->
-                if (!sbn.isOngoing && sbn.packageName != packageName && !isMediaNotification(sbn) && !isSilentNotification(
-                        sbn
+                if (!sbn.isOngoing &&
+                    sbn.packageName != packageName &&
+                    !isMediaNotification(sbn) &&
+                    !isSilentNotification(
+                        sbn,
                     )
                 ) {
                     unreadNotifications[sbn.key] = sbn.packageName
@@ -179,12 +199,13 @@ class NotificationListener : NotificationListenerService() {
             val pm = getSystemService(POWER_SERVICE) as PowerManager
             isScreenLocked = !pm.isInteractive
 
-            val filter = android.content.IntentFilter().apply {
-                addAction(ACTION_LIKE_CURRENT_SONG)
-                addAction(ACTION_REQUEST_AMBIENT_GLANCE)
-                addAction(Intent.ACTION_SCREEN_OFF)
-                addAction(Intent.ACTION_USER_PRESENT)
-            }
+            val filter =
+                android.content.IntentFilter().apply {
+                    addAction(ACTION_LIKE_CURRENT_SONG)
+                    addAction(ACTION_REQUEST_AMBIENT_GLANCE)
+                    addAction(Intent.ACTION_SCREEN_OFF)
+                    addAction(Intent.ACTION_USER_PRESENT)
+                }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 registerReceiver(likeActionReceiver, filter, RECEIVER_NOT_EXPORTED)
             } else {
@@ -207,28 +228,35 @@ class NotificationListener : NotificationListenerService() {
         }
     }
 
-    private fun discoverMapsChannel(channelId: String?, userHandle: android.os.UserHandle) {
+    private fun discoverMapsChannel(
+        channelId: String?,
+        userHandle: android.os.UserHandle,
+    ) {
         if (channelId.isNullOrBlank()) return
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             try {
-                val prefs = applicationContext.getSharedPreferences(
-                    "essentials_prefs",
-                    MODE_PRIVATE
-                )
+                val prefs =
+                    applicationContext.getSharedPreferences(
+                        "essentials_prefs",
+                        MODE_PRIVATE,
+                    )
                 val discoveredJson = prefs.getString("maps_discovered_channels", null)
                 val gson = com.google.gson.Gson()
                 val discoveredChannels: MutableList<com.sameerasw.essentials.domain.model.MapsChannel> =
                     if (discoveredJson != null) {
                         try {
-                            gson.fromJson(
-                                discoveredJson,
-                                Array<com.sameerasw.essentials.domain.model.MapsChannel>::class.java
-                            ).toMutableList()
+                            gson
+                                .fromJson(
+                                    discoveredJson,
+                                    Array<com.sameerasw.essentials.domain.model.MapsChannel>::class.java,
+                                ).toMutableList()
                         } catch (_: Exception) {
                             mutableListOf()
                         }
-                    } else mutableListOf()
+                    } else {
+                        mutableListOf()
+                    }
 
                 if (discoveredChannels.none { it.id == channelId }) {
                     var foundName: String? = null
@@ -240,16 +268,21 @@ class NotificationListener : NotificationListenerService() {
                     } catch (_: Exception) {
                     }
 
-                    val name = if (!foundName.isNullOrBlank()) foundName
-                    else channelId.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+                    val name =
+                        if (!foundName.isNullOrBlank()) {
+                            foundName
+                        } else {
+                            channelId.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+                        }
 
                     discoveredChannels.add(
                         com.sameerasw.essentials.domain.model.MapsChannel(
                             channelId,
-                            name
-                        )
+                            name,
+                        ),
                     )
-                    prefs.edit()
+                    prefs
+                        .edit()
                         .putString("maps_discovered_channels", gson.toJson(discoveredChannels))
                         .apply()
                 }
@@ -261,29 +294,33 @@ class NotificationListener : NotificationListenerService() {
     private fun discoverSystemChannel(
         packageName: String,
         channelId: String?,
-        userHandle: android.os.UserHandle
+        userHandle: android.os.UserHandle,
     ) {
         if (channelId.isNullOrBlank()) return
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             try {
-                val prefs = applicationContext.getSharedPreferences(
-                    "essentials_prefs",
-                    MODE_PRIVATE
-                )
+                val prefs =
+                    applicationContext.getSharedPreferences(
+                        "essentials_prefs",
+                        MODE_PRIVATE,
+                    )
                 val discoveredJson = prefs.getString("snooze_discovered_channels", null)
                 val gson = com.google.gson.Gson()
                 val discoveredChannels: MutableList<com.sameerasw.essentials.domain.model.SnoozeChannel> =
                     if (discoveredJson != null) {
                         try {
-                            gson.fromJson(
-                                discoveredJson,
-                                Array<com.sameerasw.essentials.domain.model.SnoozeChannel>::class.java
-                            ).toMutableList()
+                            gson
+                                .fromJson(
+                                    discoveredJson,
+                                    Array<com.sameerasw.essentials.domain.model.SnoozeChannel>::class.java,
+                                ).toMutableList()
                         } catch (_: Exception) {
                             mutableListOf()
                         }
-                    } else mutableListOf()
+                    } else {
+                        mutableListOf()
+                    }
 
                 if (discoveredChannels.none { it.id == channelId }) {
                     var foundName: String? = null
@@ -294,18 +331,23 @@ class NotificationListener : NotificationListenerService() {
                     } catch (_: Exception) {
                     }
 
-                    val name = if (!foundName.isNullOrBlank()) foundName
-                    else channelId.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+                    val name =
+                        if (!foundName.isNullOrBlank()) {
+                            foundName
+                        } else {
+                            channelId.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }
+                        }
 
                     val finalName = if (packageName == "android") name else "[$packageName] $name"
 
                     discoveredChannels.add(
                         com.sameerasw.essentials.domain.model.SnoozeChannel(
                             channelId,
-                            finalName
-                        )
+                            finalName,
+                        ),
                     )
-                    prefs.edit()
+                    prefs
+                        .edit()
                         .putString("snooze_discovered_channels", gson.toJson(discoveredChannels))
                         .apply()
                 }
@@ -316,7 +358,7 @@ class NotificationListener : NotificationListenerService() {
 
     private fun extractBitmap(
         metadata: android.media.MediaMetadata?,
-        sbn: StatusBarNotification?
+        sbn: StatusBarNotification?,
     ): Bitmap? {
         // 1. Try Metadata bitmaps
         var bitmap = metadata?.getBitmap(android.media.MediaMetadata.METADATA_KEY_ALBUM_ART)
@@ -333,11 +375,12 @@ class NotificationListener : NotificationListenerService() {
                     if (drawable is BitmapDrawable) {
                         bitmap = drawable.bitmap
                     } else if (drawable != null) {
-                        bitmap = Bitmap.createBitmap(
-                            drawable.intrinsicWidth.coerceAtLeast(1),
-                            drawable.intrinsicHeight.coerceAtLeast(1),
-                            Bitmap.Config.ARGB_8888
-                        )
+                        bitmap =
+                            Bitmap.createBitmap(
+                                drawable.intrinsicWidth.coerceAtLeast(1),
+                                drawable.intrinsicHeight.coerceAtLeast(1),
+                                Bitmap.Config.ARGB_8888,
+                            )
                         val canvas = Canvas(bitmap)
                         drawable.setBounds(0, 0, canvas.width, canvas.height)
                         drawable.draw(canvas)
@@ -377,9 +420,10 @@ class NotificationListener : NotificationListenerService() {
                 getSystemService(MEDIA_SESSION_SERVICE) as android.media.session.MediaSessionManager
             val sessions = getMediaSessions(mediaSessionManager)
 
-            val activeSession = sessions.firstOrNull {
-                it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
-            } ?: return
+            val activeSession =
+                sessions.firstOrNull {
+                    it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
+                } ?: return
 
             triggerAmbientGlance(activeSession, "play_pause", bypassInteractiveCheck = true)
         } catch (_: Exception) {
@@ -393,26 +437,32 @@ class NotificationListener : NotificationListenerService() {
             val sessions = getMediaSessions(mediaSessionManager)
 
             // Check if toast is enabled
-            val prefs = getSharedPreferences(
-                SettingsRepository.PREFS_NAME,
-                MODE_PRIVATE
-            )
-            val showToast = prefs.getBoolean(
-                SettingsRepository.KEY_LIKE_SONG_TOAST_ENABLED,
-                true
-            )
+            val prefs =
+                getSharedPreferences(
+                    SettingsRepository.PREFS_NAME,
+                    MODE_PRIVATE,
+                )
+            val showToast =
+                prefs.getBoolean(
+                    SettingsRepository.KEY_LIKE_SONG_TOAST_ENABLED,
+                    true,
+                )
 
             // STRICT: Only target playing sessions
-            val activeSession = sessions.firstOrNull {
-                it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
-            } ?: return
+            val activeSession =
+                sessions.firstOrNull {
+                    it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
+                } ?: return
 
             if (isLikedState(activeSession)) {
-                if (showToast) android.widget.Toast.makeText(
-                    applicationContext,
-                    "Already Liked \u2665",
-                    android.widget.Toast.LENGTH_SHORT
-                ).show()
+                if (showToast) {
+                    android.widget.Toast
+                        .makeText(
+                            applicationContext,
+                            "Already Liked \u2665",
+                            android.widget.Toast.LENGTH_SHORT,
+                        ).show()
+                }
                 triggerAmbientGlance(activeSession, "like", true)
                 return
             }
@@ -421,7 +471,8 @@ class NotificationListener : NotificationListenerService() {
             if (playbackState != null) {
                 for (action in playbackState.customActions) {
                     val name = action.name.toString()
-                    val isLike = name.contains("Like", ignoreCase = true) ||
+                    val isLike =
+                        name.contains("Like", ignoreCase = true) ||
                             name.contains("Heart", ignoreCase = true) ||
                             name.contains("Favorite", ignoreCase = true) ||
                             name.contains("Love", ignoreCase = true) ||
@@ -434,11 +485,14 @@ class NotificationListener : NotificationListenerService() {
 
                     if (isLike) {
                         activeSession.transportControls.sendCustomAction(action, action.extras)
-                        if (showToast) android.widget.Toast.makeText(
-                            applicationContext,
-                            "Liked song \u2665",
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
+                        if (showToast) {
+                            android.widget.Toast
+                                .makeText(
+                                    applicationContext,
+                                    "Liked song \u2665",
+                                    android.widget.Toast.LENGTH_SHORT,
+                                ).show()
+                        }
 
                         triggerAmbientGlance(activeSession, "like", true)
                         return
@@ -452,7 +506,8 @@ class NotificationListener : NotificationListenerService() {
                 if (actions != null) {
                     for (action in actions) {
                         val title = action.title?.toString() ?: ""
-                        val isLike = title.contains("Like", ignoreCase = true) ||
+                        val isLike =
+                            title.contains("Like", ignoreCase = true) ||
                                 title.contains("Heart", ignoreCase = true) ||
                                 title.contains("Favorite", ignoreCase = true) ||
                                 title.contains("Love", ignoreCase = true) ||
@@ -462,11 +517,14 @@ class NotificationListener : NotificationListenerService() {
 
                         if (isLike) {
                             action.actionIntent.send()
-                            if (showToast) android.widget.Toast.makeText(
-                                applicationContext,
-                                "Liked song \u2665",
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
+                            if (showToast) {
+                                android.widget.Toast
+                                    .makeText(
+                                        applicationContext,
+                                        "Liked song \u2665",
+                                        android.widget.Toast.LENGTH_SHORT,
+                                    ).show()
+                            }
 
                             triggerAmbientGlance(activeSession, "like", true)
                             return
@@ -487,7 +545,9 @@ class NotificationListener : NotificationListenerService() {
                 val rating =
                     metadata.getRating(android.media.MediaMetadata.METADATA_KEY_USER_RATING)
                 if (rating != null && rating.isRated) {
-                    val isLiked = rating.hasHeart() || rating.isThumbUp ||
+                    val isLiked =
+                        rating.hasHeart() ||
+                            rating.isThumbUp ||
                             (rating.ratingStyle == android.media.Rating.RATING_3_STARS && rating.starRating > 0) ||
                             (rating.ratingStyle == android.media.Rating.RATING_4_STARS && rating.starRating > 0) ||
                             (rating.ratingStyle == android.media.Rating.RATING_5_STARS && rating.starRating > 0) ||
@@ -505,9 +565,12 @@ class NotificationListener : NotificationListenerService() {
                         name.contains("Queue", ignoreCase = true) ||
                         name.contains("Dislike", ignoreCase = true) ||
                         name.contains("ThumbsDown", ignoreCase = true)
-                    ) continue
+                    ) {
+                        continue
+                    }
 
-                    val isAlreadyLikedState = name.contains("Unlike", ignoreCase = true) ||
+                    val isAlreadyLikedState =
+                        name.contains("Unlike", ignoreCase = true) ||
                             name.contains("Unheart", ignoreCase = true) ||
                             name.contains("Remove from collection", ignoreCase = true) ||
                             name.contains("Remove from library", ignoreCase = true) ||
@@ -533,9 +596,12 @@ class NotificationListener : NotificationListenerService() {
                             title.contains("Dislike", ignoreCase = true) ||
                             title.contains("ThumbsDown", ignoreCase = true) ||
                             title.contains("Thumbs Down", ignoreCase = true)
-                        ) continue
+                        ) {
+                            continue
+                        }
 
-                        val isAlreadyLiked = title.contains("Unlike", ignoreCase = true) ||
+                        val isAlreadyLiked =
+                            title.contains("Unlike", ignoreCase = true) ||
                                 title.contains("Unheart", ignoreCase = true) ||
                                 title.contains("Remove from", ignoreCase = true) ||
                                 title.contains("Saved", ignoreCase = true) ||
@@ -554,7 +620,7 @@ class NotificationListener : NotificationListenerService() {
         val title: String?,
         val artist: String?,
         val isPlaying: Boolean,
-        val isLiked: Boolean
+        val isLiked: Boolean,
     )
 
     private val lastMediaStates = mutableMapOf<String, MediaState>()
@@ -564,16 +630,18 @@ class NotificationListener : NotificationListenerService() {
         eventType: String,
         isAlreadyLikedOverride: Boolean? = null,
         bypassInteractiveCheck: Boolean = false,
-        sbn: StatusBarNotification? = null
+        sbn: StatusBarNotification? = null,
     ) {
-        val prefs = getSharedPreferences(
-            SettingsRepository.PREFS_NAME,
-            MODE_PRIVATE
-        )
-        val isEnabled = prefs.getBoolean(
-            SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED,
-            false
-        )
+        val prefs =
+            getSharedPreferences(
+                SettingsRepository.PREFS_NAME,
+                MODE_PRIVATE,
+            )
+        val isEnabled =
+            prefs.getBoolean(
+                SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED,
+                false,
+            )
 
         if (isEnabled) {
             // Skip if Android Auto is running
@@ -589,21 +657,24 @@ class NotificationListener : NotificationListenerService() {
             val title = metadata?.getString(android.media.MediaMetadata.METADATA_KEY_TITLE)
             val artist = metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ARTIST)
             val isAlreadyLiked = isAlreadyLikedOverride ?: isLikedState(activeSession)
-            val isDockedMode = prefs.getBoolean(
-                SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE,
-                false
-            )
+            val isDockedMode =
+                prefs.getBoolean(
+                    SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE,
+                    false,
+                )
 
             // 1. Robust Album Art Extraction
             if (title != null) {
-                val artHash = kotlin.math.abs("${title}_${artist}".hashCode())
+                val artHash = kotlin.math.abs("${title}_$artist".hashCode())
                 val artFile = java.io.File(cacheDir, "art_$artHash.png")
 
                 // Extract bitmap from all possible sources
-                val bitmap = extractBitmap(
-                    metadata,
-                    sbn
-                        ?: activeNotifications?.find { it.packageName == activeSession.packageName })
+                val bitmap =
+                    extractBitmap(
+                        metadata,
+                        sbn
+                            ?: activeNotifications?.find { it.packageName == activeSession.packageName },
+                    )
 
                 if (bitmap != null) {
                     latestArtBitmap = bitmap
@@ -627,9 +698,10 @@ class NotificationListener : NotificationListenerService() {
                             tempArtTmp.renameTo(tempArtFile)
 
                             // Cleanup old art files (Keep last 3)
-                            val files = cacheDir.listFiles { _, name ->
-                                name.startsWith("art_") && !name.endsWith(".tmp")
-                            }
+                            val files =
+                                cacheDir.listFiles { _, name ->
+                                    name.startsWith("art_") && !name.endsWith(".tmp")
+                                }
                             if (files != null && files.size > 3) {
                                 files.sortByDescending { it.lastModified() }
                                 for (i in 3 until files.size) {
@@ -655,18 +727,19 @@ class NotificationListener : NotificationListenerService() {
                     com.sameerasw.essentials.services.dreams.AmbientDreamService.isDreaming
 
                 if (!powerManager.isInteractive || bypassInteractiveCheck || isDreaming) {
-                    val intent = Intent("SHOW_AMBIENT_GLANCE").apply {
-                        putExtra("event_type", eventType)
-                        putExtra("is_playing", isPlaying)
-                        putExtra("track_title", title)
-                        putExtra("artist_name", artist)
-                        putExtra("art_hash", artHash.toLong()) // PASS HASH
-                        putExtra("is_already_liked", isAlreadyLiked)
-                        putExtra("is_docked_mode", isDockedMode)
-                        putExtra("package_name", activeSession.packageName)
-                        putStringArrayListExtra("unread_packages", ArrayList(getUnreadPackages()))
-                        setPackage(packageName)
-                    }
+                    val intent =
+                        Intent("SHOW_AMBIENT_GLANCE").apply {
+                            putExtra("event_type", eventType)
+                            putExtra("is_playing", isPlaying)
+                            putExtra("track_title", title)
+                            putExtra("artist_name", artist)
+                            putExtra("art_hash", artHash.toLong()) // PASS HASH
+                            putExtra("is_already_liked", isAlreadyLiked)
+                            putExtra("is_docked_mode", isDockedMode)
+                            putExtra("package_name", activeSession.packageName)
+                            putStringArrayListExtra("unread_packages", ArrayList(getUnreadPackages()))
+                            setPackage(packageName)
+                        }
                     sendBroadcast(intent)
                 }
             }
@@ -676,15 +749,16 @@ class NotificationListener : NotificationListenerService() {
     private fun handleMediaUpdate(sbn: StatusBarNotification) {
         try {
             val extras = sbn.notification.extras
-            val token = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                extras.getParcelable(
-                    Notification.EXTRA_MEDIA_SESSION,
-                    android.media.session.MediaSession.Token::class.java
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                extras.getParcelable(Notification.EXTRA_MEDIA_SESSION)
-            }
+            val token =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    extras.getParcelable(
+                        Notification.EXTRA_MEDIA_SESSION,
+                        android.media.session.MediaSession.Token::class.java,
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    extras.getParcelable(Notification.EXTRA_MEDIA_SESSION)
+                }
 
             if (token != null) {
                 val controller = android.media.session.MediaController(this, token)
@@ -740,7 +814,6 @@ class NotificationListener : NotificationListenerService() {
 
                 var eventType: String? = null
 
-
                 val isLiked = isLikedState(controller)
 
                 if (lastState == null) {
@@ -761,11 +834,13 @@ class NotificationListener : NotificationListenerService() {
 
                 lastMediaStates[sbn.packageName] = MediaState(title, artist, isPlaying, isLiked)
 
-                val prefs = applicationContext.getSharedPreferences(
-                    "essentials_prefs",
-                    MODE_PRIVATE
-                )
-                prefs.edit()
+                val prefs =
+                    applicationContext.getSharedPreferences(
+                        "essentials_prefs",
+                        MODE_PRIVATE,
+                    )
+                prefs
+                    .edit()
                     .putString("current_media_title", title)
                     .putString("current_media_artist", artist)
                     .putBoolean("current_media_is_liked", isLiked)
@@ -787,12 +862,18 @@ class NotificationListener : NotificationListenerService() {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onNotificationPosted(sbn: StatusBarNotification, rankingMap: RankingMap) {
+    override fun onNotificationPosted(
+        sbn: StatusBarNotification,
+        rankingMap: RankingMap,
+    ) {
         onNotificationPostedInternal(sbn, rankingMap)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun onNotificationPostedInternal(sbn: StatusBarNotification, rankingMap: RankingMap?) {
+    private fun onNotificationPostedInternal(
+        sbn: StatusBarNotification,
+        rankingMap: RankingMap?,
+    ) {
         // Skip our own app's notifications early to avoid flooding logs and redundant processing
         if (sbn.packageName == packageName) {
             return
@@ -807,9 +888,13 @@ class NotificationListener : NotificationListenerService() {
         val isReallyLocked =
             isScreenLocked || !pm.isInteractive || com.sameerasw.essentials.services.dreams.AmbientDreamService.isDreaming
 
-        if (isReallyLocked && !sbn.isOngoing && sbn.packageName != packageName && !isMediaNotification(
-                sbn
-            ) && !isSilentNotification(sbn, rankingMap)
+        if (isReallyLocked &&
+            !sbn.isOngoing &&
+            sbn.packageName != packageName &&
+            !isMediaNotification(
+                sbn,
+            ) &&
+            !isSilentNotification(sbn, rankingMap)
         ) {
             unreadNotifications[sbn.key] = sbn.packageName
             // Trigger refresh if something is playing
@@ -817,9 +902,10 @@ class NotificationListener : NotificationListenerService() {
                 val mediaSessionManager =
                     getSystemService(MEDIA_SESSION_SERVICE) as android.media.session.MediaSessionManager
                 val sessions = getMediaSessions(mediaSessionManager)
-                val activeSession = sessions.firstOrNull {
-                    it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
-                }
+                val activeSession =
+                    sessions.firstOrNull {
+                        it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
+                    }
                 if (activeSession != null) {
                     triggerAmbientGlance(activeSession, "notification_update")
                 }
@@ -852,14 +938,19 @@ class NotificationListener : NotificationListenerService() {
                 // 2. Snoozing
                 if (channelId != null) {
                     val blockedChannelsJson = prefs.getString("snooze_blocked_channels", null)
-                    val blockedChannels: Set<String> = if (blockedChannelsJson != null) {
-                        try {
-                            com.google.gson.Gson()
-                                .fromJson(blockedChannelsJson, Array<String>::class.java).toSet()
-                        } catch (_: Exception) {
+                    val blockedChannels: Set<String> =
+                        if (blockedChannelsJson != null) {
+                            try {
+                                com.google.gson
+                                    .Gson()
+                                    .fromJson(blockedChannelsJson, Array<String>::class.java)
+                                    .toSet()
+                            } catch (_: Exception) {
+                                emptySet()
+                            }
+                        } else {
                             emptySet()
                         }
-                    } else emptySet()
 
                     if (blockedChannels.contains(channelId)) {
                         snoozeNotification(sbn.key, 24 * 60 * 60 * 1000L) // Snooze for 24 hours
@@ -879,7 +970,8 @@ class NotificationListener : NotificationListenerService() {
             val extras = notification.extras
 
             // Skip media sessions
-            val isMedia = extras.containsKey(Notification.EXTRA_MEDIA_SESSION) ||
+            val isMedia =
+                extras.containsKey(Notification.EXTRA_MEDIA_SESSION) ||
                     extras.getString(Notification.EXTRA_TEMPLATE) == "android.app.Notification\$MediaStyle"
 
             if (isMedia) {
@@ -918,74 +1010,87 @@ class NotificationListener : NotificationListenerService() {
                     // Check if the app is selected for notification lighting
                     val appSelected = isAppSelectedForNotificationLighting(sbn.packageName)
                     if (appSelected) {
-                        val cornerRadius = try {
-                            prefs.getFloat("edge_lighting_corner_radius", 20f)
-                        } catch (e: ClassCastException) {
-                            prefs.getInt("edge_lighting_corner_radius", 20).toFloat()
-                        }
-                        val strokeThickness = try {
-                            prefs.getFloat("edge_lighting_stroke_thickness", 8f)
-                        } catch (e: ClassCastException) {
-                            prefs.getInt("edge_lighting_stroke_thickness", 8).toFloat()
-                        }
-                        val colorModeName = prefs.getString(
-                            "edge_lighting_color_mode",
-                            NotificationLightingColorMode.SYSTEM.name
-                        )
-                        val colorMode = NotificationLightingColorMode.valueOf(
-                            colorModeName ?: NotificationLightingColorMode.SYSTEM.name
-                        )
-                        val pulseCount = try {
-                            prefs.getInt("edge_lighting_pulse_count", 1)
-                        } catch (e: ClassCastException) {
-                            prefs.getFloat("edge_lighting_pulse_count", 1f).toInt()
-                        }
-                        val pulseDuration = try {
-                            prefs.getFloat("edge_lighting_pulse_duration", 3000f).toLong()
-                        } catch (e: ClassCastException) {
-                            prefs.getInt("edge_lighting_pulse_duration", 3000).toLong()
-                        }
-                        val styleName = prefs.getString(
-                            "edge_lighting_style",
-                            com.sameerasw.essentials.domain.model.NotificationLightingStyle.STROKE.name
-                        )
+                        val cornerRadius =
+                            try {
+                                prefs.getFloat("edge_lighting_corner_radius", 20f)
+                            } catch (e: ClassCastException) {
+                                prefs.getInt("edge_lighting_corner_radius", 20).toFloat()
+                            }
+                        val strokeThickness =
+                            try {
+                                prefs.getFloat("edge_lighting_stroke_thickness", 8f)
+                            } catch (e: ClassCastException) {
+                                prefs.getInt("edge_lighting_stroke_thickness", 8).toFloat()
+                            }
+                        val colorModeName =
+                            prefs.getString(
+                                "edge_lighting_color_mode",
+                                NotificationLightingColorMode.SYSTEM.name,
+                            )
+                        val colorMode =
+                            NotificationLightingColorMode.valueOf(
+                                colorModeName ?: NotificationLightingColorMode.SYSTEM.name,
+                            )
+                        val pulseCount =
+                            try {
+                                prefs.getInt("edge_lighting_pulse_count", 1)
+                            } catch (e: ClassCastException) {
+                                prefs.getFloat("edge_lighting_pulse_count", 1f).toInt()
+                            }
+                        val pulseDuration =
+                            try {
+                                prefs.getFloat("edge_lighting_pulse_duration", 3000f).toLong()
+                            } catch (e: ClassCastException) {
+                                prefs.getInt("edge_lighting_pulse_duration", 3000).toLong()
+                            }
+                        val styleName =
+                            prefs.getString(
+                                "edge_lighting_style",
+                                com.sameerasw.essentials.domain.model.NotificationLightingStyle.STROKE.name,
+                            )
 
                         val gson = com.google.gson.Gson()
                         val glowSidesJson = prefs.getString("edge_lighting_glow_sides", null)
-                        val glowSides: Set<NotificationLightingSide> = if (glowSidesJson != null) {
-                            try {
-                                gson.fromJson(
-                                    glowSidesJson,
-                                    Array<NotificationLightingSide>::class.java
-                                ).toSet()
-                            } catch (_: Exception) {
+                        val glowSides: Set<NotificationLightingSide> =
+                            if (glowSidesJson != null) {
+                                try {
+                                    gson
+                                        .fromJson(
+                                            glowSidesJson,
+                                            Array<NotificationLightingSide>::class.java,
+                                        ).toSet()
+                                } catch (_: Exception) {
+                                    setOf(NotificationLightingSide.LEFT, NotificationLightingSide.RIGHT)
+                                }
+                            } else {
                                 setOf(NotificationLightingSide.LEFT, NotificationLightingSide.RIGHT)
                             }
-                        } else {
-                            setOf(NotificationLightingSide.LEFT, NotificationLightingSide.RIGHT)
-                        }
 
-                        val indicatorX = try {
-                            prefs.getFloat("edge_lighting_indicator_x", 50f)
-                        } catch (e: ClassCastException) {
-                            prefs.getInt("edge_lighting_indicator_x", 50).toFloat()
-                        }
-                        val indicatorY = try {
-                            prefs.getFloat("edge_lighting_indicator_y", 2f)
-                        } catch (e: ClassCastException) {
-                            prefs.getInt("edge_lighting_indicator_y", 2).toFloat()
-                        }
-                        val indicatorScale = try {
-                            prefs.getFloat("edge_lighting_indicator_scale", 1.0f)
-                        } catch (e: ClassCastException) {
-                            prefs.getInt("edge_lighting_indicator_scale", 1).toFloat()
-                        }
+                        val indicatorX =
+                            try {
+                                prefs.getFloat("edge_lighting_indicator_x", 50f)
+                            } catch (e: ClassCastException) {
+                                prefs.getInt("edge_lighting_indicator_x", 50).toFloat()
+                            }
+                        val indicatorY =
+                            try {
+                                prefs.getFloat("edge_lighting_indicator_y", 2f)
+                            } catch (e: ClassCastException) {
+                                prefs.getInt("edge_lighting_indicator_y", 2).toFloat()
+                            }
+                        val indicatorScale =
+                            try {
+                                prefs.getFloat("edge_lighting_indicator_scale", 1.0f)
+                            } catch (e: ClassCastException) {
+                                prefs.getInt("edge_lighting_indicator_scale", 1).toFloat()
+                            }
 
-                        val sweepThickness = try {
-                            prefs.getFloat("edge_lighting_sweep_thickness", 8f)
-                        } catch (e: ClassCastException) {
-                            prefs.getInt("edge_lighting_sweep_thickness", 8).toFloat()
-                        }
+                        val sweepThickness =
+                            try {
+                                prefs.getFloat("edge_lighting_sweep_thickness", 8f)
+                            } catch (e: ClassCastException) {
+                                prefs.getInt("edge_lighting_sweep_thickness", 8).toFloat()
+                            }
                         val sweepPosition =
                             prefs.getString("edge_lighting_sweep_position", "CENTER") ?: "CENTER"
                         val randomShapes =
@@ -993,48 +1098,49 @@ class NotificationListener : NotificationListenerService() {
                         val systemLightingMode = prefs.getInt("edge_lighting_system_mode", 0)
 
                         fun startNotificationLighting(resolvedColor: Int? = null) {
-                            val intent = Intent(
-                                applicationContext,
-                                NotificationLightingService::class.java
-                            ).apply {
-                                putExtra("corner_radius_dp", cornerRadius)
-                                putExtra("stroke_thickness_dp", strokeThickness)
-                                putExtra("color_mode", colorMode.name)
-                                putExtra("pulse_count", pulseCount)
-                                putExtra("pulse_duration", pulseDuration)
-                                putExtra("style", styleName)
-                                putExtra("glow_sides", glowSides.map { it.name }.toTypedArray())
-                                putExtra("indicator_x", indicatorX)
-                                putExtra("indicator_y", indicatorY)
-                                putExtra("indicator_scale", indicatorScale)
-                                if (resolvedColor != null) {
-                                    putExtra("resolved_color", resolvedColor)
-                                } else if (colorMode == NotificationLightingColorMode.CUSTOM) {
-                                    putExtra(
-                                        "custom_color",
-                                        prefs.getInt(
-                                            "edge_lighting_custom_color",
-                                            0xFF6200EE.toInt()
+                            val intent =
+                                Intent(
+                                    applicationContext,
+                                    NotificationLightingService::class.java,
+                                ).apply {
+                                    putExtra("corner_radius_dp", cornerRadius)
+                                    putExtra("stroke_thickness_dp", strokeThickness)
+                                    putExtra("color_mode", colorMode.name)
+                                    putExtra("pulse_count", pulseCount)
+                                    putExtra("pulse_duration", pulseDuration)
+                                    putExtra("style", styleName)
+                                    putExtra("glow_sides", glowSides.map { it.name }.toTypedArray())
+                                    putExtra("indicator_x", indicatorX)
+                                    putExtra("indicator_y", indicatorY)
+                                    putExtra("indicator_scale", indicatorScale)
+                                    if (resolvedColor != null) {
+                                        putExtra("resolved_color", resolvedColor)
+                                    } else if (colorMode == NotificationLightingColorMode.CUSTOM) {
+                                        putExtra(
+                                            "custom_color",
+                                            prefs.getInt(
+                                                "edge_lighting_custom_color",
+                                                0xFF6200EE.toInt(),
+                                            ),
                                         )
+                                    }
+                                    putExtra(
+                                        "is_ambient_display",
+                                        prefs.getBoolean("edge_lighting_ambient_display", false),
                                     )
+                                    putExtra(
+                                        "is_ambient_show_lock_screen",
+                                        prefs.getBoolean(
+                                            "edge_lighting_ambient_show_lock_screen",
+                                            false,
+                                        ),
+                                    )
+                                    putExtra("sweep_position", sweepPosition)
+                                    putExtra("sweep_thickness", sweepThickness)
+                                    putExtra("random_shapes", randomShapes)
+                                    putExtra("system_lighting_mode", systemLightingMode)
+                                    putExtra("package_name", sbn.packageName)
                                 }
-                                putExtra(
-                                    "is_ambient_display",
-                                    prefs.getBoolean("edge_lighting_ambient_display", false)
-                                )
-                                putExtra(
-                                    "is_ambient_show_lock_screen",
-                                    prefs.getBoolean(
-                                        "edge_lighting_ambient_show_lock_screen",
-                                        false
-                                    )
-                                )
-                                putExtra("sweep_position", sweepPosition)
-                                putExtra("sweep_thickness", sweepThickness)
-                                putExtra("random_shapes", randomShapes)
-                                putExtra("system_lighting_mode", systemLightingMode)
-                                putExtra("package_name", sbn.packageName)
-                            }
                             if (PermissionUtils.isAccessibilityServiceEnabled(applicationContext)) {
                                 applicationContext.startService(intent)
                             } else {
@@ -1045,7 +1151,7 @@ class NotificationListener : NotificationListenerService() {
                         if (colorMode == NotificationLightingColorMode.APP_SPECIFIC) {
                             AppUtil.getAppBrandColor(
                                 applicationContext,
-                                sbn.packageName
+                                sbn.packageName,
                             ) { brandColor ->
                                 startNotificationLighting(brandColor)
                             }
@@ -1086,9 +1192,12 @@ class NotificationListener : NotificationListenerService() {
 
             val pkg = sbn.packageName
             val isDialer =
-                pkg.contains("dialer") || pkg.contains("telecom") || pkg.contains("phone") || pkg.contains(
-                    "miui.voiceassist"
-                )
+                pkg.contains("dialer") ||
+                    pkg.contains("telecom") ||
+                    pkg.contains("phone") ||
+                    pkg.contains(
+                        "miui.voiceassist",
+                    )
             if (!isDialer) return
 
             val isOngoing = (notification.flags and Notification.FLAG_ONGOING_EVENT) != 0
@@ -1103,12 +1212,12 @@ class NotificationListener : NotificationListenerService() {
                 if (now - lastVibrate > 5000) {
                     HapticUtil.performHapticForService(
                         applicationContext,
-                        HapticFeedbackType.DOUBLE
+                        HapticFeedbackType.DOUBLE,
                     )
                     lastCallVibrateTime[sbn.key] = now
                     Log.d(
                         "NotificationListener",
-                        "Outgoing/Incoming call answer detected for ${sbn.packageName}"
+                        "Outgoing/Incoming call answer detected for ${sbn.packageName}",
                     )
                 }
             }
@@ -1121,7 +1230,10 @@ class NotificationListener : NotificationListenerService() {
         unreadNotifications.remove(sbn.key)
         WatchNotificationSyncManager.onNotificationRemoved(applicationContext, sbn.key)
 
-        if (isOngoingScreenCaptureNotification(sbn) || sbn.packageName.contains("screenrecord") || sbn.packageName == "com.android.systemui") {
+        if (isOngoingScreenCaptureNotification(sbn) ||
+            sbn.packageName.contains("screenrecord") ||
+            sbn.packageName == "com.android.systemui"
+        ) {
             ScreenOffAccessibilityService.updateSmartPixelsState()
         }
 
@@ -1130,9 +1242,10 @@ class NotificationListener : NotificationListenerService() {
             val mediaSessionManager =
                 getSystemService(MEDIA_SESSION_SERVICE) as android.media.session.MediaSessionManager
             val sessions = getMediaSessions(mediaSessionManager)
-            val activeSession = sessions.firstOrNull {
-                it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
-            }
+            val activeSession =
+                sessions.firstOrNull {
+                    it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING
+                }
             if (activeSession != null) {
                 triggerAmbientGlance(activeSession, "notification_update")
             }
@@ -1146,7 +1259,10 @@ class NotificationListener : NotificationListenerService() {
         handleNotificationGlance(sbn, false)
     }
 
-    private fun handleNotificationGlance(sbn: StatusBarNotification, isPosted: Boolean) {
+    private fun handleNotificationGlance(
+        sbn: StatusBarNotification,
+        isPosted: Boolean,
+    ) {
         try {
             val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
             val enabled =
@@ -1171,7 +1287,6 @@ class NotificationListener : NotificationListenerService() {
             }
 
             updateAodState(activeGlanceNotifications.isNotEmpty())
-
         } catch (e: Exception) {
             Log.e("NotificationListener", "Error in handleNotificationGlance", e)
         }
@@ -1189,10 +1304,11 @@ class NotificationListener : NotificationListenerService() {
                     val powerManager = getSystemService(POWER_SERVICE) as PowerManager
                     if (!powerManager.isInteractive) {
                         val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
-                        val forceTurnOffEnabled = prefs.getBoolean(
-                            SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED,
-                            false
-                        )
+                        val forceTurnOffEnabled =
+                            prefs.getBoolean(
+                                SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED,
+                                false,
+                            )
                         if (forceTurnOffEnabled) {
                             sendBroadcast(Intent("FORCE_TURN_OFF_AOD").setPackage(packageName))
                         }
@@ -1218,10 +1334,12 @@ class NotificationListener : NotificationListenerService() {
             if (json == null) return true
 
             val selectedApps: List<com.sameerasw.essentials.domain.model.AppSelection> =
-                com.google.gson.Gson().fromJson(
-                    json,
-                    Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java
-                ).toList()
+                com.google.gson
+                    .Gson()
+                    .fromJson(
+                        json,
+                        Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java,
+                    ).toList()
 
             val app = selectedApps.find { it.packageName == packageName }
             return app?.isEnabled ?: true
@@ -1246,23 +1364,21 @@ class NotificationListener : NotificationListenerService() {
         return true
     }
 
-    private fun canDrawOverlays(): Boolean {
-        return Settings.canDrawOverlays(applicationContext)
-    }
+    private fun canDrawOverlays(): Boolean = Settings.canDrawOverlays(applicationContext)
 
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        return try {
-            val enabledServices = Settings.Secure.getString(
-                applicationContext.contentResolver,
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            )
+    private fun isAccessibilityServiceEnabled(): Boolean =
+        try {
+            val enabledServices =
+                Settings.Secure.getString(
+                    applicationContext.contentResolver,
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                )
             val serviceName =
                 "${applicationContext.packageName}/${ScreenOffAccessibilityService::class.java.name}"
             enabledServices?.contains(serviceName) == true
         } catch (_: Exception) {
             false
         }
-    }
 
     private fun isNavigationNotification(sbn: StatusBarNotification): Boolean {
         val notification = sbn.notification
@@ -1271,26 +1387,33 @@ class NotificationListener : NotificationListenerService() {
         val prefs =
             applicationContext.getSharedPreferences("essentials_prefs", MODE_PRIVATE)
         val detectionChannelsJson = prefs.getString("maps_detection_channels", null)
-        val detectionChannels: Set<String> = if (detectionChannelsJson != null) {
-            try {
-                com.google.gson.Gson().fromJson(detectionChannelsJson, Array<String>::class.java)
-                    .toSet()
-            } catch (_: Exception) {
-                emptySet()
+        val detectionChannels: Set<String> =
+            if (detectionChannelsJson != null) {
+                try {
+                    com.google.gson
+                        .Gson()
+                        .fromJson(detectionChannelsJson, Array<String>::class.java)
+                        .toSet()
+                } catch (_: Exception) {
+                    emptySet()
+                }
+            } else {
+                // Default known navigation channels
+                setOf(
+                    "navigation_notification_channel",
+                    "primary_navigation_channel_v1",
+                    "primary_navigation_channel_v2",
+                )
             }
-        } else {
-            // Default known navigation channels
-            setOf(
-                "navigation_notification_channel",
-                "primary_navigation_channel_v1",
-                "primary_navigation_channel_v2"
-            )
-        }
 
-        if (channelId != null && (detectionChannels.contains(channelId) || channelId.contains(
-                "navigation",
-                ignoreCase = true
-            ))
+        if (channelId != null &&
+            (
+                detectionChannels.contains(channelId) ||
+                    channelId.contains(
+                        "navigation",
+                        ignoreCase = true,
+                    )
+            )
         ) {
             return true
         }
@@ -1300,9 +1423,8 @@ class NotificationListener : NotificationListenerService() {
         return hasNavigationCategory(notification)
     }
 
-    private fun isPersistentNotification(notification: Notification): Boolean {
-        return (notification.flags and Notification.FLAG_ONGOING_EVENT) != 0
-    }
+    private fun isPersistentNotification(notification: Notification): Boolean =
+        (notification.flags and Notification.FLAG_ONGOING_EVENT) != 0
 
     private fun hasNavigationCategory(notification: Notification): Boolean {
         val category = notification.category ?: return false
@@ -1335,16 +1457,16 @@ class NotificationListener : NotificationListenerService() {
 
             val gson = com.google.gson.Gson()
             val selectedApps: List<com.sameerasw.essentials.domain.model.AppSelection> =
-                gson.fromJson(
-                    json,
-                    Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java
-                ).toList()
+                gson
+                    .fromJson(
+                        json,
+                        Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java,
+                    ).toList()
 
             // Find the app in the saved list
             val app = selectedApps.find { it.packageName == packageName }
             val result = app?.isEnabled ?: true
             return result
-
         } catch (_: Exception) {
             // If there's an error, default to allowing all apps (backward compatibility)
             return true
@@ -1370,16 +1492,16 @@ class NotificationListener : NotificationListenerService() {
 
             val gson = com.google.gson.Gson()
             val selectedApps: List<com.sameerasw.essentials.domain.model.AppSelection> =
-                gson.fromJson(
-                    json,
-                    Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java
-                ).toList()
+                gson
+                    .fromJson(
+                        json,
+                        Array<com.sameerasw.essentials.domain.model.AppSelection>::class.java,
+                    ).toList()
 
             // Find the app in the saved list
             val app = selectedApps.find { it.packageName == packageName }
             val result = app?.isEnabled ?: true
             return result
-
         } catch (_: Exception) {
             // If there's an error, default to allowing all apps
             return true
@@ -1396,15 +1518,16 @@ class NotificationListener : NotificationListenerService() {
                 val sessions = mutableListOf<android.media.session.MediaController>()
                 val notifications = getActiveNotifications() ?: emptyArray()
                 for (sbn in notifications) {
-                    val token = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        sbn.notification.extras.getParcelable(
-                            Notification.EXTRA_MEDIA_SESSION,
-                            android.media.session.MediaSession.Token::class.java
-                        )
-                    } else {
-                        @Suppress("DEPRECATION")
-                        sbn.notification.extras.getParcelable(Notification.EXTRA_MEDIA_SESSION)
-                    }
+                    val token =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            sbn.notification.extras.getParcelable(
+                                Notification.EXTRA_MEDIA_SESSION,
+                                android.media.session.MediaSession.Token::class.java,
+                            )
+                        } else {
+                            @Suppress("DEPRECATION")
+                            sbn.notification.extras.getParcelable(Notification.EXTRA_MEDIA_SESSION)
+                        }
                     if (token != null) {
                         sessions.add(android.media.session.MediaController(this, token))
                     }
@@ -1422,17 +1545,19 @@ class NotificationListener : NotificationListenerService() {
         try {
             val notification = sbn.notification
             val extras = notification.extras
-            val isMedia = extras.containsKey(Notification.EXTRA_MEDIA_SESSION) ||
+            val isMedia =
+                extras.containsKey(Notification.EXTRA_MEDIA_SESSION) ||
                     extras.getString(Notification.EXTRA_TEMPLATE) == "android.app.Notification\$MediaStyle"
 
             // Do not hide for media or calls as they are handled/displayed by EOD already
             if (isMedia || sbn.packageName.contains("telecom") || sbn.packageName.contains("dialer")) return
 
             val prefs = getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE)
-            val respectEnabled = prefs.getBoolean(
-                SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_RESPECT_NOTIFICATIONS,
-                false
-            )
+            val respectEnabled =
+                prefs.getBoolean(
+                    SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_RESPECT_NOTIFICATIONS,
+                    false,
+                )
             if (!respectEnabled) return
 
             val isDocked =
@@ -1441,11 +1566,12 @@ class NotificationListener : NotificationListenerService() {
 
             // Criteria: Non-silent or Lighting logic
             val isLightingOn = prefs.getBoolean(SettingsRepository.KEY_EDGE_LIGHTING_ENABLED, false)
-            val shouldHide = if (isLightingOn) {
-                isAppSelectedForNotificationLighting(sbn.packageName)
-            } else {
-                !sbn.isOngoing && sbn.notification.priority >= Notification.PRIORITY_DEFAULT
-            }
+            val shouldHide =
+                if (isLightingOn) {
+                    isAppSelectedForNotificationLighting(sbn.packageName)
+                } else {
+                    !sbn.isOngoing && sbn.notification.priority >= Notification.PRIORITY_DEFAULT
+                }
 
             if (shouldHide) {
                 sendBroadcast(Intent("HIDE_AMBIENT_GLANCE_TEMPORARILY").setPackage(packageName))

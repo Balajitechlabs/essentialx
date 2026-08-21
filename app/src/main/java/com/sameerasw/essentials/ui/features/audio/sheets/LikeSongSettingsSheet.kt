@@ -47,41 +47,44 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun LikeSongSettingsSheet(
     onDismiss: () -> Unit,
     viewModel: MainViewModel,
-    context: Context
+    context: Context,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
-        contentColor = MaterialTheme.colorScheme.onSurface
+        contentColor = MaterialTheme.colorScheme.onSurface,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 24.dp),
         ) {
             Text(
                 text = stringResource(R.string.like_song_settings_title),
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             Text(
                 text = stringResource(R.string.like_song_settings_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = 24.dp),
             )
 
-            val componentName = android.content.ComponentName(
-                context,
-                com.sameerasw.essentials.services.NotificationListener::class.java
-            )
-            val enabledListeners = android.provider.Settings.Secure.getString(
-                context.contentResolver,
-                "enabled_notification_listeners"
-            )
+            val componentName =
+                android.content.ComponentName(
+                    context,
+                    com.sameerasw.essentials.services.NotificationListener::class.java,
+                )
+            val enabledListeners =
+                android.provider.Settings.Secure.getString(
+                    context.contentResolver,
+                    "enabled_notification_listeners",
+                )
             val hasNotificationAccess =
                 enabledListeners != null && enabledListeners.contains(componentName.flattenToString())
 
@@ -92,47 +95,52 @@ fun LikeSongSettingsSheet(
                             Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
                         context.startActivity(intent)
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_notification_settings_24),
                         contentDescription = null,
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(20.dp)
+                        modifier =
+                            Modifier
+                                .padding(end = 8.dp)
+                                .size(20.dp),
                     )
                     Text(text = stringResource(R.string.grant_notification_access))
                 }
             } else {
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
-                    ),
-                    shape = RoundedCornerShape(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                        ),
+                    shape = RoundedCornerShape(16.dp),
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_check_circle_24),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(
                             text = "Notification access granted",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
                         )
                     }
                 }
@@ -141,7 +149,7 @@ fun LikeSongSettingsSheet(
             Text(
                 text = "Options",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 8.dp, top = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp, top = 8.dp),
             )
 
             RoundedCardContainer {
@@ -149,14 +157,14 @@ fun LikeSongSettingsSheet(
                     iconRes = R.drawable.rounded_chat_info_24,
                     title = stringResource(R.string.like_song_toast_enabled),
                     isChecked = viewModel.isLikeSongToastEnabled.value,
-                    onCheckedChange = { viewModel.setLikeSongToastEnabled(it) }
+                    onCheckedChange = { viewModel.setLikeSongToastEnabled(it) },
                 )
 
                 IconToggleItem(
                     iconRes = R.drawable.rounded_music_video_24,
                     title = stringResource(R.string.like_song_aod_overlay_title),
                     isChecked = viewModel.isLikeSongAodOverlayEnabled.value,
-                    onCheckedChange = { viewModel.setLikeSongAodOverlayEnabled(it) }
+                    onCheckedChange = { viewModel.setLikeSongAodOverlayEnabled(it) },
                 )
             }
 

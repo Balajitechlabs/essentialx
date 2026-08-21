@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 class PixelSearchbarWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = PixelSearchbarWidget()
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         super.onReceive(context, intent)
 
         val action = intent.action
@@ -42,7 +45,7 @@ class PixelSearchbarWidgetReceiver : GlanceAppWidgetReceiver() {
                     android.util.Log.e(
                         "PixelSearchbarWidget",
                         "Error updating searchbar widget on broadcast",
-                        e
+                        e,
                     )
                 }
             }

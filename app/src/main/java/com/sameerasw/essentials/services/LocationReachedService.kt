@@ -46,7 +46,10 @@ class LocationReachedService : Service() {
     private var isInitialCalculationDone = false
 
     private val repository by lazy { LocationReachedRepository(this) }
-    private val settingsRepository by lazy { com.sameerasw.essentials.data.repository.SettingsRepository(this) }
+    private val settingsRepository by lazy {
+        com.sameerasw.essentials.data.repository
+            .SettingsRepository(this)
+    }
     private val fusedLocationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
 
@@ -75,7 +78,11 @@ class LocationReachedService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         if (intent?.action == ACTION_STOP) {
             stopTracking()
             return START_NOT_STICKY
@@ -99,24 +106,25 @@ class LocationReachedService : Service() {
 
     private fun startTracking() {
         trackingJob?.cancel()
-        trackingJob = serviceScope.launch {
-            while (isActive) {
-                val activeId = repository.getActiveAlarmId()
-                val alarms = repository.getAlarms()
-                val alarm = alarms.find { it.id == activeId }
+        trackingJob =
+            serviceScope.launch {
+                while (isActive) {
+                    val activeId = repository.getActiveAlarmId()
+                    val alarms = repository.getAlarms()
+                    val alarm = alarms.find { it.id == activeId }
 
-                if (alarm != null) {
-                    updateProgress(alarm)
-                } else {
-                    serviceScope.launch {
-                        delay(500)
-                        stopSelf()
+                    if (alarm != null) {
+                        updateProgress(alarm)
+                    } else {
+                        serviceScope.launch {
+                            delay(500)
+                            stopSelf()
+                        }
+                        break
                     }
-                    break
+                    delay(5000)
                 }
-                delay(5000)
             }
-        }
     }
 
     private fun stopTracking() {
@@ -142,7 +150,7 @@ class LocationReachedService : Service() {
         alarm: LocationAlarm?,
         progressPercent: Int,
         etaText: String?,
-        distanceText: String?
+        distanceText: String?,
     ) {
         val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
         val editor = prefs.edit()
@@ -162,11 +170,11 @@ class LocationReachedService : Service() {
             editor.putFloat("travel_progress", progressPercent.toFloat() / 100f)
             editor.putString(
                 "travel_remaining_time",
-                etaText ?: getString(R.string.location_reached_calculating)
+                etaText ?: getString(R.string.location_reached_calculating),
             )
             editor.putString(
                 "travel_remaining_distance",
-                distanceText ?: getString(R.string.location_reached_calculating)
+                distanceText ?: getString(R.string.location_reached_calculating),
             )
             editor.putString("travel_icon_name", alarm.iconResName)
             editor.putBoolean("travel_is_paused", isPaused)
@@ -236,15 +244,17 @@ class LocationReachedService : Service() {
             return
         }
 
-        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
+        fusedLocationClient
+            .getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
             .addOnSuccessListener { location ->
                 location?.let {
-                    val distance = calculateDistance(
-                        it.latitude,
-                        it.longitude,
-                        alarm.latitude,
-                        alarm.longitude
-                    )
+                    val distance =
+                        calculateDistance(
+                            it.latitude,
+                            it.longitude,
+                            alarm.latitude,
+                            alarm.longitude,
+                        )
                     val distanceKm = distance / 1000f
 
                     // Watchdog: If we reached the radius but geofence didn't trigger
@@ -267,48 +277,58 @@ class LocationReachedService : Service() {
         val channelId = if (isFullScreenAlarmEnabled) "location_reached_channel_alarm" else "location_reached_channel"
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                getString(R.string.feat_location_reached_title),
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                enableLights(true)
-                enableVibration(true)
-                if (isFullScreenAlarmEnabled) {
-                    val audioAttributes = android.media.AudioAttributes.Builder()
-                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .setUsage(android.media.AudioAttributes.USAGE_ALARM)
-                        .build()
-                    val alarmUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
-                        ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE)
-                        ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
-                    setSound(alarmUri, audioAttributes)
+            val channel =
+                NotificationChannel(
+                    channelId,
+                    getString(R.string.feat_location_reached_title),
+                    NotificationManager.IMPORTANCE_HIGH,
+                ).apply {
+                    enableLights(true)
+                    enableVibration(true)
+                    if (isFullScreenAlarmEnabled) {
+                        val audioAttributes =
+                            android.media.AudioAttributes
+                                .Builder()
+                                .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                                .build()
+                        val alarmUri =
+                            android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
+                                ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE)
+                                ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+                        setSound(alarmUri, audioAttributes)
+                    }
                 }
-            }
             notificationManager.createNotificationChannel(channel)
         }
 
-        val fullScreenIntent = Intent(
-            this,
-            com.sameerasw.essentials.ui.activities.LocationAlarmActivity::class.java
-        ).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+        val fullScreenIntent =
+            Intent(
+                this,
+                com.sameerasw.essentials.ui.activities.LocationAlarmActivity::class.java,
+            ).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
                     Intent.FLAG_ACTIVITY_CLEAR_TOP or
                     Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val fullScreenPendingIntent = PendingIntent.getActivity(
-            this, 0, fullScreenIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+            }
+        val fullScreenPendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                fullScreenIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.rounded_navigation_24)
-            .setContentTitle(getString(R.string.location_reached_notification_title))
-            .setContentText(getString(R.string.location_reached_notification_desc))
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setAutoCancel(true)
+        val notificationBuilder =
+            NotificationCompat
+                .Builder(this, channelId)
+                .setSmallIcon(R.drawable.rounded_navigation_24)
+                .setContentTitle(getString(R.string.location_reached_notification_title))
+                .setContentText(getString(R.string.location_reached_notification_desc))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setAutoCancel(true)
 
         if (isFullScreenAlarmEnabled) {
             notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
@@ -331,9 +351,12 @@ class LocationReachedService : Service() {
     private fun updateNotification(distanceKm: Float?) {
         val startDist = repository.getStartDistance()
         val startTime = repository.getStartTime()
-        val progressPercent = if (startDist > 0 && distanceKm != null) {
-            ((1.0f - (distanceKm * 1000f / startDist)) * 100).toInt().coerceIn(0, 100)
-        } else 0
+        val progressPercent =
+            if (startDist > 0 && distanceKm != null) {
+                ((1.0f - (distanceKm * 1000f / startDist)) * 100).toInt().coerceIn(0, 100)
+            } else {
+                0
+            }
 
         var etaText: String? = null
         if (startDist > 0 && startTime > 0 && distanceKm != null) {
@@ -344,20 +367,25 @@ class LocationReachedService : Service() {
                 val remainingMillis = (currentDistMeters * elapsed / distanceTravelled).toLong()
                 val remainingMinutes = (remainingMillis / 60000).toInt().coerceAtLeast(1)
 
-                etaText = if (remainingMinutes >= 60) {
-                    val hrs = remainingMinutes / 60
-                    val mins = remainingMinutes % 60
-                    getString(R.string.location_reached_eta_hr_min, hrs, mins)
-                } else {
-                    getString(R.string.location_reached_eta_min, remainingMinutes)
-                }
+                etaText =
+                    if (remainingMinutes >= 60) {
+                        val hrs = remainingMinutes / 60
+                        val mins = remainingMinutes % 60
+                        getString(R.string.location_reached_eta_hr_min, hrs, mins)
+                    } else {
+                        getString(R.string.location_reached_eta_min, remainingMinutes)
+                    }
             }
         }
 
-        val distanceText = distanceKm?.let {
-            if (it < 1.0) getString(R.string.location_reached_dist_m, (it * 1000).toInt())
-            else getString(R.string.location_reached_dist_km, it)
-        } ?: getString(R.string.location_reached_calculating)
+        val distanceText =
+            distanceKm?.let {
+                if (it < 1.0) {
+                    getString(R.string.location_reached_dist_m, (it * 1000).toInt())
+                } else {
+                    getString(R.string.location_reached_dist_km, it)
+                }
+            } ?: getString(R.string.location_reached_calculating)
 
         val activeId = repository.getActiveAlarmId()
         val alarm = repository.getAlarms().find { it.id == activeId }
@@ -367,63 +395,79 @@ class LocationReachedService : Service() {
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
-    private fun buildInitialNotification(): Notification {
-        return buildOngoingNotification(null, 0, null)
-    }
+    private fun buildInitialNotification(): Notification = buildOngoingNotification(null, 0, null)
 
     private fun buildOngoingNotification(
         distanceKm: Float?,
         progress: Int,
-        etaText: String?
+        etaText: String?,
     ): Notification {
-        val stopIntent = Intent(this, LocationReachedService::class.java).apply {
-            action = ACTION_STOP
-        }
-        val stopPendingIntent = PendingIntent.getService(
-            this,
-            0,
-            stopIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val stopIntent =
+            Intent(this, LocationReachedService::class.java).apply {
+                action = ACTION_STOP
+            }
+        val stopPendingIntent =
+            PendingIntent.getService(
+                this,
+                0,
+                stopIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
         val mainIntent =
             Intent(this, com.sameerasw.essentials.ui.activities.TravelCompassActivity::class.java)
-        val mainPendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            mainIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val distanceText = distanceKm?.let {
-            if (it < 1.0) getString(R.string.location_reached_dist_m, (it * 1000).toInt())
-            else getString(R.string.location_reached_dist_km, it)
-        } ?: getString(R.string.location_reached_calculating)
-
-        val contentText = if (etaText != null) {
-            getString(
-                R.string.location_reached_service_remaining_with_eta,
-                distanceText,
-                progress,
-                etaText
+        val mainPendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                mainIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
-        } else {
-            getString(R.string.location_reached_service_remaining, distanceText, progress)
-        }
 
-        val pauseIntent = Intent(this, LocationReachedService::class.java).apply {
-            action = ACTION_PAUSE
-        }
-        val pausePendingIntent = PendingIntent.getService(
-            this, 1, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val distanceText =
+            distanceKm?.let {
+                if (it < 1.0) {
+                    getString(R.string.location_reached_dist_m, (it * 1000).toInt())
+                } else {
+                    getString(R.string.location_reached_dist_km, it)
+                }
+            } ?: getString(R.string.location_reached_calculating)
 
-        val resumeIntent = Intent(this, LocationReachedService::class.java).apply {
-            action = ACTION_RESUME
-        }
-        val resumePendingIntent = PendingIntent.getService(
-            this, 2, resumeIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+        val contentText =
+            if (etaText != null) {
+                getString(
+                    R.string.location_reached_service_remaining_with_eta,
+                    distanceText,
+                    progress,
+                    etaText,
+                )
+            } else {
+                getString(R.string.location_reached_service_remaining, distanceText, progress)
+            }
+
+        val pauseIntent =
+            Intent(this, LocationReachedService::class.java).apply {
+                action = ACTION_PAUSE
+            }
+        val pausePendingIntent =
+            PendingIntent.getService(
+                this,
+                1,
+                pauseIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+
+        val resumeIntent =
+            Intent(this, LocationReachedService::class.java).apply {
+                action = ACTION_RESUME
+            }
+        val resumePendingIntent =
+            PendingIntent.getService(
+                this,
+                2,
+                resumeIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
         val activeId = repository.getActiveAlarmId()
         val alarm = repository.getAlarms().find { it.id == activeId }
@@ -434,50 +478,59 @@ class LocationReachedService : Service() {
 
         if (Build.VERSION.SDK_INT >= 35) {
             val destinationName = alarm?.name?.ifEmpty { "Destination" } ?: "Destination"
-            val builder = Notification.Builder(this, CHANNEL_ID)
-                .setSmallIcon(finalIconId)
-                .setContentTitle(
-                    getString(
-                        R.string.location_reached_service_title,
-                        destinationName
+            val builder =
+                Notification
+                    .Builder(this, CHANNEL_ID)
+                    .setSmallIcon(finalIconId)
+                    .setContentTitle(
+                        getString(
+                            R.string.location_reached_service_title,
+                            destinationName,
+                        ),
+                    ).setContentText(if (isPaused) getString(R.string.location_reached_pause) else contentText)
+                    .setOngoing(true)
+                    .setOnlyAlertOnce(true)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .setContentIntent(mainPendingIntent)
+                    .addAction(
+                        if (isPaused) {
+                            Notification.Action
+                                .Builder(
+                                    Icon.createWithResource(this, R.drawable.round_play_arrow_24),
+                                    getString(R.string.location_reached_resume),
+                                    resumePendingIntent,
+                                ).build()
+                        } else {
+                            Notification.Action
+                                .Builder(
+                                    Icon.createWithResource(this, R.drawable.rounded_pause_24),
+                                    getString(R.string.location_reached_pause),
+                                    pausePendingIntent,
+                                ).build()
+                        },
+                    ).addAction(
+                        Notification.Action
+                            .Builder(
+                                Icon.createWithResource(this, R.drawable.rounded_power_settings_new_24),
+                                getString(R.string.location_reached_stop_tracking),
+                                stopPendingIntent,
+                            ).build(),
                     )
-                )
-                .setContentText(if (isPaused) getString(R.string.location_reached_pause) else contentText)
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .setContentIntent(mainPendingIntent)
-                .addAction(
-                    if (isPaused) {
-                        Notification.Action.Builder(
-                            Icon.createWithResource(this, R.drawable.round_play_arrow_24),
-                            getString(R.string.location_reached_resume), resumePendingIntent
-                        ).build()
-                    } else {
-                        Notification.Action.Builder(
-                            Icon.createWithResource(this, R.drawable.rounded_pause_24),
-                            getString(R.string.location_reached_pause), pausePendingIntent
-                        ).build()
-                    }
-                )
-                .addAction(
-                    Notification.Action.Builder(
-                        Icon.createWithResource(this, R.drawable.rounded_power_settings_new_24),
-                        getString(R.string.location_reached_stop_tracking), stopPendingIntent
-                    ).build()
-                )
 
             if (Build.VERSION.SDK_INT >= 36) {
                 try {
-                    val progressStyle = Notification.ProgressStyle()
-                        .setStyledByProgress(true)
-                        .setProgress(progress)
-                        .setProgressTrackerIcon(
-                            Icon.createWithResource(
-                                this,
-                                if (isPaused) R.drawable.rounded_pause_24 else R.drawable.round_play_arrow_24
-                            ).setTint(getColor(android.R.color.system_accent1_300))
-                        )
+                    val progressStyle =
+                        Notification
+                            .ProgressStyle()
+                            .setStyledByProgress(true)
+                            .setProgress(progress)
+                            .setProgressTrackerIcon(
+                                Icon
+                                    .createWithResource(
+                                        this,
+                                        if (isPaused) R.drawable.rounded_pause_24 else R.drawable.round_play_arrow_24,
+                                    ).setTint(getColor(android.R.color.system_accent1_300)),
+                            )
                     builder.style = progressStyle
                 } catch (_: Throwable) {
                     builder.setProgress(100, progress, false)
@@ -497,22 +550,23 @@ class LocationReachedService : Service() {
                 }
                 builder.addExtras(extras)
 
-                builder.javaClass.getMethod(
-                    "setRequestPromotedOngoing",
-                    Boolean::class.javaPrimitiveType
-                )
-                    .invoke(builder, true)
+                builder.javaClass
+                    .getMethod(
+                        "setRequestPromotedOngoing",
+                        Boolean::class.javaPrimitiveType,
+                    ).invoke(builder, true)
 
                 if (isPaused) {
-                    builder.javaClass.getMethod("setShortCriticalText", CharSequence::class.java)
+                    builder.javaClass
+                        .getMethod("setShortCriticalText", CharSequence::class.java)
                         .invoke(builder, "Paused")
                 } else {
                     distanceKm?.let {
-                        builder.javaClass.getMethod(
-                            "setShortCriticalText",
-                            CharSequence::class.java
-                        )
-                            .invoke(builder, distanceText)
+                        builder.javaClass
+                            .getMethod(
+                                "setShortCriticalText",
+                                CharSequence::class.java,
+                            ).invoke(builder, distanceText)
                     }
                 }
             } catch (_: Throwable) {
@@ -522,27 +576,28 @@ class LocationReachedService : Service() {
         }
 
         val destinationName = alarm?.name?.ifEmpty { "Destination" } ?: "Destination"
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(finalIconId)
-            .setContentTitle(getString(R.string.location_reached_service_title, destinationName))
-            .setContentText(if (isPaused) getString(R.string.location_reached_pause) else contentText)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentIntent(mainPendingIntent)
-            .setProgress(100, progress, false)
-            .addAction(
-                if (isPaused) R.drawable.round_play_arrow_24 else R.drawable.rounded_pause_24,
-                if (isPaused) getString(R.string.location_reached_resume) else getString(R.string.location_reached_pause),
-                if (isPaused) resumePendingIntent else pausePendingIntent
-            )
-            .addAction(
-                R.drawable.rounded_power_settings_new_24,
-                getString(R.string.location_reached_stop_tracking),
-                stopPendingIntent
-            )
+        val builder =
+            NotificationCompat
+                .Builder(this, CHANNEL_ID)
+                .setSmallIcon(finalIconId)
+                .setContentTitle(getString(R.string.location_reached_service_title, destinationName))
+                .setContentText(if (isPaused) getString(R.string.location_reached_pause) else contentText)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setContentIntent(mainPendingIntent)
+                .setProgress(100, progress, false)
+                .addAction(
+                    if (isPaused) R.drawable.round_play_arrow_24 else R.drawable.rounded_pause_24,
+                    if (isPaused) getString(R.string.location_reached_resume) else getString(R.string.location_reached_pause),
+                    if (isPaused) resumePendingIntent else pausePendingIntent,
+                ).addAction(
+                    R.drawable.rounded_power_settings_new_24,
+                    getString(R.string.location_reached_stop_tracking),
+                    stopPendingIntent,
+                )
 
         val extras = android.os.Bundle()
         extras.putBoolean("android.requestPromotedOngoing", true)
@@ -558,26 +613,33 @@ class LocationReachedService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.location_reached_channel_name),
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = getString(R.string.location_reached_channel_desc)
-                setShowBadge(false)
-                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                setSound(null, null)
-                enableVibration(false)
-            }
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.location_reached_channel_name),
+                    NotificationManager.IMPORTANCE_HIGH,
+                ).apply {
+                    description = getString(R.string.location_reached_channel_desc)
+                    setShowBadge(false)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    setSound(null, null)
+                    enableVibration(false)
+                }
             notificationManager.createNotificationChannel(channel)
         }
     }
 
-    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+    private fun calculateDistance(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double,
+    ): Float {
         val r = 6371e3
         val dLat = Math.toRadians(lat2 - lat1)
         val dLon = Math.toRadians(lon2 - lon1)
-        val a = sin(dLat / 2) * sin(dLat / 2) +
+        val a =
+            sin(dLat / 2) * sin(dLat / 2) +
                 cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
                 sin(dLon / 2) * sin(dLon / 2)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))

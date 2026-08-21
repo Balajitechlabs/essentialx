@@ -43,13 +43,14 @@ fun RestoreModePicker(
     selectedMode: String,
     onModeSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    options: List<String> = listOf("Auto", "Notify")
+    options: List<String> = listOf("Auto", "Notify"),
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceBright),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceBright),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         ListItem(
             onClick = {},
@@ -59,31 +60,34 @@ fun RestoreModePicker(
                     painter = painterResource(id = R.drawable.rounded_timer_24),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             },
-            contentPadding = PaddingValues(
-                horizontal = 16.dp,
-                vertical = 16.dp
-            ),
+            contentPadding =
+                PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 16.dp,
+                ),
             verticalAlignment = Alignment.CenterVertically,
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
-            ),
+            colors =
+                ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                ),
             content = {
                 Text(
                     text = stringResource(R.string.label_restore_mode),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
-            }
+            },
         )
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
         ) {
             options.forEachIndexed { index, mode ->
@@ -94,20 +98,22 @@ fun RestoreModePicker(
                     onCheckedChange = {
                         onModeSelected(mode)
                     },
-                    modifier = Modifier
-                        .weight(1f)
-                        .semantics { role = Role.RadioButton },
-                    shapes = when {
-                        index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        index == options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .semantics { role = Role.RadioButton },
+                    shapes =
+                        when {
+                            index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            index == options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
                 ) {
                     Text(
                         text = mode,
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = if (isChecked) FontWeight.Bold else FontWeight.Normal,
-                        maxLines = 1
+                        maxLines = 1,
                     )
                 }
             }

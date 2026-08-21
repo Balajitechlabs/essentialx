@@ -42,7 +42,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun FreezeTagColorPicker(
     selectedColorHex: String,
     onColorSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val carouselState = rememberCarouselState { PRESET_PASTEL_COLORS.size }
     val view = LocalView.current
@@ -52,7 +52,7 @@ fun FreezeTagColorPicker(
             text = stringResource(R.string.freeze_tag_color_picker_label),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         )
 
         HorizontalMultiBrowseCarousel(
@@ -62,35 +62,38 @@ fun FreezeTagColorPicker(
             maxSmallItemWidth = 36.dp,
             itemSpacing = 6.dp,
             contentPadding = PaddingValues(horizontal = 0.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
         ) { index ->
             val colorHex = PRESET_PASTEL_COLORS[index]
             val isSelected = colorHex.equals(selectedColorHex, ignoreCase = true)
-            val parsedColor = try {
-                Color(android.graphics.Color.parseColor(colorHex))
-            } catch (e: Exception) {
-                MaterialTheme.colorScheme.primary
-            }
+            val parsedColor =
+                try {
+                    Color(android.graphics.Color.parseColor(colorHex))
+                } catch (e: Exception) {
+                    MaterialTheme.colorScheme.primary
+                }
 
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .maskClip(MaterialTheme.shapes.medium)
-                    .background(parsedColor)
-                    .clickable {
-                        HapticUtil.performVirtualKeyHaptic(view)
-                        onColorSelected(colorHex)
-                    },
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .maskClip(MaterialTheme.shapes.medium)
+                        .background(parsedColor)
+                        .clickable {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onColorSelected(colorHex)
+                        },
+                contentAlignment = Alignment.Center,
             ) {
                 if (isSelected) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_check_24),
                         contentDescription = null,
                         tint = Color.Black.copy(alpha = 0.7f),
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }

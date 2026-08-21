@@ -43,17 +43,18 @@ import com.sameerasw.essentials.viewmodels.CaffeinateViewModel
 fun CaffeinateSettingsUI(
     viewModel: CaffeinateViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
 
     var showPermissionSheet by remember { mutableStateOf(false) }
 
-    val requestPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        viewModel.postNotificationsGranted.value = isGranted
-    }
+    val requestPermissionLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            viewModel.postNotificationsGranted.value = isGranted
+        }
 
     // Refresh state when composable is shown
     LaunchedEffect(Unit) {
@@ -64,45 +65,46 @@ fun CaffeinateSettingsUI(
         PermissionsBottomSheet(
             onDismissRequest = { showPermissionSheet = false },
             featureTitle = R.string.permission_show_notification_title,
-            permissions = listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_notifications_unread_24,
-                    title = R.string.permission_post_notifications_title,
-                    description = R.string.permission_post_notifications_desc,
-                    dependentFeatures = listOf(R.string.permission_show_notification_title),
-                    actionLabel = R.string.permission_grant_action,
-                    action = {
-                        requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    },
-                    isGranted = viewModel.postNotificationsGranted.value
+            permissions =
+                listOf(
+                    PermissionItem(
+                        iconRes = R.drawable.rounded_notifications_unread_24,
+                        title = R.string.permission_post_notifications_title,
+                        description = R.string.permission_post_notifications_desc,
+                        dependentFeatures = listOf(R.string.permission_show_notification_title),
+                        actionLabel = R.string.permission_grant_action,
+                        action = {
+                            requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        },
+                        isGranted = viewModel.postNotificationsGranted.value,
+                    ),
+                    PermissionItem(
+                        iconRes = R.drawable.rounded_battery_android_frame_alert_24,
+                        title = R.string.perm_battery_optimization_title,
+                        description = R.string.perm_battery_optimization_desc,
+                        dependentFeatures = listOf(R.string.feat_caffeinate_title),
+                        actionLabel = R.string.permission_grant_action,
+                        action = {
+                            val intent =
+                                Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                    data = android.net.Uri.parse("package:${context.packageName}")
+                                }
+                            context.startActivity(intent)
+                        },
+                        isGranted = viewModel.batteryOptimizationGranted.value,
+                    ),
                 ),
-                PermissionItem(
-                    iconRes = R.drawable.rounded_battery_android_frame_alert_24,
-                    title = R.string.perm_battery_optimization_title,
-                    description = R.string.perm_battery_optimization_desc,
-                    dependentFeatures = listOf(R.string.feat_caffeinate_title),
-                    actionLabel = R.string.permission_grant_action,
-                    action = {
-                        val intent =
-                            Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
-                                data = android.net.Uri.parse("package:${context.packageName}")
-                            }
-                        context.startActivity(intent)
-                    },
-                    isGranted = viewModel.batteryOptimizationGranted.value
-                )
-            )
         )
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         RoundedCardContainer {
-
             IconToggleItem(
                 title = stringResource(R.string.caffeinate_battery_optimization_title),
                 isChecked = viewModel.batteryOptimizationGranted.value,
@@ -141,7 +143,7 @@ fun CaffeinateSettingsUI(
                 isChecked = true,
                 onCheckedChange = { },
                 iconRes = R.drawable.rounded_timer_24,
-                showToggle = false
+                showToggle = false,
             )
 
             MultiSegmentedPicker(
@@ -152,7 +154,8 @@ fun CaffeinateSettingsUI(
                     // Since MultiSegmentedPicker manages the set, we can just sync it
                     val prefs =
                         context.getSharedPreferences("caffeinate_prefs", Context.MODE_PRIVATE)
-                    prefs.edit()
+                    prefs
+                        .edit()
                         .putStringSet("enabled_presets", newSelection.map { it.toString() }.toSet())
                         .apply()
                     viewModel.enabledPresets.value = newSelection
@@ -166,7 +169,7 @@ fun CaffeinateSettingsUI(
                         else -> context.getString(R.string.caffeinate_timeout_infinity)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }

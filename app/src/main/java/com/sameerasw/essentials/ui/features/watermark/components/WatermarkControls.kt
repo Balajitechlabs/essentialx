@@ -69,21 +69,22 @@ fun WatermarkControls(
     onBorderCornerChange: (Int) -> Unit,
     onColorModeChange: (ColorMode) -> Unit,
     onShowExifClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Controls Area
         RoundedCardContainer(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             // Style Picker
             SegmentedPicker(
@@ -100,18 +101,19 @@ fun WatermarkControls(
                     }
                 },
                 iconProvider = { style ->
-                    val iconRes = when (style) {
-                        WatermarkStyle.OVERLAY -> R.drawable.rounded_magnify_fullscreen_24
-                        WatermarkStyle.FRAME -> R.drawable.rounded_window_open_24
-                    }
+                    val iconRes =
+                        when (style) {
+                            WatermarkStyle.OVERLAY -> R.drawable.rounded_magnify_fullscreen_24
+                            WatermarkStyle.FRAME -> R.drawable.rounded_window_open_24
+                        }
 
                     Icon(
                         painter = painterResource(id = iconRes),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
 
             // Style-specific options
@@ -120,54 +122,53 @@ fun WatermarkControls(
                     iconRes = R.drawable.rounded_top_panel_close_24,
                     title = stringResource(R.string.watermark_move_to_top),
                     isChecked = options.moveToTop,
-                    onCheckedChange = onMoveToTopChange
+                    onCheckedChange = onMoveToTopChange,
                 )
             } else {
                 IconToggleItem(
                     iconRes = R.drawable.rounded_position_bottom_left_24,
                     title = stringResource(R.string.watermark_left_align),
                     isChecked = options.leftAlignOverlay,
-                    onCheckedChange = onLeftAlignChange
+                    onCheckedChange = onLeftAlignChange,
                 )
             }
 
             // Show EXIF Settings Row
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceBright,
-                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                    )
-                    .heightIn(min = 56.dp)
-                    .clickable {
-                        performUIHaptic(view)
-                        onShowExifClick()
-                    }
-                    .padding(12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                        ).heightIn(min = 56.dp)
+                        .clickable {
+                            performUIHaptic(view)
+                            onShowExifClick()
+                        }.padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Spacer(modifier = Modifier.size(2.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_image_search_24),
                     contentDescription = stringResource(R.string.watermark_show_exif),
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.size(2.dp))
 
                 Text(
                     text = stringResource(R.string.watermark_show_exif),
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_chevron_right_24),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -183,7 +184,7 @@ fun WatermarkControls(
                 onValueChangeFinished = { onPaddingChange(paddingValue.toInt()) },
                 valueRange = 0f..100f,
                 increment = 5f,
-                valueFormatter = { "${it.toInt()}%" }
+                valueFormatter = { "${it.toInt()}%" },
             )
         }
 
@@ -193,7 +194,7 @@ fun WatermarkControls(
                 text = stringResource(R.string.watermark_font_options),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
@@ -209,7 +210,7 @@ fun WatermarkControls(
                         onValueChangeFinished = { onBrandTextSizeChange(brandSize.toInt()) },
                         valueRange = 0f..100f,
                         increment = 5f,
-                        valueFormatter = { "${it.toInt()}%" }
+                        valueFormatter = { "${it.toInt()}%" },
                     )
                 }
 
@@ -225,7 +226,7 @@ fun WatermarkControls(
                         onValueChangeFinished = { onDataTextSizeChange(dataSize.toInt()) },
                         valueRange = 0f..100f,
                         increment = 5f,
-                        valueFormatter = { "${it.toInt()}%" }
+                        valueFormatter = { "${it.toInt()}%" },
                     )
                 }
 
@@ -241,7 +242,7 @@ fun WatermarkControls(
                         onValueChangeFinished = { onCustomTextSizeChange(customSize.toInt()) },
                         valueRange = 0f..100f,
                         increment = 5f,
-                        valueFormatter = { "${it.toInt()}%" }
+                        valueFormatter = { "${it.toInt()}%" },
                     )
                 }
             }
@@ -252,7 +253,7 @@ fun WatermarkControls(
             text = stringResource(R.string.watermark_logo_section),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
@@ -260,14 +261,14 @@ fun WatermarkControls(
                 iconRes = R.drawable.rounded_image_24,
                 title = stringResource(R.string.watermark_logo_show),
                 isChecked = showLogo,
-                onCheckedChange = onShowLogoChange
+                onCheckedChange = onShowLogoChange,
             )
 
             if (showLogo) {
                 LogoCarouselPicker(
                     selectedResId = logoResId,
                     onLogoSelected = onLogoResIdChange,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 var logoSizeValue by remember(options.logoSize) { mutableFloatStateOf(options.logoSize.toFloat()) }
@@ -281,7 +282,7 @@ fun WatermarkControls(
                     onValueChangeFinished = { onLogoSizeChange(logoSizeValue.toInt()) },
                     valueRange = 1f..100f,
                     increment = 1f,
-                    valueFormatter = { "${it.toInt()}%" }
+                    valueFormatter = { "${it.toInt()}%" },
                 )
             }
         }
@@ -291,7 +292,7 @@ fun WatermarkControls(
             text = "Border",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
@@ -306,7 +307,7 @@ fun WatermarkControls(
                 onValueChangeFinished = { onBorderStrokeChange(strokeValue.toInt()) },
                 valueRange = 0f..100f,
                 increment = 5f,
-                valueFormatter = { "${it.toInt()}%" }
+                valueFormatter = { "${it.toInt()}%" },
             )
 
             var cornerValue by remember(options.borderCorner) { mutableFloatStateOf(options.borderCorner.toFloat()) }
@@ -320,7 +321,7 @@ fun WatermarkControls(
                 onValueChangeFinished = { onBorderCornerChange(cornerValue.toInt()) },
                 valueRange = 0f..100f,
                 increment = 5f,
-                valueFormatter = { "${it.toInt()}%" }
+                valueFormatter = { "${it.toInt()}%" },
             )
         }
 
@@ -329,38 +330,39 @@ fun WatermarkControls(
             text = stringResource(R.string.watermark_color_section),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceBright)
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surfaceBright)
+                        .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 ColorModeOption(
                     mode = ColorMode.LIGHT,
                     isSelected = options.colorMode == ColorMode.LIGHT,
-                    onClick = { onColorModeChange(ColorMode.LIGHT) }
+                    onClick = { onColorModeChange(ColorMode.LIGHT) },
                 )
                 ColorModeOption(
                     mode = ColorMode.DARK,
                     isSelected = options.colorMode == ColorMode.DARK,
-                    onClick = { onColorModeChange(ColorMode.DARK) }
+                    onClick = { onColorModeChange(ColorMode.DARK) },
                 )
                 ColorModeOption(
                     mode = ColorMode.ACCENT_LIGHT,
                     accentColor = options.accentColor,
                     isSelected = options.colorMode == ColorMode.ACCENT_LIGHT,
-                    onClick = { onColorModeChange(ColorMode.ACCENT_LIGHT) }
+                    onClick = { onColorModeChange(ColorMode.ACCENT_LIGHT) },
                 )
                 ColorModeOption(
                     mode = ColorMode.ACCENT_DARK,
                     accentColor = options.accentColor,
                     isSelected = options.colorMode == ColorMode.ACCENT_DARK,
-                    onClick = { onColorModeChange(ColorMode.ACCENT_DARK) }
+                    onClick = { onColorModeChange(ColorMode.ACCENT_DARK) },
                 )
             }
         }

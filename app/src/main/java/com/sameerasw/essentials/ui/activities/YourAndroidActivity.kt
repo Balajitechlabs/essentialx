@@ -102,20 +102,26 @@ class YourAndroidActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val isDarkMode =
-            (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
         window.setBackgroundDrawableResource(if (isDarkMode) android.R.color.black else R.color.app_window_background)
 
         setContent {
             val mainViewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val isPitchBlackThemeEnabled by mainViewModel.isPitchBlackThemeEnabled
             val isBlurEnabled by mainViewModel.isBlurEnabled
 
-            val viewModel: YourAndroidViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val viewModel: YourAndroidViewModel =
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val updatesViewModel: AppUpdatesViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val gitHubAuthViewModel: GitHubAuthViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
 
             val context = androidx.compose.ui.platform.LocalContext.current
             val deviceInfo = remember { DeviceUtils.getDeviceInfo(context) }
@@ -138,43 +144,48 @@ class YourAndroidActivity : ComponentActivity() {
                 }
             }
 
-            val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.CreateDocument("application/json")
-            ) { uri ->
-                uri?.let {
-                    contentResolver.openOutputStream(it)?.use { outputStream ->
-                        updatesViewModel.exportTrackedRepos(context, outputStream)
-                        Toast.makeText(
-                            context,
-                            getString(R.string.msg_export_success),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-
-            val importLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.OpenDocument()
-            ) { uri ->
-                uri?.let {
-                    contentResolver.openInputStream(it)?.use { inputStream ->
-                        if (updatesViewModel.importTrackedRepos(context, inputStream)) {
-                            updatesViewModel.loadTrackedRepos(context)
-                            Toast.makeText(
-                                context,
-                                getString(R.string.msg_import_success),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                getString(R.string.msg_import_failed),
-                                Toast.LENGTH_SHORT
-                            ).show()
+            val exportLauncher =
+                androidx.activity.compose.rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.CreateDocument("application/json"),
+                ) { uri ->
+                    uri?.let {
+                        contentResolver.openOutputStream(it)?.use { outputStream ->
+                            updatesViewModel.exportTrackedRepos(context, outputStream)
+                            Toast
+                                .makeText(
+                                    context,
+                                    getString(R.string.msg_export_success),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                         }
                     }
                 }
-            }
+
+            val importLauncher =
+                androidx.activity.compose.rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.OpenDocument(),
+                ) { uri ->
+                    uri?.let {
+                        contentResolver.openInputStream(it)?.use { inputStream ->
+                            if (updatesViewModel.importTrackedRepos(context, inputStream)) {
+                                updatesViewModel.loadTrackedRepos(context)
+                                Toast
+                                    .makeText(
+                                        context,
+                                        getString(R.string.msg_import_success),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            } else {
+                                Toast
+                                    .makeText(
+                                        context,
+                                        getString(R.string.msg_import_failed),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                            }
+                        }
+                    }
+                }
 
             remember {
                 object : com.sameerasw.essentials.domain.model.Feature(
@@ -185,15 +196,14 @@ class YourAndroidActivity : ComponentActivity() {
                     description = R.string.about_desc_your_android,
                     aboutDescription = R.string.about_desc_your_android,
                     showToggle = false,
-                    hasMoreSettings = false
+                    hasMoreSettings = false,
                 ) {
-                    override fun isEnabled(viewModel: com.sameerasw.essentials.viewmodels.MainViewModel) =
-                        true
+                    override fun isEnabled(viewModel: com.sameerasw.essentials.viewmodels.MainViewModel) = true
 
                     override fun onToggle(
                         viewModel: com.sameerasw.essentials.viewmodels.MainViewModel,
                         context: android.content.Context,
-                        enabled: Boolean
+                        enabled: Boolean,
                     ) {
                     }
                 }
@@ -204,19 +214,24 @@ class YourAndroidActivity : ComponentActivity() {
             }
 
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
-                val statusBarHeightPx = with(LocalDensity.current) {
-                    WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx()
-                }
+                val statusBarHeightPx =
+                    with(LocalDensity.current) {
+                        WindowInsets.statusBars
+                            .asPaddingValues()
+                            .calculateTopPadding()
+                            .toPx()
+                    }
 
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .progressiveBlur(
-                            blurRadius = if (isBlurEnabled) 40f else 0f,
-                            height = statusBarHeightPx * 1.15f,
-                            direction = BlurDirection.TOP
-                        )
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .progressiveBlur(
+                                blurRadius = if (isBlurEnabled) 40f else 0f,
+                                height = statusBarHeightPx * 1.15f,
+                                direction = BlurDirection.TOP,
+                            ),
                 ) {
                     YourAndroidContent(
                         deviceInfo = deviceInfo,
@@ -227,7 +242,7 @@ class YourAndroidActivity : ComponentActivity() {
                         importLauncher = importLauncher,
                         onAddRepoClick = { showAddRepoSheet = true },
                         onShowReleaseNotes = { repoToShowReleaseNotesFullName = it },
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     )
 
                     val localView = LocalView.current
@@ -251,28 +266,30 @@ class YourAndroidActivity : ComponentActivity() {
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                     shape = MaterialTheme.shapes.large,
-                                    elevation = FloatingActionButtonDefaults.elevation(
-                                        0.dp,
-                                        0.dp,
-                                        0.dp,
-                                        0.dp
-                                    )
+                                    elevation =
+                                        FloatingActionButtonDefaults.elevation(
+                                            0.dp,
+                                            0.dp,
+                                            0.dp,
+                                            0.dp,
+                                        ),
                                 ) {
                                     if (gitHubUser != null) {
                                         AsyncImage(
                                             model = gitHubUser!!.avatarUrl,
                                             contentDescription = stringResource(R.string.action_profile),
                                             contentScale = ContentScale.Crop,
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .clip(CircleShape),
+                                            modifier =
+                                                Modifier
+                                                    .size(24.dp)
+                                                    .clip(CircleShape),
                                             placeholder = painterResource(id = R.drawable.brand_github),
-                                            error = painterResource(id = R.drawable.brand_github)
+                                            error = painterResource(id = R.drawable.brand_github),
                                         )
                                     } else {
                                         Icon(
                                             painter = painterResource(id = R.drawable.brand_github),
-                                            contentDescription = stringResource(R.string.action_sign_in_github)
+                                            contentDescription = stringResource(R.string.action_sign_in_github),
                                         )
                                     }
                                 }
@@ -280,21 +297,21 @@ class YourAndroidActivity : ComponentActivity() {
                                 if (gitHubUser != null) {
                                     SegmentedDropdownMenu(
                                         expanded = showFabProfileMenu,
-                                        onDismissRequest = { showFabProfileMenu = false }
+                                        onDismissRequest = { showFabProfileMenu = false },
                                     ) {
                                         SegmentedDropdownMenuItem(
                                             text = {
                                                 Text(
-                                                    gitHubUser!!.name ?: gitHubUser!!.login
+                                                    gitHubUser!!.name ?: gitHubUser!!.login,
                                                 )
                                             },
                                             onClick = { showFabProfileMenu = false },
                                             leadingIcon = {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.brand_github),
-                                                    contentDescription = null
+                                                    contentDescription = null,
                                                 )
-                                            }
+                                            },
                                         )
                                         SegmentedDropdownMenuItem(
                                             text = { Text(stringResource(R.string.action_sign_out)) },
@@ -305,23 +322,24 @@ class YourAndroidActivity : ComponentActivity() {
                                             leadingIcon = {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.rounded_logout_24),
-                                                    contentDescription = null
+                                                    contentDescription = null,
                                                 )
-                                            }
+                                            },
                                         )
                                     }
                                 }
                             }
                         },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .zIndex(1f)
+                        modifier =
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .zIndex(1f),
                     )
 
                     if (showGitHubAuthSheet) {
                         GitHubAuthSheet(
                             viewModel = gitHubAuthViewModel,
-                            onDismissRequest = { showGitHubAuthSheet = false }
+                            onDismissRequest = { showGitHubAuthSheet = false },
                         )
                     }
 
@@ -335,7 +353,7 @@ class YourAndroidActivity : ComponentActivity() {
                             onTrackClick = {
                                 showAddRepoSheet = false
                                 updatesViewModel.clearSearch()
-                            }
+                            },
                         )
                     }
 
@@ -346,15 +364,16 @@ class YourAndroidActivity : ComponentActivity() {
                         if (repo != null) {
                             val isNotesLoading = repo.latestReleaseBody.isNullOrBlank()
                             UpdateBottomSheet(
-                                updateInfo = com.sameerasw.essentials.domain.model.UpdateInfo(
-                                    versionName = repo.latestTagName,
-                                    releaseNotes = repo.latestReleaseBody ?: "",
-                                    downloadUrl = repo.downloadUrl ?: "",
-                                    releaseUrl = repo.latestReleaseUrl ?: "",
-                                    isUpdateAvailable = repo.isUpdateAvailable
-                                ),
+                                updateInfo =
+                                    com.sameerasw.essentials.domain.model.UpdateInfo(
+                                        versionName = repo.latestTagName,
+                                        releaseNotes = repo.latestReleaseBody ?: "",
+                                        downloadUrl = repo.downloadUrl ?: "",
+                                        releaseUrl = repo.latestReleaseUrl ?: "",
+                                        isUpdateAvailable = repo.isUpdateAvailable,
+                                    ),
                                 isChecking = isNotesLoading,
-                                onDismissRequest = { repoToShowReleaseNotesFullName = null }
+                                onDismissRequest = { repoToShowReleaseNotesFullName = null },
                             )
                         } else {
                             repoToShowReleaseNotesFullName = null
@@ -382,56 +401,62 @@ fun YourAndroidContent(
     onAddRepoClick: () -> Unit,
     onShowReleaseNotes: (String) -> Unit,
     modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val scrollState = rememberScrollState()
-    val overscrollOffset = remember { androidx.compose.animation.core.Animatable(0f) }
+    val overscrollOffset =
+        remember {
+            androidx.compose.animation.core
+                .Animatable(0f)
+        }
     val scope = rememberCoroutineScope()
     val view = LocalView.current
 
-    val nestedScrollConnection = remember {
-        object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
-            override fun onPreScroll(
-                available: androidx.compose.ui.geometry.Offset,
-                source: androidx.compose.ui.input.nestedscroll.NestedScrollSource
-            ): androidx.compose.ui.geometry.Offset {
-                if (available.y < 0 && overscrollOffset.value > 0) {
-                    val toConsume =
-                        if (overscrollOffset.value + available.y >= 0) available.y else -overscrollOffset.value
-                    scope.launch {
-                        overscrollOffset.snapTo(overscrollOffset.value + toConsume)
+    val nestedScrollConnection =
+        remember {
+            object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
+                override fun onPreScroll(
+                    available: androidx.compose.ui.geometry.Offset,
+                    source: androidx.compose.ui.input.nestedscroll.NestedScrollSource,
+                ): androidx.compose.ui.geometry.Offset {
+                    if (available.y < 0 && overscrollOffset.value > 0) {
+                        val toConsume =
+                            if (overscrollOffset.value + available.y >= 0) available.y else -overscrollOffset.value
+                        scope.launch {
+                            overscrollOffset.snapTo(overscrollOffset.value + toConsume)
+                        }
+                        return androidx.compose.ui.geometry
+                            .Offset(0f, toConsume)
                     }
-                    return androidx.compose.ui.geometry.Offset(0f, toConsume)
+                    return androidx.compose.ui.geometry.Offset.Zero
                 }
-                return androidx.compose.ui.geometry.Offset.Zero
-            }
 
-            override fun onPostScroll(
-                consumed: androidx.compose.ui.geometry.Offset,
-                available: androidx.compose.ui.geometry.Offset,
-                source: androidx.compose.ui.input.nestedscroll.NestedScrollSource
-            ): androidx.compose.ui.geometry.Offset {
-                if (available.y > 0 && scrollState.value == 0) {
-                    val prevValue = overscrollOffset.value
-                    if (prevValue >= 350f) return androidx.compose.ui.geometry.Offset.Zero
+                override fun onPostScroll(
+                    consumed: androidx.compose.ui.geometry.Offset,
+                    available: androidx.compose.ui.geometry.Offset,
+                    source: androidx.compose.ui.input.nestedscroll.NestedScrollSource,
+                ): androidx.compose.ui.geometry.Offset {
+                    if (available.y > 0 && scrollState.value == 0) {
+                        val prevValue = overscrollOffset.value
+                        if (prevValue >= 350f) return androidx.compose.ui.geometry.Offset.Zero
 
-                    val newValue = (prevValue + available.y * 0.5f).coerceAtMost(350f)
-                    scope.launch {
-                        overscrollOffset.snapTo(newValue)
+                        val newValue = (prevValue + available.y * 0.5f).coerceAtMost(350f)
+                        scope.launch {
+                            overscrollOffset.snapTo(newValue)
+                        }
+
+                        // Haptic feedback when stretched significantly
+                        if (prevValue < 300f && newValue >= 300f) {
+                            HapticUtil.performUIHaptic(view)
+                        }
+
+                        return androidx.compose.ui.geometry
+                            .Offset(0f, available.y)
                     }
-
-                    // Haptic feedback when stretched significantly
-                    if (prevValue < 300f && newValue >= 300f) {
-                        HapticUtil.performUIHaptic(view)
-                    }
-
-                    return androidx.compose.ui.geometry.Offset(0f, available.y)
+                    return super.onPostScroll(consumed, available, source)
                 }
-                return super.onPostScroll(consumed, available, source)
             }
         }
-    }
-
 
     var isStartupAnimationRunning by remember { mutableStateOf(hasRunStartupAnimation) }
 
@@ -443,67 +468,74 @@ fun YourAndroidContent(
     }
 
     val mainViewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-        androidx.lifecycle.viewmodel.compose.viewModel()
+        androidx.lifecycle.viewmodel.compose
+            .viewModel()
     val configuration = LocalConfiguration.current
     configuration.screenHeightDp.dp
     val isBlurEnabled by mainViewModel.isBlurEnabled
 
+    val contentAlphaState =
+        animateFloatAsState(
+            targetValue = if (isStartupAnimationRunning) 1f else 0f,
+            animationSpec = tween(durationMillis = 400, delayMillis = 0, easing = EaseOut),
+            label = "contentAlpha",
+        )
 
-    val contentAlphaState = animateFloatAsState(
-        targetValue = if (isStartupAnimationRunning) 1f else 0f,
-        animationSpec = tween(durationMillis = 400, delayMillis = 0, easing = EaseOut),
-        label = "contentAlpha"
-    )
-
-    val contentOffsetState = animateDpAsState(
-        targetValue = if (isStartupAnimationRunning) 0.dp else 40.dp,
-        animationSpec = tween(
-            durationMillis = 400,
-            delayMillis = 0,
-            easing = FastOutSlowInEasing
-        ),
-        label = "contentOffset"
-    )
+    val contentOffsetState =
+        animateDpAsState(
+            targetValue = if (isStartupAnimationRunning) 0.dp else 40.dp,
+            animationSpec =
+                tween(
+                    durationMillis = 400,
+                    delayMillis = 0,
+                    easing = FastOutSlowInEasing,
+                ),
+            label = "contentOffset",
+        )
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .progressiveBlur(
-                blurRadius = if (isBlurEnabled) 40f else 0f,
-                height = with(LocalDensity.current) { 150.dp.toPx() },
-                direction = BlurDirection.BOTTOM
-            )
-            .nestedScroll(nestedScrollConnection)
-            .pointerInput(Unit) {
-                awaitPointerEventScope {
-                    while (true) {
-                        val event = awaitPointerEvent()
-                        if (event.type == androidx.compose.ui.input.pointer.PointerEventType.Release && overscrollOffset.value > 0) {
-                            scope.launch {
-                                overscrollOffset.animateTo(
-                                    0f,
-                                    androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow)
-                                )
+        modifier =
+            modifier
+                .fillMaxSize()
+                .progressiveBlur(
+                    blurRadius = if (isBlurEnabled) 40f else 0f,
+                    height = with(LocalDensity.current) { 150.dp.toPx() },
+                    direction = BlurDirection.BOTTOM,
+                ).nestedScroll(nestedScrollConnection)
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            if (event.type == androidx.compose.ui.input.pointer.PointerEventType.Release && overscrollOffset.value > 0) {
+                                scope.launch {
+                                    overscrollOffset.animateTo(
+                                        0f,
+                                        androidx.compose.animation.core.spring(
+                                            stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow,
+                                        ),
+                                    )
+                                }
                             }
                         }
                     }
-                }
-            }
-            .verticalScroll(scrollState)
-            .padding(
-                top = contentPadding.calculateTopPadding() + WindowInsets.statusBars.asPaddingValues()
-                    .calculateTopPadding(),
-                bottom = 150.dp,
-                start = 16.dp,
-                end = 16.dp
-            ),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+                }.verticalScroll(scrollState)
+                .padding(
+                    top =
+                        contentPadding.calculateTopPadding() +
+                            WindowInsets.statusBars
+                                .asPaddingValues()
+                                .calculateTopPadding(),
+                    bottom = 150.dp,
+                    start = 16.dp,
+                    end = 16.dp,
+                ),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         DeviceHeroCard(
             deviceInfo = deviceInfo,
             contentAlpha = { contentAlphaState.value },
             contentOffset = { contentOffsetState.value },
-            overscrollOffset = overscrollOffset.value
+            overscrollOffset = overscrollOffset.value,
         )
 
         // Apps Section
@@ -514,72 +546,80 @@ fun YourAndroidContent(
 
         Text(
             text = stringResource(R.string.label_apps),
-            modifier = Modifier
-                .padding(start = 8.dp, top = 16.dp, bottom = 4.dp)
-                .graphicsLayer {
-                    alpha = contentAlphaState.value
-                    translationY = contentOffsetState.value.toPx()
-                },
+            modifier =
+                Modifier
+                    .padding(start = 8.dp, top = 16.dp, bottom = 4.dp)
+                    .graphicsLayer {
+                        alpha = contentAlphaState.value
+                        translationY = contentOffsetState.value.toPx()
+                    },
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        val pending = trackedRepos.filter { it.isUpdateAvailable && it.mappedPackageName != null }
-            .sortedByDescending { it.publishedAt }
-        val upToDate = trackedRepos.filter { !it.isUpdateAvailable && it.mappedPackageName != null }
-            .sortedByDescending { it.publishedAt }
+        val pending =
+            trackedRepos
+                .filter { it.isUpdateAvailable && it.mappedPackageName != null }
+                .sortedByDescending { it.publishedAt }
+        val upToDate =
+            trackedRepos
+                .filter { !it.isUpdateAvailable && it.mappedPackageName != null }
+                .sortedByDescending { it.publishedAt }
         val notInstalled = trackedRepos.filter { it.mappedPackageName == null }
 
         if (isLoading && trackedRepos.isEmpty()) {
             androidx.compose.material3.LoadingIndicator(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(32.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(32.dp),
             )
         } else if (trackedRepos.isEmpty()) {
             RoundedCardContainer(
-                modifier = Modifier.graphicsLayer {
-                    alpha = contentAlphaState.value
-                    translationY = contentOffsetState.value.toPx()
-                }
+                modifier =
+                    Modifier.graphicsLayer {
+                        alpha = contentAlphaState.value
+                        translationY = contentOffsetState.value.toPx()
+                    },
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.surfaceBright,
-                            shape = Shapes.extraSmall
-                        )
-                        .padding(32.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                MaterialTheme.colorScheme.surfaceBright,
+                                shape = Shapes.extraSmall,
+                            ).padding(32.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
                         text = stringResource(R.string.msg_no_repos_tracked),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.surfaceBright,
-                            shape = Shapes.extraSmall
-                        )
-                        .padding(12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                MaterialTheme.colorScheme.surfaceBright,
+                                shape = Shapes.extraSmall,
+                            ).padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     ImportExportButtons(
-                        modifier = Modifier
-                            .wrapContentWidth()
-                            .weight(1f),
+                        modifier =
+                            Modifier
+                                .wrapContentWidth()
+                                .weight(1f),
                         view = view,
                         exportLauncher = exportLauncher,
                         importLauncher = importLauncher,
-                        showExport = false
+                        showExport = false,
                     )
                     Button(onClick = onAddRepoClick, modifier = Modifier.weight(1f)) {
                         Text(stringResource(R.string.action_add_repository))
@@ -588,16 +628,17 @@ fun YourAndroidContent(
             }
         } else {
             RoundedCardContainer(
-                modifier = Modifier.graphicsLayer {
-                    alpha = contentAlphaState.value
-                    translationY = contentOffsetState.value.toPx()
-                }
+                modifier =
+                    Modifier.graphicsLayer {
+                        alpha = contentAlphaState.value
+                        translationY = contentOffsetState.value.toPx()
+                    },
             ) {
                 AppsActionButtons(
                     onAddClick = onAddRepoClick,
                     onRefreshAllClick = { updatesViewModel.checkForUpdates(context) },
                     isRefreshing = refreshingRepoIds.isNotEmpty(),
-                    progress = { updatesViewModel.updateProgress.value }
+                    progress = { updatesViewModel.updateProgress.value },
                 )
             }
 
@@ -606,19 +647,21 @@ fun YourAndroidContent(
                 Text(
                     text = "${stringResource(R.string.label_pending)} (${pending.size})",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
-                        .graphicsLayer {
+                    modifier =
+                        Modifier
+                            .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
+                            .graphicsLayer {
+                                alpha = contentAlphaState.value
+                                translationY = contentOffsetState.value.toPx()
+                            },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                RoundedCardContainer(
+                    modifier =
+                        Modifier.graphicsLayer {
                             alpha = contentAlphaState.value
                             translationY = contentOffsetState.value.toPx()
                         },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                RoundedCardContainer(
-                    modifier = Modifier.graphicsLayer {
-                        alpha = contentAlphaState.value
-                        translationY = contentOffsetState.value.toPx()
-                    }
                 ) {
                     pending.forEach { repo ->
                         RepoItem(
@@ -627,7 +670,7 @@ fun YourAndroidContent(
                             refreshingRepoIds = refreshingRepoIds,
                             context = context,
                             onAddRepoClick = onAddRepoClick,
-                            onShowReleaseNotes = onShowReleaseNotes
+                            onShowReleaseNotes = onShowReleaseNotes,
                         )
                     }
                 }
@@ -638,19 +681,21 @@ fun YourAndroidContent(
                 Text(
                     text = "${stringResource(R.string.label_up_to_date)} (${upToDate.size})",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
-                        .graphicsLayer {
+                    modifier =
+                        Modifier
+                            .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
+                            .graphicsLayer {
+                                alpha = contentAlphaState.value
+                                translationY = contentOffsetState.value.toPx()
+                            },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                RoundedCardContainer(
+                    modifier =
+                        Modifier.graphicsLayer {
                             alpha = contentAlphaState.value
                             translationY = contentOffsetState.value.toPx()
                         },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                RoundedCardContainer(
-                    modifier = Modifier.graphicsLayer {
-                        alpha = contentAlphaState.value
-                        translationY = contentOffsetState.value.toPx()
-                    }
                 ) {
                     upToDate.forEach { repo ->
                         RepoItem(
@@ -659,7 +704,7 @@ fun YourAndroidContent(
                             refreshingRepoIds = refreshingRepoIds,
                             context = context,
                             onAddRepoClick = onAddRepoClick,
-                            onShowReleaseNotes = onShowReleaseNotes
+                            onShowReleaseNotes = onShowReleaseNotes,
                         )
                     }
                 }
@@ -670,19 +715,21 @@ fun YourAndroidContent(
                 Text(
                     text = "${stringResource(R.string.label_not_installed)} (${notInstalled.size})",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
-                        .graphicsLayer {
+                    modifier =
+                        Modifier
+                            .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
+                            .graphicsLayer {
+                                alpha = contentAlphaState.value
+                                translationY = contentOffsetState.value.toPx()
+                            },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                RoundedCardContainer(
+                    modifier =
+                        Modifier.graphicsLayer {
                             alpha = contentAlphaState.value
                             translationY = contentOffsetState.value.toPx()
                         },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                RoundedCardContainer(
-                    modifier = Modifier.graphicsLayer {
-                        alpha = contentAlphaState.value
-                        translationY = contentOffsetState.value.toPx()
-                    }
                 ) {
                     notInstalled.forEach { repo ->
                         RepoItem(
@@ -691,7 +738,7 @@ fun YourAndroidContent(
                             refreshingRepoIds = refreshingRepoIds,
                             context = context,
                             onAddRepoClick = onAddRepoClick,
-                            onShowReleaseNotes = onShowReleaseNotes
+                            onShowReleaseNotes = onShowReleaseNotes,
                         )
                     }
                 }
@@ -701,10 +748,11 @@ fun YourAndroidContent(
                 view = view,
                 exportLauncher = exportLauncher,
                 importLauncher = importLauncher,
-                modifier = Modifier.graphicsLayer {
-                    alpha = contentAlphaState.value
-                    translationY = contentOffsetState.value.toPx()
-                }
+                modifier =
+                    Modifier.graphicsLayer {
+                        alpha = contentAlphaState.value
+                        translationY = contentOffsetState.value.toPx()
+                    },
             )
         }
     }
@@ -717,7 +765,7 @@ private fun RepoItem(
     refreshingRepoIds: Set<String>,
     context: android.content.Context,
     onAddRepoClick: () -> Unit,
-    onShowReleaseNotes: (String) -> Unit
+    onShowReleaseNotes: (String) -> Unit,
 ) {
     val isInstallingThis = updatesViewModel.installingRepoId.value == repo.fullName
     TrackedRepoCard(
@@ -743,6 +791,6 @@ private fun RepoItem(
         onShowReleaseNotes = {
             onShowReleaseNotes(repo.fullName)
             updatesViewModel.fetchReleaseNotesIfNeeded(context, repo)
-        }
+        },
     )
 }

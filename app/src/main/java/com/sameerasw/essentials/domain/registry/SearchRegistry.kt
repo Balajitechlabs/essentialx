@@ -16,14 +16,15 @@ import com.sameerasw.essentials.domain.StatusBarIconRegistry
 import com.sameerasw.essentials.domain.model.SearchableItem
 
 object SearchRegistry {
-
-    fun search(context: Context, query: String): List<SearchableItem> =
-        search(context, query, SettingsRepository(context).isEnableUnsupportedFeatures())
+    fun search(
+        context: Context,
+        query: String,
+    ): List<SearchableItem> = search(context, query, SettingsRepository(context).isEnableUnsupportedFeatures())
 
     fun search(
         context: Context,
         query: String,
-        includeUnsupportedFeatures: Boolean = false
+        includeUnsupportedFeatures: Boolean = false,
     ): List<SearchableItem> {
         val q = query.trim().lowercase()
         if (q.isEmpty()) return emptyList()
@@ -31,7 +32,8 @@ object SearchRegistry {
         val allItems = mutableListOf<SearchableItem>()
 
         // --- Index Features and Sub-settings ---
-        FeatureRegistry.getFilteredFeatures(context, includeUnsupportedFeatures)
+        FeatureRegistry
+            .getFilteredFeatures(context, includeUnsupportedFeatures)
             .forEach { feature ->
                 val featureTitle = context.getString(feature.title)
                 val featureCategory = context.getString(feature.category)
@@ -44,12 +46,13 @@ object SearchRegistry {
                         category = featureCategory,
                         icon = feature.iconRes,
                         featureKey = feature.id,
-                        keywords = listOf(
-                            context.getString(R.string.keyword_feature),
-                            context.getString(R.string.keyword_settings)
-                        ),
-                        isBeta = feature.isBeta
-                    )
+                        keywords =
+                            listOf(
+                                context.getString(R.string.keyword_feature),
+                                context.getString(R.string.keyword_settings),
+                            ),
+                        isBeta = feature.isBeta,
+                    ),
                 )
 
                 // Index sub-settings
@@ -58,17 +61,24 @@ object SearchRegistry {
                         SearchableItem(
                             title = context.getString(setting.title),
                             description = context.getString(setting.description),
-                            category = setting.category?.let { context.getString(it) }
-                                ?: featureCategory,
+                            category =
+                                setting.category?.let { context.getString(it) }
+                                    ?: featureCategory,
                             icon = feature.iconRes,
                             featureKey = feature.id,
                             parentFeature = featureTitle,
                             targetSettingHighlightKey = setting.targetSettingHighlightKey,
-                            keywords = if (setting.keywordRes != 0) context.resources.getStringArray(
-                                setting.keywordRes
-                            ).toList() else emptyList(),
-                            isBeta = feature.isBeta
-                        )
+                            keywords =
+                                if (setting.keywordRes != 0) {
+                                    context.resources
+                                        .getStringArray(
+                                            setting.keywordRes,
+                                        ).toList()
+                                } else {
+                                    emptyList()
+                                },
+                            isBeta = feature.isBeta,
+                        ),
                     )
                 }
             }
@@ -85,20 +95,23 @@ object SearchRegistry {
                     featureKey = "Statusbar icons",
                     parentFeature = context.getString(R.string.feat_statusbar_icons_title),
                     targetSettingHighlightKey = title,
-                    keywords = icon.blacklistNames + listOf(
-                        context.getString(R.string.keyword_hide),
-                        context.getString(R.string.keyword_show),
-                        context.getString(R.string.keyword_visibility)
-                    )
-                )
+                    keywords =
+                        icon.blacklistNames +
+                            listOf(
+                                context.getString(R.string.keyword_hide),
+                                context.getString(R.string.keyword_show),
+                                context.getString(R.string.keyword_visibility),
+                            ),
+                ),
             )
         }
 
-        return allItems.filter { item ->
-            item.title.lowercase().contains(q) ||
+        return allItems
+            .filter { item ->
+                item.title.lowercase().contains(q) ||
                     item.description.lowercase().contains(q) ||
                     item.category.lowercase().contains(q) ||
                     item.keywords.any { it.lowercase().contains(q) }
-        }.sortedByDescending { it.title.lowercase().startsWith(q) }
+            }.sortedByDescending { it.title.lowercase().startsWith(q) }
     }
 }

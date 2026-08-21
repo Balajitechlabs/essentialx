@@ -13,5 +13,5 @@ enum class NotificationLightingSide {
     LEFT,
     TOP,
     RIGHT,
-    BOTTOM
+    BOTTOM,
 }

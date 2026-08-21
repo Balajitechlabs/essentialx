@@ -30,32 +30,37 @@ class DisplayModule : AutomationModule {
     private var automations: List<Automation> = emptyList()
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                Intent.ACTION_SCREEN_ON -> {
-                    handleTrigger(context, Trigger.ScreenOn)
-                    handleStateChange(context, true)
-                }
+    private val receiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context,
+                intent: Intent,
+            ) {
+                when (intent.action) {
+                    Intent.ACTION_SCREEN_ON -> {
+                        handleTrigger(context, Trigger.ScreenOn)
+                        handleStateChange(context, true)
+                    }
 
-                Intent.ACTION_SCREEN_OFF -> {
-                    handleTrigger(context, Trigger.ScreenOff)
-                    handleStateChange(context, false)
-                }
+                    Intent.ACTION_SCREEN_OFF -> {
+                        handleTrigger(context, Trigger.ScreenOff)
+                        handleStateChange(context, false)
+                    }
 
-                Intent.ACTION_USER_PRESENT -> {
-                    handleTrigger(context, Trigger.DeviceUnlock)
+                    Intent.ACTION_USER_PRESENT -> {
+                        handleTrigger(context, Trigger.DeviceUnlock)
+                    }
                 }
             }
         }
-    }
 
     override fun start(context: Context) {
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_ON)
-            addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Intent.ACTION_USER_PRESENT)
-        }
+        val filter =
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_ON)
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_USER_PRESENT)
+            }
         context.registerReceiver(receiver, filter)
     }
 
@@ -71,9 +76,13 @@ class DisplayModule : AutomationModule {
         this.automations = automations
     }
 
-    private fun handleTrigger(context: Context, trigger: Trigger) {
+    private fun handleTrigger(
+        context: Context,
+        trigger: Trigger,
+    ) {
         scope.launch {
-            automations.filter { it.type == Automation.Type.TRIGGER && it.trigger == trigger }
+            automations
+                .filter { it.type == Automation.Type.TRIGGER && it.trigger == trigger }
                 .forEach { automation ->
                     automation.actions.forEach { action ->
                         CombinedActionExecutor.execute(context, action)
@@ -82,9 +91,13 @@ class DisplayModule : AutomationModule {
         }
     }
 
-    private fun handleStateChange(context: Context, isActive: Boolean) {
+    private fun handleStateChange(
+        context: Context,
+        isActive: Boolean,
+    ) {
         scope.launch {
-            automations.filter { it.type == Automation.Type.STATE }
+            automations
+                .filter { it.type == Automation.Type.STATE }
                 .forEach { automation ->
                     if (automation.state is DIYState.ScreenOn) {
                         if (isActive) {
@@ -92,7 +105,7 @@ class DisplayModule : AutomationModule {
                             automation.entryAction?.let {
                                 CombinedActionExecutor.execute(
                                     context,
-                                    it
+                                    it,
                                 )
                             }
                         } else {
@@ -100,7 +113,7 @@ class DisplayModule : AutomationModule {
                             automation.exitAction?.let {
                                 CombinedActionExecutor.execute(
                                     context,
-                                    it
+                                    it,
                                 )
                             }
                         }

@@ -54,7 +54,7 @@ fun <T> FeatureDropdownRow(
     options: List<T>,
     labelProvider: (T) -> String,
     onOptionSelected: (T) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val view = LocalView.current
     var isMenuExpanded by remember { mutableStateOf(false) }
@@ -66,24 +66,25 @@ fun <T> FeatureDropdownRow(
         leadingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Checkbox(
                     checked = isChecked,
-                    onCheckedChange = onCheckedChange
+                    onCheckedChange = onCheckedChange,
                 )
                 Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(ColorUtil.getPastelColorFor(title)),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(ColorUtil.getPastelColorFor(title)),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(iconRes),
                         contentDescription = null,
                         tint = ColorUtil.getVibrantColorFor(title),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }
@@ -100,20 +101,25 @@ fun <T> FeatureDropdownRow(
                     enabled = isChecked,
                     shape = RoundedCornerShape(12.dp),
                     color = if (isChecked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
-                    contentColor = if (isChecked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                        alpha = 0.5f
-                    )
+                    contentColor =
+                        if (isChecked) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                alpha = 0.5f,
+                            )
+                        },
                 ) {
                     Text(
                         text = selectedValue,
                         style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                     )
                 }
 
                 SegmentedDropdownMenu(
                     expanded = isMenuExpanded,
-                    onDismissRequest = { isMenuExpanded = false }
+                    onDismissRequest = { isMenuExpanded = false },
                 ) {
                     options.forEach { item ->
                         val label = labelProvider(item)
@@ -122,22 +128,23 @@ fun <T> FeatureDropdownRow(
                             onClick = {
                                 isMenuExpanded = false
                                 onOptionSelected(item)
-                            }
+                            },
                         )
                     }
                 }
             }
         },
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        ),
+        colors =
+            ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         content = {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-        }
+        },
     )
 }

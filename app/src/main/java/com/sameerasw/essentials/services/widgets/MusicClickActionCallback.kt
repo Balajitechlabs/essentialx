@@ -20,7 +20,7 @@ class MusicClickActionCallback : ActionCallback {
     override suspend fun onAction(
         context: Context,
         glanceId: GlanceId,
-        parameters: ActionParameters
+        parameters: ActionParameters,
     ) {
         val settings = SettingsRepository(context)
         val packageName = settings.getPixelSearchbarMusicPackage()

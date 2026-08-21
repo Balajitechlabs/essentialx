@@ -16,15 +16,23 @@ import android.provider.Settings
 import com.sameerasw.essentials.viewmodels.StatusBarIconViewModel
 
 class StatusBarAutomationReceiver : BroadcastReceiver() {
-
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val action = intent.action ?: return
-        if (action == Intent.ACTION_POWER_CONNECTED || action == Intent.ACTION_POWER_DISCONNECTED || action == Intent.ACTION_BOOT_COMPLETED) {
+        if (action == Intent.ACTION_POWER_CONNECTED ||
+            action == Intent.ACTION_POWER_DISCONNECTED ||
+            action == Intent.ACTION_BOOT_COMPLETED
+        ) {
             updateBatteryPercentage(context, action)
         }
     }
 
-    private fun updateBatteryPercentage(context: Context, action: String) {
+    private fun updateBatteryPercentage(
+        context: Context,
+        action: String,
+    ) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         val mode = prefs.getInt(StatusBarIconViewModel.PREF_BATTERY_PERCENT_MODE, 0)
         val isCharging = action == Intent.ACTION_POWER_CONNECTED
@@ -38,7 +46,10 @@ class StatusBarAutomationReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun updateSystemSetting(context: Context, value: Int) {
+    private fun updateSystemSetting(
+        context: Context,
+        value: Int,
+    ) {
         val key = "status_bar_show_battery_percent"
         var success = false
         try {
@@ -51,20 +62,29 @@ class StatusBarAutomationReceiver : BroadcastReceiver() {
         }
 
         // Get current value safely
-        val currentValue = try {
-            Settings.System.getInt(context.contentResolver, key, -1)
-        } catch (e: Exception) {
-            -1
-        }
+        val currentValue =
+            try {
+                Settings.System.getInt(context.contentResolver, key, -1)
+            } catch (e: Exception) {
+                -1
+            }
 
         // Background Shizuku/Root fallback
         if (!success || currentValue != value) {
-            if (com.sameerasw.essentials.utils.ShizukuUtils.hasPermission()) {
-                com.sameerasw.essentials.utils.ShizukuUtils.runCommand("settings put system $key $value")
-                com.sameerasw.essentials.utils.ShizukuUtils.runCommand("settings put secure $key $value")
-            } else if (com.sameerasw.essentials.utils.RootUtils.isRootPermissionGranted()) {
-                com.sameerasw.essentials.utils.RootUtils.runCommand("settings put system $key $value")
-                com.sameerasw.essentials.utils.RootUtils.runCommand("settings put secure $key $value")
+            if (com.sameerasw.essentials.utils.ShizukuUtils
+                    .hasPermission()
+            ) {
+                com.sameerasw.essentials.utils.ShizukuUtils
+                    .runCommand("settings put system $key $value")
+                com.sameerasw.essentials.utils.ShizukuUtils
+                    .runCommand("settings put secure $key $value")
+            } else if (com.sameerasw.essentials.utils.RootUtils
+                    .isRootPermissionGranted()
+            ) {
+                com.sameerasw.essentials.utils.RootUtils
+                    .runCommand("settings put system $key $value")
+                com.sameerasw.essentials.utils.RootUtils
+                    .runCommand("settings put secure $key $value")
             }
         }
     }

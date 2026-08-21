@@ -60,9 +60,7 @@ import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SimNamesBottomSheet(
-    onDismissRequest: () -> Unit
-) {
+fun SimNamesBottomSheet(onDismissRequest: () -> Unit) {
     val context = LocalContext.current
     val view = LocalView.current
     val scope = rememberCoroutineScope()
@@ -74,9 +72,10 @@ fun SimNamesBottomSheet(
     val carrierNameInputs = remember { mutableStateMapOf<Int, String>() }
 
     LaunchedEffect(Unit) {
-        val sims = withContext(Dispatchers.IO) {
-            SimCarrierUtil.getSimCarrierInfoList(context)
-        }
+        val sims =
+            withContext(Dispatchers.IO) {
+                SimCarrierUtil.getSimCarrierInfoList(context)
+            }
         simList = sims
         sims.forEach { sim ->
             carrierNameInputs[sim.subId] = sim.currentCarrierName
@@ -87,35 +86,36 @@ fun SimNamesBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.feat_sim_names_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.padding(32.dp),
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
             } else if (simList.isEmpty()) {
                 Text(
                     text = stringResource(R.string.sim_names_no_sim),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(32.dp)
+                    modifier = Modifier.padding(32.dp),
                 )
             } else {
                 RoundedCardContainer {
@@ -123,48 +123,50 @@ fun SimNamesBottomSheet(
                     simList.forEachIndexed { index, sim ->
                         val currentText = carrierNameInputs[sim.subId] ?: ""
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(MaterialTheme.shapes.extraSmall)
-                                .background(MaterialTheme.colorScheme.surfaceBright)
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.extraSmall)
+                                    .background(MaterialTheme.colorScheme.surfaceBright)
+                                    .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Text(
-                                text = stringResource(
-                                    R.string.sim_names_slot_format,
-                                    sim.simSlotIndex + 1,
-                                    sim.displayName.ifBlank { sim.defaultCarrierName }
-                                ),
+                                text =
+                                    stringResource(
+                                        R.string.sim_names_slot_format,
+                                        sim.simSlotIndex + 1,
+                                        sim.displayName.ifBlank { sim.defaultCarrierName },
+                                    ),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 OutlinedTextField(
                                     value = currentText,
                                     onValueChange = { carrierNameInputs[sim.subId] = it },
                                     label = { Text(stringResource(R.string.sim_names_carrier_label)) },
                                     modifier = Modifier.weight(1f),
-                                    singleLine = true
+                                    singleLine = true,
                                 )
 
                                 IconButton(
                                     onClick = {
                                         HapticUtil.performVirtualKeyHaptic(view)
                                         carrierNameInputs[sim.subId] = sim.defaultCarrierName
-                                    }
+                                    },
                                 ) {
                                     Icon(
                                         painter = painterResource(R.drawable.rounded_refresh_24),
                                         contentDescription = stringResource(R.string.sim_names_reset_tooltip),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(24.dp),
                                     )
                                 }
                             }
@@ -178,13 +180,13 @@ fun SimNamesBottomSheet(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 OutlinedButton(
                     onClick = {
                         HapticUtil.performVirtualKeyHaptic(view)
                         onDismissRequest()
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.action_cancel))
                 }
@@ -206,7 +208,7 @@ fun SimNamesBottomSheet(
                             isSaving = false
                             onDismissRequest()
                         }
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.action_save))
                 }

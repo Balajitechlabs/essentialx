@@ -13,10 +13,9 @@ import android.os.Build
 import com.sameerasw.essentials.R
 
 object ActionRegistry {
-
     data class ActionCategory(
         val titleRes: Int,
-        val actions: List<Action>
+        val actions: List<Action>,
     )
 
     /**
@@ -28,67 +27,73 @@ object ActionRegistry {
      */
     fun getCategories(
         sdkInt: Int = Build.VERSION.SDK_INT,
-        screenOnOnly: Boolean? = null
+        screenOnOnly: Boolean? = null,
     ): List<ActionCategory> {
-        val connectivityActions = listOf(
-            Action.TurnOnWifi,
-            Action.TurnOffWifi,
-            Action.TurnOnCellularData,
-            Action.TurnOffCellularData,
-            Action.TurnOnHotspot,
-            Action.TurnOffHotspot,
-            Action.ToggleHotspot
-        )
+        val connectivityActions =
+            listOf(
+                Action.TurnOnWifi,
+                Action.TurnOffWifi,
+                Action.TurnOnCellularData,
+                Action.TurnOffCellularData,
+                Action.TurnOnHotspot,
+                Action.TurnOffHotspot,
+                Action.ToggleHotspot,
+            )
 
-        val displayActions = buildList {
-            add(Action.TurnOnAutoBrightness)
-            add(Action.TurnOffAutoBrightness)
-            add(Action.DimWallpaper())
-            add(Action.ScreenOff())
-            if (sdkInt >= 35) add(Action.DeviceEffects())
-        }
-
-        val appsActions = listOf(
-            Action.OpenApp(),
-            Action.AIAssistant,
-            Action.FreezeApps(),
-            Action.UnfreezeApps(),
-            Action.FreezeTag(),
-            Action.PinApp,
-            Action.Keyboard()
-        )
-
-        val systemActions = buildList {
-            add(Action.TurnOnFlashlight)
-            add(Action.TurnOffFlashlight)
-            add(Action.ToggleFlashlight)
-            add(Action.TurnOnLowPower)
-            add(Action.TurnOffLowPower)
-            add(Action.CustomSettings())
-            add(Action.CircleToSearch)
-            // TakeScreenshot only available on screen-on context (null means no filter = include always)
-            if (screenOnOnly == null || screenOnOnly == true) {
-                add(Action.TakeScreenshot)
+        val displayActions =
+            buildList {
+                add(Action.TurnOnAutoBrightness)
+                add(Action.TurnOffAutoBrightness)
+                add(Action.DimWallpaper())
+                add(Action.ScreenOff())
+                if (sdkInt >= 35) add(Action.DeviceEffects())
             }
-        }
 
-        val soundMediaActions = listOf(
-            Action.SoundMode(),
-            Action.CycleSoundModes,
-            Action.ToggleMute,
-            Action.ToggleVibrate,
-            Action.HapticVibration,
-            Action.ToggleMediaVolume,
-            Action.SetVolume(),
-            Action.MediaPlayPause,
-            Action.MediaNext,
-            Action.MediaPrevious,
-            Action.LikeCurrentSong
-        )
+        val appsActions =
+            listOf(
+                Action.OpenApp(),
+                Action.AIAssistant,
+                Action.FreezeApps(),
+                Action.UnfreezeApps(),
+                Action.FreezeTag(),
+                Action.PinApp,
+                Action.Keyboard(),
+            )
 
-        val essentialsActions = listOf(
-            Action.SometimesEssentials()
-        )
+        val systemActions =
+            buildList {
+                add(Action.TurnOnFlashlight)
+                add(Action.TurnOffFlashlight)
+                add(Action.ToggleFlashlight)
+                add(Action.TurnOnLowPower)
+                add(Action.TurnOffLowPower)
+                add(Action.CustomSettings())
+                add(Action.CircleToSearch)
+                // TakeScreenshot only available on screen-on context (null means no filter = include always)
+                if (screenOnOnly == null || screenOnOnly == true) {
+                    add(Action.TakeScreenshot)
+                }
+            }
+
+        val soundMediaActions =
+            listOf(
+                Action.SoundMode(),
+                Action.CycleSoundModes,
+                Action.ToggleMute,
+                Action.ToggleVibrate,
+                Action.HapticVibration,
+                Action.ToggleMediaVolume,
+                Action.SetVolume(),
+                Action.MediaPlayPause,
+                Action.MediaNext,
+                Action.MediaPrevious,
+                Action.LikeCurrentSong,
+            )
+
+        val essentialsActions =
+            listOf(
+                Action.SometimesEssentials(),
+            )
 
         return listOf(
             ActionCategory(R.string.diy_category_connectivity, connectivityActions),
@@ -96,7 +101,7 @@ object ActionRegistry {
             ActionCategory(R.string.diy_category_apps, appsActions),
             ActionCategory(R.string.diy_category_system, systemActions),
             ActionCategory(R.string.diy_category_sound_media, soundMediaActions),
-            ActionCategory(R.string.diy_category_essentials, essentialsActions)
+            ActionCategory(R.string.diy_category_essentials, essentialsActions),
         )
     }
 }

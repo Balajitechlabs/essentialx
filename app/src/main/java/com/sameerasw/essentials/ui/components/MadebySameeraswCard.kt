@@ -49,9 +49,7 @@ import com.sameerasw.essentials.ui.theme.GoogleSansFlexRounded
  * A reusable promotion card for the "Made by Sameera" subreddit community.
  */
 @Composable
-fun MadebySameeraswCard(
-    modifier: Modifier = Modifier
-) {
+fun MadebySameeraswCard(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val redditUrl = "https://www.reddit.com/r/MadebySameerasw/"
     val isDark = isSystemInDarkTheme()
@@ -61,54 +59,58 @@ fun MadebySameeraswCard(
     val accentColor = if (isDark) brandColor else brandColorDark
 
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(32.dp))
-            .clickable {
-                val intent = Intent(Intent.ACTION_VIEW, redditUrl.toUri())
-                context.startActivity(intent)
-            },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(32.dp))
+                .clickable {
+                    val intent = Intent(Intent.ACTION_VIEW, redditUrl.toUri())
+                    context.startActivity(intent)
+                },
         color = MaterialTheme.colorScheme.surfaceBright,
-        shape = RoundedCornerShape(32.dp)
+        shape = RoundedCornerShape(32.dp),
     ) {
         Column {
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(140.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(140.dp),
             ) {
                 // Banner Image
                 Image(
                     painter = painterResource(id = R.drawable.madebysameerasw_cover),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
                 )
 
                 // Avatar Image (Overlapping)
                 Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .offset(y = 32.dp)
-                        .size(84.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceBright)
-                        .border(4.dp, MaterialTheme.colorScheme.surfaceBright, CircleShape)
-                        .border(
-                            6.dp,
-                            accentColor.copy(alpha = 0.5f),
-                            CircleShape
-                        ) // Subtle outer ring
-                        .padding(4.dp)
-                        .border(2.dp, Color(0xFF49FCBB), CircleShape) // Sharper inner stroke
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .offset(y = 32.dp)
+                            .size(84.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceBright)
+                            .border(4.dp, MaterialTheme.colorScheme.surfaceBright, CircleShape)
+                            .border(
+                                6.dp,
+                                accentColor.copy(alpha = 0.5f),
+                                CircleShape,
+                            ) // Subtle outer ring
+                            .padding(4.dp)
+                            .border(2.dp, Color(0xFF49FCBB), CircleShape), // Sharper inner stroke
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.avatar),
                         contentDescription = "Subreddit Avatar",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape),
-                        contentScale = ContentScale.Crop
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .clip(CircleShape),
+                        contentScale = ContentScale.Crop,
                     )
                 }
             }
@@ -116,20 +118,22 @@ fun MadebySameeraswCard(
             Spacer(modifier = Modifier.height(42.dp))
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = "r/MadebySameerasw",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontFamily = GoogleSansFlexRounded,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.5.sp
-                    ),
-                    color = accentColor
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = GoogleSansFlexRounded,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.5.sp,
+                        ),
+                    color = accentColor,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -139,7 +143,7 @@ fun MadebySameeraswCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    lineHeight = 20.sp
+                    lineHeight = 20.sp,
                 )
             }
         }

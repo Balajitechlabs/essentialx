@@ -17,18 +17,18 @@ import androidx.glance.appwidget.action.ActionCallback
 import com.sameerasw.essentials.services.receivers.QsTileActionRouter
 
 class QsTileClickActionCallback : ActionCallback {
-
     override suspend fun onAction(
         context: Context,
         glanceId: GlanceId,
-        parameters: ActionParameters
+        parameters: ActionParameters,
     ) {
         val serviceClassName = parameters[SERVICE_CLASS_KEY] ?: return
         // action
-        val intent = Intent(context, QsTileActionRouter::class.java).apply {
-            action = QsTileActionRouter.ACTION_TRIGGER_TILE
-            putExtra(QsTileActionRouter.EXTRA_SERVICE_CLASS_NAME, serviceClassName)
-        }
+        val intent =
+            Intent(context, QsTileActionRouter::class.java).apply {
+                action = QsTileActionRouter.ACTION_TRIGGER_TILE
+                putExtra(QsTileActionRouter.EXTRA_SERVICE_CLASS_NAME, serviceClassName)
+            }
         context.sendBroadcast(intent)
     }
 

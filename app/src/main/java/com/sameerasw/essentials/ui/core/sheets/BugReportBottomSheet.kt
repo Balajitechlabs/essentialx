@@ -57,7 +57,7 @@ import org.json.JSONObject
 @Composable
 fun BugReportBottomSheet(
     viewModel: MainViewModel,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
     var deviceInfoString by remember { mutableStateOf("") }
@@ -85,40 +85,42 @@ fun BugReportBottomSheet(
     }
 
     EssentialsBottomSheet(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 24.dp)
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 24.dp)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(R.string.bug_report_title),
-                style = MaterialTheme.typography.headlineMedium
+                style = MaterialTheme.typography.headlineMedium,
             )
 
             // Device Info
             RoundedCardContainer {
                 Column(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surfaceBright)
-                        .padding(16.dp)
-                        .fillMaxWidth()
+                    modifier =
+                        Modifier
+                            .background(MaterialTheme.colorScheme.surfaceBright)
+                            .padding(16.dp)
+                            .fillMaxWidth(),
                 ) {
                     Text(
                         text = stringResource(R.string.bug_report_device_info),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     SelectionContainer {
                         Text(
                             text = deviceInfoString,
                             style = MaterialTheme.typography.bodyMedium,
-                            fontFamily = FontFamily.Monospace
+                            fontFamily = FontFamily.Monospace,
                         )
                     }
                 }
@@ -129,11 +131,12 @@ fun BugReportBottomSheet(
                 value = feedbackMessage,
                 onValueChange = { feedbackMessage = it },
                 label = { Text(stringResource(R.string.bug_report_feedback_placeholder)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
                 shape = MaterialTheme.shapes.large,
-                minLines = 3
+                minLines = 3,
             )
 
             // Contact Email Input
@@ -144,7 +147,7 @@ fun BugReportBottomSheet(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
                 singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             )
             // Actions
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -156,17 +159,18 @@ fun BugReportBottomSheet(
                             feedback.contactEmail = contactEmail
                         }
                         Sentry.captureFeedback(feedback)
-                        Toast.makeText(context, R.string.msg_feedback_sent, Toast.LENGTH_SHORT)
+                        Toast
+                            .makeText(context, R.string.msg_feedback_sent, Toast.LENGTH_SHORT)
                             .show()
                         onDismissRequest()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = feedbackMessage.isNotBlank()
+                    enabled = feedbackMessage.isNotBlank(),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.rounded_send_24),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.action_send_feedback))
@@ -176,9 +180,10 @@ fun BugReportBottomSheet(
                     text = stringResource(R.string.label_alternatively),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(vertical = 4.dp)
+                    modifier =
+                        Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(vertical = 4.dp),
                 )
 
                 // GitHub
@@ -187,18 +192,19 @@ fun BugReportBottomSheet(
                         val body =
                             "Feedback:\n$feedbackMessage\n\nDevice Info:\n$deviceInfoString\n\n"
                         val encodedBody = Uri.encode(body)
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://github.com/sameerasw/essentials/issues/new?body=$encodedBody")
-                        )
+                        val intent =
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://github.com/sameerasw/essentials/issues/new?body=$encodedBody"),
+                            )
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.brand_github),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.action_report_github))
@@ -211,31 +217,33 @@ fun BugReportBottomSheet(
                             if (contactEmail.isNotBlank()) "Contact Email: $contactEmail\n" else ""
                         val body =
                             "${contactLine}Feedback:\n$feedbackMessage\n\nDevice Info:\n$deviceInfoString\n\n"
-                        val intent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:")
-                            putExtra(Intent.EXTRA_EMAIL, arrayOf("mail@sameerasw.com"))
-                            putExtra(
-                                Intent.EXTRA_SUBJECT,
-                                context.getString(R.string.bug_report_email_subject)
-                            )
-                            putExtra(Intent.EXTRA_TEXT, body)
-                        }
+                        val intent =
+                            Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("mailto:")
+                                putExtra(Intent.EXTRA_EMAIL, arrayOf("mail@sameerasw.com"))
+                                putExtra(
+                                    Intent.EXTRA_SUBJECT,
+                                    context.getString(R.string.bug_report_email_subject),
+                                )
+                                putExtra(Intent.EXTRA_TEXT, body)
+                            }
                         try {
                             context.startActivity(intent)
                         } catch (e: Exception) {
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.error_no_email_app),
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.error_no_email_app),
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.rounded_mail_24),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.action_report_email))

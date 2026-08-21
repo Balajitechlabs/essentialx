@@ -25,7 +25,7 @@ import com.sameerasw.essentials.utils.LanguageUtils
 fun LanguagePicker(
     selectedLanguageCode: String,
     onLanguageSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val languages = LanguageUtils.languages
     val selectedLanguage = LanguageUtils.getLanguage(selectedLanguageCode)
@@ -34,7 +34,7 @@ fun LanguagePicker(
         title = stringResource(R.string.label_app_language),
         selectedValue = "${selectedLanguage.nativeName} (${selectedLanguage.name})",
         iconRes = R.drawable.rounded_globe_24,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         languages.forEach { language ->
             SegmentedDropdownMenuItem(
@@ -43,7 +43,7 @@ fun LanguagePicker(
                 },
                 onClick = {
                     onLanguageSelected(language.code)
-                }
+                },
             )
         }
     }

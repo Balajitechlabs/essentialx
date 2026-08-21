@@ -77,7 +77,7 @@ import kotlinx.coroutines.withContext
 fun LiveWallpaperSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -86,25 +86,26 @@ fun LiveWallpaperSettingsUI(
     var selectedVideo by remember { mutableStateOf(repository.getLiveWallpaperSelectedVideo()) }
     var playbackTrigger by remember { mutableStateOf(repository.getLiveWallpaperPlaybackTrigger()) }
 
-    val pickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri ->
-            uri?.let {
-                try {
-                    context.contentResolver.takePersistableUriPermission(
-                        it,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                    )
-                } catch (e: Exception) {
-                    e.printStackTrace()
+    val pickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+            onResult = { uri ->
+                uri?.let {
+                    try {
+                        context.contentResolver.takePersistableUriPermission(
+                            it,
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                        )
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    repository.addLiveWallpaperCustomVideo(it.toString())
+                    availableVideos = repository.getLiveWallpaperAvailableVideos()
+                    selectedVideo = it.toString()
+                    repository.saveLiveWallpaperSelectedVideo(it.toString())
                 }
-                repository.addLiveWallpaperCustomVideo(it.toString())
-                availableVideos = repository.getLiveWallpaperAvailableVideos()
-                selectedVideo = it.toString()
-                repository.saveLiveWallpaperSelectedVideo(it.toString())
-            }
-        }
-    )
+            },
+        )
 
     LaunchedEffect(availableVideos) {
         if (selectedVideo == SettingsRepository.LIVE_WALLPAPER_DEFAULT_VIDEO && availableVideos.isNotEmpty()) {
@@ -120,38 +121,41 @@ fun LiveWallpaperSettingsUI(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-
         Button(
             onClick = {
                 HapticUtil.performCustomHaptic(view, 0.8f)
-                val intent = Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
-                    putExtra(
-                        WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
-                        ComponentName(context, LiveWallpaperService::class.java)
-                    )
-                }
+                val intent =
+                    Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER).apply {
+                        putExtra(
+                            WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
+                            ComponentName(context, LiveWallpaperService::class.java),
+                        )
+                    }
                 context.startActivity(intent)
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(28.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+            shape = RoundedCornerShape(28.dp),
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.rounded_open_in_new_24),
                 contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(end = 8.dp)
+                modifier =
+                    Modifier
+                        .size(24.dp)
+                        .padding(end = 8.dp),
             )
             Text(
                 text = stringResource(R.string.btn_apply),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
         }
 
@@ -159,14 +163,15 @@ fun LiveWallpaperSettingsUI(
             text = stringResource(R.string.live_wallpaper_playback_trigger_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
-            val options = listOf(
-                SettingsRepository.LIVE_WALLPAPER_TRIGGER_UNLOCK to stringResource(R.string.live_wallpaper_trigger_unlock),
-                SettingsRepository.LIVE_WALLPAPER_TRIGGER_SCREEN_ON to stringResource(R.string.live_wallpaper_trigger_screen_on)
-            )
+            val options =
+                listOf(
+                    SettingsRepository.LIVE_WALLPAPER_TRIGGER_UNLOCK to stringResource(R.string.live_wallpaper_trigger_unlock),
+                    SettingsRepository.LIVE_WALLPAPER_TRIGGER_SCREEN_ON to stringResource(R.string.live_wallpaper_trigger_screen_on),
+                )
 
             SegmentedPicker(
                 items = options,
@@ -176,7 +181,7 @@ fun LiveWallpaperSettingsUI(
                     repository.saveLiveWallpaperPlaybackTrigger(option.first)
                 },
                 labelProvider = { it.second },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 
@@ -184,7 +189,7 @@ fun LiveWallpaperSettingsUI(
             text = stringResource(R.string.live_wallpaper_video_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         LazyVerticalGrid(
@@ -192,9 +197,10 @@ fun LiveWallpaperSettingsUI(
             contentPadding = PaddingValues(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
-            modifier = Modifier
-                .heightIn(max = 800.dp)
-                .fillMaxWidth()
+            modifier =
+                Modifier
+                    .heightIn(max = 800.dp)
+                    .fillMaxWidth(),
         ) {
             item {
                 AddVideoItem(onClick = {
@@ -212,13 +218,16 @@ fun LiveWallpaperSettingsUI(
                         selectedVideo = video
                         repository.saveLiveWallpaperSelectedVideo(video)
                     },
-                    onRemove = if (video.startsWith("content://")) {
-                        {
-                            repository.removeLiveWallpaperCustomVideo(video)
-                            availableVideos = repository.getLiveWallpaperAvailableVideos()
-                            selectedVideo = repository.getLiveWallpaperSelectedVideo()
-                        }
-                    } else null
+                    onRemove =
+                        if (video.startsWith("content://")) {
+                            {
+                                repository.removeLiveWallpaperCustomVideo(video)
+                                availableVideos = repository.getLiveWallpaperAvailableVideos()
+                                selectedVideo = repository.getLiveWallpaperSelectedVideo()
+                            }
+                        } else {
+                            null
+                        },
                 )
             }
         }
@@ -233,7 +242,7 @@ fun ThumbnailItem(
     videoName: String,
     isSelected: Boolean,
     onClick: () -> Unit,
-    onRemove: (() -> Unit)? = null
+    onRemove: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -241,85 +250,93 @@ fun ThumbnailItem(
     var showMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(videoName) {
-        thumbnail = withContext(Dispatchers.IO) {
-            val resId = context.resources.getIdentifier(videoName, "raw", context.packageName)
-            if (resId != 0) {
-                MediaMetadataRetriever().use { retriever ->
+        thumbnail =
+            withContext(Dispatchers.IO) {
+                val resId = context.resources.getIdentifier(videoName, "raw", context.packageName)
+                if (resId != 0) {
+                    MediaMetadataRetriever().use { retriever ->
+                        try {
+                            val uri = Uri.parse("android.resource://${context.packageName}/$resId")
+                            retriever.setDataSource(context, uri)
+                            retriever.getFrameAtTime(0)
+                        } catch (e: Exception) {
+                            null
+                        }
+                    }
+                } else {
                     try {
-                        val uri = Uri.parse("android.resource://${context.packageName}/$resId")
-                        retriever.setDataSource(context, uri)
-                        retriever.getFrameAtTime(0)
+                        val uri = Uri.parse(videoName)
+                        MediaMetadataRetriever().use { retriever ->
+                            retriever.setDataSource(context, uri)
+                            retriever.getFrameAtTime(0)
+                        }
                     } catch (e: Exception) {
                         null
                     }
                 }
-            } else {
-                try {
-                    val uri = Uri.parse(videoName)
-                    MediaMetadataRetriever().use { retriever ->
-                        retriever.setDataSource(context, uri)
-                        retriever.getFrameAtTime(0)
-                    }
-                } catch (e: Exception) {
-                    null
-                }
             }
-        }
     }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.combinedClickable(
-            onClick = { onClick() },
-            onLongClick = {
-                if (onRemove != null) {
-                    HapticUtil.performHeavyHaptic(view)
-                    showMenu = true
-                }
-            }
-        )
+        modifier =
+            Modifier.combinedClickable(
+                onClick = { onClick() },
+                onLongClick = {
+                    if (onRemove != null) {
+                        HapticUtil.performHeavyHaptic(view)
+                        showMenu = true
+                    }
+                },
+            ),
     ) {
         Box(
-            modifier = Modifier
-                .aspectRatio(9f / 16f)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .then(
-                    if (isSelected) Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-                    else Modifier
-                ),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .aspectRatio(9f / 16f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .then(
+                        if (isSelected) {
+                            Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                        } else {
+                            Modifier
+                        },
+                    ),
+            contentAlignment = Alignment.Center,
         ) {
             thumbnail?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             } ?: Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black),
             )
 
             if (isSelected) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)),
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_check_circle_24),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
 
             SegmentedDropdownMenu(
                 expanded = showMenu,
-                onDismissRequest = { showMenu = false }
+                onDismissRequest = { showMenu = false },
             ) {
                 SegmentedDropdownMenuItem(
                     text = { Text(stringResource(R.string.action_remove)) },
@@ -330,9 +347,9 @@ fun ThumbnailItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_delete_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
             }
         }
@@ -343,20 +360,21 @@ fun ThumbnailItem(
 fun AddVideoItem(onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable { onClick() }
+        modifier = Modifier.clickable { onClick() },
     ) {
         Box(
-            modifier = Modifier
-                .aspectRatio(9f / 16f)
-                .clip(RoundedCornerShape(12.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .aspectRatio(9f / 16f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.rounded_add_24),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(32.dp),
             )
         }
     }

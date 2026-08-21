@@ -51,20 +51,24 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun TranslationBottomSheet(
     stringKey: String,
     initialTargetLocale: String? = null,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val currentLocale = remember {
-        val appLocale = context.resources.configuration.locales[0].language
-        if (appLocale != "en" && appLocale.isNotBlank()) appLocale else initialTargetLocale ?: "si"
-    }
+    val currentLocale =
+        remember {
+            val appLocale =
+                context.resources.configuration.locales[0]
+                    .language
+            if (appLocale != "en" && appLocale.isNotBlank()) appLocale else initialTargetLocale ?: "si"
+        }
 
-    val translations = remember(stringKey) {
-        StringLoader.getTranslationsForKey(context, stringKey)
-    }
+    val translations =
+        remember(stringKey) {
+            StringLoader.getTranslationsForKey(context, stringKey)
+        }
 
     val sourceEnglish = translations["en"] ?: ""
     val originalTargetVal = translations[currentLocale] ?: ""
@@ -76,13 +80,14 @@ fun TranslationBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Header
             Column {
@@ -90,13 +95,13 @@ fun TranslationBottomSheet(
                     text = "Translate String",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = "Key: $stringKey",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
             }
 
@@ -107,7 +112,7 @@ fun TranslationBottomSheet(
                         Text(
                             text = stringResource(R.string.translation_source_label),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
                     supportingContent = {
@@ -115,13 +120,13 @@ fun TranslationBottomSheet(
                             text = sourceEnglish.ifBlank { stringKey },
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     },
-
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.extraSmall)
-                        .background(MaterialTheme.colorScheme.surfaceBright)
+                    modifier =
+                        Modifier
+                            .clip(MaterialTheme.shapes.extraSmall)
+                            .background(MaterialTheme.colorScheme.surfaceBright),
                 )
 
                 ListItem(
@@ -130,7 +135,7 @@ fun TranslationBottomSheet(
                             text = "Target Language (${currentLocale.uppercase()})",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
                     },
                     supportingContent = {
@@ -138,35 +143,37 @@ fun TranslationBottomSheet(
                             OutlinedTextField(
                                 value = inputText,
                                 onValueChange = { inputText = it },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(end = 8.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(end = 8.dp),
                                 placeholder = { Text("Enter translation in ${currentLocale.uppercase()}…") },
                                 singleLine = false,
                                 maxLines = 4,
-                                shape = MaterialTheme.shapes.large
+                                shape = MaterialTheme.shapes.large,
                             )
                         }
                     },
-
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.extraSmall)
-                        .background(MaterialTheme.colorScheme.surfaceBright)
+                    modifier =
+                        Modifier
+                            .clip(MaterialTheme.shapes.extraSmall)
+                            .background(MaterialTheme.colorScheme.surfaceBright),
                 )
             }
 
             // Action Buttons
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.End
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.End,
             ) {
                 OutlinedButton(
                     onClick = {
                         HapticUtil.performUIHaptic(view)
                         onDismissRequest()
-                    }
+                    },
                 ) {
                     Text("Cancel")
                 }
@@ -181,23 +188,23 @@ fun TranslationBottomSheet(
                                 key = stringKey,
                                 locale = currentLocale,
                                 originalValue = originalTargetVal,
-                                newValue = inputText
+                                newValue = inputText,
                             )
-                            android.widget.Toast.makeText(
-                                context,
-                                context.getString(R.string.translation_saved_toast),
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
+                            android.widget.Toast
+                                .makeText(
+                                    context,
+                                    context.getString(R.string.translation_saved_toast),
+                                    android.widget.Toast.LENGTH_SHORT,
+                                ).show()
                         } else {
                             TranslationManager.removeEdit(stringKey, currentLocale)
                         }
                         onDismissRequest()
-
-                    }
+                    },
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_check_24),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Save Edit")

@@ -30,7 +30,6 @@ import com.sameerasw.essentials.utils.BatteryRingDrawer
 import com.sameerasw.essentials.utils.BluetoothBatteryUtils
 
 class BatteryNotificationService : Service() {
-
     private lateinit var settingsRepository: SettingsRepository
     private val NOTIF_ID = 8822
     private val CHANNEL_ID = "battery_notification_channel"
@@ -39,7 +38,7 @@ class BatteryNotificationService : Service() {
         object : SharedPreferences.OnSharedPreferenceChangeListener {
             override fun onSharedPreferenceChanged(
                 sharedPreferences: SharedPreferences?,
-                key: String?
+                key: String?,
             ) {
                 if (key == SettingsRepository.KEY_AIRSYNC_MAC_CONNECTED ||
                     key == SettingsRepository.KEY_MAC_BATTERY_LEVEL ||
@@ -60,17 +59,21 @@ class BatteryNotificationService : Service() {
 
         startForeground(
             NOTIF_ID,
-            buildBaseNotification(getString(R.string.feat_batteries_title), "")
+            buildBaseNotification(getString(R.string.feat_batteries_title), ""),
         )
 
         updateNotification()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForeground(
                 NOTIF_ID,
-                buildBaseNotification(getString(R.string.feat_batteries_title), "")
+                buildBaseNotification(getString(R.string.feat_batteries_title), ""),
             )
         }
         updateNotification()
@@ -92,10 +95,11 @@ class BatteryNotificationService : Service() {
             val name = getString(R.string.battery_notification_channel_name)
             val descriptionText = getString(R.string.battery_notification_channel_desc)
             val importance = NotificationManager.IMPORTANCE_LOW
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-                setShowBadge(false)
-            }
+            val channel =
+                NotificationChannel(CHANNEL_ID, name, importance).apply {
+                    description = descriptionText
+                    setShowBadge(false)
+                }
             val notificationManager: NotificationManager =
                 getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
@@ -105,33 +109,39 @@ class BatteryNotificationService : Service() {
     private fun updateNotification() {
         val batteryItems = fetchBatteryData()
 
-        val notification = if (batteryItems.isEmpty()) {
-            buildBaseNotification(
-                getString(R.string.feat_batteries_title),
-                getString(R.string.battery_notification_no_devices)
-            )
-        } else {
-            val bitmap = createCompositeBitmap(batteryItems)
-            NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.rounded_battery_charging_60_24)
-                .setLargeIcon(bitmap)
-                .setStyle(
-                    NotificationCompat.BigPictureStyle()
-                        .bigPicture(bitmap)
-                        .bigLargeIcon(null as Bitmap?)
+        val notification =
+            if (batteryItems.isEmpty()) {
+                buildBaseNotification(
+                    getString(R.string.feat_batteries_title),
+                    getString(R.string.battery_notification_no_devices),
                 )
-                .setContentTitle(getString(R.string.feat_batteries_title))
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setOngoing(true)
-                .setSilent(true)
-                .build()
-        }
+            } else {
+                val bitmap = createCompositeBitmap(batteryItems)
+                NotificationCompat
+                    .Builder(this, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.rounded_battery_charging_60_24)
+                    .setLargeIcon(bitmap)
+                    .setStyle(
+                        NotificationCompat
+                            .BigPictureStyle()
+                            .bigPicture(bitmap)
+                            .bigLargeIcon(null as Bitmap?),
+                    ).setContentTitle(getString(R.string.feat_batteries_title))
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .setOngoing(true)
+                    .setSilent(true)
+                    .build()
+            }
 
         startForeground(NOTIF_ID, notification)
     }
 
-    private fun buildBaseNotification(title: String, content: String): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+    private fun buildBaseNotification(
+        title: String,
+        content: String,
+    ): Notification =
+        NotificationCompat
+            .Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.rounded_battery_charging_60_24)
             .setContentTitle(title)
             .setContentText(content)
@@ -139,7 +149,6 @@ class BatteryNotificationService : Service() {
             .setOngoing(true)
             .setSilent(true)
             .build()
-    }
 
     private fun fetchBatteryData(): List<BatteryItemData> {
         val items = mutableListOf<BatteryItemData>()
@@ -155,16 +164,21 @@ class BatteryNotificationService : Service() {
             settingsRepository.getBoolean(SettingsRepository.KEY_MAC_BATTERY_IS_CHARGING)
 
         if (isAirSyncEnabled && macLevel != -1 && isMacConnected) {
-            val statusIcon = if (macIsCharging) R.drawable.rounded_flash_on_24
-            else if (macLevel <= 15) R.drawable.rounded_battery_android_frame_alert_24
-            else null
+            val statusIcon =
+                if (macIsCharging) {
+                    R.drawable.rounded_flash_on_24
+                } else if (macLevel <= 15) {
+                    R.drawable.rounded_battery_android_frame_alert_24
+                } else {
+                    null
+                }
             items.add(
                 BatteryItemData(
                     macLevel,
                     R.drawable.rounded_laptop_mac_24,
                     "Mac",
-                    statusIcon
-                )
+                    statusIcon,
+                ),
             )
         }
 
@@ -176,27 +190,36 @@ class BatteryNotificationService : Service() {
 
         if (isShowBluetoothEnabled && !bluetoothJson.isNullOrEmpty() && bluetoothJson != "[]") {
             try {
-                val devices: List<BluetoothBatteryUtils.BluetoothDeviceBattery> = Gson().fromJson(
-                    bluetoothJson,
-                    Array<BluetoothBatteryUtils.BluetoothDeviceBattery>::class.java
-                ).toList()
+                val devices: List<BluetoothBatteryUtils.BluetoothDeviceBattery> =
+                    Gson()
+                        .fromJson(
+                            bluetoothJson,
+                            Array<BluetoothBatteryUtils.BluetoothDeviceBattery>::class.java,
+                        ).toList()
                 devices.forEach { device ->
-                    val iconRes = when {
-                        device.name.contains("watch", true) || device.name.contains(
-                            "gear",
-                            true
-                        ) || device.name.contains("fit", true) -> R.drawable.rounded_watch_24
+                    val iconRes =
+                        when {
+                            device.name.contains("watch", true) ||
+                                device.name.contains(
+                                    "gear",
+                                    true,
+                                ) ||
+                                device.name.contains("fit", true) -> R.drawable.rounded_watch_24
 
-                        device.name.contains("bud", true) || device.name.contains(
-                            "pod",
-                            true
-                        ) || device.name.contains("head", true) || device.name.contains(
-                            "audio",
-                            true
-                        ) || device.name.contains("sound", true) -> R.drawable.rounded_headphones_24
+                            device.name.contains("bud", true) ||
+                                device.name.contains(
+                                    "pod",
+                                    true,
+                                ) ||
+                                device.name.contains("head", true) ||
+                                device.name.contains(
+                                    "audio",
+                                    true,
+                                ) ||
+                                device.name.contains("sound", true) -> R.drawable.rounded_headphones_24
 
-                        else -> R.drawable.rounded_bluetooth_24
-                    }
+                            else -> R.drawable.rounded_bluetooth_24
+                        }
                     val statusIcon =
                         if (device.level <= 15) R.drawable.rounded_battery_android_frame_alert_24 else null
                     items.add(BatteryItemData(device.level, iconRes, device.name, statusIcon))
@@ -224,33 +247,42 @@ class BatteryNotificationService : Service() {
 
         val startX = (totalWidth - actualContentWidth) / 2f
 
-        val accentColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            getColor(android.R.color.system_accent1_100)
-        } else {
-            Color.parseColor("#6200EE")
-        }
+        val accentColor =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                getColor(android.R.color.system_accent1_100)
+            } else {
+                Color.parseColor("#6200EE")
+            }
 
         val onSurface = Color.WHITE
         val trackColor = ColorUtils.setAlphaComponent(onSurface, 40)
         val surfaceColor = Color.parseColor("#99000000")
 
         items.forEachIndexed { index, item ->
-            val ringColor = when {
-                item.level <= 15 -> Color.parseColor("#F44336") // Red
-                item.level <= 30 -> Color.parseColor("#FF9800") // Orange
-                else -> accentColor
-            }
-            val itemBitmap = BatteryRingDrawer.drawBatteryWidget(
-                this, item.level, ringColor, trackColor, onSurface, surfaceColor,
-                ContextCompat.getDrawable(this, item.iconRes),
-                item.statusIconRes?.let { ContextCompat.getDrawable(this, it) },
-                itemSize, itemSize
-            )
+            val ringColor =
+                when {
+                    item.level <= 15 -> Color.parseColor("#F44336") // Red
+                    item.level <= 30 -> Color.parseColor("#FF9800") // Orange
+                    else -> accentColor
+                }
+            val itemBitmap =
+                BatteryRingDrawer.drawBatteryWidget(
+                    this,
+                    item.level,
+                    ringColor,
+                    trackColor,
+                    onSurface,
+                    surfaceColor,
+                    ContextCompat.getDrawable(this, item.iconRes),
+                    item.statusIconRes?.let { ContextCompat.getDrawable(this, it) },
+                    itemSize,
+                    itemSize,
+                )
             canvas.drawBitmap(
                 itemBitmap,
                 startX + (index * (itemSize + spacing)).toFloat(),
                 0f,
-                null
+                null,
             )
         }
 
@@ -261,6 +293,6 @@ class BatteryNotificationService : Service() {
         val level: Int,
         val iconRes: Int,
         val name: String,
-        val statusIconRes: Int? = null
+        val statusIconRes: Int? = null,
     )
 }

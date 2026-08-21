@@ -31,34 +31,42 @@ fun SelectionCardItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     description: String? = null,
-    iconRes: Int? = null
+    iconRes: Int? = null,
 ) {
     val view = LocalView.current
 
     ListItem(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.extraSmall)
-            .clickable {
-                HapticUtil.performUIHaptic(view)
-                onClick()
-            },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraSmall)
+                .clickable {
+                    HapticUtil.performUIHaptic(view)
+                    onClick()
+                },
         headlineContent = { Text(title) },
-        supportingContent = if (description != null) {
-            { Text(description) }
-        } else null,
-        leadingContent = if (iconRes != null && iconRes != 0) {
-            {
-                Icon(
-                    painter = painterResource(iconRes),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        } else null,
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        )
+        supportingContent =
+            if (description != null) {
+                { Text(description) }
+            } else {
+                null
+            },
+        leadingContent =
+            if (iconRes != null && iconRes != 0) {
+                {
+                    Icon(
+                        painter = painterResource(iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            } else {
+                null
+            },
+        colors =
+            ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
     )
 }

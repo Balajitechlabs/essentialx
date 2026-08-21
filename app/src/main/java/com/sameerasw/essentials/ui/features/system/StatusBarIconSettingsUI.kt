@@ -60,7 +60,7 @@ fun StatusBarIconSettingsUI(
     viewModel: StatusBarIconViewModel,
     mainViewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -84,26 +84,28 @@ fun StatusBarIconSettingsUI(
         PermissionsBottomSheet(
             onDismissRequest = { showPermissionSheet = false },
             featureTitle = R.string.smart_data_title,
-            permissions = listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_android_cell_dual_4_bar_24,
-                    title = R.string.permission_read_phone_state_title,
-                    description = R.string.permission_read_phone_state_desc,
-                    dependentFeatures = listOf(R.string.smart_data_title),
-                    actionLabel = R.string.permission_grant_action,
-                    action = {
-                        ActivityCompat.requestPermissions(
-                            context as ComponentActivity,
-                            arrayOf(Manifest.permission.READ_PHONE_STATE),
-                            1001
-                        )
-                    },
-                    isGranted = ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.READ_PHONE_STATE
-                    ) == PackageManager.PERMISSION_GRANTED
-                )
-            )
+            permissions =
+                listOf(
+                    PermissionItem(
+                        iconRes = R.drawable.rounded_android_cell_dual_4_bar_24,
+                        title = R.string.permission_read_phone_state_title,
+                        description = R.string.permission_read_phone_state_desc,
+                        dependentFeatures = listOf(R.string.smart_data_title),
+                        actionLabel = R.string.permission_grant_action,
+                        action = {
+                            ActivityCompat.requestPermissions(
+                                context as ComponentActivity,
+                                arrayOf(Manifest.permission.READ_PHONE_STATE),
+                                1001,
+                            )
+                        },
+                        isGranted =
+                            ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.READ_PHONE_STATE,
+                            ) == PackageManager.PERMISSION_GRANTED,
+                    ),
+                ),
         )
     }
 
@@ -111,40 +113,44 @@ fun StatusBarIconSettingsUI(
         PermissionsBottomSheet(
             onDismissRequest = { showAdvancedPermissionSheet = false },
             featureTitle = R.string.stb_advanced_flags_title,
-            permissions = listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_adb_24,
-                    title = R.string.perm_shizuku_title,
-                    description = R.string.perm_shizuku_desc,
-                    dependentFeatures = listOf(R.string.stb_advanced_flags_title),
-                    actionLabel = R.string.perm_shizuku_install_action,
-                    action = {
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            Uri.parse("https://github.com/thedjchi/Shizuku")
-                        )
-                        context.startActivity(intent)
-                    },
-                    isGranted = viewModel.isShizukuAvailable.value || viewModel.isRootAvailable.value
-                )
-            )
+            permissions =
+                listOf(
+                    PermissionItem(
+                        iconRes = R.drawable.rounded_adb_24,
+                        title = R.string.perm_shizuku_title,
+                        description = R.string.perm_shizuku_desc,
+                        dependentFeatures = listOf(R.string.stb_advanced_flags_title),
+                        actionLabel = R.string.perm_shizuku_install_action,
+                        action = {
+                            val intent =
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://github.com/thedjchi/Shizuku"),
+                                )
+                            context.startActivity(intent)
+                        },
+                        isGranted = viewModel.isShizukuAvailable.value || viewModel.isRootAvailable.value,
+                    ),
+                ),
         )
     }
 
     // Categorized icons
-    val categories = listOf(
-        StatusBarIconRegistry.CAT_CONNECTIVITY,
-        StatusBarIconRegistry.CAT_PHONE_NETWORK,
-        StatusBarIconRegistry.CAT_AUDIO_MEDIA,
-        StatusBarIconRegistry.CAT_SYSTEM_STATUS,
-        StatusBarIconRegistry.CAT_OEM_SPECIFIC
-    )
+    val categories =
+        listOf(
+            StatusBarIconRegistry.CAT_CONNECTIVITY,
+            StatusBarIconRegistry.CAT_PHONE_NETWORK,
+            StatusBarIconRegistry.CAT_AUDIO_MEDIA,
+            StatusBarIconRegistry.CAT_SYSTEM_STATUS,
+            StatusBarIconRegistry.CAT_OEM_SPECIFIC,
+        )
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         if (isMasterEnabled) {
             // Iterate through categories
@@ -156,13 +162,13 @@ fun StatusBarIconSettingsUI(
                         text = stringResource(categoryRes),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
                     RoundedCardContainer(
                         modifier = Modifier,
                         spacing = 2.dp,
-                        cornerRadius = 24.dp
+                        cornerRadius = 24.dp,
                     ) {
                         iconsInCat.forEach { icon ->
                             val isChecked =
@@ -175,11 +181,13 @@ fun StatusBarIconSettingsUI(
                                     viewModel.setIconVisibility(icon.id, checked, context)
                                 },
                                 enabled = isPermissionGranted,
-                                modifier = Modifier.highlight(
-                                    highlightSetting == context.getString(
-                                        icon.displayNameRes
-                                    )
-                                )
+                                modifier =
+                                    Modifier.highlight(
+                                        highlightSetting ==
+                                            context.getString(
+                                                icon.displayNameRes,
+                                            ),
+                                    ),
                             )
                         }
                     }
@@ -191,13 +199,13 @@ fun StatusBarIconSettingsUI(
                 text = stringResource(R.string.settings_section_smart_visibility),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(
                 modifier = Modifier,
                 spacing = 2.dp,
-                cornerRadius = 24.dp
+                cornerRadius = 24.dp,
             ) {
                 IconToggleItem(
                     iconRes = R.drawable.rounded_cell_wifi_24,
@@ -208,23 +216,25 @@ fun StatusBarIconSettingsUI(
                         viewModel.setSmartWiFiEnabled(isChecked, context)
                     },
                     enabled = isPermissionGranted && viewModel.isMobileDataVisible.value,
-                    modifier = Modifier.highlight(highlightSetting == "smart_wifi")
+                    modifier = Modifier.highlight(highlightSetting == "smart_wifi"),
                 )
 
                 Box(
-                    modifier = Modifier
-                        .highlight(highlightSetting == "smart_data")
-                        .clickable {
-                            HapticUtil.performUIHaptic(view)
-                            val hasPermission = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.READ_PHONE_STATE
-                            ) == PackageManager.PERMISSION_GRANTED
+                    modifier =
+                        Modifier
+                            .highlight(highlightSetting == "smart_data")
+                            .clickable {
+                                HapticUtil.performUIHaptic(view)
+                                val hasPermission =
+                                    ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.READ_PHONE_STATE,
+                                    ) == PackageManager.PERMISSION_GRANTED
 
-                            if (!hasPermission) {
-                                showPermissionSheet = true
-                            }
-                        }
+                                if (!hasPermission) {
+                                    showPermissionSheet = true
+                                }
+                            },
                 ) {
                     IconToggleItem(
                         iconRes = R.drawable.rounded_android_cell_dual_5_bar_alert_24,
@@ -232,10 +242,11 @@ fun StatusBarIconSettingsUI(
                         description = stringResource(R.string.smart_data_desc),
                         isChecked = viewModel.isSmartDataEnabled.value,
                         onCheckedChange = { isChecked ->
-                            val hasPermission = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.READ_PHONE_STATE
-                            ) == PackageManager.PERMISSION_GRANTED
+                            val hasPermission =
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.READ_PHONE_STATE,
+                                ) == PackageManager.PERMISSION_GRANTED
 
                             if (isChecked && !hasPermission) {
                                 showPermissionSheet = true
@@ -243,43 +254,53 @@ fun StatusBarIconSettingsUI(
                                 viewModel.setSmartDataEnabled(isChecked, context)
                             }
                         },
-                        enabled = isPermissionGranted && ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.READ_PHONE_STATE
-                        ) == PackageManager.PERMISSION_GRANTED && viewModel.isMobileDataVisible.value,
+                        enabled =
+                            isPermissionGranted &&
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.READ_PHONE_STATE,
+                                ) == PackageManager.PERMISSION_GRANTED &&
+                                viewModel.isMobileDataVisible.value,
                         onDisabledClick = {
-                            val hasPermission = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.READ_PHONE_STATE
-                            ) == PackageManager.PERMISSION_GRANTED
+                            val hasPermission =
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.READ_PHONE_STATE,
+                                ) == PackageManager.PERMISSION_GRANTED
 
                             if (!hasPermission) {
                                 showPermissionSheet = true
                             }
-                        }
+                        },
                     )
 
                     val isSwitchDisabled =
-                        !(isPermissionGranted && ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.READ_PHONE_STATE
-                        ) == PackageManager.PERMISSION_GRANTED)
+                        !(
+                            isPermissionGranted &&
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.READ_PHONE_STATE,
+                                ) == PackageManager.PERMISSION_GRANTED
+                        )
 
                     if (isSwitchDisabled) {
                         Box(
-                            modifier = Modifier
-                                .matchParentSize()
-                                .clickable {
-                                    HapticUtil.performUIHaptic(view)
-                                    val hasPermission = ContextCompat.checkSelfPermission(
-                                        context,
-                                        Manifest.permission.READ_PHONE_STATE
-                                    ) == PackageManager.PERMISSION_GRANTED
+                            modifier =
+                                Modifier
+                                    .matchParentSize()
+                                    .clickable {
+                                        HapticUtil.performUIHaptic(view)
+                                        val hasPermission =
+                                            ContextCompat.checkSelfPermission(
+                                                context,
+                                                Manifest.permission.READ_PHONE_STATE,
+                                            ) == PackageManager.PERMISSION_GRANTED
 
-                                    if (!hasPermission) {
-                                        showPermissionSheet = true
-                                    }
-                                })
+                                        if (!hasPermission) {
+                                            showPermissionSheet = true
+                                        }
+                                    },
+                        )
                     }
                 }
 
@@ -291,17 +312,18 @@ fun StatusBarIconSettingsUI(
                             onTypesSelected = { selectedTypes ->
                                 viewModel.selectedNetworkTypes.value = selectedTypes
                                 // Save to preferences
-                                val prefs = context.getSharedPreferences(
-                                    "essentials_prefs",
-                                    Context.MODE_PRIVATE
-                                )
+                                val prefs =
+                                    context.getSharedPreferences(
+                                        "essentials_prefs",
+                                        Context.MODE_PRIVATE,
+                                    )
                                 prefs.edit {
                                     putStringSet(
                                         "selected_network_types",
-                                        selectedTypes.map { it.name }.toSet()
+                                        selectedTypes.map { it.name }.toSet(),
                                     )
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -312,13 +334,13 @@ fun StatusBarIconSettingsUI(
                 text = stringResource(R.string.status_bar_section_advanced),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(
                 modifier = Modifier,
                 spacing = 2.dp,
-                cornerRadius = 24.dp
+                cornerRadius = 24.dp,
             ) {
                 IconToggleItem(
                     iconRes = R.drawable.rounded_nest_clock_farsight_analog_24,
@@ -328,32 +350,39 @@ fun StatusBarIconSettingsUI(
                         viewModel.setClockSecondsEnabled(checked, context)
                     },
                     enabled = isPermissionGranted,
-                    modifier = Modifier.highlight(highlightSetting == "clock_seconds")
+                    modifier = Modifier.highlight(highlightSetting == "clock_seconds"),
                 )
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(
-                                MaterialTheme.shapes.extraSmall.bottomEnd
-                            )
-                        )
-                        .highlight(highlightSetting == "clock_position")
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape =
+                                    androidx.compose.foundation.shape.RoundedCornerShape(
+                                        MaterialTheme.shapes.extraSmall.bottomEnd,
+                                    ),
+                            ).highlight(highlightSetting == "clock_position"),
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp, start = 20.dp, end = 16.dp, bottom = 2.dp),
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, start = 20.dp, end = 16.dp, bottom = 2.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(R.string.stb_clock_position),
                             style = MaterialTheme.typography.titleSmall,
-                            color = if (isPermissionGranted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = 0.38f
-                            )
+                            color =
+                                if (isPermissionGranted) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(
+                                        alpha = 0.38f,
+                                    )
+                                },
                         )
                     }
                     SegmentedPicker(
@@ -370,9 +399,10 @@ fun StatusBarIconSettingsUI(
                                 else -> ""
                             }
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(if (!isPermissionGranted) Modifier.alpha(0.5f) else Modifier),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .then(if (!isPermissionGranted) Modifier.alpha(0.5f) else Modifier),
                     )
                 }
 
@@ -384,39 +414,46 @@ fun StatusBarIconSettingsUI(
                         viewModel.setPrivacyChipEnabled(checked, context)
                     },
                     enabled = isPermissionGranted,
-                    modifier = Modifier.highlight(highlightSetting == "privacy_chip")
+                    modifier = Modifier.highlight(highlightSetting == "privacy_chip"),
                 )
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(
-                                MaterialTheme.shapes.extraSmall.bottomEnd
-                            )
-                        )
-                        .highlight(highlightSetting == "battery_percentage")
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape =
+                                    androidx.compose.foundation.shape.RoundedCornerShape(
+                                        MaterialTheme.shapes.extraSmall.bottomEnd,
+                                    ),
+                            ).highlight(highlightSetting == "battery_percentage"),
                 ) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp, start = 20.dp, end = 16.dp, bottom = 2.dp),
-                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, start = 20.dp, end = 16.dp, bottom = 2.dp),
+                        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
                     ) {
                         Text(
                             text = stringResource(R.string.stb_battery_percentage),
                             style = MaterialTheme.typography.titleSmall,
-                            color = if (batteryPermissionGranted) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = 0.38f
-                            )
+                            color =
+                                if (batteryPermissionGranted) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(
+                                        alpha = 0.38f,
+                                    )
+                                },
                         )
                         if (!viewModel.isShizukuAvailable.value && !viewModel.isRootAvailable.value) {
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
                                 text = stringResource(R.string.req_shizuku),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.error
+                                color = MaterialTheme.colorScheme.error,
                             )
                         }
                     }
@@ -434,9 +471,10 @@ fun StatusBarIconSettingsUI(
                                 else -> ""
                             }
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(if (!batteryPermissionGranted) Modifier.alpha(0.5f) else Modifier),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .then(if (!batteryPermissionGranted) Modifier.alpha(0.5f) else Modifier),
                     )
                 }
             }
@@ -447,11 +485,12 @@ fun StatusBarIconSettingsUI(
                     HapticUtil.performVirtualKeyHaptic(view)
                     viewModel.resetAllIcons(context)
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
-                    .highlight(highlightSetting == "reset_icons"),
-                enabled = isPermissionGranted
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                        .highlight(highlightSetting == "reset_icons"),
+                enabled = isPermissionGranted,
             ) {
                 Text(stringResource(R.string.action_reset_all_icons))
             }
@@ -462,7 +501,7 @@ fun StatusBarIconSettingsUI(
             text = stringResource(R.string.stb_advanced_flags_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         val isAdvancedEnabled =
@@ -471,7 +510,7 @@ fun StatusBarIconSettingsUI(
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             IconToggleItem(
                 iconRes = R.drawable.rounded_android_24,
@@ -485,7 +524,7 @@ fun StatusBarIconSettingsUI(
                         viewModel.setAdvancedFlagEnabled(
                             context,
                             StatusBarIconViewModel.PREF_HIDE_SYSTEM_ICONS,
-                            checked
+                            checked,
                         )
                     }
                 },
@@ -495,7 +534,7 @@ fun StatusBarIconSettingsUI(
                         showAdvancedPermissionSheet = true
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "hide_system_icons")
+                modifier = Modifier.highlight(highlightSetting == "hide_system_icons"),
             )
 
             IconToggleItem(
@@ -510,7 +549,7 @@ fun StatusBarIconSettingsUI(
                         viewModel.setAdvancedFlagEnabled(
                             context,
                             StatusBarIconViewModel.PREF_HIDE_SYSTEM_ICONS_LOCKED_ONLY,
-                            checked
+                            checked,
                         )
                     }
                 },
@@ -520,7 +559,7 @@ fun StatusBarIconSettingsUI(
                         showAdvancedPermissionSheet = true
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "hide_system_icons_locked")
+                modifier = Modifier.highlight(highlightSetting == "hide_system_icons_locked"),
             )
 
             IconToggleItem(
@@ -535,7 +574,7 @@ fun StatusBarIconSettingsUI(
                         viewModel.setAdvancedFlagEnabled(
                             context,
                             StatusBarIconViewModel.PREF_HIDE_CLOCK,
-                            checked
+                            checked,
                         )
                     }
                 },
@@ -545,7 +584,7 @@ fun StatusBarIconSettingsUI(
                         showAdvancedPermissionSheet = true
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "hide_clock")
+                modifier = Modifier.highlight(highlightSetting == "hide_clock"),
             )
 
             IconToggleItem(
@@ -560,7 +599,7 @@ fun StatusBarIconSettingsUI(
                         viewModel.setAdvancedFlagEnabled(
                             context,
                             StatusBarIconViewModel.PREF_HIDE_NOTIFICATION_ICONS,
-                            checked
+                            checked,
                         )
                     }
                 },
@@ -570,7 +609,7 @@ fun StatusBarIconSettingsUI(
                         showAdvancedPermissionSheet = true
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "hide_notifications")
+                modifier = Modifier.highlight(highlightSetting == "hide_notifications"),
             )
         }
 
@@ -578,7 +617,7 @@ fun StatusBarIconSettingsUI(
             text = stringResource(R.string.status_bar_icons_disclaimer),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }

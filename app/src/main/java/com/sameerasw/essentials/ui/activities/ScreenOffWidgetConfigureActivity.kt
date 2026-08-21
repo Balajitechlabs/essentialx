@@ -55,7 +55,6 @@ import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.HapticUtil
 
 class ScreenOffWidgetConfigureActivity : ComponentActivity() {
-
     private var appWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,10 +67,11 @@ class ScreenOffWidgetConfigureActivity : ComponentActivity() {
         // Find the widget id from the intent.
         val extras = intent.extras
         if (extras != null) {
-            appWidgetId = extras.getInt(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID
-            )
+            appWidgetId =
+                extras.getInt(
+                    AppWidgetManager.EXTRA_APPWIDGET_ID,
+                    AppWidgetManager.INVALID_APPWIDGET_ID,
+                )
         }
 
         // If this activity was started with an invalid widget ID, finish with cancel.
@@ -84,7 +84,8 @@ class ScreenOffWidgetConfigureActivity : ComponentActivity() {
 
         setContent {
             val viewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val context = LocalContext.current
             LaunchedEffect(Unit) {
                 viewModel.check(context)
@@ -96,13 +97,14 @@ class ScreenOffWidgetConfigureActivity : ComponentActivity() {
                     onConfigured = { isDoubleTapRequired ->
                         saveWidgetPrefs(isDoubleTapRequired)
                         updateWidget()
-                        val resultValue = Intent().apply {
-                            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-                        }
+                        val resultValue =
+                            Intent().apply {
+                                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+                            }
                         setResult(RESULT_OK, resultValue)
                         finish()
                     },
-                    onDismiss = { finish() }
+                    onDismiss = { finish() },
                 )
             }
         }
@@ -124,15 +126,16 @@ class ScreenOffWidgetConfigureActivity : ComponentActivity() {
 fun ScreenOffWidgetConfigureOverlay(
     appWidgetId: Int,
     onConfigured: (Boolean) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val prefs = remember {
-        context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-    }
+    val prefs =
+        remember {
+            context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+        }
 
     var isDoubleTapRequired by remember {
         mutableStateOf(prefs.getBoolean("screen_off_double_tap_$appWidgetId", false))
@@ -141,33 +144,35 @@ fun ScreenOffWidgetConfigureOverlay(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             // Header
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_mobile_lock_portrait_24),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Text(
                     text = stringResource(R.string.screen_off_widget_label),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
 
@@ -175,14 +180,14 @@ fun ScreenOffWidgetConfigureOverlay(
                 text = stringResource(R.string.feat_screen_off_widget_desc),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
 
             // Double Tap Toggle Card
             RoundedCardContainer(
                 modifier = Modifier.padding(top = 8.dp),
                 spacing = 8.dp,
-                cornerRadius = 24.dp
+                cornerRadius = 24.dp,
             ) {
                 IconToggleItem(
                     title = stringResource(R.string.require_double_tap_title),
@@ -193,7 +198,7 @@ fun ScreenOffWidgetConfigureOverlay(
                         isDoubleTapRequired = it
                         HapticUtil.performUIHaptic(view)
                     },
-                    showToggle = true
+                    showToggle = true,
                 )
             }
 
@@ -205,7 +210,7 @@ fun ScreenOffWidgetConfigureOverlay(
                     HapticUtil.performUIHaptic(view)
                     onConfigured(isDoubleTapRequired)
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(text = stringResource(android.R.string.ok))
             }

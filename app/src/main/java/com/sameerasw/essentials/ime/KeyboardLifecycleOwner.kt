@@ -23,8 +23,10 @@ import androidx.savedstate.SavedStateRegistryOwner
  * Allows granular control over lifecycle states (Created, Resumed, Destroyed)
  * to match the InputMethodService lifecycle events.
  */
-class KeyboardLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner, ViewModelStoreOwner {
-
+class KeyboardLifecycleOwner :
+    LifecycleOwner,
+    SavedStateRegistryOwner,
+    ViewModelStoreOwner {
     private val lifecycleRegistry = LifecycleRegistry(this)
     private val savedStateRegistryController = SavedStateRegistryController.create(this)
     private val store = ViewModelStore()

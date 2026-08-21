@@ -30,21 +30,22 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun FlashlightSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
             text = stringResource(R.string.flashlight_options_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(spacing = 2.dp) {
@@ -54,7 +55,7 @@ fun FlashlightSettingsUI(
                 description = stringResource(R.string.flashlight_global_desc),
                 isChecked = viewModel.isFlashlightGlobalEnabled.value,
                 onCheckedChange = { viewModel.setFlashlightGlobalEnabled(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "flashlight_global")
+                modifier = Modifier.highlight(highlightSetting == "flashlight_global"),
             )
 
             IconToggleItem(
@@ -63,7 +64,7 @@ fun FlashlightSettingsUI(
                 description = stringResource(R.string.flashlight_adjust_intensity_desc),
                 isChecked = viewModel.isFlashlightAdjustEnabled.value,
                 onCheckedChange = { viewModel.setFlashlightAdjustEnabled(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "flashlight_adjust")
+                modifier = Modifier.highlight(highlightSetting == "flashlight_adjust"),
             )
             IconToggleItem(
                 iconRes = R.drawable.rounded_flashlight_on_24,
@@ -71,23 +72,22 @@ fun FlashlightSettingsUI(
                 description = stringResource(R.string.flashlight_live_update_desc),
                 isChecked = viewModel.isFlashlightLiveUpdateEnabled.value,
                 onCheckedChange = { viewModel.setFlashlightLiveUpdateEnabled(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "flashlight_live_update")
+                modifier = Modifier.highlight(highlightSetting == "flashlight_live_update"),
             )
             IconToggleItem(
                 iconRes = R.drawable.rounded_front_hand_24,
                 title = stringResource(R.string.flashlight_pocket_title),
                 description = stringResource(R.string.flashlight_pocket_desc),
                 isChecked = viewModel.isFlashlightPocketTurnOffEnabled.value,
-                onCheckedChange = { viewModel.setFlashlightPocketTurnOffEnabled(it, context) }
+                onCheckedChange = { viewModel.setFlashlightPocketTurnOffEnabled(it, context) },
             )
             IconToggleItem(
                 iconRes = R.drawable.rounded_thermometer_alert_24,
                 title = stringResource(R.string.flashlight_overheat_title),
                 description = stringResource(R.string.flashlight_overheat_desc),
                 isChecked = viewModel.isFlashlightOverheatEnabled.value,
-                onCheckedChange = { viewModel.setFlashlightOverheatEnabled(it, context) }
+                onCheckedChange = { viewModel.setFlashlightOverheatEnabled(it, context) },
             )
-
         }
     }
 }

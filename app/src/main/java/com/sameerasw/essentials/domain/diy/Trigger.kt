@@ -56,7 +56,7 @@ sealed interface Trigger {
     data class Schedule(
         @SerializedName("hour") val hour: Int = 0,
         @SerializedName("minute") val minute: Int = 0,
-        @SerializedName("days") val days: Set<Int> = emptySet()
+        @SerializedName("days") val days: Set<Int> = emptySet(),
     ) : Trigger {
         override val title: Int get() = R.string.diy_trigger_schedule
         override val icon: Int get() = R.drawable.rounded_nest_clock_farsight_analog_24
@@ -66,38 +66,40 @@ sealed interface Trigger {
     @Keep
     data class BluetoothConnected(
         @SerializedName("deviceAddress") val deviceAddress: String = "",
-        @SerializedName("deviceName") val deviceName: String = ""
+        @SerializedName("deviceName") val deviceName: String = "",
     ) : Trigger {
         override val title: Int get() = R.string.diy_trigger_bluetooth_connected
         override val icon: Int get() = R.drawable.rounded_bluetooth_24
         override val isConfigurable: Boolean get() = true
         override val permissions: List<String>
-            get() = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                listOf(android.Manifest.permission.BLUETOOTH_CONNECT)
-            } else {
-                emptyList()
-            }
+            get() =
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    listOf(android.Manifest.permission.BLUETOOTH_CONNECT)
+                } else {
+                    emptyList()
+                }
     }
 
     @Keep
     data class BluetoothDisconnected(
         @SerializedName("deviceAddress") val deviceAddress: String = "",
-        @SerializedName("deviceName") val deviceName: String = ""
+        @SerializedName("deviceName") val deviceName: String = "",
     ) : Trigger {
         override val title: Int get() = R.string.diy_trigger_bluetooth_disconnected
         override val icon: Int get() = R.drawable.rounded_bluetooth_24
         override val isConfigurable: Boolean get() = true
         override val permissions: List<String>
-            get() = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                listOf(android.Manifest.permission.BLUETOOTH_CONNECT)
-            } else {
-                emptyList()
-            }
+            get() =
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    listOf(android.Manifest.permission.BLUETOOTH_CONNECT)
+                } else {
+                    emptyList()
+                }
     }
 
     @Keep
     data class WifiConnected(
-        @SerializedName("ssid") val ssid: String = ""
+        @SerializedName("ssid") val ssid: String = "",
     ) : Trigger {
         override val title: Int get() = R.string.diy_trigger_wifi_connected
         override val icon: Int get() = R.drawable.rounded_android_wifi_4_bar_plus_24
@@ -108,7 +110,7 @@ sealed interface Trigger {
 
     @Keep
     data class WifiDisconnected(
-        @SerializedName("ssid") val ssid: String = ""
+        @SerializedName("ssid") val ssid: String = "",
     ) : Trigger {
         override val title: Int get() = R.string.diy_trigger_wifi_disconnected
         override val icon: Int get() = R.drawable.rounded_android_wifi_3_bar_24

@@ -27,13 +27,14 @@ fun RoundedCardContainer(
     spacing: Dp = 2.dp,
     cornerRadius: Dp = 24.dp,
     containerColor: Color = Color.Transparent,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(cornerRadius))
-            .background(containerColor),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(cornerRadius))
+                .background(containerColor),
         verticalArrangement = Arrangement.spacedBy(spacing),
-        content = content
+        content = content,
     )
 }

@@ -58,13 +58,17 @@ class QsTilesWidget : GlanceAppWidget() {
     override val sizeMode = androidx.glance.appwidget.SizeMode.Exact
 
     @RequiresApi(Build.VERSION_CODES_FULL.BAKLAVA_1)
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
+    override suspend fun provideGlance(
+        context: Context,
+        id: GlanceId,
+    ) {
         provideContent {
             GlanceTheme {
                 val prefs =
                     androidx.glance.currentState<androidx.datastore.preferences.core.Preferences>()
                 val KEY_UPDATE =
-                    androidx.datastore.preferences.core.longPreferencesKey("qs_widget_last_update")
+                    androidx.datastore.preferences.core
+                        .longPreferencesKey("qs_widget_last_update")
 
                 @Suppress("UNUSED_VARIABLE")
                 val lastUpdate = prefs[KEY_UPDATE] ?: 0L
@@ -78,30 +82,33 @@ class QsTilesWidget : GlanceAppWidget() {
                 val height = LocalSize.current.height
 
                 Box(
-                    modifier = GlanceModifier
-                        .fillMaxSize()
+                    modifier =
+                        GlanceModifier
+                            .fillMaxSize(),
                 ) {
                     if (pinnedTiles.isEmpty()) {
                         Column(
-                            modifier = GlanceModifier
-                                .fillMaxSize()
-                                .padding(8.dp)
-                                .cornerRadius(16.dp)
-                                .background(GlanceTheme.colors.primary)
-                                .padding(16.dp),
+                            modifier =
+                                GlanceModifier
+                                    .fillMaxSize()
+                                    .padding(8.dp)
+                                    .cornerRadius(16.dp)
+                                    .background(GlanceTheme.colors.primary)
+                                    .padding(16.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
                                 text = context.getString(R.string.qs_tiles_widget_empty_state),
-                                style = TextStyle(
-                                    color = GlanceTheme.colors.onPrimary,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Normal,
-                                    fontFamily = FontFamily("google-sans-flex"),
-                                    textAlign = TextAlign.Center
-                                ),
-                                modifier = GlanceModifier.fillMaxWidth()
+                                style =
+                                    TextStyle(
+                                        color = GlanceTheme.colors.onPrimary,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Normal,
+                                        fontFamily = FontFamily("google-sans-flex"),
+                                        textAlign = TextAlign.Center,
+                                    ),
+                                modifier = GlanceModifier.fillMaxWidth(),
                             )
                         }
                     } else {
@@ -114,31 +121,34 @@ class QsTilesWidget : GlanceAppWidget() {
                         val halfSpacing = 4.dp
                         val cellHeight = targetRowHeight
 
-                        val scrollMode = if (Build.VERSION.SDK_INT >= 37) {
-                            VerticalScrollMode.SnapScrollMatchHeight(height)
-                        } else {
-                            VerticalScrollMode.Normal
-                        }
+                        val scrollMode =
+                            if (Build.VERSION.SDK_INT >= 37) {
+                                VerticalScrollMode.SnapScrollMatchHeight(height)
+                            } else {
+                                VerticalScrollMode.Normal
+                            }
 
                         LazyColumn(
                             modifier = GlanceModifier.fillMaxSize(),
-                            verticalScrollMode = scrollMode
+                            verticalScrollMode = scrollMode,
                         ) {
                             items(pages) { pageTiles ->
                                 Column(
                                     modifier = GlanceModifier.fillMaxSize().padding(halfSpacing),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {
                                     val rows = pageTiles.chunked(columnsCount)
                                     for (rowIndex in 0 until rowsCount) {
                                         val rowTiles = rows.getOrNull(rowIndex)
                                         if (rowTiles != null) {
                                             Row(
-                                                modifier = GlanceModifier.fillMaxWidth()
-                                                    .height(cellHeight),
+                                                modifier =
+                                                    GlanceModifier
+                                                        .fillMaxWidth()
+                                                        .height(cellHeight),
                                                 verticalAlignment = Alignment.CenterVertically,
-                                                horizontalAlignment = Alignment.CenterHorizontally
+                                                horizontalAlignment = Alignment.CenterHorizontally,
                                             ) {
                                                 for (colIndex in 0 until columnsCount) {
                                                     val tile = rowTiles.getOrNull(colIndex)
@@ -147,33 +157,37 @@ class QsTilesWidget : GlanceAppWidget() {
                                                             context.getString(tile.titleRes)
                                                         val pastelColor =
                                                             ColorUtil.getPastelColorFor(
-                                                                resolvedTitle
+                                                                resolvedTitle,
                                                             )
                                                         val vibrantColor =
                                                             ColorUtil.getVibrantColorFor(
-                                                                resolvedTitle
+                                                                resolvedTitle,
                                                             )
 
-                                                        val isActive = QsTileRegistry.isTileActive(
-                                                            context,
-                                                            tile.serviceClass.name
-                                                        )
+                                                        val isActive =
+                                                            QsTileRegistry.isTileActive(
+                                                                context,
+                                                                tile.serviceClass.name,
+                                                            )
 
-                                                        val tileBg = if (isActive) {
-                                                            GlanceTheme.colors.primary
-                                                        } else {
-                                                            GlanceTheme.colors.widgetBackground
-                                                        }
-                                                        val tileTextColor = if (isActive) {
-                                                            GlanceTheme.colors.onPrimary
-                                                        } else {
-                                                            GlanceTheme.colors.onSurface
-                                                        }
-                                                        val tileSubtextColor = if (isActive) {
-                                                            GlanceTheme.colors.onPrimary
-                                                        } else {
-                                                            GlanceTheme.colors.onSurfaceVariant
-                                                        }
+                                                        val tileBg =
+                                                            if (isActive) {
+                                                                GlanceTheme.colors.primary
+                                                            } else {
+                                                                GlanceTheme.colors.widgetBackground
+                                                            }
+                                                        val tileTextColor =
+                                                            if (isActive) {
+                                                                GlanceTheme.colors.onPrimary
+                                                            } else {
+                                                                GlanceTheme.colors.onSurface
+                                                            }
+                                                        val tileSubtextColor =
+                                                            if (isActive) {
+                                                                GlanceTheme.colors.onPrimary
+                                                            } else {
+                                                                GlanceTheme.colors.onSurfaceVariant
+                                                            }
 
                                                         val iconBoxSize = 38.dp
                                                         val iconCornerRadius = 10.dp
@@ -182,114 +196,125 @@ class QsTilesWidget : GlanceAppWidget() {
                                                         val spacerSize = 8.dp
 
                                                         Box(
-                                                            modifier = GlanceModifier
-                                                                .defaultWeight()
-                                                                .fillMaxHeight()
-                                                                .padding(
-                                                                    horizontal = halfSpacing,
-                                                                    vertical = halfSpacing
-                                                                ),
-                                                            contentAlignment = Alignment.Center
+                                                            modifier =
+                                                                GlanceModifier
+                                                                    .defaultWeight()
+                                                                    .fillMaxHeight()
+                                                                    .padding(
+                                                                        horizontal = halfSpacing,
+                                                                        vertical = halfSpacing,
+                                                                    ),
+                                                            contentAlignment = Alignment.Center,
                                                         ) {
-                                                            val cardModifier = GlanceModifier
-                                                                .fillMaxSize()
-                                                                .cornerRadius(16.dp)
-                                                                .background(tileBg)
-                                                                .clickable(
-                                                                    actionRunCallback<QsTileClickActionCallback>(
-                                                                        actionParametersOf(
-                                                                            QsTileClickActionCallback.SERVICE_CLASS_KEY to tile.serviceClass.name
-                                                                        )
+                                                            val cardModifier =
+                                                                GlanceModifier
+                                                                    .fillMaxSize()
+                                                                    .cornerRadius(16.dp)
+                                                                    .background(tileBg)
+                                                                    .clickable(
+                                                                        actionRunCallback<QsTileClickActionCallback>(
+                                                                            actionParametersOf(
+                                                                                QsTileClickActionCallback.SERVICE_CLASS_KEY to
+                                                                                    tile.serviceClass.name,
+                                                                            ),
+                                                                        ),
                                                                     )
-                                                                )
 
                                                             val activeIconRes =
                                                                 QsTileRegistry.getTileIcon(
                                                                     context,
                                                                     tile.serviceClass.name,
-                                                                    tile.iconRes
+                                                                    tile.iconRes,
                                                                 )
 
                                                             Row(
-                                                                modifier = cardModifier.padding(
-                                                                    horizontal = 12.dp,
-                                                                    vertical = 6.dp
-                                                                ),
+                                                                modifier =
+                                                                    cardModifier.padding(
+                                                                        horizontal = 12.dp,
+                                                                        vertical = 6.dp,
+                                                                    ),
                                                                 horizontalAlignment = Alignment.CenterHorizontally,
-                                                                verticalAlignment = Alignment.CenterVertically
+                                                                verticalAlignment = Alignment.CenterVertically,
                                                             ) {
-
                                                                 Box(
-                                                                    modifier = GlanceModifier
-                                                                        .size(iconBoxSize)
-                                                                        .cornerRadius(
-                                                                            iconCornerRadius
-                                                                        )
-                                                                        .background(
-                                                                            ColorProvider(
-                                                                                pastelColor
-                                                                            )
-                                                                        ),
-                                                                    contentAlignment = Alignment.Center
+                                                                    modifier =
+                                                                        GlanceModifier
+                                                                            .size(iconBoxSize)
+                                                                            .cornerRadius(
+                                                                                iconCornerRadius,
+                                                                            ).background(
+                                                                                ColorProvider(
+                                                                                    pastelColor,
+                                                                                ),
+                                                                            ),
+                                                                    contentAlignment = Alignment.Center,
                                                                 ) {
                                                                     Image(
-                                                                        provider = ImageProvider(
-                                                                            activeIconRes
-                                                                        ),
+                                                                        provider =
+                                                                            ImageProvider(
+                                                                                activeIconRes,
+                                                                            ),
                                                                         contentDescription = resolvedTitle,
-                                                                        colorFilter = ColorFilter.tint(
-                                                                            ColorProvider(
-                                                                                vibrantColor
-                                                                            )
-                                                                        ),
-                                                                        modifier = GlanceModifier.size(
-                                                                            iconSize
-                                                                        )
+                                                                        colorFilter =
+                                                                            ColorFilter.tint(
+                                                                                ColorProvider(
+                                                                                    vibrantColor,
+                                                                                ),
+                                                                            ),
+                                                                        modifier =
+                                                                            GlanceModifier.size(
+                                                                                iconSize,
+                                                                            ),
                                                                     )
                                                                 }
 
                                                                 Spacer(
-                                                                    modifier = GlanceModifier.width(
-                                                                        spacerSize
-                                                                    )
+                                                                    modifier =
+                                                                        GlanceModifier.width(
+                                                                            spacerSize,
+                                                                        ),
                                                                 )
 
                                                                 val subtitle =
                                                                     QsTileRegistry.getTileSubtitle(
                                                                         context,
-                                                                        tile.serviceClass.name
+                                                                        tile.serviceClass.name,
                                                                     )
 
                                                                 Column(
                                                                     modifier = GlanceModifier.defaultWeight(),
-                                                                    verticalAlignment = Alignment.CenterVertically
+                                                                    verticalAlignment = Alignment.CenterVertically,
                                                                 ) {
                                                                     Text(
                                                                         text = resolvedTitle,
-                                                                        style = TextStyle(
-                                                                            color = tileTextColor,
-                                                                            fontSize = fontSize,
-                                                                            fontWeight = FontWeight.Normal,
-                                                                            fontFamily = FontFamily(
-                                                                                "google-sans-flex"
+                                                                        style =
+                                                                            TextStyle(
+                                                                                color = tileTextColor,
+                                                                                fontSize = fontSize,
+                                                                                fontWeight = FontWeight.Normal,
+                                                                                fontFamily =
+                                                                                    FontFamily(
+                                                                                        "google-sans-flex",
+                                                                                    ),
+                                                                                textAlign = TextAlign.Start,
                                                                             ),
-                                                                            textAlign = TextAlign.Start
-                                                                        ),
-                                                                        maxLines = 1
+                                                                        maxLines = 1,
                                                                     )
                                                                     if (subtitle.isNotEmpty()) {
                                                                         Text(
                                                                             text = subtitle,
-                                                                            style = TextStyle(
-                                                                                color = tileSubtextColor,
-                                                                                fontSize = 11.sp,
-                                                                                fontWeight = FontWeight.Normal,
-                                                                                fontFamily = FontFamily(
-                                                                                    "google-sans-flex"
+                                                                            style =
+                                                                                TextStyle(
+                                                                                    color = tileSubtextColor,
+                                                                                    fontSize = 11.sp,
+                                                                                    fontWeight = FontWeight.Normal,
+                                                                                    fontFamily =
+                                                                                        FontFamily(
+                                                                                            "google-sans-flex",
+                                                                                        ),
+                                                                                    textAlign = TextAlign.Start,
                                                                                 ),
-                                                                                textAlign = TextAlign.Start
-                                                                            ),
-                                                                            maxLines = 1
+                                                                            maxLines = 1,
                                                                         )
                                                                     }
                                                                 }
@@ -297,23 +322,25 @@ class QsTilesWidget : GlanceAppWidget() {
                                                         }
                                                     } else {
                                                         Spacer(
-                                                            modifier = GlanceModifier
-                                                                .defaultWeight()
-                                                                .fillMaxHeight()
-                                                                .padding(
-                                                                    horizontal = halfSpacing,
-                                                                    vertical = halfSpacing
-                                                                )
+                                                            modifier =
+                                                                GlanceModifier
+                                                                    .defaultWeight()
+                                                                    .fillMaxHeight()
+                                                                    .padding(
+                                                                        horizontal = halfSpacing,
+                                                                        vertical = halfSpacing,
+                                                                    ),
                                                         )
                                                     }
                                                 }
                                             }
                                         } else {
                                             Spacer(
-                                                modifier = GlanceModifier
-                                                    .fillMaxWidth()
-                                                    .height(cellHeight)
-                                                    .padding(vertical = halfSpacing)
+                                                modifier =
+                                                    GlanceModifier
+                                                        .fillMaxWidth()
+                                                        .height(cellHeight)
+                                                        .padding(vertical = halfSpacing),
                                             )
                                         }
                                     }

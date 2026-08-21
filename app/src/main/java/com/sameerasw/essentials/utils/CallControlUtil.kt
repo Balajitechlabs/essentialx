@@ -24,10 +24,11 @@ object CallControlUtil {
 
     fun acceptCall(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val hasPermission = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ANSWER_PHONE_CALLS
-            ) == PackageManager.PERMISSION_GRANTED
+            val hasPermission =
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ANSWER_PHONE_CALLS,
+                ) == PackageManager.PERMISSION_GRANTED
 
             if (hasPermission) {
                 try {
@@ -47,10 +48,11 @@ object CallControlUtil {
 
     fun endCall(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            val hasPermission = ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ANSWER_PHONE_CALLS
-            ) == PackageManager.PERMISSION_GRANTED
+            val hasPermission =
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ANSWER_PHONE_CALLS,
+                ) == PackageManager.PERMISSION_GRANTED
 
             if (hasPermission) {
                 try {
@@ -68,8 +70,8 @@ object CallControlUtil {
         emulateHeadsetHookClick(context)
     }
 
-    fun toggleMute(context: Context): Boolean {
-        return try {
+    fun toggleMute(context: Context): Boolean =
+        try {
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
             if (audioManager != null) {
                 val currentMute = audioManager.isMicrophoneMute
@@ -84,7 +86,6 @@ object CallControlUtil {
             Log.e(TAG, "Error toggling microphone mute", e)
             false
         }
-    }
 
     private fun emulateHeadsetHookClick(context: Context) {
         try {

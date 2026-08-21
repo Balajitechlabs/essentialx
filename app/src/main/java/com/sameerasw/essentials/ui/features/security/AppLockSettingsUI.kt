@@ -44,10 +44,14 @@ import com.sameerasw.essentials.viewmodels.SecurityViewModel
 @Composable
 fun AppLockSettingsUI(
     viewModel: MainViewModel,
-    securityViewModel: SecurityViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
-    permissionViewModel: PermissionViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    securityViewModel: SecurityViewModel =
+        androidx.lifecycle.viewmodel.compose
+            .viewModel(),
+    permissionViewModel: PermissionViewModel =
+        androidx.lifecycle.viewmodel.compose
+            .viewModel(),
     modifier: Modifier = Modifier,
-    highlightKey: String? = null
+    highlightKey: String? = null,
 ) {
     val context = LocalContext.current
     var isAppSelectionSheetOpen by remember { mutableStateOf(false) }
@@ -60,32 +64,34 @@ fun AppLockSettingsUI(
     val canEnableAppLock =
         if (isUseUsageAccess) isUsageStatsPermissionGranted else isAccessibilityEnabled
 
-    val delayLabels = listOf(
-        stringResource(R.string.app_lock_auto_lock_delay_none),
-        stringResource(R.string.app_lock_auto_lock_delay_1min),
-        stringResource(R.string.app_lock_auto_lock_delay_5min),
-        stringResource(R.string.app_lock_auto_lock_delay_10min),
-        stringResource(R.string.app_lock_auto_lock_delay_20min),
-        stringResource(R.string.app_lock_auto_lock_delay_30min)
-    )
+    val delayLabels =
+        listOf(
+            stringResource(R.string.app_lock_auto_lock_delay_none),
+            stringResource(R.string.app_lock_auto_lock_delay_1min),
+            stringResource(R.string.app_lock_auto_lock_delay_5min),
+            stringResource(R.string.app_lock_auto_lock_delay_10min),
+            stringResource(R.string.app_lock_auto_lock_delay_20min),
+            stringResource(R.string.app_lock_auto_lock_delay_30min),
+        )
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
             text = stringResource(R.string.settings_section_security),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             IconToggleItem(
                 iconRes = R.drawable.rounded_shield_lock_24,
@@ -96,10 +102,15 @@ fun AppLockSettingsUI(
                         BiometricHelper.showBiometricPrompt(
                             activity = context,
                             title = context.getString(R.string.app_lock_auth_title),
-                            subtitle = if (enabled) context.getString(R.string.app_lock_enable_auth_subtitle) else context.getString(
-                                R.string.app_lock_disable_auth_subtitle
-                            ),
-                            onSuccess = { viewModel.setAppLockEnabled(enabled, context) }
+                            subtitle =
+                                if (enabled) {
+                                    context.getString(R.string.app_lock_enable_auth_subtitle)
+                                } else {
+                                    context.getString(
+                                        R.string.app_lock_disable_auth_subtitle,
+                                    )
+                                },
+                            onSuccess = { viewModel.setAppLockEnabled(enabled, context) },
                         )
                     } else {
                         viewModel.setAppLockEnabled(enabled, context)
@@ -107,7 +118,7 @@ fun AppLockSettingsUI(
                 },
                 enabled = canEnableAppLock,
                 onDisabledClick = {},
-                modifier = Modifier.highlight(highlightKey == "app_lock_enabled")
+                modifier = Modifier.highlight(highlightKey == "app_lock_enabled"),
             )
 
             FeatureCard(
@@ -119,7 +130,7 @@ fun AppLockSettingsUI(
                 hasMoreSettings = true,
                 onToggle = {},
                 onClick = { isAppSelectionSheetOpen = true },
-                modifier = Modifier.highlight(highlightKey == "app_lock_selected_apps")
+                modifier = Modifier.highlight(highlightKey == "app_lock_selected_apps"),
             )
 
             ConfigPickerItem(
@@ -128,14 +139,14 @@ fun AppLockSettingsUI(
                 iconRes = R.drawable.rounded_lock_clock_24,
                 isEnabled = isAppLockEnabled,
                 selectedValue = delayLabels[viewModel.appLockAutoLockDelayIndex.intValue],
-                modifier = Modifier.highlight(highlightKey == "app_lock_auto_lock_delay")
+                modifier = Modifier.highlight(highlightKey == "app_lock_auto_lock_delay"),
             ) {
                 delayLabels.forEachIndexed { index, label ->
                     SegmentedDropdownMenuItem(
                         text = { Text(label) },
                         onClick = {
                             viewModel.setAppLockAutoLockDelayIndex(index)
-                        }
+                        },
                     )
                 }
             }
@@ -145,21 +156,21 @@ fun AppLockSettingsUI(
             text = stringResource(R.string.app_lock_description),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Text(
             text = stringResource(R.string.app_lock_warning),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Text(
             text = stringResource(R.string.app_lock_biometric_note),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         if (isAppSelectionSheetOpen) {
@@ -171,9 +182,9 @@ fun AppLockSettingsUI(
                     viewModel.updateAppLockAppEnabled(
                         ctx,
                         pkg,
-                        enabled
+                        enabled,
                     )
-                }
+                },
             )
         }
     }

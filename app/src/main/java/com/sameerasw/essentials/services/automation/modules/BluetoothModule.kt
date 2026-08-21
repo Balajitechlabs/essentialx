@@ -32,42 +32,49 @@ class BluetoothModule : AutomationModule {
     private val scope = CoroutineScope(Dispatchers.IO)
 
     @SuppressLint("MissingPermission")
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val device =
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                    intent.getParcelableExtra(
-                        BluetoothDevice.EXTRA_DEVICE,
-                        BluetoothDevice::class.java
-                    )
-                } else {
-                    @Suppress("DEPRECATION")
-                    intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
-                } ?: return
+    private val receiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context,
+                intent: Intent,
+            ) {
+                val device =
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                        intent.getParcelableExtra(
+                            BluetoothDevice.EXTRA_DEVICE,
+                            BluetoothDevice::class.java,
+                        )
+                    } else {
+                        @Suppress("DEPRECATION")
+                        intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    } ?: return
 
-            val address = device.address ?: return
+                val address = device.address ?: return
 
-            when (intent.action) {
-                BluetoothDevice.ACTION_ACL_CONNECTED -> handleTrigger(context, address) {
-                    it is Trigger.BluetoothConnected && it.deviceAddress == address
-                }
+                when (intent.action) {
+                    BluetoothDevice.ACTION_ACL_CONNECTED ->
+                        handleTrigger(context, address) {
+                            it is Trigger.BluetoothConnected && it.deviceAddress == address
+                        }
 
-                BluetoothDevice.ACTION_ACL_DISCONNECTED -> handleTrigger(context, address) {
-                    it is Trigger.BluetoothDisconnected && it.deviceAddress == address
+                    BluetoothDevice.ACTION_ACL_DISCONNECTED ->
+                        handleTrigger(context, address) {
+                            it is Trigger.BluetoothDisconnected && it.deviceAddress == address
+                        }
                 }
             }
         }
-    }
 
     private var appContext: Context? = null
 
     override fun start(context: Context) {
         val appCtx = context.applicationContext
         appContext = appCtx
-        val filter = IntentFilter().apply {
-            addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
-            addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-        }
+        val filter =
+            IntentFilter().apply {
+                addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
+                addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+            }
         appCtx.registerReceiver(receiver, filter)
     }
 
@@ -85,9 +92,14 @@ class BluetoothModule : AutomationModule {
         this.automations = automations
     }
 
-    private fun handleTrigger(context: Context, address: String, matches: (Trigger) -> Boolean) {
+    private fun handleTrigger(
+        context: Context,
+        address: String,
+        matches: (Trigger) -> Boolean,
+    ) {
         scope.launch {
-            automations.filter { it.type == Automation.Type.TRIGGER && it.trigger?.let(matches) == true }
+            automations
+                .filter { it.type == Automation.Type.TRIGGER && it.trigger?.let(matches) == true }
                 .forEach { automation ->
                     automation.actions.forEach { action ->
                         CombinedActionExecutor.execute(context, action)

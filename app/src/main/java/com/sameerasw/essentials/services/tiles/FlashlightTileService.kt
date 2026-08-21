@@ -20,7 +20,6 @@ import com.sameerasw.essentials.services.receivers.FlashlightActionReceiver
 
 @RequiresApi(Build.VERSION_CODES.N)
 class FlashlightTileService : BaseTileService() {
-
     private var isTorchOn = false
     private val cameraManager by lazy { getSystemService(CAMERA_SERVICE) as CameraManager }
 
@@ -30,18 +29,23 @@ class FlashlightTileService : BaseTileService() {
     private val isTileActive: Boolean
         get() = isTorchOn || isSpecialModeActive
 
-    private val torchCallback = object : CameraManager.TorchCallback() {
-        override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
-            super.onTorchModeChanged(cameraId, enabled)
-            isTorchOn = enabled
-            updateTile()
+    private val torchCallback =
+        object : CameraManager.TorchCallback() {
+            override fun onTorchModeChanged(
+                cameraId: String,
+                enabled: Boolean,
+            ) {
+                super.onTorchModeChanged(cameraId, enabled)
+                isTorchOn = enabled
+                updateTile()
 
-            val intent = Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
-                setPackage(packageName)
+                val intent =
+                    Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
+                        setPackage(packageName)
+                    }
+                sendBroadcast(intent)
             }
-            sendBroadcast(intent)
         }
-    }
 
     override fun onCreate() {
         super.onCreate()
@@ -63,14 +67,16 @@ class FlashlightTileService : BaseTileService() {
 
     override fun onTileClick() {
         if (isSpecialModeActive) {
-            val intent = Intent(this, FlashlightActionReceiver::class.java).apply {
-                action = FlashlightActionReceiver.ACTION_OFF
-            }
+            val intent =
+                Intent(this, FlashlightActionReceiver::class.java).apply {
+                    action = FlashlightActionReceiver.ACTION_OFF
+                }
             sendBroadcast(intent)
         } else {
-            val intent = Intent(this, FlashlightActionReceiver::class.java).apply {
-                action = FlashlightActionReceiver.ACTION_TOGGLE
-            }
+            val intent =
+                Intent(this, FlashlightActionReceiver::class.java).apply {
+                    action = FlashlightActionReceiver.ACTION_TOGGLE
+                }
             sendBroadcast(intent)
         }
     }

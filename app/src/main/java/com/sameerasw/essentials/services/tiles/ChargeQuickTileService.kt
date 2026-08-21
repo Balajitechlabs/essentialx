@@ -18,7 +18,6 @@ import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.ShellUtils
 
 class ChargeQuickTileService : BaseTileService() {
-
     override fun isDeviceSupported(): Boolean = DeviceUtils.isGoogleDevice()
 
     companion object {
@@ -28,17 +27,20 @@ class ChargeQuickTileService : BaseTileService() {
 
     override fun onClick() {
         if (!hasFeaturePermission()) {
-            com.sameerasw.essentials.utils.HapticUtil.performHapticForService(this)
-            val intent = Intent(this, FeatureSettingsActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                putExtra("feature", "Quick settings tiles")
-            }
-            val pendingIntent = android.app.PendingIntent.getActivity(
-                this,
-                0,
-                intent,
-                android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
-            )
+            com.sameerasw.essentials.utils.HapticUtil
+                .performHapticForService(this)
+            val intent =
+                Intent(this, FeatureSettingsActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    putExtra("feature", "Quick settings tiles")
+                }
+            val pendingIntent =
+                android.app.PendingIntent.getActivity(
+                    this,
+                    0,
+                    intent,
+                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE,
+                )
             startActivityAndCollapse(pendingIntent)
             return
         }
@@ -49,27 +51,31 @@ class ChargeQuickTileService : BaseTileService() {
         val adaptiveChargingEnabled = getSecureInt(ADAPTIVE_CHARGING_SETTING, 0) == 1
         val chargeOptimizationEnabled = getSecureInt(CHARGE_OPTIMIZATION_MODE, 0) == 1
 
-        val settingsRepository = com.sameerasw.essentials.data.repository.SettingsRepository(this)
+        val settingsRepository =
+            com.sameerasw.essentials.data.repository
+                .SettingsRepository(this)
         val enableAdaptive = settingsRepository.getBoolean("charge_opt_toggle_adaptive", true)
         val enableLimit = settingsRepository.getBoolean("charge_opt_toggle_limit", true)
         val enableDeactivated = settingsRepository.getBoolean("charge_opt_toggle_deactivated", true)
 
-        val currentSelection = when {
-            chargeOptimizationEnabled -> 2 // LIMIT
-            adaptiveChargingEnabled -> 1 // ADAPTIVE
-            else -> 0 // DEACTIVATED
-        }
+        val currentSelection =
+            when {
+                chargeOptimizationEnabled -> 2 // LIMIT
+                adaptiveChargingEnabled -> 1 // ADAPTIVE
+                else -> 0 // DEACTIVATED
+            }
 
         // Determine the next state
         var nextSelection = currentSelection
         for (i in 1..3) {
             val candidate = (currentSelection + i) % 3
-            val isAllowed = when (candidate) {
-                0 -> enableDeactivated
-                1 -> enableAdaptive
-                2 -> enableLimit
-                else -> false
-            }
+            val isAllowed =
+                when (candidate) {
+                    0 -> enableDeactivated
+                    1 -> enableAdaptive
+                    2 -> enableLimit
+                    else -> false
+                }
             if (isAllowed) {
                 nextSelection = candidate
                 break
@@ -107,19 +113,17 @@ class ChargeQuickTileService : BaseTileService() {
         }
     }
 
-    override fun hasFeaturePermission(): Boolean {
-        return ShellUtils.isAvailable(this) && ShellUtils.hasPermission(this)
-    }
-
+    override fun hasFeaturePermission(): Boolean = ShellUtils.isAvailable(this) && ShellUtils.hasPermission(this)
 
     override fun getTileIcon(): Icon {
         val adaptiveChargingEnabled = getSecureInt(ADAPTIVE_CHARGING_SETTING, 0) == 1
         val chargeOptimizationEnabled = getSecureInt(CHARGE_OPTIMIZATION_MODE, 0) == 1
-        val resId = when {
-            chargeOptimizationEnabled -> R.drawable.rounded_battery_android_frame_shield_24
-            adaptiveChargingEnabled -> R.drawable.rounded_battery_android_frame_plus_24
-            else -> R.drawable.outline_battery_android_frame_bolt_24
-        }
+        val resId =
+            when {
+                chargeOptimizationEnabled -> R.drawable.rounded_battery_android_frame_shield_24
+                adaptiveChargingEnabled -> R.drawable.rounded_battery_android_frame_plus_24
+                else -> R.drawable.outline_battery_android_frame_bolt_24
+            }
         return Icon.createWithResource(this, resId)
     }
 

@@ -47,7 +47,7 @@ fun ScreenOffWidgetSettingsUI(
     modifier: Modifier = Modifier,
     highlightSetting: String? = null,
     onShowPermissionSheet: (Boolean) -> Unit,
-    onSetChildFeatureForPermissions: (String?) -> Unit
+    onSetChildFeatureForPermissions: (String?) -> Unit,
 ) {
     val context = LocalContext.current
     val isShizukuPermissionGranted by viewModel.isShizukuPermissionGranted
@@ -58,30 +58,33 @@ fun ScreenOffWidgetSettingsUI(
         mutableStateOf(
             try {
                 ScreenOffMethod.valueOf(name ?: ScreenOffMethod.ACCESSIBILITY.name)
-            } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+            } catch (
+                @Suppress("UNUSED_PARAMETER") e: Exception,
+            ) {
                 ScreenOffMethod.ACCESSIBILITY
-            }
+            },
         )
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         // Screen Off Method Category
         Text(
             text = stringResource(R.string.screen_off_method_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 8.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             ScreenOffMethodPicker(
                 selectedMethod = selectedScreenOffMethod,
@@ -96,7 +99,7 @@ fun ScreenOffWidgetSettingsUI(
                         selectedScreenOffMethod = type
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "screen_off_method_picker")
+                modifier = Modifier.highlight(highlightSetting == "screen_off_method_picker"),
             )
         }
 
@@ -105,13 +108,13 @@ fun ScreenOffWidgetSettingsUI(
             text = stringResource(R.string.settings_section_haptic),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 8.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             HapticFeedbackPicker(
                 selectedFeedback = selectedHaptic,
@@ -125,7 +128,7 @@ fun ScreenOffWidgetSettingsUI(
                         performHapticFeedback(vibrator, type)
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "haptic_picker")
+                modifier = Modifier.highlight(highlightSetting == "haptic_picker"),
             )
         }
     }

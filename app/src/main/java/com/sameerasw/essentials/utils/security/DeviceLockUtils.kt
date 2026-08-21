@@ -22,47 +22,56 @@ import com.sameerasw.essentials.domain.ScreenOffMethod
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 
 object DeviceLockUtils {
-
-    fun performLockdownTileAction(context: Context, isLongPress: Boolean): Boolean {
+    fun performLockdownTileAction(
+        context: Context,
+        isLongPress: Boolean,
+    ): Boolean {
         val isLockdownEnabled =
             SettingsRepository(context).getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE, false)
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
 
-        val selectedScreenOffMethod = try {
-            ScreenOffMethod.valueOf(
-                prefs.getString("screen_off_method", ScreenOffMethod.ACCESSIBILITY.name)
-                    ?: ScreenOffMethod.ACCESSIBILITY.name
-            )
-        } catch (e: Exception) {
-            ScreenOffMethod.ACCESSIBILITY
-        }
+        val selectedScreenOffMethod =
+            try {
+                ScreenOffMethod.valueOf(
+                    prefs.getString("screen_off_method", ScreenOffMethod.ACCESSIBILITY.name)
+                        ?: ScreenOffMethod.ACCESSIBILITY.name,
+                )
+            } catch (e: Exception) {
+                ScreenOffMethod.ACCESSIBILITY
+            }
 
-        val methodToExecute = if (!isLongPress) {
-            if (isLockdownEnabled) ScreenOffMethod.DEVICE_ADMIN else selectedScreenOffMethod
-        } else {
-            if (isLockdownEnabled) selectedScreenOffMethod else ScreenOffMethod.DEVICE_ADMIN
-        }
+        val methodToExecute =
+            if (!isLongPress) {
+                if (isLockdownEnabled) ScreenOffMethod.DEVICE_ADMIN else selectedScreenOffMethod
+            } else {
+                if (isLockdownEnabled) selectedScreenOffMethod else ScreenOffMethod.DEVICE_ADMIN
+            }
 
         return lockDevice(context, methodToExecute)
     }
 
-    fun lockDevice(context: Context, method: ScreenOffMethod): Boolean {
+    fun lockDevice(
+        context: Context,
+        method: ScreenOffMethod,
+    ): Boolean {
         return when (method) {
             ScreenOffMethod.ACCESSIBILITY -> {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.msg_feature_not_supported),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(R.string.msg_feature_not_supported),
+                            Toast.LENGTH_SHORT,
+                        ).show()
                     return false
                 }
                 if (!PermissionUtils.isAccessibilityServiceEnabled(context)) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.msg_missing_accessibility_permission),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(R.string.msg_missing_accessibility_permission),
+                            Toast.LENGTH_SHORT,
+                        ).show()
                     return false
                 }
                 if (ScreenOffAccessibilityService.instance != null) {
@@ -79,11 +88,12 @@ object DeviceLockUtils {
 
             ScreenOffMethod.DEVICE_ADMIN -> {
                 if (!PermissionUtils.isDeviceAdminActive(context)) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.msg_device_admin_required_lockdown),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(R.string.msg_device_admin_required_lockdown),
+                            Toast.LENGTH_SHORT,
+                        ).show()
                     return false
                 }
                 val dpm =
@@ -94,11 +104,12 @@ object DeviceLockUtils {
 
             ScreenOffMethod.INPUT -> {
                 if (!ShellUtils.hasPermission(context)) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.msg_shizuku_root_required_lock),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast
+                        .makeText(
+                            context,
+                            context.getString(R.string.msg_shizuku_root_required_lock),
+                            Toast.LENGTH_SHORT,
+                        ).show()
                     return false
                 }
                 ShellUtils.runCommand(context, "input keyevent ${KeyEvent.KEYCODE_POWER}")
@@ -107,11 +118,10 @@ object DeviceLockUtils {
         }
     }
 
-    fun performAccessibilityLock(service: AccessibilityService): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    fun performAccessibilityLock(service: AccessibilityService): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN)
         } else {
             false
         }
-    }
 }

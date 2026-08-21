@@ -72,7 +72,7 @@ fun KaomojiPicker(
     hapticStrength: Float = 0.5f,
     onKaomojiSelected: (String) -> Unit,
     onSwipeDownToExit: () -> Unit = {},
-    bottomContentPadding: Dp = 0.dp
+    bottomContentPadding: Dp = 0.dp,
 ) {
     val scope = rememberCoroutineScope()
     val view = LocalView.current
@@ -103,55 +103,67 @@ fun KaomojiPicker(
     }
 
     // Nested Scroll for swipe-down exit gesture
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                if (pagerState.currentPage == 0 && available.y > 50f) {
-                    val gridState = gridStates[0]
-                    if (gridState?.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0) {
-                        onSwipeDownToExit()
-                        return available
+    val nestedScrollConnection =
+        remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(
+                    available: Offset,
+                    source: NestedScrollSource,
+                ): Offset {
+                    if (pagerState.currentPage == 0 && available.y > 50f) {
+                        val gridState = gridStates[0]
+                        if (gridState?.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0) {
+                            onSwipeDownToExit()
+                            return available
+                        }
                     }
+                    return Offset.Zero
                 }
-                return Offset.Zero
             }
         }
-    }
 
     Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
-            .nestedScroll(nestedScrollConnection)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(Color.Transparent)
+                .nestedScroll(nestedScrollConnection),
     ) {
         // Kaomoji Grid
         VerticalPager(
             state = pagerState,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
             beyondViewportPageCount = 1,
             userScrollEnabled = true,
-            flingBehavior = PagerDefaults.flingBehavior(
-                state = pagerState,
-                snapPositionalThreshold = 0.15f
-            )
+            flingBehavior =
+                PagerDefaults.flingBehavior(
+                    state = pagerState,
+                    snapPositionalThreshold = 0.15f,
+                ),
         ) { pageIndex ->
             val category = KaomojiData.categories.getOrNull(pageIndex)
             if (category != null) {
                 val gridState = gridStates.getOrPut(pageIndex) { LazyGridState() }
                 val context = androidx.compose.ui.platform.LocalContext.current
-                val categoryNameRes = remember(category.name) {
-                    context.resources.getIdentifier(
-                        "kaomoji_cat_${category.name}",
-                        "string",
-                        context.packageName
-                    )
+                val categoryNameRes =
+                    remember(category.name) {
+                        context.resources.getIdentifier(
+                            "kaomoji_cat_${category.name}",
+                            "string",
+                            context.packageName,
+                        )
+                    }
+                if (categoryNameRes !=
+                    0
+                ) {
+                    androidx.compose.ui.res
+                        .stringResource(categoryNameRes)
+                } else {
+                    category.name.replaceFirstChar { it.uppercase() }
                 }
-                if (categoryNameRes != 0) androidx.compose.ui.res.stringResource(categoryNameRes) else category.name.replaceFirstChar { it.uppercase() }
 
                 Column(modifier = Modifier.fillMaxSize()) {
                     // Category Header within the page
@@ -167,39 +179,42 @@ fun KaomojiPicker(
                     LazyVerticalGrid(
                         state = gridState,
                         columns = GridCells.Adaptive(minSize = 100.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 4.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 4.dp),
                         contentPadding = PaddingValues(bottom = bottomContentPadding + 32.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         itemsIndexed(
                             items = category.kaomojis,
                             key = { index, it -> "${category.name}_${it.value}_$index" },
-                            contentType = { _, _ -> "kaomoji" }
+                            contentType = { _, _ -> "kaomoji" },
                         ) { index, kaomojiObj ->
                             val interactionSource = remember { MutableInteractionSource() }
                             val isPressed by interactionSource.collectIsPressedAsState()
 
                             Box(
-                                modifier = Modifier
-                                    .height(48.dp)
-                                    .clip(RoundedCornerShape(keyRoundness))
-                                    .background(
-                                        if (isPressed) MaterialTheme.colorScheme.surfaceContainerHighest
-                                        else MaterialTheme.colorScheme.surfaceContainerLow
-                                    )
-                                    .clickable(
-                                        interactionSource = interactionSource,
-                                        indication = null,
-                                        onClick = {
-                                            onKaomojiSelected(kaomojiObj.value)
-                                            performHaptic(hapticStrength)
-                                        }
-                                    )
-                                    .padding(horizontal = 8.dp),
-                                contentAlignment = Alignment.Center
+                                modifier =
+                                    Modifier
+                                        .height(48.dp)
+                                        .clip(RoundedCornerShape(keyRoundness))
+                                        .background(
+                                            if (isPressed) {
+                                                MaterialTheme.colorScheme.surfaceContainerHighest
+                                            } else {
+                                                MaterialTheme.colorScheme.surfaceContainerLow
+                                            },
+                                        ).clickable(
+                                            interactionSource = interactionSource,
+                                            indication = null,
+                                            onClick = {
+                                                onKaomojiSelected(kaomojiObj.value)
+                                                performHaptic(hapticStrength)
+                                            },
+                                        ).padding(horizontal = 8.dp),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = kaomojiObj.value,
@@ -207,7 +222,7 @@ fun KaomojiPicker(
                                     maxLines = 1,
                                     textAlign = TextAlign.Center,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                         }
@@ -219,12 +234,13 @@ fun KaomojiPicker(
         // Vertical Category Rail
         LazyColumn(
             state = railScrollState,
-            modifier = Modifier
-                .width(65.dp)
-                .fillMaxHeight()
-                .padding(vertical = 4.dp),
+            modifier =
+                Modifier
+                    .width(65.dp)
+                    .fillMaxHeight()
+                    .padding(vertical = 4.dp),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             items(KaomojiData.categories.size) { index ->
                 val category = KaomojiData.categories[index]
@@ -232,51 +248,68 @@ fun KaomojiPicker(
                 val interactionSource = remember { MutableInteractionSource() }
 
                 val context = androidx.compose.ui.platform.LocalContext.current
-                val categoryNameRes = remember(category.name) {
-                    context.resources.getIdentifier(
-                        "kaomoji_cat_${category.name}",
-                        "string",
-                        context.packageName
-                    )
-                }
+                val categoryNameRes =
+                    remember(category.name) {
+                        context.resources.getIdentifier(
+                            "kaomoji_cat_${category.name}",
+                            "string",
+                            context.packageName,
+                        )
+                    }
                 val localizedName =
-                    if (categoryNameRes != 0) androidx.compose.ui.res.stringResource(categoryNameRes) else category.name.replaceFirstChar { it.uppercase() }
+                    if (categoryNameRes !=
+                        0
+                    ) {
+                        androidx.compose.ui.res
+                            .stringResource(categoryNameRes)
+                    } else {
+                        category.name.replaceFirstChar { it.uppercase() }
+                    }
 
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(44.dp)
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                        .clip(RoundedCornerShape(keyRoundness / 2))
-                        .background(
-                            if (isSelected) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceContainerHigh
-                        )
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null,
-                            onClick = {
-                                scope.launch {
-                                    gridStates[index]?.scrollToItem(0)
-                                    pagerState.animateScrollToPage(index)
-                                }
-                                performHaptic(hapticStrength * 0.8f)
-                            }
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(44.dp)
+                            .padding(horizontal = 4.dp, vertical = 2.dp)
+                            .clip(RoundedCornerShape(keyRoundness / 2))
+                            .background(
+                                if (isSelected) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceContainerHigh
+                                },
+                            ).clickable(
+                                interactionSource = interactionSource,
+                                indication = null,
+                                onClick = {
+                                    scope.launch {
+                                        gridStates[index]?.scrollToItem(0)
+                                        pagerState.animateScrollToPage(index)
+                                    }
+                                    performHaptic(hapticStrength * 0.8f)
+                                },
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = localizedName,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
-                            fontSize = 10.sp
-                        ),
-                        color = if (isSelected) MaterialTheme.colorScheme.background
-                        else MaterialTheme.colorScheme.secondary,
+                        style =
+                            MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
+                                fontSize = 10.sp,
+                            ),
+                        color =
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.background
+                            } else {
+                                MaterialTheme.colorScheme.secondary
+                            },
                         maxLines = 1,
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .basicMarquee()
+                        modifier =
+                            Modifier
+                                .padding(horizontal = 4.dp)
+                                .basicMarquee(),
                     )
                 }
             }

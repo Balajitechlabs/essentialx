@@ -15,11 +15,10 @@ import android.content.Context
 import androidx.annotation.Keep
 
 object BluetoothPairedDevicesUtil {
-
     @Keep
     data class PairedDevice(
         val name: String,
-        val address: String
+        val address: String,
     )
 
     @SuppressLint("MissingPermission")
@@ -28,17 +27,19 @@ object BluetoothPairedDevicesUtil {
             context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         val adapter = bluetoothManager?.adapter ?: return emptyList()
 
-        val devices = try {
-            adapter.bondedDevices
-        } catch (e: SecurityException) {
-            return emptyList()
-        }
+        val devices =
+            try {
+                adapter.bondedDevices
+            } catch (e: SecurityException) {
+                return emptyList()
+            }
 
-        return devices.map { device ->
-            PairedDevice(
-                name = device.alias ?: device.name ?: device.address,
-                address = device.address
-            )
-        }.sortedBy { it.name.lowercase() }
+        return devices
+            .map { device ->
+                PairedDevice(
+                    name = device.alias ?: device.name ?: device.address,
+                    address = device.address,
+                )
+            }.sortedBy { it.name.lowercase() }
     }
 }

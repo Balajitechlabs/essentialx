@@ -19,7 +19,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 
 @androidx.annotation.Keep
-class LocationReachedRepository(context: Context) {
+class LocationReachedRepository(
+    context: Context,
+) {
     private val prefs: SharedPreferences =
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
     private val gson = Gson()
@@ -63,14 +65,15 @@ class LocationReachedRepository(context: Context) {
             val enabled = prefs.getBoolean("location_reached_enabled", false)
 
             if (lat != 0.0 || lng != 0.0) {
-                val migratedAlarm = LocationAlarm(
-                    id = UUID.randomUUID().toString(),
-                    name = "Migrated Destination",
-                    latitude = lat,
-                    longitude = lng,
-                    radius = radius,
-                    isEnabled = enabled
-                )
+                val migratedAlarm =
+                    LocationAlarm(
+                        id = UUID.randomUUID().toString(),
+                        name = "Migrated Destination",
+                        latitude = lat,
+                        longitude = lng,
+                        radius = radius,
+                        isEnabled = enabled,
+                    )
                 saveAlarms(listOf(migratedAlarm))
                 if (enabled) {
                     saveActiveAlarmId(migratedAlarm.id)
@@ -113,9 +116,7 @@ class LocationReachedRepository(context: Context) {
         _activeAlarmId.value = id
     }
 
-    fun getActiveAlarmId(): String? {
-        return prefs.getString("location_reached_active_id", null)
-    }
+    fun getActiveAlarmId(): String? = prefs.getString("location_reached_active_id", null)
 
     fun saveLastTrip(alarm: LocationAlarm?) {
         if (alarm == null) {
@@ -139,19 +140,18 @@ class LocationReachedRepository(context: Context) {
         prefs.edit().putFloat("location_reached_start_dist", distance).apply()
     }
 
-    fun getStartDistance(): Float {
-        return prefs.getFloat("location_reached_start_dist", 0f)
-    }
+    fun getStartDistance(): Float = prefs.getFloat("location_reached_start_dist", 0f)
 
     fun saveStartTime(time: Long) {
         prefs.edit().putLong("location_reached_start_time", time).apply()
     }
 
-    fun getStartTime(): Long {
-        return prefs.getLong("location_reached_start_time", 0L)
-    }
+    fun getStartTime(): Long = prefs.getLong("location_reached_start_time", 0L)
 
-    fun updateLastTravelled(alarmId: String, timestamp: Long) {
+    fun updateLastTravelled(
+        alarmId: String,
+        timestamp: Long,
+    ) {
         val alarms = getAlarms().toMutableList()
         val index = alarms.indexOfFirst { it.id == alarmId }
         if (index != -1) {
@@ -160,7 +160,10 @@ class LocationReachedRepository(context: Context) {
         }
     }
 
-    fun updatePausedState(alarmId: String, isPaused: Boolean) {
+    fun updatePausedState(
+        alarmId: String,
+        isPaused: Boolean,
+    ) {
         val alarms = getAlarms().toMutableList()
         val index = alarms.indexOfFirst { it.id == alarmId }
         if (index != -1) {

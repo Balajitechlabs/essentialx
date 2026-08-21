@@ -32,25 +32,29 @@ class FlashlightActionReceiver : BroadcastReceiver() {
         const val EXTRA_IS_PREVIEW = "is_preview"
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val action = intent.action ?: return
         Log.d("FlashlightAction", "Action received: $action")
 
-        val serviceIntent = Intent(context, ScreenOffAccessibilityService::class.java).apply {
-            this.action = action
-            if (intent.hasExtra(EXTRA_INTENSITY)) {
-                putExtra(EXTRA_INTENSITY, intent.getIntExtra(EXTRA_INTENSITY, 1))
+        val serviceIntent =
+            Intent(context, ScreenOffAccessibilityService::class.java).apply {
+                this.action = action
+                if (intent.hasExtra(EXTRA_INTENSITY)) {
+                    putExtra(EXTRA_INTENSITY, intent.getIntExtra(EXTRA_INTENSITY, 1))
+                }
+                if (intent.hasExtra(EXTRA_STROBE_SPEED)) {
+                    putExtra(EXTRA_STROBE_SPEED, intent.getFloatExtra(EXTRA_STROBE_SPEED, 5f))
+                }
+                if (intent.hasExtra(EXTRA_STROBE_FADE)) {
+                    putExtra(EXTRA_STROBE_FADE, intent.getBooleanExtra(EXTRA_STROBE_FADE, false))
+                }
+                if (intent.hasExtra(EXTRA_IS_PREVIEW)) {
+                    putExtra(EXTRA_IS_PREVIEW, intent.getBooleanExtra(EXTRA_IS_PREVIEW, false))
+                }
             }
-            if (intent.hasExtra(EXTRA_STROBE_SPEED)) {
-                putExtra(EXTRA_STROBE_SPEED, intent.getFloatExtra(EXTRA_STROBE_SPEED, 5f))
-            }
-            if (intent.hasExtra(EXTRA_STROBE_FADE)) {
-                putExtra(EXTRA_STROBE_FADE, intent.getBooleanExtra(EXTRA_STROBE_FADE, false))
-            }
-            if (intent.hasExtra(EXTRA_IS_PREVIEW)) {
-                putExtra(EXTRA_IS_PREVIEW, intent.getBooleanExtra(EXTRA_IS_PREVIEW, false))
-            }
-        }
         context.startService(serviceIntent)
     }
 }

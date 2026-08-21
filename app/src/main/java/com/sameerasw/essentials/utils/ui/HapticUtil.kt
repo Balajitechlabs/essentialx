@@ -82,42 +82,48 @@ object HapticUtil {
      */
     fun performHapticForService(
         context: Context,
-        type: HapticFeedbackType = HapticFeedbackType.SUBTLE
+        type: HapticFeedbackType = HapticFeedbackType.SUBTLE,
     ) {
         if (!isAppHapticsEnabled.value) return
-        val vibrator = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            val vibratorManager =
-                context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
-            vibratorManager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        }
+        val vibrator =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                val vibratorManager =
+                    context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
+                vibratorManager.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            }
         performHapticFeedback(vibrator, type)
     }
 
-    fun performCustomHaptic(view: View, strength: Float) {
+    fun performCustomHaptic(
+        view: View,
+        strength: Float,
+    ) {
         if (!isAppHapticsEnabled.value) return
 
-        val vibrator = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            val vibratorManager =
-                view.context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
-            vibratorManager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            view.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        }
+        val vibrator =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                val vibratorManager =
+                    view.context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
+                vibratorManager.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                view.context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            }
 
         // Use Primitives (API 30+) for the most consistent, crisp feedback with scaling
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
             try {
                 if (vibrator.areAllPrimitivesSupported(android.os.VibrationEffect.Composition.PRIMITIVE_CLICK)) {
-                    val effect = android.os.VibrationEffect.startComposition()
-                        .addPrimitive(
-                            android.os.VibrationEffect.Composition.PRIMITIVE_CLICK,
-                            strength
-                        )
-                        .compose()
+                    val effect =
+                        android.os.VibrationEffect
+                            .startComposition()
+                            .addPrimitive(
+                                android.os.VibrationEffect.Composition.PRIMITIVE_CLICK,
+                                strength,
+                            ).compose()
 
                     val attrs =
                         android.os.VibrationAttributes.createForUsage(android.os.VibrationAttributes.USAGE_TOUCH)
@@ -166,7 +172,10 @@ object HapticUtil {
     /**
      * Save app haptic preference to SharedPreferences
      */
-    fun saveAppHapticsEnabled(context: Context, enabled: Boolean) {
+    fun saveAppHapticsEnabled(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         prefs.edit().putBoolean("app_haptics_enabled", enabled).apply()
         isAppHapticsEnabled.value = enabled
@@ -179,4 +188,3 @@ object HapticUtil {
         isAppHapticsEnabled.value = loadAppHapticsEnabled(context)
     }
 }
-

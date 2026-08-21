@@ -40,7 +40,10 @@ class SettingsViewModel : ViewModel() {
      * @param context [Context] Application context for persistence.
      * @param key [String] Unique key of the feature card.
      */
-    fun togglePinFeature(context: Context, key: String) {
+    fun togglePinFeature(
+        context: Context,
+        key: String,
+    ) {
         val repo = SettingsRepository(context)
         val current = pinnedFeatureKeys.value.toMutableList()
         if (current.contains(key)) {

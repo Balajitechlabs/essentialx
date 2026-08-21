@@ -52,7 +52,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 @Composable
 fun SweepShapesBottomSheet(
     viewModel: MainViewModel,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -64,56 +64,62 @@ fun SweepShapesBottomSheet(
 
     EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.notification_lighting_sweep_select_shapes_title),
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             LazyVerticalGrid(
                 columns = GridCells.Fixed(4),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f, fill = false)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false),
             ) {
                 items(AmbientMusicShapeHelper.allShapesWithNames) { (name, polygon) ->
                     val isSelected = selectedShapes.contains(name)
                     Box(
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .clip(polygon.toShape())
-                            .background(
-                                if (isSelected) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.surfaceBright
-                            )
-                            .clickable {
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                selectedShapes = if (isSelected) {
-                                    selectedShapes - name
-                                } else {
-                                    selectedShapes + name
-                                }
-                            },
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .aspectRatio(1f)
+                                .clip(polygon.toShape())
+                                .background(
+                                    if (isSelected) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.surfaceBright
+                                    },
+                                ).clickable {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    selectedShapes =
+                                        if (isSelected) {
+                                            selectedShapes - name
+                                        } else {
+                                            selectedShapes + name
+                                        }
+                                },
+                        contentAlignment = Alignment.Center,
                     ) {
                         if (isSelected) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_check_24),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         }
                     }
@@ -122,7 +128,7 @@ fun SweepShapesBottomSheet(
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 OutlinedButton(
                     onClick = {
@@ -131,7 +137,7 @@ fun SweepShapesBottomSheet(
                             AmbientMusicShapeHelper.allShapesWithNames.map { it.first }.toSet()
                         selectedShapes = allNames - selectedShapes
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Text(stringResource(R.string.action_invert_selection))
                 }
@@ -142,7 +148,7 @@ fun SweepShapesBottomSheet(
                         viewModel.saveEdgeLightingSweepSelectedShapes(selectedShapes)
                         onDismissRequest()
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Text(stringResource(R.string.action_save))
                 }

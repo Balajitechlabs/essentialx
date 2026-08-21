@@ -107,7 +107,7 @@ fun FreezeGridUI(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onGetStartedClick: (() -> Unit)? = null,
     onAppLaunched: (() -> Unit)? = null,
-    onSettingsClick: (() -> Unit)? = null
+    onSettingsClick: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -130,36 +130,41 @@ fun FreezeGridUI(
 
     var selectedTagId by rememberSaveable { mutableStateOf<String?>(null) }
 
-    val filteredApps = remember(pickedApps, searchQuery, selectedTagId, freezeAppTagMap) {
-        var list = pickedApps
-        val filterTagId = selectedTagId
-        if (!filterTagId.isNullOrEmpty()) {
-            list = list.filter { app ->
-                val assignedTagIds = freezeAppTagMap[app.packageName] ?: emptyList()
-                assignedTagIds.contains(filterTagId)
+    val filteredApps =
+        remember(pickedApps, searchQuery, selectedTagId, freezeAppTagMap) {
+            var list = pickedApps
+            val filterTagId = selectedTagId
+            if (!filterTagId.isNullOrEmpty()) {
+                list =
+                    list.filter { app ->
+                        val assignedTagIds = freezeAppTagMap[app.packageName] ?: emptyList()
+                        assignedTagIds.contains(filterTagId)
+                    }
             }
-        }
-        if (searchQuery.isNotBlank()) {
-            list = list.filter { app ->
-                app.appName.contains(searchQuery, ignoreCase = true) ||
-                        app.packageName.contains(searchQuery, ignoreCase = true)
+            if (searchQuery.isNotBlank()) {
+                list =
+                    list.filter { app ->
+                        app.appName.contains(searchQuery, ignoreCase = true) ||
+                            app.packageName.contains(searchQuery, ignoreCase = true)
+                    }
             }
+            list
         }
-        list
-    }
 
-    val bestMatch = remember(searchQuery, filteredApps) {
-        if (searchQuery.isNotBlank() && filteredApps.isNotEmpty()) filteredApps.first() else null
-    }
+    val bestMatch =
+        remember(searchQuery, filteredApps) {
+            if (searchQuery.isNotBlank() && filteredApps.isNotEmpty()) filteredApps.first() else null
+        }
 
     // Refresh frozen states when active
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.check(context)
-                viewModel.refreshFreezePickedApps(context)
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    viewModel.check(context)
+                    viewModel.refreshFreezePickedApps(context)
+                }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -168,9 +173,10 @@ fun FreezeGridUI(
 
     LaunchedEffect(pickedApps) {
         withContext(Dispatchers.IO) {
-            val states = pickedApps.associate { app ->
-                app.packageName to FreezeManager.isAppFrozen(context, app.packageName)
-            }
+            val states =
+                pickedApps.associate { app ->
+                    app.packageName to FreezeManager.isAppFrozen(context, app.packageName)
+                }
             // Batch update on Main thread
             withContext(Dispatchers.Main) {
                 frozenStates.putAll(states)
@@ -187,24 +193,25 @@ fun FreezeGridUI(
             }
         } else if (pickedApps.isEmpty()) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_mode_cool_24),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.msg_no_apps_frozen),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 if (onGetStartedClick != null) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -212,7 +219,7 @@ fun FreezeGridUI(
                         onClick = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             onGetStartedClick()
-                        }
+                        },
                     ) {
                         Text(stringResource(R.string.action_get_started))
                     }
@@ -222,28 +229,30 @@ fun FreezeGridUI(
             val scrollState = androidx.compose.foundation.rememberScrollState()
 
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .pointerInput(Unit) {
-                        detectTapGestures(onTap = { focusManager.clearFocus() })
-                    }
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .pointerInput(Unit) {
+                            detectTapGestures(onTap = { focusManager.clearFocus() })
+                        },
             ) {
                 Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
 
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .focusRequester(focusRequester)
-                        .onFocusChanged { isFocused = it.isFocused },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .focusRequester(focusRequester)
+                            .onFocusChanged { isFocused = it.isFocused },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_search_24),
                             contentDescription = stringResource(R.string.label_search_content_description),
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         )
                     },
                     trailingIcon = {
@@ -254,7 +263,7 @@ fun FreezeGridUI(
                             }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_close_24),
-                                    contentDescription = stringResource(R.string.action_stop)
+                                    contentDescription = stringResource(R.string.action_stop),
                                 )
                             }
                         }
@@ -264,47 +273,53 @@ fun FreezeGridUI(
                     },
                     shape = MaterialTheme.shapes.extraExtraLarge,
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceBright
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Search,
-                        capitalization = KeyboardCapitalization.Words
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            bestMatch?.let { app ->
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                viewModel.launchAndUnfreezeApp(context, app.packageName)
-                                onAppLaunched?.invoke()
-                            }
-                        }
-                    )
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
+                        ),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            imeAction = ImeAction.Search,
+                            capitalization = KeyboardCapitalization.Words,
+                        ),
+                    keyboardActions =
+                        KeyboardActions(
+                            onSearch = {
+                                bestMatch?.let { app ->
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    viewModel.launchAndUnfreezeApp(context, app.packageName)
+                                    onAppLaunched?.invoke()
+                                }
+                            },
+                        ),
                 )
 
                 if (freezeTags.isNotEmpty()) {
                     androidx.compose.foundation.lazy.LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         items(freezeTags.size) { index ->
                             val tag = freezeTags[index]
                             val isSelected = selectedTagId == tag.id
-                            val color = try {
-                                Color(android.graphics.Color.parseColor(tag.colorHex))
-                            } catch (e: Exception) {
-                                MaterialTheme.colorScheme.primary
-                            }
-                            val iconResId = context.resources.getIdentifier(
-                                tag.iconName,
-                                "drawable",
-                                context.packageName
-                            )
+                            val color =
+                                try {
+                                    Color(android.graphics.Color.parseColor(tag.colorHex))
+                                } catch (e: Exception) {
+                                    MaterialTheme.colorScheme.primary
+                                }
+                            val iconResId =
+                                context.resources.getIdentifier(
+                                    tag.iconName,
+                                    "drawable",
+                                    context.packageName,
+                                )
 
                             val richColor = remember(color) { ColorUtil.toRichColor(color) }
 
@@ -321,91 +336,98 @@ fun FreezeGridUI(
                                         Icon(
                                             painter = painterResource(id = R.drawable.rounded_check_24),
                                             contentDescription = null,
-                                            modifier = Modifier.size(androidx.compose.material3.FilterChipDefaults.IconSize)
+                                            modifier = Modifier.size(androidx.compose.material3.FilterChipDefaults.IconSize),
                                         )
                                     } else {
                                         Icon(
-                                            painter = painterResource(
-                                                id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
-                                            ),
+                                            painter =
+                                                painterResource(
+                                                    id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24,
+                                                ),
                                             contentDescription = null,
                                             tint = richColor,
-                                            modifier = Modifier.size(18.dp)
+                                            modifier = Modifier.size(18.dp),
                                         )
                                     }
-                                }
+                                },
                             )
                         }
                     }
                 }
 
-
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // App Grid Items
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     if (filteredApps.isEmpty() && searchQuery.isNotEmpty()) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 32.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 32.dp),
                             verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = "¯\\_(ツ)_/¯",
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
                                 text = stringResource(id = R.string.search_no_results, searchQuery),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(top = 8.dp)
+                                modifier = Modifier.padding(top = 8.dp),
                             )
                         }
                     } else {
                         val chunkedApps = filteredApps.chunked(4)
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             chunkedApps.forEach { rowApps ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 ) {
                                     rowApps.forEach { app ->
                                         val appTagIds =
                                             freezeAppTagMap[app.packageName] ?: emptyList()
                                         val neverAutoFreezeTagIds =
-                                            freezeTags.filter { it.neverAutoFreeze }.map { it.id }
+                                            freezeTags
+                                                .filter { it.neverAutoFreeze }
+                                                .map { it.id }
                                                 .toSet()
                                         val isLockedByTag =
                                             appTagIds.any { neverAutoFreezeTagIds.contains(it) }
 
-                                        val tagColor = if (isTagColorCodedEnabled) {
-                                            appTagIds.firstOrNull()?.let { firstTagId ->
-                                                freezeTags.find { it.id == firstTagId }?.colorHex?.let { colorHex ->
-                                                    try {
-                                                        Color(
-                                                            android.graphics.Color.parseColor(
-                                                                colorHex
+                                        val tagColor =
+                                            if (isTagColorCodedEnabled) {
+                                                appTagIds.firstOrNull()?.let { firstTagId ->
+                                                    freezeTags.find { it.id == firstTagId }?.colorHex?.let { colorHex ->
+                                                        try {
+                                                            Color(
+                                                                android.graphics.Color.parseColor(
+                                                                    colorHex,
+                                                                ),
                                                             )
-                                                        )
-                                                    } catch (e: Exception) {
-                                                        null
+                                                        } catch (e: Exception) {
+                                                            null
+                                                        }
                                                     }
                                                 }
+                                            } else {
+                                                null
                                             }
-                                        } else null
 
                                         Box(modifier = Modifier.weight(1f)) {
                                             AppGridItem(
@@ -420,7 +442,7 @@ fun FreezeGridUI(
                                                     HapticUtil.performVirtualKeyHaptic(view)
                                                     viewModel.launchAndUnfreezeApp(
                                                         context,
-                                                        app.packageName
+                                                        app.packageName,
                                                     )
                                                     onAppLaunched?.invoke()
                                                 },
@@ -431,12 +453,12 @@ fun FreezeGridUI(
                                                         if (isCurrentlyFrozen) {
                                                             FreezeManager.unfreezeApp(
                                                                 context,
-                                                                app.packageName
+                                                                app.packageName,
                                                             )
                                                         } else {
                                                             FreezeManager.freezeApp(
                                                                 context,
-                                                                app.packageName
+                                                                app.packageName,
                                                             )
                                                         }
                                                         withContext(Dispatchers.Main) {
@@ -449,7 +471,7 @@ fun FreezeGridUI(
                                                     viewModel.updateFreezeAppAutoFreeze(
                                                         context,
                                                         app.packageName,
-                                                        isAutoFreeze
+                                                        isAutoFreeze,
                                                     )
                                                 },
                                                 onAssignTags = {
@@ -459,9 +481,9 @@ fun FreezeGridUI(
                                                     viewModel.updateFreezeAppEnabled(
                                                         context,
                                                         app.packageName,
-                                                        false
+                                                        false,
                                                     )
-                                                }
+                                                },
                                             )
                                         }
                                     }
@@ -486,7 +508,7 @@ fun FreezeGridUI(
                 onDismissRequest = { appForTagAssignment = null },
                 onSave = { selectedTagIds ->
                     viewModel.setAppTags(context, targetApp.packageName, selectedTagIds)
-                }
+                },
             )
         }
     }
@@ -506,7 +528,7 @@ fun AppGridItem(
     onToggleFreeze: () -> Unit,
     onToggleAutoFreeze: (Boolean) -> Unit,
     onAssignTags: () -> Unit,
-    onRemove: () -> Unit
+    onRemove: () -> Unit,
 ) {
     val view = LocalView.current
     val context = LocalContext.current
@@ -516,12 +538,12 @@ fun AppGridItem(
     val blurRadius by animateDpAsState(
         targetValue = if (isBlurred) 10.dp else 0.dp,
         animationSpec = tween(durationMillis = 500),
-        label = "blur"
+        label = "blur",
     )
     val alpha by animateFloatAsState(
         targetValue = if (isBlurred) 0.5f else 1f,
         animationSpec = tween(durationMillis = 500),
-        label = "alpha"
+        label = "alpha",
     )
 
     DisposableEffect(showMenu) {
@@ -543,78 +565,88 @@ fun AppGridItem(
 
     val borderColor by animateColorAsState(
         targetValue = if (isHighlighted) MaterialTheme.colorScheme.primary else Color.Transparent,
-        label = "borderColorAnimation"
+        label = "borderColorAnimation",
     )
 
     val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
-    val containerColor = remember(tagColor, isDarkTheme) {
-        if (tagColor == null) null
-        else {
-            val rich = ColorUtil.toRichColor(tagColor)
-            if (isDarkTheme) rich.copy(alpha = 0.35f)
-            else rich.copy(alpha = 0.2f)
+    val containerColor =
+        remember(tagColor, isDarkTheme) {
+            if (tagColor == null) {
+                null
+            } else {
+                val rich = ColorUtil.toRichColor(tagColor)
+                if (isDarkTheme) {
+                    rich.copy(alpha = 0.35f)
+                } else {
+                    rich.copy(alpha = 0.2f)
+                }
+            }
         }
-    }
 
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = containerColor ?: MaterialTheme.colorScheme.surfaceBright,
         border = if (isHighlighted) BorderStroke(2.dp, borderColor) else null,
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(alpha)
-            .blur(blurRadius)
-            .combinedClickable(
-                onClick = {
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    onClick()
-                },
-                onLongClick = {
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    showMenu = true
-                }
-            )
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .alpha(alpha)
+                .blur(blurRadius)
+                .combinedClickable(
+                    onClick = {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        onClick()
+                    },
+                    onLongClick = {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        showMenu = true
+                    },
+                ),
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
-                modifier = Modifier
-                    .size(56.dp)
+                modifier =
+                    Modifier
+                        .size(56.dp),
             ) {
                 // App Icon
                 Image(
                     bitmap = app.icon,
                     contentDescription = app.appName,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(14.dp)),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .clip(RoundedCornerShape(14.dp)),
                     contentScale = ContentScale.Fit,
                     colorFilter = if (isFrozen) ColorFilter.colorMatrix(grayscaleMatrix) else null,
-                    alpha = if (isFrozen) 0.6f else 1f
+                    alpha = if (isFrozen) 0.6f else 1f,
                 )
 
                 // Status Badges (Top Right)
                 Row(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = 4.dp, y = (-4).dp),
-                    horizontalArrangement = Arrangement.spacedBy((-4).dp)
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = 4.dp, y = (-4).dp),
+                    horizontalArrangement = Arrangement.spacedBy((-4).dp),
                 ) {
                     // Auto-freeze Exclusion Badge (Lock)
                     if (!isAutoFreezeEnabled || isLockedByTag) {
                         Box(
-                            modifier = Modifier
-                                .size(20.dp)
-                                .background(MaterialTheme.colorScheme.error, CircleShape)
-                                .padding(4.dp)
+                            modifier =
+                                Modifier
+                                    .size(20.dp)
+                                    .background(MaterialTheme.colorScheme.error, CircleShape)
+                                    .padding(4.dp),
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_lock_clock_24),
                                 contentDescription = "Auto-freeze excluded",
                                 modifier = Modifier.fillMaxSize(),
-                                tint = MaterialTheme.colorScheme.onError
+                                tint = MaterialTheme.colorScheme.onError,
                             )
                         }
                     }
@@ -628,19 +660,23 @@ fun AppGridItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 8.dp),
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             SegmentedDropdownMenu(
                 expanded = showMenu,
-                onDismissRequest = { showMenu = false }
+                onDismissRequest = { showMenu = false },
             ) {
                 SegmentedDropdownMenuItem(
                     text = {
                         Text(
-                            if (isFrozen) stringResource(R.string.action_unfreeze) else stringResource(
-                                R.string.action_freeze
-                            )
+                            if (isFrozen) {
+                                stringResource(R.string.action_unfreeze)
+                            } else {
+                                stringResource(
+                                    R.string.action_freeze,
+                                )
+                            },
                         )
                     },
                     onClick = {
@@ -649,18 +685,25 @@ fun AppGridItem(
                     },
                     leadingIcon = {
                         Icon(
-                            painter = painterResource(id = if (isFrozen) R.drawable.rounded_mode_cool_off_24 else R.drawable.rounded_mode_cool_24),
-                            contentDescription = null
+                            painter =
+                                painterResource(
+                                    id = if (isFrozen) R.drawable.rounded_mode_cool_off_24 else R.drawable.rounded_mode_cool_24,
+                                ),
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
 
                 SegmentedDropdownMenuItem(
                     text = {
                         Text(
-                            if (isAutoFreezeEnabled && !isLockedByTag) stringResource(R.string.action_lock_auto_freeze) else stringResource(
-                                R.string.action_unlock_auto_freeze
-                            )
+                            if (isAutoFreezeEnabled && !isLockedByTag) {
+                                stringResource(R.string.action_lock_auto_freeze)
+                            } else {
+                                stringResource(
+                                    R.string.action_unlock_auto_freeze,
+                                )
+                            },
                         )
                     },
                     enabled = !isLockedByTag,
@@ -671,9 +714,9 @@ fun AppGridItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_lock_clock_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
 
                 SegmentedDropdownMenuItem(
@@ -687,9 +730,9 @@ fun AppGridItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_interests_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
 
                 SegmentedDropdownMenuItem(
@@ -704,9 +747,9 @@ fun AppGridItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_delete_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
 
                 SegmentedDropdownMenuItem(
@@ -720,9 +763,9 @@ fun AppGridItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_home_health_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
 
                 SegmentedDropdownMenuItem(
@@ -731,18 +774,19 @@ fun AppGridItem(
                     },
                     onClick = {
                         showMenu = false
-                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                            data = Uri.fromParts("package", app.packageName, null)
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        }
+                        val intent =
+                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                data = Uri.fromParts("package", app.packageName, null)
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
                         context.startActivity(intent)
                     },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_info_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
             }
         }

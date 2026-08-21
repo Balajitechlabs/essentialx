@@ -52,7 +52,7 @@ import com.sameerasw.essentials.utils.performHapticFeedback
 fun ScreenOffSettingsSheet(
     initialAction: Action.ScreenOff,
     onDismiss: () -> Unit,
-    onSave: (Action.ScreenOff) -> Unit
+    onSave: (Action.ScreenOff) -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -63,26 +63,27 @@ fun ScreenOffSettingsSheet(
 
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.diy_action_screen_off),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             // Screen Off Method
             Text(
                 text = stringResource(R.string.screen_off_method_title),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(spacing = 8.dp, cornerRadius = 24.dp) {
@@ -91,15 +92,16 @@ fun ScreenOffSettingsSheet(
                     onMethodSelected = { type ->
                         HapticUtil.performUIHaptic(view)
                         if (type == ScreenOffMethod.INPUT && !ShellUtils.hasPermission(context)) {
-                            android.widget.Toast.makeText(
-                                context,
-                                "Shizuku/Root permission required for Input method",
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
+                            android.widget.Toast
+                                .makeText(
+                                    context,
+                                    "Shizuku/Root permission required for Input method",
+                                    android.widget.Toast.LENGTH_SHORT,
+                                ).show()
                         } else {
                             selectedMethod = type
                         }
-                    }
+                    },
                 )
             }
 
@@ -107,7 +109,7 @@ fun ScreenOffSettingsSheet(
             Text(
                 text = stringResource(R.string.settings_section_haptic),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(spacing = 8.dp, cornerRadius = 24.dp) {
@@ -116,16 +118,17 @@ fun ScreenOffSettingsSheet(
                     onFeedbackSelected = { type ->
                         HapticUtil.performUIHaptic(view)
                         selectedHaptic = type
-                        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                            context.getSystemService(VibratorManager::class.java)?.defaultVibrator
-                        } else {
-                            @Suppress("DEPRECATION")
-                            context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? Vibrator
-                        }
+                        val vibrator =
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                                context.getSystemService(VibratorManager::class.java)?.defaultVibrator
+                            } else {
+                                @Suppress("DEPRECATION")
+                                context.getSystemService(android.content.Context.VIBRATOR_SERVICE) as? Vibrator
+                            }
                         if (vibrator != null) {
                             performHapticFeedback(vibrator, type)
                         }
-                    }
+                    },
                 )
             }
 
@@ -134,16 +137,17 @@ fun ScreenOffSettingsSheet(
             // Action Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Button(
                     onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(28.dp)
+                    shape = RoundedCornerShape(28.dp),
                 ) {
                     Text(stringResource(R.string.action_cancel))
                 }
@@ -154,7 +158,7 @@ fun ScreenOffSettingsSheet(
                         onSave(Action.ScreenOff(selectedMethod, selectedHaptic))
                     },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(28.dp)
+                    shape = RoundedCornerShape(28.dp),
                 ) {
                     Text(stringResource(R.string.action_save))
                 }

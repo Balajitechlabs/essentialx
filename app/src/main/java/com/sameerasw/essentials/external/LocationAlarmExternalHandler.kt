@@ -20,26 +20,31 @@ import com.sameerasw.essentials.services.LocationReachedService
 class LocationAlarmExternalHandler : ExternalHandler {
     override val path: String = "location_alarm"
 
-    override fun onQuery(context: Context, remainingPath: String, extras: Bundle?): Cursor? {
+    override fun onQuery(
+        context: Context,
+        remainingPath: String,
+        extras: Bundle?,
+    ): Cursor? {
         val repository = LocationReachedRepository(context)
         if (remainingPath == "list") {
             val alarms = repository.getAlarms()
             val activeId = repository.getActiveAlarmId()
 
-            val cursor = MatrixCursor(
-                arrayOf(
-                    "id",
-                    "name",
-                    "latitude",
-                    "longitude",
-                    "radius",
-                    "isEnabled",
-                    "isPaused",
-                    "lastTravelled",
-                    "isActive",
-                    "iconResName"
+            val cursor =
+                MatrixCursor(
+                    arrayOf(
+                        "id",
+                        "name",
+                        "latitude",
+                        "longitude",
+                        "radius",
+                        "isEnabled",
+                        "isPaused",
+                        "lastTravelled",
+                        "isActive",
+                        "iconResName",
+                    ),
                 )
-            )
 
             for (alarm in alarms) {
                 cursor.addRow(
@@ -53,8 +58,8 @@ class LocationAlarmExternalHandler : ExternalHandler {
                         if (alarm.isPaused) 1 else 0,
                         alarm.lastTravelled ?: 0L,
                         if (alarm.id == activeId) 1 else 0,
-                        alarm.iconResName
-                    )
+                        alarm.iconResName,
+                    ),
                 )
             }
             return cursor
@@ -66,16 +71,14 @@ class LocationAlarmExternalHandler : ExternalHandler {
         context: Context,
         remainingPath: String,
         value: String?,
-        extras: Bundle?
-    ): Boolean {
-        return false
-    }
+        extras: Bundle?,
+    ): Boolean = false
 
     override fun onAction(
         context: Context,
         remainingPath: String,
         action: String?,
-        extras: Bundle?
+        extras: Bundle?,
     ): Bundle? {
         val repository = LocationReachedRepository(context)
         val targetAction = action ?: remainingPath
@@ -89,9 +92,10 @@ class LocationAlarmExternalHandler : ExternalHandler {
 
             "stop" -> {
                 repository.saveActiveAlarmId(null)
-                val intent = Intent(context, LocationReachedService::class.java).apply {
-                    this.action = LocationReachedService.ACTION_STOP
-                }
+                val intent =
+                    Intent(context, LocationReachedService::class.java).apply {
+                        this.action = LocationReachedService.ACTION_STOP
+                    }
                 context.startService(intent)
                 return Bundle().apply { putBoolean("success", true) }
             }

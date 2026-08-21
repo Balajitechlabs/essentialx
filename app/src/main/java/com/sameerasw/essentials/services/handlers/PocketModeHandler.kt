@@ -59,8 +59,9 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.utils.OverlayHelper
 
-class PocketModeHandler(private val service: AccessibilityService) {
-
+class PocketModeHandler(
+    private val service: AccessibilityService,
+) {
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
     private var lifecycleOwner: OverlayLifecycleOwner? = null
@@ -70,19 +71,21 @@ class PocketModeHandler(private val service: AccessibilityService) {
 
     private val handler = Handler(Looper.getMainLooper())
     private var isPending = false
-    private val showOverlayRunnable = Runnable {
-        isPending = false
-        if (!isBypassed) {
-            showOverlay()
-        }
-    }
-    private val screenOffRunnable = Runnable {
-        if (isOverlayVisible) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN)
+    private val showOverlayRunnable =
+        Runnable {
+            isPending = false
+            if (!isBypassed) {
+                showOverlay()
             }
         }
-    }
+    private val screenOffRunnable =
+        Runnable {
+            if (isOverlayVisible) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                    service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_LOCK_SCREEN)
+                }
+            }
+        }
 
     fun showOverlay() {
         if (isOverlayVisible || overlayView != null) return
@@ -100,21 +103,23 @@ class PocketModeHandler(private val service: AccessibilityService) {
         frameLayout.setViewTreeSavedStateRegistryOwner(owner)
         frameLayout.setViewTreeViewModelStoreOwner(owner)
 
-        val composeView = ComposeView(context).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
-            setContent {
-                PocketModeOverlayContent()
+        val composeView =
+            ComposeView(context).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+                setContent {
+                    PocketModeOverlayContent()
+                }
             }
-        }
         frameLayout.addView(composeView)
 
         overlayView = frameLayout
 
-        val params = OverlayHelper.createOverlayLayoutParams(
-            overlayType = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            flags = 0,
-            isTouchable = true
-        )
+        val params =
+            OverlayHelper.createOverlayLayoutParams(
+                overlayType = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                flags = 0,
+                isTouchable = true,
+            )
 
         try {
             windowManager?.addView(frameLayout, params)
@@ -147,7 +152,7 @@ class PocketModeHandler(private val service: AccessibilityService) {
         isBlocked: Boolean,
         isLightDark: Boolean,
         useLightSensor: Boolean,
-        triggerDelayMs: Long = 3000L
+        triggerDelayMs: Long = 3000L,
     ) {
         val shouldShow = isBlocked && (!useLightSensor || isLightDark)
         if (shouldShow) {
@@ -172,7 +177,9 @@ class PocketModeHandler(private val service: AccessibilityService) {
         isBypassed = false
     }
 
-    private class OverlayLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner,
+    private class OverlayLifecycleOwner :
+        LifecycleOwner,
+        SavedStateRegistryOwner,
         ViewModelStoreOwner {
         private val lifecycleRegistry = LifecycleRegistry(this)
         private val savedStateRegistryController = SavedStateRegistryController.create(this)
@@ -204,59 +211,62 @@ class PocketModeHandler(private val service: AccessibilityService) {
         val scale by infiniteTransition.animateFloat(
             initialValue = 0.8f,
             targetValue = 1.2f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1000, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "scale"
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(1000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+            label = "scale",
         )
         val alpha by infiniteTransition.animateFloat(
             initialValue = 0.4f,
             targetValue = 0.9f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1000, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "alpha"
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(1000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+            label = "alpha",
         )
 
         val context = LocalContext.current
 
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.Black),
         ) {
             // Pulsing circle at top center (near front camera/proximity sensor)
             Box(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 140.dp)
-                    .size(52.dp)
-                    .graphicsLayer(
-                        scaleX = scale,
-                        scaleY = scale,
-                        alpha = alpha
-                    )
-                    .background(Color.White.copy(alpha = 0.3f), shape = CircleShape)
+                modifier =
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(top = 140.dp)
+                        .size(52.dp)
+                        .graphicsLayer(
+                            scaleX = scale,
+                            scaleY = scale,
+                            alpha = alpha,
+                        ).background(Color.White.copy(alpha = 0.3f), shape = CircleShape),
             )
 
             // Center details
             Column(
                 modifier = Modifier.align(Alignment.Center),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = context.getString(R.string.pocket_mode_active),
                     color = Color.White,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = context.getString(R.string.pocket_mode_dismiss_hint),
                     color = Color.LightGray,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
                 )
             }
         }

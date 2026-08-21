@@ -9,7 +9,6 @@
 
 package com.sameerasw.essentials.ui.core.sheets
 
-
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -53,80 +52,86 @@ fun NewAutomationSheet(
     onDismiss: () -> Unit,
     onOptionSelected: (Automation.Type) -> Unit,
     onAIDescribeRequested: ((String) -> Unit)? = null,
-    isGenAILoading: Boolean = false
+    isGenAILoading: Boolean = false,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
     var aiPromptText by remember { mutableStateOf("") }
 
-    val isGenAIEnabled = remember(context) {
-        SettingsRepository(context).getBoolean(
-            SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED,
-            false
-        )
-    }
+    val isGenAIEnabled =
+        remember(context) {
+            SettingsRepository(context).getBoolean(
+                SettingsRepository.KEY_GENAI_AUTOMATION_ENABLED,
+                false,
+            )
+        }
     var isGenAISupported by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (isGenAIEnabled) {
             isGenAISupported =
-                com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
+                com.sameerasw.essentials.domain.genai.GenAIAutomationService
+                    .isSupported()
         }
     }
 
-
-    val isPixelSearchbarEnabled = remember(context) {
-        SettingsRepository(context).getBoolean(SettingsRepository.KEY_PIXEL_SEARCHBAR, false)
-    }
-
-    val hasActionShortcut = remember {
-        DIYRepository.automations.value.any {
-            it.type == Automation.Type.ACTION_SHORTCUT
+    val isPixelSearchbarEnabled =
+        remember(context) {
+            SettingsRepository(context).getBoolean(SettingsRepository.KEY_PIXEL_SEARCHBAR, false)
         }
-    }
 
-    val hasPixelSearchbar = remember {
-        DIYRepository.automations.value.any {
-            it.type == Automation.Type.PIXEL_SEARCHBAR
+    val hasActionShortcut =
+        remember {
+            DIYRepository.automations.value.any {
+                it.type == Automation.Type.ACTION_SHORTCUT
+            }
         }
-    }
+
+    val hasPixelSearchbar =
+        remember {
+            DIYRepository.automations.value.any {
+                it.type == Automation.Type.PIXEL_SEARCHBAR
+            }
+        }
 
     EssentialsBottomSheet(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 12.dp, start = 24.dp, end = 24.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 12.dp, start = 24.dp, end = 24.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 18.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 18.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = stringResource(R.string.diy_editor_new_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 OutlinedIconButton(
                     onClick = { /* TODO: Implement import */ },
-                    enabled = false
+                    enabled = false,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_download_24),
-                        contentDescription = "Import Automation"
+                        contentDescription = "Import Automation",
                     )
                 }
             }
 
             if (isGenAIEnabled && isGenAISupported && onAIDescribeRequested != null) {
                 RoundedCardContainer(
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
                 ) {
                     com.sameerasw.essentials.ui.core.cards.IconToggleItem(
                         iconRes = R.drawable.rounded_auto_awesome_24,
@@ -141,21 +146,18 @@ fun NewAutomationSheet(
                             HapticUtil.performVirtualKeyHaptic(view)
                             onDismiss()
                             onAIDescribeRequested("")
-                        }
+                        },
                     )
                 }
             }
 
-
-
             RoundedCardContainer {
-
                 // Trigger Option
                 AutomationTypeOption(
                     title = stringResource(R.string.diy_create_trigger_title),
                     description = stringResource(R.string.diy_create_trigger_desc),
                     iconRes = R.drawable.rounded_bolt_24,
-                    onClick = { onOptionSelected(Automation.Type.TRIGGER) }
+                    onClick = { onOptionSelected(Automation.Type.TRIGGER) },
                 )
 
                 // State Option
@@ -163,7 +165,7 @@ fun NewAutomationSheet(
                     title = stringResource(R.string.diy_create_state_title),
                     description = stringResource(R.string.diy_create_state_desc),
                     iconRes = R.drawable.rounded_toggle_on_24,
-                    onClick = { onOptionSelected(Automation.Type.STATE) }
+                    onClick = { onOptionSelected(Automation.Type.STATE) },
                 )
 
                 // App Option
@@ -171,7 +173,7 @@ fun NewAutomationSheet(
                     title = stringResource(R.string.diy_create_app_title),
                     description = stringResource(R.string.diy_create_app_desc),
                     iconRes = R.drawable.rounded_apps_24,
-                    onClick = { onOptionSelected(Automation.Type.APP) }
+                    onClick = { onOptionSelected(Automation.Type.APP) },
                 )
 
                 // Action Shortcut Option
@@ -180,7 +182,7 @@ fun NewAutomationSheet(
                     description = stringResource(R.string.diy_create_action_shortcut_desc),
                     iconRes = R.drawable.rounded_rocket_launch_24,
                     enabled = !hasActionShortcut,
-                    onClick = { onOptionSelected(Automation.Type.ACTION_SHORTCUT) }
+                    onClick = { onOptionSelected(Automation.Type.ACTION_SHORTCUT) },
                 )
 
                 // Pixel Searchbar Tap Option
@@ -190,7 +192,7 @@ fun NewAutomationSheet(
                         description = stringResource(R.string.diy_create_pixel_searchbar_desc),
                         iconRes = R.drawable.rounded_search_24,
                         enabled = !hasPixelSearchbar,
-                        onClick = { onOptionSelected(Automation.Type.PIXEL_SEARCHBAR) }
+                        onClick = { onOptionSelected(Automation.Type.PIXEL_SEARCHBAR) },
                     )
                 }
             }
@@ -205,35 +207,50 @@ private fun AutomationTypeOption(
     iconRes: Int,
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val view = LocalView.current
     Surface(
-        color = if (enabled) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHighest.copy(
-            alpha = 0.5f
-        ),
+        color =
+            if (enabled) {
+                MaterialTheme.colorScheme.surfaceContainerHighest
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerHighest.copy(
+                    alpha = 0.5f,
+                )
+            },
         shape = RoundedCornerShape(4.dp),
-        modifier = modifier
-            .fillMaxWidth()
-            .then(
-                if (enabled) Modifier.clickable {
-                    HapticUtil.performUIHaptic(view)
-                    onClick()
-                } else Modifier
-            )
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .then(
+                    if (enabled) {
+                        Modifier.clickable {
+                            HapticUtil.performUIHaptic(view)
+                            onClick()
+                        }
+                    } else {
+                        Modifier
+                    },
+                ),
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 painter = painterResource(id = iconRes),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                    alpha = 0.5f
-                )
+                tint =
+                    if (enabled) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = 0.5f,
+                        )
+                    },
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -241,28 +258,44 @@ private fun AutomationTypeOption(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = 0.5f
-                    )
+                    color =
+                        if (enabled) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = 0.5f,
+                            )
+                        },
                 )
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                        alpha = 0.5f
-                    )
+                    color =
+                        if (enabled) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                alpha = 0.5f,
+                            )
+                        },
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
             Icon(
                 painter = painterResource(R.drawable.rounded_chevron_right_24),
                 contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .size(24.dp),
-                tint = if (enabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                    alpha = 0.5f
-                )
+                modifier =
+                    Modifier
+                        .padding(end = 4.dp)
+                        .size(24.dp),
+                tint =
+                    if (enabled) {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = 0.5f,
+                        )
+                    },
             )
         }
     }

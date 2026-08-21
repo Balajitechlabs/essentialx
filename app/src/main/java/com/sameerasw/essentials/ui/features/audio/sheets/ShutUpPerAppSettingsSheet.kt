@@ -50,7 +50,7 @@ fun ShutUpPerAppSettingsSheet(
     onConfigChanged: (ShutUpAppConfig) -> Unit,
     onCreateShortcut: (ShutUpAppConfig) -> Unit,
     isFrozen: Boolean,
-    viewModel: MainViewModel = viewModel()
+    viewModel: MainViewModel = viewModel(),
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -78,31 +78,32 @@ fun ShutUpPerAppSettingsSheet(
                 TextButton(onClick = { showShizukuRestartWarning = false }) {
                     Text(stringResource(R.string.action_cancel))
                 }
-            }
+            },
         )
     }
 
     EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.shut_up_per_app_settings),
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(horizontal = 16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp),
             )
 
             RoundedCardContainer(
                 modifier = Modifier,
                 spacing = 2.dp,
-                cornerRadius = 24.dp
+                cornerRadius = 24.dp,
             ) {
                 IconToggleItem(
                     iconRes = R.drawable.rounded_settings_24,
@@ -112,7 +113,7 @@ fun ShutUpPerAppSettingsSheet(
                         val newConfig = currentConfig.copy(disableDevOptions = it)
                         currentConfig = newConfig
                         onConfigChanged(newConfig)
-                    }
+                    },
                 )
                 IconToggleItem(
                     iconRes = R.drawable.rounded_adb_24,
@@ -122,7 +123,7 @@ fun ShutUpPerAppSettingsSheet(
                         val newConfig = currentConfig.copy(disableUsbDebugging = it)
                         currentConfig = newConfig
                         onConfigChanged(newConfig)
-                    }
+                    },
                 )
                 IconToggleItem(
                     iconRes = R.drawable.rounded_android_wifi_4_bar_plus_24,
@@ -132,7 +133,7 @@ fun ShutUpPerAppSettingsSheet(
                         val newConfig = currentConfig.copy(disableWirelessDebugging = it)
                         currentConfig = newConfig
                         onConfigChanged(newConfig)
-                    }
+                    },
                 )
                 if (currentConfig.disableWirelessDebugging) {
                     IconToggleItem(
@@ -142,13 +143,14 @@ fun ShutUpPerAppSettingsSheet(
                         onCheckedChange = {
                             viewModel.setShutUpAttemptShizukuRestartEnabled(it)
                             if (it && viewModel.shizukuAuthToken.value.isEmpty()) {
-                                android.widget.Toast.makeText(
-                                    context,
-                                    "Please enter the Shizuku auth token in Essentials settings",
-                                    android.widget.Toast.LENGTH_LONG
-                                ).show()
+                                android.widget.Toast
+                                    .makeText(
+                                        context,
+                                        "Please enter the Shizuku auth token in Essentials settings",
+                                        android.widget.Toast.LENGTH_LONG,
+                                    ).show()
                             }
-                        }
+                        },
                     )
                 }
                 IconToggleItem(
@@ -159,14 +161,14 @@ fun ShutUpPerAppSettingsSheet(
                         val newConfig = currentConfig.copy(disableAccessibility = it)
                         currentConfig = newConfig
                         onConfigChanged(newConfig)
-                    }
+                    },
                 )
             }
 
             RoundedCardContainer(
                 modifier = Modifier,
                 spacing = 2.dp,
-                cornerRadius = 24.dp
+                cornerRadius = 24.dp,
             ) {
                 IconToggleItem(
                     iconRes = R.drawable.rounded_snowflake_24,
@@ -180,7 +182,7 @@ fun ShutUpPerAppSettingsSheet(
                             currentConfig = newConfig
                             onConfigChanged(newConfig)
                         }
-                    }
+                    },
                 )
             }
 
@@ -189,15 +191,18 @@ fun ShutUpPerAppSettingsSheet(
                     onCreateShortcut(currentConfig)
                     onDismissRequest()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                shape = MaterialTheme.shapes.extraLarge
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                shape = MaterialTheme.shapes.extraLarge,
             ) {
                 Icon(
-                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.rounded_open_in_new_24),
+                    painter =
+                        androidx.compose.ui.res
+                            .painterResource(id = R.drawable.rounded_open_in_new_24),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = stringResource(R.string.action_create_shortcut))

@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 class BatteriesWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = BatteriesWidget()
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         super.onReceive(context, intent)
 
         // Always update widget on configuration changes (including theme changes)
@@ -42,7 +45,7 @@ class BatteriesWidgetReceiver : GlanceAppWidgetReceiver() {
                     android.util.Log.e(
                         "BatteriesWidget",
                         "Error updating widget on config change",
-                        e
+                        e,
                     )
                 }
             }
@@ -59,7 +62,6 @@ class BatteriesWidgetReceiver : GlanceAppWidgetReceiver() {
             intent.action == android.bluetooth.BluetoothAdapter.ACTION_STATE_CHANGED ||
             intent.action == android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
         ) {
-
             // Trigger update
             val appWidgetManager =
                 context.getSystemService(Context.APPWIDGET_SERVICE) as? android.appwidget.AppWidgetManager
@@ -71,43 +73,55 @@ class BatteriesWidgetReceiver : GlanceAppWidgetReceiver() {
                         androidx.glance.appwidget.GlanceAppWidgetManager(context)
                     // Check permissions first
                     val repository =
-                        com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                        com.sameerasw.essentials.data.repository
+                            .SettingsRepository(context)
                     val hasPerm =
                         com.sameerasw.essentials.utils.PermissionUtils.hasBluetoothPermission(
-                            context
+                            context,
                         )
 
                     val isEnabled = repository.isBluetoothDevicesEnabled()
-                    val bluetoothDevices = if (isEnabled && hasPerm) {
-                        com.sameerasw.essentials.utils.BluetoothBatteryUtils.getPairedDevicesBattery(
-                            context
-                        )
-                    } else {
-                        emptyList()
-                    }
-
+                    val bluetoothDevices =
+                        if (isEnabled && hasPerm) {
+                            com.sameerasw.essentials.utils.BluetoothBatteryUtils.getPairedDevicesBattery(
+                                context,
+                            )
+                        } else {
+                            emptyList()
+                        }
 
                     repository.saveBluetoothDevicesBattery(bluetoothDevices)
 
                     val maxDevices = repository.getBatteryWidgetMaxDevices()
                     val isBackgroundEnabled = repository.isBatteryWidgetBackgroundEnabled()
 
-                    val devicesJson = com.google.gson.Gson().toJson(bluetoothDevices)
+                    val devicesJson =
+                        com.google.gson
+                            .Gson()
+                            .toJson(bluetoothDevices)
 
                     val glanceIds = glanceAppWidgetManager.getGlanceIds(BatteriesWidget::class.java)
                     glanceIds.forEach { glanceId ->
                         androidx.glance.appwidget.state.updateAppWidgetState(
                             context,
-                            glanceId
+                            glanceId,
                         ) { prefs ->
                             val KEY_SHOW =
-                                androidx.datastore.preferences.core.booleanPreferencesKey(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_SHOW_BLUETOOTH_DEVICES)
+                                androidx.datastore.preferences.core.booleanPreferencesKey(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_SHOW_BLUETOOTH_DEVICES,
+                                )
                             val KEY_DATA =
-                                androidx.datastore.preferences.core.stringPreferencesKey(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_BLUETOOTH_DEVICES_BATTERY)
+                                androidx.datastore.preferences.core.stringPreferencesKey(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_BLUETOOTH_DEVICES_BATTERY,
+                                )
                             val KEY_MAX =
-                                androidx.datastore.preferences.core.intPreferencesKey(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_BATTERY_WIDGET_MAX_DEVICES)
+                                androidx.datastore.preferences.core.intPreferencesKey(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_BATTERY_WIDGET_MAX_DEVICES,
+                                )
                             val KEY_BG =
-                                androidx.datastore.preferences.core.booleanPreferencesKey(com.sameerasw.essentials.data.repository.SettingsRepository.KEY_BATTERY_WIDGET_BACKGROUND_ENABLED)
+                                androidx.datastore.preferences.core.booleanPreferencesKey(
+                                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_BATTERY_WIDGET_BACKGROUND_ENABLED,
+                                )
 
                             prefs[KEY_SHOW] = isEnabled
                             prefs[KEY_DATA] = devicesJson
@@ -128,7 +142,7 @@ class BatteriesWidgetReceiver : GlanceAppWidgetReceiver() {
                     }
                 context.sendBroadcast(
                     requestIntent,
-                    "com.sameerasw.permission.ESSENTIALS_AIRSYNC_BRIDGE"
+                    "com.sameerasw.permission.ESSENTIALS_AIRSYNC_BRIDGE",
                 )
             } catch (e: Exception) {
                 // Ignore if AirSync not installed/found

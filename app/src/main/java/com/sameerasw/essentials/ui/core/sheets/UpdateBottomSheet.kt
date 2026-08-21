@@ -70,7 +70,7 @@ import java.net.URL
 fun UpdateBottomSheet(
     updateInfo: UpdateInfo?,
     isChecking: Boolean,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
     val context = LocalContext.current
@@ -87,9 +87,10 @@ fun UpdateBottomSheet(
         val notesStr = updateInfo?.releaseNotes?.trim() ?: ""
         if (notesStr.startsWith("http://") || notesStr.startsWith("https://")) {
             isFetchingNotes = true
-            fetchedNotes = withContext(Dispatchers.IO) {
-                fetchMarkdownFromUrl(notesStr)
-            }
+            fetchedNotes =
+                withContext(Dispatchers.IO) {
+                    fetchMarkdownFromUrl(notesStr)
+                }
             isFetchingNotes = false
         } else {
             fetchedNotes = notesStr
@@ -99,52 +100,67 @@ fun UpdateBottomSheet(
 
     EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         androidx.compose.foundation.layout.Box(
-            modifier = Modifier
-                .fillMaxWidth(),
-            contentAlignment = Alignment.TopCenter
+            modifier =
+                Modifier
+                    .fillMaxWidth(),
+            contentAlignment = Alignment.TopCenter,
         ) {
             if (isChecking || updateInfo == null) {
                 androidx.compose.foundation.layout.Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(240.dp),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(240.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
                     LoadingIndicator()
                 }
             } else {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .verticalScroll(rememberScrollState()),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Icon(
-                        painter = painterResource(id = if (updateInfo.isUpdateAvailable) R.drawable.rounded_mobile_arrow_down_24 else R.drawable.rounded_mobile_check_24),
+                        painter =
+                            painterResource(
+                                id = if (updateInfo.isUpdateAvailable) R.drawable.rounded_mobile_arrow_down_24 else R.drawable.rounded_mobile_check_24,
+                            ),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = if (updateInfo.isUpdateAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
+                        tint = if (updateInfo.isUpdateAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                     )
 
                     Text(
-                        text = if (updateInfo.isUpdateAvailable) stringResource(R.string.update_available_title) else stringResource(
-                            R.string.status_up_to_date
-                        ),
+                        text =
+                            if (updateInfo.isUpdateAvailable) {
+                                stringResource(R.string.update_available_title)
+                            } else {
+                                stringResource(
+                                    R.string.status_up_to_date,
+                                )
+                            },
                         style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
 
-                    val isPreRelease = remember(updateInfo.versionName) {
-                        val v = updateInfo.versionName.lowercase()
-                        v.contains("beta") || v.contains("alpha") || v.contains("rc") || v.contains(
-                            "pre"
-                        )
-                    }
+                    val isPreRelease =
+                        remember(updateInfo.versionName) {
+                            val v = updateInfo.versionName.lowercase()
+                            v.contains("beta") ||
+                                v.contains("alpha") ||
+                                v.contains("rc") ||
+                                v.contains(
+                                    "pre",
+                                )
+                        }
 
                     if (isPreRelease) {
                         RoundedCardContainer {
@@ -159,23 +175,26 @@ fun UpdateBottomSheet(
                                         modifier = Modifier.size(24.dp),
                                     )
                                 },
-                                contentPadding = PaddingValues(
-                                    horizontal = 16.dp,
-                                    vertical = 16.dp
-                                ),
+                                contentPadding =
+                                    PaddingValues(
+                                        horizontal = 16.dp,
+                                        vertical = 16.dp,
+                                    ),
                                 verticalAlignment = Alignment.CenterVertically,
-                                colors = ListItemDefaults.colors(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(
-                                        alpha = 0.5f
-                                    )
-                                ),
+                                colors =
+                                    ListItemDefaults.colors(
+                                        containerColor =
+                                            MaterialTheme.colorScheme.errorContainer.copy(
+                                                alpha = 0.5f,
+                                            ),
+                                    ),
                                 content = {
                                     Text(
                                         text = stringResource(R.string.warning_pre_release),
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                        color = MaterialTheme.colorScheme.onErrorContainer,
                                     )
-                                }
+                                },
                             )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
@@ -184,37 +203,40 @@ fun UpdateBottomSheet(
                     val notesToDisplay = fetchedNotes ?: updateInfo.releaseNotes
                     if (isFetchingNotes) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             LoadingIndicator()
                         }
                     } else if (notesToDisplay.isNotEmpty()) {
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.Start
+                            horizontalAlignment = Alignment.Start,
                         ) {
                             Text(
-                                text = stringResource(
-                                    R.string.release_notes_format,
-                                    updateInfo.versionName
-                                ),
+                                text =
+                                    stringResource(
+                                        R.string.release_notes_format,
+                                        updateInfo.versionName,
+                                    ),
                                 style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             RoundedCardContainer {
                                 Surface(
                                     modifier = Modifier.fillMaxWidth(),
-                                    color = MaterialTheme.colorScheme.surfaceContainer
+                                    color = MaterialTheme.colorScheme.surfaceContainer,
                                 ) {
                                     SimpleMarkdown(
                                         content = notesToDisplay,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp)
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(16.dp),
                                     )
                                 }
                             }
@@ -229,12 +251,12 @@ fun UpdateBottomSheet(
                                     Intent(Intent.ACTION_VIEW, updateInfo.releaseUrl.toUri())
                                 context.startActivity(intent)
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.brand_github),
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(stringResource(R.string.action_view_on_github))
@@ -245,20 +267,21 @@ fun UpdateBottomSheet(
                         if (isDownloading) {
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 LinearWavyProgressIndicator(
                                     progress = { downloadProgress / 100f },
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    text = stringResource(
-                                        R.string.downloading_update_progress,
-                                        downloadProgress
-                                    ),
+                                    text =
+                                        stringResource(
+                                            R.string.downloading_update_progress,
+                                            downloadProgress,
+                                        ),
                                     style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         } else {
@@ -268,10 +291,11 @@ fun UpdateBottomSheet(
                                     isDownloading = true
                                     val helper = AutoUpdateManagerHelper(context)
                                     coroutineScope.launch {
-                                        val cleanVersion = updateInfo.versionName.replace(
-                                            Regex("[^a-zA-Z0-9]"),
-                                            "_"
-                                        )
+                                        val cleanVersion =
+                                            updateInfo.versionName.replace(
+                                                Regex("[^a-zA-Z0-9]"),
+                                                "_",
+                                            )
                                         helper.downloadAndInstallApk(
                                             apkUrl = updateInfo.downloadUrl,
                                             apkName = "Essentials_$cleanVersion",
@@ -280,16 +304,16 @@ fun UpdateBottomSheet(
                                                 if (progress >= 100) {
                                                     isDownloading = false
                                                 }
-                                            }
+                                            },
                                         )
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_mobile_arrow_down_24),
                                     contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(20.dp),
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(stringResource(R.string.action_install_update))

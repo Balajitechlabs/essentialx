@@ -81,8 +81,9 @@ import java.util.Calendar
 import kotlin.math.PI
 import kotlin.math.min
 
-class TravelCompassActivity : ComponentActivity(), SensorEventListener {
-
+class TravelCompassActivity :
+    ComponentActivity(),
+    SensorEventListener {
     private lateinit var sensorManager: SensorManager
     private var rotationVectorSensor: Sensor? = null
 
@@ -108,14 +109,16 @@ class TravelCompassActivity : ComponentActivity(), SensorEventListener {
         rotationVectorSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
 
         setContent {
-            val viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val viewModel: MainViewModel =
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val context = LocalContext.current
             LaunchedEffect(Unit) { viewModel.check(context) }
             val isPitchBlack by viewModel.isPitchBlackThemeEnabled
             EssentialsTheme(darkTheme = true, pitchBlackTheme = isPitchBlack) {
                 CompassScreen(
                     azimuth = _azimuth.floatValue,
-                    onDismiss = { finish() }
+                    onDismiss = { finish() },
                 )
             }
         }
@@ -147,7 +150,7 @@ class TravelCompassActivity : ComponentActivity(), SensorEventListener {
                 rotMatrix,
                 SensorManager.AXIS_X,
                 SensorManager.AXIS_Z,
-                remappedMatrix
+                remappedMatrix,
             )
         } else {
             System.arraycopy(rotMatrix, 0, remappedMatrix, 0, 9)
@@ -160,30 +163,34 @@ class TravelCompassActivity : ComponentActivity(), SensorEventListener {
         _azimuth.floatValue = azimuthDeg.toFloat()
     }
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+    override fun onAccuracyChanged(
+        sensor: Sensor?,
+        accuracy: Int,
+    ) = Unit
 }
 
 @Composable
 private fun CompassScreen(
     azimuth: Float,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
     val repository = remember { LocationReachedRepository(context) }
     val fusedLocation = remember { LocationServices.getFusedLocationProviderClient(context) }
     val is24h = remember { DateFormat.is24HourFormat(context) }
-    val sharedPrefs = remember {
-        context.getSharedPreferences(
-            "essentials_prefs",
-            android.content.Context.MODE_PRIVATE
-        )
-    }
+    val sharedPrefs =
+        remember {
+            context.getSharedPreferences(
+                "essentials_prefs",
+                android.content.Context.MODE_PRIVATE,
+            )
+        }
     var useIcon by remember {
         mutableStateOf(
             sharedPrefs.getBoolean(
                 "location_reached_compass_use_icon",
-                false
-            )
+                false,
+            ),
         )
     }
 
@@ -198,40 +205,47 @@ private fun CompassScreen(
     LaunchedEffect(Unit) {
         while (true) {
             val cal = Calendar.getInstance()
-            currentTime = if (is24h) {
-                "%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
-            } else {
-                val hour = cal.get(Calendar.HOUR).let { if (it == 0) 12 else it }
-                val min = cal.get(Calendar.MINUTE)
-                "%02d:%02d".format(hour, min)
-            }
+            currentTime =
+                if (is24h) {
+                    "%02d:%02d".format(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
+                } else {
+                    val hour = cal.get(Calendar.HOUR).let { if (it == 0) 12 else it }
+                    val min = cal.get(Calendar.MINUTE)
+                    "%02d:%02d".format(hour, min)
+                }
 
             val activeId = repository.getActiveAlarmId()
             val alarm = repository.getAlarms().find { it.id == activeId }
             destinationName = alarm?.name ?: ""
             @Suppress("MissingPermission")
             alarm?.let { dest ->
-                fusedLocation.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
+                fusedLocation
+                    .getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
                     .addOnSuccessListener { loc ->
                         loc?.let {
                             val results = FloatArray(2)
                             android.location.Location.distanceBetween(
-                                it.latitude, it.longitude,
-                                dest.latitude, dest.longitude,
-                                results
+                                it.latitude,
+                                it.longitude,
+                                dest.latitude,
+                                dest.longitude,
+                                results,
                             )
                             val distM = results[0]
-                            distanceText = if (distM < 1000f) {
-                                "${distM.toInt()} m"
-                            } else {
-                                "%.1f km".format(distM / 1000f)
-                            }
-                            destinationBearing = it.bearingTo(
-                                android.location.Location("").also { l ->
-                                    l.latitude = dest.latitude
-                                    l.longitude = dest.longitude
+                            distanceText =
+                                if (distM < 1000f) {
+                                    "${distM.toInt()} m"
+                                } else {
+                                    "%.1f km".format(distM / 1000f)
                                 }
-                            ).let { b -> (b + 360f) % 360f }
+                            destinationBearing =
+                                it
+                                    .bearingTo(
+                                        android.location.Location("").also { l ->
+                                            l.latitude = dest.latitude
+                                            l.longitude = dest.longitude
+                                        },
+                                    ).let { b -> (b + 360f) % 360f }
 
                             // Calculate remaining time (ETA)
                             val startDist = repository.getStartDistance()
@@ -242,13 +256,14 @@ private fun CompassScreen(
                                 if (travelled > 0f && elapsed > 0L) {
                                     val remainingMillis = (distM * elapsed / travelled).toLong()
                                     val mins = (remainingMillis / 60000).toInt().coerceAtLeast(1)
-                                    remainingTimeText = if (mins >= 60) {
-                                        val hrs = mins / 60
-                                        val rMins = mins % 60
-                                        if (rMins > 0) "${hrs}h ${rMins}m remaining" else "${hrs}h remaining"
-                                    } else {
-                                        "${mins}m remaining"
-                                    }
+                                    remainingTimeText =
+                                        if (mins >= 60) {
+                                            val hrs = mins / 60
+                                            val rMins = mins % 60
+                                            if (rMins > 0) "${hrs}h ${rMins}m remaining" else "${hrs}h remaining"
+                                        } else {
+                                            "${mins}m remaining"
+                                        }
                                 } else {
                                     remainingTimeText = ""
                                 }
@@ -275,11 +290,12 @@ private fun CompassScreen(
 
     val animatedRotation by animateFloatAsState(
         targetValue = continuousTargetRotation,
-        animationSpec = spring(
-            stiffness = Spring.StiffnessLow,
-            dampingRatio = Spring.DampingRatioMediumBouncy
-        ),
-        label = "arrowRotation"
+        animationSpec =
+            spring(
+                stiffness = Spring.StiffnessLow,
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+            ),
+        label = "arrowRotation",
     )
 
     // Normalize for haptics to the 0..360 range
@@ -311,30 +327,34 @@ private fun CompassScreen(
 
     val primaryColor = MaterialTheme.colorScheme.primary
 
-    val pagerState = rememberPagerState(
-        initialPage = sharedPrefs.getInt("location_reached_compass_preset", 0),
-        pageCount = { 3 }
-    )
+    val pagerState =
+        rememberPagerState(
+            initialPage = sharedPrefs.getInt("location_reached_compass_preset", 0),
+            pageCount = { 3 },
+        )
 
     LaunchedEffect(pagerState.currentPage) {
         sharedPrefs.edit().putInt("location_reached_compass_preset", pagerState.currentPage).apply()
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = { onDismiss() },
-                    onLongPress = {
-                        HapticUtil.performHeavyHaptic(view)
-                        useIcon = !useIcon
-                        sharedPrefs.edit().putBoolean("location_reached_compass_use_icon", useIcon)
-                            .apply()
-                    }
-                )
-            },
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = { onDismiss() },
+                        onLongPress = {
+                            HapticUtil.performHeavyHaptic(view)
+                            useIcon = !useIcon
+                            sharedPrefs
+                                .edit()
+                                .putBoolean("location_reached_compass_use_icon", useIcon)
+                                .apply()
+                        },
+                    )
+                },
+        contentAlignment = Alignment.Center,
     ) {
         // Pure black background
         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -343,11 +363,11 @@ private fun CompassScreen(
 
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) { page ->
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 val isLandscape =
                     LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
@@ -357,28 +377,29 @@ private fun CompassScreen(
                     0 -> { // Default
                         if (isLandscape) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 48.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 48.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceEvenly
+                                horizontalArrangement = Arrangement.SpaceEvenly,
                             ) {
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
+                                    verticalArrangement = Arrangement.Center,
                                 ) {
                                     Text(
                                         text = currentTime,
                                         fontSize = 28.sp,
                                         fontWeight = FontWeight.Light,
-                                        color = primaryColor
+                                        color = primaryColor,
                                     )
                                     Spacer(modifier = Modifier.height(16.dp))
                                     Text(
                                         text = distanceText,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = primaryColor
+                                        color = primaryColor,
                                     )
                                     if (remainingTimeText.isNotEmpty()) {
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -386,7 +407,7 @@ private fun CompassScreen(
                                             text = remainingTimeText,
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.Light,
-                                            color = primaryColor.copy(alpha = 0.8f)
+                                            color = primaryColor.copy(alpha = 0.8f),
                                         )
                                     }
                                 }
@@ -395,7 +416,7 @@ private fun CompassScreen(
                                     rotationDegrees = animatedRotation,
                                     useIcon = useIcon,
                                     color = primaryColor,
-                                    modifier = Modifier.size(arrowSize)
+                                    modifier = Modifier.size(arrowSize),
                                 )
                             }
                         } else {
@@ -405,9 +426,10 @@ private fun CompassScreen(
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Light,
                                 color = primaryColor,
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .padding(top = 80.dp)
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = 80.dp),
                             )
 
                             // Arrow container (shape or drawable) — center, rotated to destination
@@ -415,23 +437,25 @@ private fun CompassScreen(
                                 rotationDegrees = animatedRotation,
                                 useIcon = useIcon,
                                 color = primaryColor,
-                                modifier = Modifier
-                                    .size(arrowSize)
-                                    .align(Alignment.Center)
+                                modifier =
+                                    Modifier
+                                        .size(arrowSize)
+                                        .align(Alignment.Center),
                             )
 
                             // Bottom Layout
                             Column(
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .padding(bottom = 80.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .padding(bottom = 80.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
                                     text = distanceText,
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = primaryColor
+                                    color = primaryColor,
                                 )
                                 if (remainingTimeText.isNotEmpty()) {
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -439,7 +463,7 @@ private fun CompassScreen(
                                         text = remainingTimeText,
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Light,
-                                        color = primaryColor.copy(alpha = 0.8f)
+                                        color = primaryColor.copy(alpha = 0.8f),
                                     )
                                 }
                             }
@@ -451,30 +475,32 @@ private fun CompassScreen(
                             rotationDegrees = animatedRotation,
                             useIcon = useIcon,
                             color = primaryColor,
-                            modifier = Modifier
-                                .size(arrowSize)
-                                .align(Alignment.Center)
+                            modifier =
+                                Modifier
+                                    .size(arrowSize)
+                                    .align(Alignment.Center),
                         )
                     }
 
                     2 -> { // Most Details
                         if (isLandscape) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 48.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 48.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceEvenly
+                                horizontalArrangement = Arrangement.SpaceEvenly,
                             ) {
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.Center
+                                    verticalArrangement = Arrangement.Center,
                                 ) {
                                     Text(
                                         text = currentTime,
                                         fontSize = 28.sp,
                                         fontWeight = FontWeight.Light,
-                                        color = primaryColor
+                                        color = primaryColor,
                                     )
                                     Spacer(modifier = Modifier.height(16.dp))
                                     if (destinationName.isNotEmpty()) {
@@ -482,7 +508,7 @@ private fun CompassScreen(
                                             text = destinationName,
                                             fontSize = 20.sp,
                                             fontWeight = FontWeight.Normal,
-                                            color = primaryColor.copy(alpha = 0.9f)
+                                            color = primaryColor.copy(alpha = 0.9f),
                                         )
                                         Spacer(modifier = Modifier.height(8.dp))
                                     }
@@ -490,7 +516,7 @@ private fun CompassScreen(
                                         text = distanceText,
                                         fontSize = 32.sp,
                                         fontWeight = FontWeight.Medium,
-                                        color = primaryColor
+                                        color = primaryColor,
                                     )
                                     if (remainingTimeText.isNotEmpty()) {
                                         Spacer(modifier = Modifier.height(8.dp))
@@ -498,7 +524,7 @@ private fun CompassScreen(
                                             text = remainingTimeText,
                                             fontSize = 18.sp,
                                             fontWeight = FontWeight.Light,
-                                            color = primaryColor.copy(alpha = 0.8f)
+                                            color = primaryColor.copy(alpha = 0.8f),
                                         )
                                     }
                                 }
@@ -507,7 +533,7 @@ private fun CompassScreen(
                                     rotationDegrees = animatedRotation,
                                     useIcon = useIcon,
                                     color = primaryColor,
-                                    modifier = Modifier.size(arrowSize)
+                                    modifier = Modifier.size(arrowSize),
                                 )
                             }
                         } else {
@@ -517,9 +543,10 @@ private fun CompassScreen(
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Light,
                                 color = primaryColor,
-                                modifier = Modifier
-                                    .align(Alignment.TopCenter)
-                                    .padding(top = 80.dp)
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = 80.dp),
                             )
 
                             // Arrow container (shape or drawable) — center, rotated to destination
@@ -527,24 +554,26 @@ private fun CompassScreen(
                                 rotationDegrees = animatedRotation,
                                 useIcon = useIcon,
                                 color = primaryColor,
-                                modifier = Modifier
-                                    .size(arrowSize)
-                                    .align(Alignment.Center)
+                                modifier =
+                                    Modifier
+                                        .size(arrowSize)
+                                        .align(Alignment.Center),
                             )
 
                             // Bottom Layout
                             Column(
-                                modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .padding(bottom = 80.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .padding(bottom = 80.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 if (destinationName.isNotEmpty()) {
                                     Text(
                                         text = destinationName,
                                         fontSize = 20.sp,
                                         fontWeight = FontWeight.Normal,
-                                        color = primaryColor.copy(alpha = 0.9f)
+                                        color = primaryColor.copy(alpha = 0.9f),
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                 }
@@ -552,7 +581,7 @@ private fun CompassScreen(
                                     text = distanceText,
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = primaryColor
+                                    color = primaryColor,
                                 )
                                 if (remainingTimeText.isNotEmpty()) {
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -560,7 +589,7 @@ private fun CompassScreen(
                                         text = remainingTimeText,
                                         fontSize = 18.sp,
                                         fontWeight = FontWeight.Light,
-                                        color = primaryColor.copy(alpha = 0.8f)
+                                        color = primaryColor.copy(alpha = 0.8f),
                                     )
                                 }
                             }
@@ -574,25 +603,27 @@ private fun CompassScreen(
         androidx.compose.material3.OutlinedIconButton(
             onClick = {
                 HapticUtil.performUIHaptic(view)
-                val intent = Intent(
-                    context,
-                    com.sameerasw.essentials.FeatureSettingsActivity::class.java
-                ).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    putExtra("feature", "Location reached")
-                }
+                val intent =
+                    Intent(
+                        context,
+                        com.sameerasw.essentials.FeatureSettingsActivity::class.java,
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        putExtra("feature", "Location reached")
+                    }
                 context.startActivity(intent)
             },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp)
-                .zIndex(1f),
-            border = androidx.compose.foundation.BorderStroke(1.dp, primaryColor)
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 24.dp)
+                    .zIndex(1f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, primaryColor),
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.rounded_map_24),
                 contentDescription = "Map Settings",
-                tint = primaryColor
+                tint = primaryColor,
             )
         }
     }
@@ -603,30 +634,31 @@ private fun CompassArrowContainer(
     rotationDegrees: Float,
     useIcon: Boolean,
     color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val shapeAlpha by animateFloatAsState(
         targetValue = if (useIcon) 0f else 1f,
         animationSpec = tween(durationMillis = 300),
-        label = "shapeAlpha"
+        label = "shapeAlpha",
     )
     val iconAlpha by animateFloatAsState(
         targetValue = if (useIcon) 1f else 0f,
         animationSpec = tween(durationMillis = 300),
-        label = "iconAlpha"
+        label = "iconAlpha",
     )
 
     Box(
-        modifier = modifier.graphicsLayer {
-            rotationZ = rotationDegrees
-        },
-        contentAlignment = Alignment.Center
+        modifier =
+            modifier.graphicsLayer {
+                rotationZ = rotationDegrees
+            },
+        contentAlignment = Alignment.Center,
     ) {
         if (shapeAlpha > 0.01f) {
             ArrowShapeCanvas(
                 color = color,
                 alpha = shapeAlpha,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             )
         }
 
@@ -635,9 +667,10 @@ private fun CompassArrowContainer(
                 painter = painterResource(id = R.drawable.round_arrow_upward_24),
                 contentDescription = null,
                 tint = color,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { alpha = iconAlpha }
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .graphicsLayer { alpha = iconAlpha },
             )
         }
     }
@@ -647,7 +680,7 @@ private fun CompassArrowContainer(
 private fun ArrowShapeCanvas(
     color: Color,
     alpha: Float,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Canvas(modifier = modifier) {
         val size = min(this.size.width, this.size.height)
@@ -673,7 +706,7 @@ private fun ArrowShapeCanvas(
         drawPath(
             path = composePath,
             color = color.copy(alpha = alpha),
-            style = Stroke(width = 6.dp.toPx())
+            style = Stroke(width = 6.dp.toPx()),
         )
     }
 }

@@ -50,7 +50,7 @@ import com.sameerasw.essentials.viewmodels.GitHubAuthViewModel
 @Composable
 fun GitHubAuthSheet(
     viewModel: GitHubAuthViewModel,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -64,19 +64,20 @@ fun GitHubAuthSheet(
             viewModel.cancelAuthFlow()
             onDismissRequest()
         },
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.action_sign_in_github),
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             when (val state = authState) {
@@ -85,14 +86,14 @@ fun GitHubAuthSheet(
                         text = stringResource(R.string.auth_sign_in_rationale),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Button(
                         onClick = {
                             HapticUtil.performUIHaptic(view)
                             viewModel.startAuthFlow()
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(stringResource(R.string.action_start_sign_in))
                     }
@@ -102,14 +103,14 @@ fun GitHubAuthSheet(
                     LoadingIndicator()
                     Text(
                         text = stringResource(R.string.auth_requesting_code),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
 
                 is AuthState.CodeReceived -> {
                     Text(
                         text = stringResource(R.string.auth_copy_code_instruction),
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleMedium,
                     )
 
                     SelectionContainer {
@@ -118,7 +119,7 @@ fun GitHubAuthSheet(
                             style = MaterialTheme.typography.displayMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
-                            letterSpacing = 4.sp
+                            letterSpacing = 4.sp,
                         )
                     }
 
@@ -126,11 +127,11 @@ fun GitHubAuthSheet(
                         onClick = {
                             HapticUtil.performUIHaptic(view)
                             clipboardManager.setText(AnnotatedString(state.userCode))
-                        }
+                        },
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_content_copy_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
                         Spacer(modifier = Modifier.padding(4.dp))
                         Text(stringResource(R.string.auth_copy_code))
@@ -139,7 +140,7 @@ fun GitHubAuthSheet(
                     Text(
                         text = stringResource(R.string.auth_paste_code_instruction),
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
                     )
 
                     Button(
@@ -147,7 +148,7 @@ fun GitHubAuthSheet(
                             HapticUtil.performUIHaptic(view)
                             uriHandler.openUri(state.verificationUri)
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(stringResource(R.string.auth_open_login_page))
                     }
@@ -155,7 +156,7 @@ fun GitHubAuthSheet(
                     Text(
                         text = stringResource(R.string.auth_waiting_for_authorization),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 
@@ -170,13 +171,13 @@ fun GitHubAuthSheet(
                     Text(
                         text = state.message,
                         color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Button(
                         onClick = {
                             HapticUtil.performUIHaptic(view)
                             viewModel.startAuthFlow() // Retry
-                        }
+                        },
                     ) {
                         Text(stringResource(R.string.action_retry))
                     }

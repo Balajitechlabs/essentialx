@@ -16,23 +16,26 @@ import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 
 object SurfaceFlingerControl {
-
     private const val SURFACE_COMPOSER_INTERFACE_KEY = "android.ui.ISurfaceComposer"
     private const val SURFACE_FLINGER_DISABLE_OVERLAYS_CODE = 1008
     private const val SURFACE_FLINGER_READ_CODE = 1010
 
-    fun setDisableHwOverlays(disable: Boolean, isRoot: Boolean = false): Boolean {
+    fun setDisableHwOverlays(
+        disable: Boolean,
+        isRoot: Boolean = false,
+    ): Boolean {
         val state = if (disable) 1 else 0
 
         if (isRoot) {
             return RootUtils.runCommand("service call SurfaceFlinger 1008 i32 $state")
         }
 
-        val rawBinder: IBinder? = try {
-            SystemServiceHelper.getSystemService("SurfaceFlinger")
-        } catch (e: Exception) {
-            null
-        }
+        val rawBinder: IBinder? =
+            try {
+                SystemServiceHelper.getSystemService("SurfaceFlinger")
+            } catch (e: Exception) {
+                null
+            }
 
         if (rawBinder != null) {
             val binder = ShizukuBinderWrapper(rawBinder)
@@ -44,7 +47,7 @@ object SurfaceFlingerControl {
                     SURFACE_FLINGER_DISABLE_OVERLAYS_CODE,
                     data,
                     null,
-                    0
+                    0,
                 )
                 true
             } catch (e: Exception) {
@@ -59,12 +62,16 @@ object SurfaceFlingerControl {
         }
     }
 
-    fun isHwOverlaysDisabled(context: Context? = null, isRoot: Boolean = false): Boolean {
-        val rawBinder: IBinder? = try {
-            SystemServiceHelper.getSystemService("SurfaceFlinger")
-        } catch (e: Exception) {
-            null
-        }
+    fun isHwOverlaysDisabled(
+        context: Context? = null,
+        isRoot: Boolean = false,
+    ): Boolean {
+        val rawBinder: IBinder? =
+            try {
+                SystemServiceHelper.getSystemService("SurfaceFlinger")
+            } catch (e: Exception) {
+                null
+            }
 
         if (rawBinder != null) {
             val binder = ShizukuBinderWrapper(rawBinder)

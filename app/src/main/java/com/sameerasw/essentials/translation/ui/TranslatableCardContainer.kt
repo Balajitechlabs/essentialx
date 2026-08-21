@@ -37,7 +37,7 @@ fun TranslatableCardContainer(
     title: Any?,
     description: Any? = null,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -49,27 +49,29 @@ fun TranslatableCardContainer(
     var resolvedKeyDesc by remember { mutableStateOf<String?>(null) }
 
     Box(
-        modifier = if (isTranslationModeActive) {
-            modifier.pointerInput(title, description) {
-                awaitEachGesture {
-                    val down = awaitFirstDown(pass = PointerEventPass.Initial)
-                    val longPressTimeout = viewConfiguration.longPressTimeoutMillis
-                    val upOrCancel = withTimeoutOrNull(longPressTimeout) {
-                        waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                    }
-                    if (upOrCancel == null) {
-                        // User held down longer than long-press threshold -> open translation menu
-                        down.consume()
-                        HapticUtil.performHeavyHaptic(view)
-                        resolvedKeyTitle = TranslationManager.resolveKey(context, title)
-                        resolvedKeyDesc = TranslationManager.resolveKey(context, description)
-                        showMenu = true
+        modifier =
+            if (isTranslationModeActive) {
+                modifier.pointerInput(title, description) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown(pass = PointerEventPass.Initial)
+                        val longPressTimeout = viewConfiguration.longPressTimeoutMillis
+                        val upOrCancel =
+                            withTimeoutOrNull(longPressTimeout) {
+                                waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                            }
+                        if (upOrCancel == null) {
+                            // User held down longer than long-press threshold -> open translation menu
+                            down.consume()
+                            HapticUtil.performHeavyHaptic(view)
+                            resolvedKeyTitle = TranslationManager.resolveKey(context, title)
+                            resolvedKeyDesc = TranslationManager.resolveKey(context, description)
+                            showMenu = true
+                        }
                     }
                 }
-            }
-        } else {
-            modifier
-        }
+            } else {
+                modifier
+            },
     ) {
         TranslationFocusOutline(visible = showMenu) {
             content()
@@ -78,7 +80,7 @@ fun TranslatableCardContainer(
         if (showMenu) {
             SegmentedDropdownMenu(
                 expanded = showMenu,
-                onDismissRequest = { showMenu = false }
+                onDismissRequest = { showMenu = false },
             ) {
                 val keyT = resolvedKeyTitle
                 val keyD = resolvedKeyDesc
@@ -93,9 +95,9 @@ fun TranslatableCardContainer(
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_translate_24),
-                                contentDescription = null
+                                contentDescription = null,
                             )
-                        }
+                        },
                     )
                 }
 
@@ -109,16 +111,16 @@ fun TranslatableCardContainer(
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_translate_24),
-                                contentDescription = null
+                                contentDescription = null,
                             )
-                        }
+                        },
                     )
                 }
 
                 if (keyT == null && keyD == null) {
                     SegmentedDropdownMenuItem(
                         text = { Text("No string key found") },
-                        onClick = { showMenu = false }
+                        onClick = { showMenu = false },
                     )
                 }
             }
@@ -128,7 +130,7 @@ fun TranslatableCardContainer(
     if (activeKeyForSheet != null) {
         TranslationBottomSheet(
             stringKey = activeKeyForSheet!!,
-            onDismissRequest = { activeKeyForSheet = null }
+            onDismissRequest = { activeKeyForSheet = null },
         )
     }
 }

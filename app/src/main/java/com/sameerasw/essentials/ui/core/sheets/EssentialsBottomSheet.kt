@@ -35,7 +35,7 @@ fun EssentialsBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -43,10 +43,10 @@ fun EssentialsBottomSheet(
         containerColor = containerColor,
         dragHandle = dragHandle,
         contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
-        modifier = modifier.statusBarsPadding()
+        modifier = modifier.statusBarsPadding(),
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             content()
             Spacer(modifier = Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))

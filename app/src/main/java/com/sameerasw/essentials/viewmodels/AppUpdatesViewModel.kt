@@ -215,31 +215,36 @@ class AppUpdatesViewModel : ViewModel() {
      * @param context [Context] Target context.
      * @param selectedApk [String] Target selected apk.
      */
-    fun trackRepo(context: Context, selectedApk: String) {
+    fun trackRepo(
+        context: Context,
+        selectedApk: String,
+    ) {
         val repo = _searchResult.value ?: return
         val release = _latestRelease.value ?: return
         val app = _selectedApp.value
 
-        val trackedRepo = TrackedRepo(
-            owner = repo.owner.login,
-            name = repo.name,
-            fullName = repo.fullName,
-            description = repo.description,
-            stars = repo.stars,
-            avatarUrl = repo.owner.avatarUrl,
-            latestTagName = release.tagName,
-            latestReleaseName = release.name,
-            latestReleaseBody = release.body,
-            latestReleaseUrl = release.htmlUrl,
-            downloadUrl = release.assets.find { it.name == selectedApk }?.downloadUrl
-                ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl,
-            publishedAt = release.publishedAt,
-            selectedApkName = selectedApk,
-            mappedPackageName = app?.packageName,
-            mappedAppName = app?.appName,
-            allowPreReleases = _allowPreReleases.value,
-            notificationsEnabled = _notificationsEnabled.value
-        )
+        val trackedRepo =
+            TrackedRepo(
+                owner = repo.owner.login,
+                name = repo.name,
+                fullName = repo.fullName,
+                description = repo.description,
+                stars = repo.stars,
+                avatarUrl = repo.owner.avatarUrl,
+                latestTagName = release.tagName,
+                latestReleaseName = release.name,
+                latestReleaseBody = release.body,
+                latestReleaseUrl = release.htmlUrl,
+                downloadUrl =
+                    release.assets.find { it.name == selectedApk }?.downloadUrl
+                        ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl,
+                publishedAt = release.publishedAt,
+                selectedApkName = selectedApk,
+                mappedPackageName = app?.packageName,
+                mappedAppName = app?.appName,
+                allowPreReleases = _allowPreReleases.value,
+                notificationsEnabled = _notificationsEnabled.value,
+            )
 
         SettingsRepository(context).addOrUpdateTrackedRepo(trackedRepo)
         loadTrackedRepos(context)
@@ -252,7 +257,10 @@ class AppUpdatesViewModel : ViewModel() {
      * @param context [Context] Target context.
      * @param fullName [String] Target full name.
      */
-    fun untrackRepo(context: Context, fullName: String) {
+    fun untrackRepo(
+        context: Context,
+        fullName: String,
+    ) {
         SettingsRepository(context).removeTrackedRepo(fullName)
         loadTrackedRepos(context)
     }
@@ -263,47 +271,55 @@ class AppUpdatesViewModel : ViewModel() {
      * @param context [Context] Target context.
      * @param repo [TrackedRepo] Target repo.
      */
-    fun prepareEdit(context: Context, repo: TrackedRepo) {
+    fun prepareEdit(
+        context: Context,
+        repo: TrackedRepo,
+    ) {
         _searchQuery.value = repo.fullName
         _isSearching.value = false
         _errorMessage.value = null
 
         // Build local fallback repo info from cache so it displays instantly
-        val localOwner = GitHubOwner(
-            login = repo.owner,
-            avatarUrl = repo.avatarUrl
-        )
-        _searchResult.value = GitHubRepo(
-            id = 0L,
-            name = repo.name,
-            fullName = repo.fullName,
-            description = repo.description,
-            stars = repo.stars,
-            owner = localOwner
-        )
+        val localOwner =
+            GitHubOwner(
+                login = repo.owner,
+                avatarUrl = repo.avatarUrl,
+            )
+        _searchResult.value =
+            GitHubRepo(
+                id = 0L,
+                name = repo.name,
+                fullName = repo.fullName,
+                description = repo.description,
+                stars = repo.stars,
+                owner = localOwner,
+            )
 
         // Build local fallback release info from cache
-        val localAssets = if (repo.downloadUrl != null) {
-            listOf(
-                GitHubAsset(
-                    name = repo.selectedApkName.takeIf { it != "Auto" }
-                        ?: repo.downloadUrl.substringAfterLast("/"),
-                    downloadUrl = repo.downloadUrl
+        val localAssets =
+            if (repo.downloadUrl != null) {
+                listOf(
+                    GitHubAsset(
+                        name =
+                            repo.selectedApkName.takeIf { it != "Auto" }
+                                ?: repo.downloadUrl.substringAfterLast("/"),
+                        downloadUrl = repo.downloadUrl,
+                    ),
                 )
-            )
-        } else {
-            emptyList()
-        }
+            } else {
+                emptyList()
+            }
 
-        _latestRelease.value = GitHubRelease(
-            tagName = repo.latestTagName,
-            name = repo.latestReleaseName,
-            body = repo.latestReleaseBody,
-            publishedAt = repo.publishedAt,
-            htmlUrl = repo.latestReleaseUrl ?: "",
-            prerelease = repo.allowPreReleases,
-            assets = localAssets
-        )
+        _latestRelease.value =
+            GitHubRelease(
+                tagName = repo.latestTagName,
+                name = repo.latestReleaseName,
+                body = repo.latestReleaseBody,
+                publishedAt = repo.publishedAt,
+                htmlUrl = repo.latestReleaseUrl ?: "",
+                prerelease = repo.allowPreReleases,
+                assets = localAssets,
+            )
 
         _readmeContent.value = null
         _allowPreReleases.value = repo.allowPreReleases
@@ -338,18 +354,32 @@ class AppUpdatesViewModel : ViewModel() {
         }
     }
 
-    private suspend fun findMatchingApp(context: Context, repoName: String) {
+    private suspend fun findMatchingApp(
+        context: Context,
+        repoName: String,
+    ) {
         val installedApps = AppUtil.getInstalledApps(context)
         // Simple name matching logic
-        val normalizedRepoName = repoName.lowercase().replace("-", "").replace("_", "").trim()
+        val normalizedRepoName =
+            repoName
+                .lowercase()
+                .replace("-", "")
+                .replace("_", "")
+                .trim()
 
-        val matchedApp = installedApps.find { app ->
-            val normalizedAppName =
-                app.appName.lowercase().replace(" ", "").replace("-", "").replace("_", "").trim()
-            normalizedAppName == normalizedRepoName ||
+        val matchedApp =
+            installedApps.find { app ->
+                val normalizedAppName =
+                    app.appName
+                        .lowercase()
+                        .replace(" ", "")
+                        .replace("-", "")
+                        .replace("_", "")
+                        .trim()
+                normalizedAppName == normalizedRepoName ||
                     normalizedAppName.contains(normalizedRepoName) ||
                     normalizedRepoName.contains(normalizedAppName)
-        }
+            }
 
         _selectedApp.value = matchedApp
     }
@@ -424,32 +454,38 @@ class AppUpdatesViewModel : ViewModel() {
      * @param context [Context] Target context.
      * @param repo [TrackedRepo] Target repo.
      */
-    fun fetchReleaseNotesIfNeeded(context: Context, repo: TrackedRepo) {
+    fun fetchReleaseNotesIfNeeded(
+        context: Context,
+        repo: TrackedRepo,
+    ) {
         if (!repo.latestReleaseBody.isNullOrBlank()) return
 
         viewModelScope.launch {
             try {
                 val token = SettingsRepository(context).getGitHubToken()
 
-                val release = if (repo.allowPreReleases) {
-                    val releases = gitHubRepository.getReleases(repo.owner, repo.name, token)
-                    releases.firstOrNull()
-                } else {
-                    gitHubRepository.getLatestRelease(repo.owner, repo.name, token)
-                }
+                val release =
+                    if (repo.allowPreReleases) {
+                        val releases = gitHubRepository.getReleases(repo.owner, repo.name, token)
+                        releases.firstOrNull()
+                    } else {
+                        gitHubRepository.getLatestRelease(repo.owner, repo.name, token)
+                    }
 
                 if (release != null) {
                     // Update the cached repo with new details
-                    val updatedRepo = repo.copy(
-                        latestTagName = release.tagName,
-                        latestReleaseName = release.name,
-                        latestReleaseBody = release.body,
-                        latestReleaseUrl = release.htmlUrl,
-                        downloadUrl = release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
-                            ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl,
-                        publishedAt = release.publishedAt,
-                        // Keep existing flags
-                    )
+                    val updatedRepo =
+                        repo.copy(
+                            latestTagName = release.tagName,
+                            latestReleaseName = release.name,
+                            latestReleaseBody = release.body,
+                            latestReleaseUrl = release.htmlUrl,
+                            downloadUrl =
+                                release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
+                                    ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl,
+                            publishedAt = release.publishedAt,
+                            // Keep existing flags
+                        )
                     SettingsRepository(context).addOrUpdateTrackedRepo(updatedRepo)
                     loadTrackedRepos(context)
                 }
@@ -486,13 +522,14 @@ class AppUpdatesViewModel : ViewModel() {
             for (i in updatedRepos.indices) {
                 val repo = updatedRepos[i]
                 try {
-                    val release = if (repo.allowPreReleases) {
-                        val releases =
-                            gitHubRepository.getReleases(repo.owner, repo.name, token)
-                        releases.firstOrNull()
-                    } else {
-                        gitHubRepository.getLatestRelease(repo.owner, repo.name, token)
-                    }
+                    val release =
+                        if (repo.allowPreReleases) {
+                            val releases =
+                                gitHubRepository.getReleases(repo.owner, repo.name, token)
+                            releases.firstOrNull()
+                        } else {
+                            gitHubRepository.getLatestRelease(repo.owner, repo.name, token)
+                        }
 
                     if (release != null) {
                         var isUpdateAvailable = false
@@ -503,22 +540,24 @@ class AppUpdatesViewModel : ViewModel() {
                             if (installedVersion != null) {
                                 isUpdateAvailable = compareVersions(
                                     release.tagName,
-                                    installedVersion
+                                    installedVersion,
                                 ) > 0
                             }
                         }
 
-                        val newRepo = repo.copy(
-                            latestTagName = release.tagName,
-                            latestReleaseName = release.name,
-                            latestReleaseBody = release.body,
-                            latestReleaseUrl = release.htmlUrl,
-                            downloadUrl = release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
-                                ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl,
-                            publishedAt = release.publishedAt,
-                            isUpdateAvailable = isUpdateAvailable,
-                            lastETag = null
-                        )
+                        val newRepo =
+                            repo.copy(
+                                latestTagName = release.tagName,
+                                latestReleaseName = release.name,
+                                latestReleaseBody = release.body,
+                                latestReleaseUrl = release.htmlUrl,
+                                downloadUrl =
+                                    release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
+                                        ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl,
+                                publishedAt = release.publishedAt,
+                                isUpdateAvailable = isUpdateAvailable,
+                                lastETag = null,
+                            )
 
                         if (newRepo != repo) {
                             updatedRepos[i] = newRepo
@@ -545,7 +584,10 @@ class AppUpdatesViewModel : ViewModel() {
         }
     }
 
-    private fun compareVersions(v1: String, v2: String): Int {
+    private fun compareVersions(
+        v1: String,
+        v2: String,
+    ): Int {
         val cleanV1 = v1.replace(Regex("[^0-9.]"), "").split(".")
         val cleanV2 = v2.replace(Regex("[^0-9.]"), "").split(".")
 
@@ -567,7 +609,10 @@ class AppUpdatesViewModel : ViewModel() {
      * @param context [Context] Target context.
      * @param repo [TrackedRepo] Target repo.
      */
-    fun downloadAndInstall(context: Context, repo: TrackedRepo) {
+    fun downloadAndInstall(
+        context: Context,
+        repo: TrackedRepo,
+    ) {
         val downloadUrl = repo.downloadUrl ?: return
         _installingRepoId.value = repo.fullName
         _installStatus.value = "Downloading..."
@@ -622,22 +667,28 @@ class AppUpdatesViewModel : ViewModel() {
         }
     }
 
-    private fun installApk(context: Context, file: File, repo: TrackedRepo) {
+    private fun installApk(
+        context: Context,
+        file: File,
+        repo: TrackedRepo,
+    ) {
         _installStatus.value = "Installing..."
 
         // Standard install
         try {
-            val apkUri = FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                file
-            )
+            val apkUri =
+                FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file,
+                )
 
             @Suppress("DEPRECATION")
-            val intent = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
-                data = apkUri
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
-            }
+            val intent =
+                Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
+                    data = apkUri
+                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+                }
             context.startActivity(intent)
             _installingRepoId.value = null
             _installStatus.value = null
@@ -654,7 +705,10 @@ class AppUpdatesViewModel : ViewModel() {
      * @param context [Context] Target context.
      * @param outputStream [OutputStream] Target output stream.
      */
-    fun exportTrackedRepos(context: Context, outputStream: OutputStream) {
+    fun exportTrackedRepos(
+        context: Context,
+        outputStream: OutputStream,
+    ) {
         try {
             val repos = SettingsRepository(context).getTrackedRepos()
             val json = gson.toJson(repos)
@@ -677,8 +731,11 @@ class AppUpdatesViewModel : ViewModel() {
      * @param inputStream [InputStream] Target input stream.
      * @return The resulting Boolean data.
      */
-    fun importTrackedRepos(context: Context, inputStream: InputStream): Boolean {
-        return try {
+    fun importTrackedRepos(
+        context: Context,
+        inputStream: InputStream,
+    ): Boolean =
+        try {
             val json = inputStream.bufferedReader().use { it.readText() }
             val importedRepos: List<TrackedRepo> =
                 gson.fromJson(json, Array<TrackedRepo>::class.java).toList()
@@ -708,5 +765,4 @@ class AppUpdatesViewModel : ViewModel() {
             } catch (e: Exception) {
             }
         }
-    }
 }

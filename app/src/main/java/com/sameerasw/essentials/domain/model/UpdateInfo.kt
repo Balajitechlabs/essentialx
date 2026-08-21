@@ -18,5 +18,5 @@ data class UpdateInfo(
     @SerializedName("releaseNotes") val releaseNotes: String,
     @SerializedName("downloadUrl") val downloadUrl: String,
     @SerializedName("releaseUrl") val releaseUrl: String = "",
-    @SerializedName("isUpdateAvailable") val isUpdateAvailable: Boolean = false
+    @SerializedName("isUpdateAvailable") val isUpdateAvailable: Boolean = false,
 )

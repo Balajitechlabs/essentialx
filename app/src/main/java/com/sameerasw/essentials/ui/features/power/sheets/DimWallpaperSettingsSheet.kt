@@ -52,7 +52,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun DimWallpaperSettingsSheet(
     initialAction: Action.DimWallpaper,
     onDismiss: () -> Unit,
-    onSave: (Action.DimWallpaper) -> Unit
+    onSave: (Action.DimWallpaper) -> Unit,
 ) {
     val view = LocalView.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -62,78 +62,83 @@ fun DimWallpaperSettingsSheet(
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        dragHandle = null
+        dragHandle = null,
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.diy_action_dim_wallpaper),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             // Permissions Info with Pastel Icon
             Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                ),
-                shape = RoundedCornerShape(24.dp)
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
+                shape = RoundedCornerShape(24.dp),
             ) {
                 Column {
                     Row(
                         modifier = Modifier.padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         val infoTitle = "Dim Wallpaper"
                         Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(
-                                    color = ColorUtil.getPastelColorFor(infoTitle),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .size(40.dp)
+                                    .background(
+                                        color = ColorUtil.getPastelColorFor(infoTitle),
+                                        shape = CircleShape,
+                                    ),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.rounded_info_24),
                                 contentDescription = null,
                                 tint = ColorUtil.getVibrantColorFor(infoTitle),
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         }
                         Text(
                             text = stringResource(R.string.diy_dim_wallpaper_desc),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
 
                     // Permission Icons
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            16.dp,
-                            Alignment.CenterHorizontally
-                        )
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                        horizontalArrangement =
+                            Arrangement.spacedBy(
+                                16.dp,
+                                Alignment.CenterHorizontally,
+                            ),
                     ) {
                         // Shizuku Icon
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.rounded_adb_24),
                                 contentDescription = "Shizuku",
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                             Text("Shizuku", style = MaterialTheme.typography.labelMedium)
                         }
@@ -141,13 +146,13 @@ fun DimWallpaperSettingsSheet(
                         // Root Icon
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.rounded_numbers_24),
                                 contentDescription = "Root",
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                             Text("Root", style = MaterialTheme.typography.labelMedium)
                         }
@@ -157,26 +162,27 @@ fun DimWallpaperSettingsSheet(
 
             // Slider Card
             Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                ),
-                shape = RoundedCornerShape(24.dp)
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
+                shape = RoundedCornerShape(24.dp),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = "Dim Amount",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
                             text = "${(dimAmount * 100).toInt()}%",
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
 
@@ -187,7 +193,7 @@ fun DimWallpaperSettingsSheet(
                             HapticUtil.performSliderHaptic(view)
                         },
                         valueRange = 0f..1f,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
                     )
                 }
             }
@@ -195,7 +201,7 @@ fun DimWallpaperSettingsSheet(
             // Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Button(
                     onClick = {
@@ -203,15 +209,16 @@ fun DimWallpaperSettingsSheet(
                         onDismiss()
                     },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceBright,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_close_24),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(stringResource(R.string.action_cancel))
@@ -222,12 +229,12 @@ fun DimWallpaperSettingsSheet(
                         HapticUtil.performVirtualKeyHaptic(view)
                         onSave(initialAction.copy(dimAmount = dimAmount))
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_check_24),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(stringResource(R.string.action_save))

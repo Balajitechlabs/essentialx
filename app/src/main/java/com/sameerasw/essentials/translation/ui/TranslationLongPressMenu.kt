@@ -36,21 +36,22 @@ fun TranslationLongPressMenu(
     onTranslateClick: () -> Unit,
     onViewAllClick: () -> Unit,
     modifier: Modifier = Modifier,
-    offset: DpOffset = DpOffset(0.dp, 0.dp)
+    offset: DpOffset = DpOffset(0.dp, 0.dp),
 ) {
     SegmentedDropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
         modifier = modifier,
-        offset = offset
+        offset = offset,
     ) {
         // Info Header Entry with background matching SegmentedDropdownMenuItem
         SegmentedDropdownMenuItem(
             text = {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 2.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp),
                 ) {
                     Text(
                         text = fullText,
@@ -58,19 +59,19 @@ fun TranslationLongPressMenu(
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     Text(
                         text = "Key: $stringKey",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             },
             onClick = {},
-            enabled = false
+            enabled = false,
         )
 
         // Action 1: Translate
@@ -80,9 +81,9 @@ fun TranslationLongPressMenu(
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.rounded_translate_24),
-                    contentDescription = null
+                    contentDescription = null,
                 )
-            }
+            },
         )
 
         // Action 2: View All
@@ -92,9 +93,9 @@ fun TranslationLongPressMenu(
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.rounded_visibility_24),
-                    contentDescription = null
+                    contentDescription = null,
                 )
-            }
+            },
         )
 
         // Action 3: Dismiss
@@ -104,9 +105,9 @@ fun TranslationLongPressMenu(
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.rounded_close_24),
-                    contentDescription = null
+                    contentDescription = null,
                 )
-            }
+            },
         )
     }
 }

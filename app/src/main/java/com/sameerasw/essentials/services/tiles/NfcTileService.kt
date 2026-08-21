@@ -21,14 +21,17 @@ import java.lang.reflect.Method
 
 @RequiresApi(Build.VERSION_CODES.N)
 class NfcTileService : BaseTileService() {
-
-    private val nfcReceiver = object : android.content.BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: android.content.Intent?) {
-            if (NfcAdapter.ACTION_ADAPTER_STATE_CHANGED == intent?.action) {
-                updateTile()
+    private val nfcReceiver =
+        object : android.content.BroadcastReceiver() {
+            override fun onReceive(
+                context: Context?,
+                intent: android.content.Intent?,
+            ) {
+                if (NfcAdapter.ACTION_ADAPTER_STATE_CHANGED == intent?.action) {
+                    updateTile()
+                }
             }
         }
-    }
 
     override fun onStartListening() {
         super.onStartListening()
@@ -64,10 +67,10 @@ class NfcTileService : BaseTileService() {
         return if (nfcAdapter?.isEnabled == true) getString(R.string.on) else getString(R.string.off)
     }
 
-    override fun hasFeaturePermission(): Boolean {
-        return com.sameerasw.essentials.utils.PermissionUtils.canWriteSecureSettings(this) ||
-                (ShellUtils.isAvailable(this) && ShellUtils.hasPermission(this))
-    }
+    override fun hasFeaturePermission(): Boolean =
+        com.sameerasw.essentials.utils.PermissionUtils
+            .canWriteSecureSettings(this) ||
+            (ShellUtils.isAvailable(this) && ShellUtils.hasPermission(this))
 
     override fun getTileIcon(): Icon {
         val nfcAdapter = NfcAdapter.getDefaultAdapter(this)
@@ -81,7 +84,10 @@ class NfcTileService : BaseTileService() {
         return if (nfcAdapter?.isEnabled == true) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
     }
 
-    private fun setNfcEnabled(context: Context, enable: Boolean): Boolean {
+    private fun setNfcEnabled(
+        context: Context,
+        enable: Boolean,
+    ): Boolean {
         val nfcAdapter = NfcAdapter.getDefaultAdapter(context) ?: return false
 
         return try {

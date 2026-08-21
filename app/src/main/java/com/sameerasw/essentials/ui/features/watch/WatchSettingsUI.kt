@@ -44,7 +44,7 @@ import com.sameerasw.essentials.viewmodels.WatchViewModel
 @Composable
 fun WatchSettingsUI(
     viewModel: WatchViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
     val view = LocalView.current
@@ -55,51 +55,56 @@ fun WatchSettingsUI(
     val isWearUpdateRequired = viewModel.isWearUpdateRequired.value
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
     ) {
         if (isWatchDetected) {
             RoundedCardContainer(
-                modifier = Modifier
-                    .padding(bottom = 18.dp)
-                    .fillMaxWidth(),
-                cornerRadius = 24.dp
+                modifier =
+                    Modifier
+                        .padding(bottom = 18.dp)
+                        .fillMaxWidth(),
+                cornerRadius = 24.dp,
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surfaceBright)
-                        .clickable {
-                            HapticUtil.performUIHaptic(view)
-                            android.widget.Toast.makeText(
-                                context,
-                                "Syncing...",
-                                android.widget.Toast.LENGTH_SHORT
-                            ).show()
-                            com.sameerasw.essentials.services.DeviceInfoSyncManager.forceSync(
-                                context
-                            )
-                            com.sameerasw.essentials.services.CalendarSyncManager.forceSync(context)
-                        }
-                        .padding(24.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(MaterialTheme.colorScheme.surfaceBright)
+                            .clickable {
+                                HapticUtil.performUIHaptic(view)
+                                android.widget.Toast
+                                    .makeText(
+                                        context,
+                                        "Syncing...",
+                                        android.widget.Toast.LENGTH_SHORT,
+                                    ).show()
+                                com.sameerasw.essentials.services.DeviceInfoSyncManager.forceSync(
+                                    context,
+                                )
+                                com.sameerasw.essentials.services.CalendarSyncManager
+                                    .forceSync(context)
+                            }.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .size(100.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                                    shape = CircleShape,
+                                ),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_watch_24),
                             contentDescription = null,
                             modifier = Modifier.size(56.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
 
@@ -108,40 +113,41 @@ fun WatchSettingsUI(
                     Text(
                         text = connectedWatchName ?: stringResource(R.string.watch_unknown_name),
                         style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     Text(
                         text = stringResource(R.string.watch_connected_status),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
 
                     if (isWearUpdateRequired) {
                         Spacer(modifier = Modifier.height(16.dp))
                         RoundedCardContainer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    color = MaterialTheme.colorScheme.errorContainer,
-                                    shape = RoundedCornerShape(12.dp)
-                                )
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = MaterialTheme.colorScheme.errorContainer,
+                                        shape = RoundedCornerShape(12.dp),
+                                    ),
                         ) {
                             Column(
                                 modifier = Modifier.padding(16.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
                             ) {
                                 Text(
                                     text = stringResource(R.string.watch_update_required_title),
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = stringResource(R.string.watch_update_required_desc),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.8f),
-                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 )
                                 Spacer(modifier = Modifier.height(12.dp))
                                 Button(
@@ -149,10 +155,11 @@ fun WatchSettingsUI(
                                         HapticUtil.performUIHaptic(view)
                                         uriHandler.openUri("https://github.com/sameerasw/essentials-wear/releases/latest")
                                     },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.error,
-                                        contentColor = MaterialTheme.colorScheme.onError
-                                    )
+                                    colors =
+                                        ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.error,
+                                            contentColor = MaterialTheme.colorScheme.onError,
+                                        ),
                                 ) {
                                     Text(text = stringResource(R.string.watch_update_action))
                                 }
@@ -163,24 +170,25 @@ fun WatchSettingsUI(
             }
         } else {
             RoundedCardContainer(
-                modifier = Modifier
-                    .padding(bottom = 18.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = RoundedCornerShape(24.dp)
-                    )
+                modifier =
+                    Modifier
+                        .padding(bottom = 18.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = RoundedCornerShape(24.dp),
+                        ),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = stringResource(R.string.watch_no_companion_title),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onPrimary,
                     )
                     Text(
                         text = stringResource(R.string.watch_no_companion_desc),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
+                        modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
                     )
                     Button(
                         onClick = {
@@ -188,15 +196,16 @@ fun WatchSettingsUI(
                             uriHandler.openUri("http://github.com/sameerasw/essentials-wear/releases/latest")
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.onPrimary,
-                            contentColor = MaterialTheme.colorScheme.primary
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onPrimary,
+                                contentColor = MaterialTheme.colorScheme.primary,
+                            ),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_download_24),
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.action_download_from_github))

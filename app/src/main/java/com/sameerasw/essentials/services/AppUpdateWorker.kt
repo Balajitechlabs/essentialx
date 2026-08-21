@@ -19,9 +19,8 @@ import com.sameerasw.essentials.utils.UpdateNotificationHelper
 
 class AppUpdateWorker(
     appContext: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
-
     override suspend fun doWork(): Result {
         Log.d("AppUpdateWorker", "Executing periodic update check")
         val context = applicationContext
@@ -29,24 +28,27 @@ class AppUpdateWorker(
         val updateRepository = UpdateRepository()
 
         return try {
-            val isAutoUpdateEnabled = settingsRepository.getBoolean(
-                SettingsRepository.KEY_AUTO_UPDATE_ENABLED,
-                true
-            )
+            val isAutoUpdateEnabled =
+                settingsRepository.getBoolean(
+                    SettingsRepository.KEY_AUTO_UPDATE_ENABLED,
+                    true,
+                )
             if (!isAutoUpdateEnabled) {
                 return Result.success()
             }
 
-            val currentVersion = try {
-                context.packageManager.getPackageInfo(context.packageName, 0).versionName
-            } catch (e: Exception) {
-                "0.0"
-            } ?: "0.0"
+            val currentVersion =
+                try {
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                } catch (e: Exception) {
+                    "0.0"
+                } ?: "0.0"
 
-            val isPreReleaseEnabled = settingsRepository.getBoolean(
-                SettingsRepository.KEY_CHECK_PRE_RELEASES_ENABLED,
-                false
-            )
+            val isPreReleaseEnabled =
+                settingsRepository.getBoolean(
+                    SettingsRepository.KEY_CHECK_PRE_RELEASES_ENABLED,
+                    false,
+                )
 
             val updateInfo =
                 updateRepository.checkForUpdates(context, isPreReleaseEnabled, currentVersion)
@@ -56,15 +58,16 @@ class AppUpdateWorker(
                 com.sameerasw.essentials.viewmodels.MainViewModel.cachedUpdateInfo = updateInfo
 
                 if (updateInfo.downloadUrl.isNotEmpty()) {
-                    val isNotifEnabled = settingsRepository.getBoolean(
-                        SettingsRepository.KEY_UPDATE_NOTIFICATION_ENABLED,
-                        true
-                    )
+                    val isNotifEnabled =
+                        settingsRepository.getBoolean(
+                            SettingsRepository.KEY_UPDATE_NOTIFICATION_ENABLED,
+                            true,
+                        )
                     if (isNotifEnabled) {
                         UpdateNotificationHelper.showUpdateNotification(
                             context,
                             updateInfo.versionName,
-                            updateInfo.downloadUrl
+                            updateInfo.downloadUrl,
                         )
                     }
                 }
@@ -72,7 +75,7 @@ class AppUpdateWorker(
 
             settingsRepository.putLong(
                 SettingsRepository.KEY_LAST_UPDATE_CHECK_TIME,
-                System.currentTimeMillis()
+                System.currentTimeMillis(),
             )
 
             Result.success()

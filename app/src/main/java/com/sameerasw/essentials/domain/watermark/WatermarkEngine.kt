@@ -31,14 +31,14 @@ import kotlin.math.roundToInt
 
 enum class WatermarkStyle {
     OVERLAY,
-    FRAME
+    FRAME,
 }
 
 enum class ColorMode {
     LIGHT,
     DARK,
     ACCENT_LIGHT,
-    ACCENT_DARK
+    ACCENT_DARK,
 }
 
 data class WatermarkOptions(
@@ -69,23 +69,31 @@ data class WatermarkOptions(
     val logoSize: Int = 50,
     val overriddenBrandText: String? = null,
     val overriddenDateText: String? = null,
-    val rotation: Int = 0
+    val rotation: Int = 0,
 )
 
 class WatermarkEngine(
     private val context: Context,
-    private val metadataProvider: MetadataProvider
+    private val metadataProvider: MetadataProvider,
 ) {
-    suspend fun processImage(uri: Uri, options: WatermarkOptions): File =
+    suspend fun processImage(
+        uri: Uri,
+        options: WatermarkOptions,
+    ): File =
         withContext(Dispatchers.IO) {
-            val inputStream = context.contentResolver.openInputStream(uri)
-                ?: throw IllegalStateException("Cannot open input stream")
+            val inputStream =
+                context.contentResolver.openInputStream(uri)
+                    ?: throw IllegalStateException("Cannot open input stream")
 
             val originalBitmap =
-                BitmapFactory.decodeStream(inputStream, null, BitmapFactory.Options().apply {
-                    inMutable = true
-                    inPreferredConfig = Bitmap.Config.ARGB_8888
-                }) ?: throw IllegalStateException("Failed to decode bitmap")
+                BitmapFactory.decodeStream(
+                    inputStream,
+                    null,
+                    BitmapFactory.Options().apply {
+                        inMutable = true
+                        inPreferredConfig = Bitmap.Config.ARGB_8888
+                    },
+                ) ?: throw IllegalStateException("Failed to decode bitmap")
 
             inputStream.close() // Close stream after decoding
 
@@ -106,29 +114,30 @@ class WatermarkEngine(
                     val newExif = androidx.exifinterface.media.ExifInterface(file)
 
                     // Copy all tags
-                    val attributes = arrayOf(
-                        androidx.exifinterface.media.ExifInterface.TAG_DATETIME,
-                        androidx.exifinterface.media.ExifInterface.TAG_DATETIME_DIGITIZED,
-                        androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL,
-                        androidx.exifinterface.media.ExifInterface.TAG_EXPOSURE_TIME,
-                        androidx.exifinterface.media.ExifInterface.TAG_F_NUMBER,
-                        androidx.exifinterface.media.ExifInterface.TAG_FLASH,
-                        androidx.exifinterface.media.ExifInterface.TAG_FOCAL_LENGTH,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_ALTITUDE,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_ALTITUDE_REF,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_DATESTAMP,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_LATITUDE,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_LATITUDE_REF,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_LONGITUDE,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_LONGITUDE_REF,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_PROCESSING_METHOD,
-                        androidx.exifinterface.media.ExifInterface.TAG_GPS_TIMESTAMP,
-                        androidx.exifinterface.media.ExifInterface.TAG_MAKE,
-                        androidx.exifinterface.media.ExifInterface.TAG_MODEL,
-                        androidx.exifinterface.media.ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY,
-                        androidx.exifinterface.media.ExifInterface.TAG_SUBSEC_TIME,
-                        androidx.exifinterface.media.ExifInterface.TAG_WHITE_BALANCE
-                    )
+                    val attributes =
+                        arrayOf(
+                            androidx.exifinterface.media.ExifInterface.TAG_DATETIME,
+                            androidx.exifinterface.media.ExifInterface.TAG_DATETIME_DIGITIZED,
+                            androidx.exifinterface.media.ExifInterface.TAG_DATETIME_ORIGINAL,
+                            androidx.exifinterface.media.ExifInterface.TAG_EXPOSURE_TIME,
+                            androidx.exifinterface.media.ExifInterface.TAG_F_NUMBER,
+                            androidx.exifinterface.media.ExifInterface.TAG_FLASH,
+                            androidx.exifinterface.media.ExifInterface.TAG_FOCAL_LENGTH,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_ALTITUDE,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_ALTITUDE_REF,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_DATESTAMP,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_LATITUDE,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_LATITUDE_REF,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_LONGITUDE,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_LONGITUDE_REF,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_PROCESSING_METHOD,
+                            androidx.exifinterface.media.ExifInterface.TAG_GPS_TIMESTAMP,
+                            androidx.exifinterface.media.ExifInterface.TAG_MAKE,
+                            androidx.exifinterface.media.ExifInterface.TAG_MODEL,
+                            androidx.exifinterface.media.ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY,
+                            androidx.exifinterface.media.ExifInterface.TAG_SUBSEC_TIME,
+                            androidx.exifinterface.media.ExifInterface.TAG_WHITE_BALANCE,
+                        )
 
                     for (attr in attributes) {
                         val value = oldExif.getAttribute(attr)
@@ -140,11 +149,11 @@ class WatermarkEngine(
                     // Add essentials tag
                     newExif.setAttribute(
                         androidx.exifinterface.media.ExifInterface.TAG_IMAGE_DESCRIPTION,
-                        "Watermark by Essentials"
+                        "Watermark by Essentials",
                     )
                     newExif.setAttribute(
                         androidx.exifinterface.media.ExifInterface.TAG_USER_COMMENT,
-                        "Watermark by Essentials"
+                        "Watermark by Essentials",
                     )
 
                     newExif.saveAttributes()
@@ -159,7 +168,11 @@ class WatermarkEngine(
             file
         }
 
-    suspend fun processBitmap(bitmap: Bitmap, uri: Uri, options: WatermarkOptions): Bitmap =
+    suspend fun processBitmap(
+        bitmap: Bitmap,
+        uri: Uri,
+        options: WatermarkOptions,
+    ): Bitmap =
         withContext(Dispatchers.Default) {
             val exifData = metadataProvider.extractExif(uri)
 
@@ -172,73 +185,76 @@ class WatermarkEngine(
             }
 
             // Apply Rotation
-            val rotated = if (options.rotation != 0) {
-                val matrix =
-                    android.graphics.Matrix().apply { postRotate(options.rotation.toFloat()) }
-                val rb =
-                    Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+            val rotated =
+                if (options.rotation != 0) {
+                    val matrix =
+                        android.graphics.Matrix().apply { postRotate(options.rotation.toFloat()) }
+                    val rb =
+                        Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
 
-                // If we have a gainmap, rotate its contents as well to align with the base image
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE && currentGainmap != null) {
-                    try {
-                        val gmContents = currentGainmap.gainmapContents
-                        val rotatedGmContents = Bitmap.createBitmap(
-                            gmContents,
-                            0,
-                            0,
-                            gmContents.width,
-                            gmContents.height,
-                            matrix,
-                            true
-                        )
-                        val newGm = android.graphics.Gainmap(rotatedGmContents)
+                    // If we have a gainmap, rotate its contents as well to align with the base image
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE && currentGainmap != null) {
+                        try {
+                            val gmContents = currentGainmap.gainmapContents
+                            val rotatedGmContents =
+                                Bitmap.createBitmap(
+                                    gmContents,
+                                    0,
+                                    0,
+                                    gmContents.width,
+                                    gmContents.height,
+                                    matrix,
+                                    true,
+                                )
+                            val newGm = android.graphics.Gainmap(rotatedGmContents)
 
-                        newGm.setRatioMin(
-                            currentGainmap.ratioMin[0],
-                            currentGainmap.ratioMin[1],
-                            currentGainmap.ratioMin[2]
-                        )
-                        newGm.setRatioMax(
-                            currentGainmap.ratioMax[0],
-                            currentGainmap.ratioMax[1],
-                            currentGainmap.ratioMax[2]
-                        )
-                        newGm.setGamma(
-                            currentGainmap.gamma[0],
-                            currentGainmap.gamma[1],
-                            currentGainmap.gamma[2]
-                        )
-                        newGm.setEpsilonSdr(
-                            currentGainmap.epsilonSdr[0],
-                            currentGainmap.epsilonSdr[1],
-                            currentGainmap.epsilonSdr[2]
-                        )
-                        newGm.setEpsilonHdr(
-                            currentGainmap.epsilonHdr[0],
-                            currentGainmap.epsilonHdr[1],
-                            currentGainmap.epsilonHdr[2]
-                        )
-                        newGm.displayRatioForFullHdr = currentGainmap.displayRatioForFullHdr
-                        newGm.minDisplayRatioForHdrTransition =
-                            currentGainmap.minDisplayRatioForHdrTransition
+                            newGm.setRatioMin(
+                                currentGainmap.ratioMin[0],
+                                currentGainmap.ratioMin[1],
+                                currentGainmap.ratioMin[2],
+                            )
+                            newGm.setRatioMax(
+                                currentGainmap.ratioMax[0],
+                                currentGainmap.ratioMax[1],
+                                currentGainmap.ratioMax[2],
+                            )
+                            newGm.setGamma(
+                                currentGainmap.gamma[0],
+                                currentGainmap.gamma[1],
+                                currentGainmap.gamma[2],
+                            )
+                            newGm.setEpsilonSdr(
+                                currentGainmap.epsilonSdr[0],
+                                currentGainmap.epsilonSdr[1],
+                                currentGainmap.epsilonSdr[2],
+                            )
+                            newGm.setEpsilonHdr(
+                                currentGainmap.epsilonHdr[0],
+                                currentGainmap.epsilonHdr[1],
+                                currentGainmap.epsilonHdr[2],
+                            )
+                            newGm.displayRatioForFullHdr = currentGainmap.displayRatioForFullHdr
+                            newGm.minDisplayRatioForHdrTransition =
+                                currentGainmap.minDisplayRatioForHdrTransition
 
-                        currentGainmap = newGm
-                        rb.gainmap = newGm
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                            currentGainmap = newGm
+                            rb.gainmap = newGm
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
+
+                    if (rb != bitmap) bitmap.recycle()
+                    rb
+                } else {
+                    bitmap
                 }
 
-                if (rb != bitmap) bitmap.recycle()
-                rb
-            } else {
-                bitmap
-            }
-
-            val result = when (options.style) {
-                WatermarkStyle.OVERLAY -> drawOverlay(rotated, exifData, options)
-                WatermarkStyle.FRAME -> drawFrame(rotated, exifData, options)
-            }
+            val result =
+                when (options.style) {
+                    WatermarkStyle.OVERLAY -> drawOverlay(rotated, exifData, options)
+                    WatermarkStyle.FRAME -> drawFrame(rotated, exifData, options)
+                }
 
             val finalResult = applyBorder(result, options)
 
@@ -257,19 +273,22 @@ class WatermarkEngine(
                         val brandScale = 0.5f + (options.brandTextSize / 100f)
                         val dataScale = 0.5f + (options.dataTextSize / 100f)
 
-                        val brandPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                            textSize = (baseFrameHeight * 0.3f) * brandScale
-                        }
-                        val exifPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                            textSize = (baseFrameHeight * 0.2f) * dataScale
-                        }
+                        val brandPaint =
+                            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                                textSize = (baseFrameHeight * 0.3f) * brandScale
+                            }
+                        val exifPaint =
+                            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                                textSize = (baseFrameHeight * 0.2f) * dataScale
+                            }
 
                         val margin = rotated.width * (options.padding / 1000f)
-                        val maxAvailableWidth = if (options.showDeviceBrand) {
-                            (rotated.width - margin * 2) * 0.6f
-                        } else {
-                            (rotated.width - margin * 2)
-                        }
+                        val maxAvailableWidth =
+                            if (options.showDeviceBrand) {
+                                (rotated.width - margin * 2) * 0.6f
+                            } else {
+                                (rotated.width - margin * 2)
+                            }
 
                         var totalExifHeight = 0f
                         if (options.showExif) {
@@ -285,10 +304,11 @@ class WatermarkEngine(
                         if (options.showDeviceBrand) leftSideHeight += brandPaint.textSize
                         if (options.showCustomText && options.customText.isNotEmpty()) {
                             val customScale = 0.5f + (options.customTextSize / 100f)
-                            val customPaint = Paint(brandPaint).apply {
-                                textSize =
-                                    brandPaint.textSize * (customScale / (0.5f + (options.brandTextSize / 100f)))
-                            }
+                            val customPaint =
+                                Paint(brandPaint).apply {
+                                    textSize =
+                                        brandPaint.textSize * (customScale / (0.5f + (options.brandTextSize / 100f)))
+                                }
                             if (options.showDeviceBrand) leftSideHeight += (brandPaint.textSize * 0.2f)
                             leftSideHeight += customPaint.textSize
                         }
@@ -320,39 +340,40 @@ class WatermarkEngine(
                     val gmCanvas = Canvas(newGmContents)
                     gmCanvas.drawColor(Color.BLACK) // fill with neutral black
 
-                    val destRect = RectF(
-                        xOffset * scale,
-                        yOffset * scale,
-                        (xOffset + rotated.width) * scale,
-                        (yOffset + rotated.height) * scale
-                    )
+                    val destRect =
+                        RectF(
+                            xOffset * scale,
+                            yOffset * scale,
+                            (xOffset + rotated.width) * scale,
+                            (yOffset + rotated.height) * scale,
+                        )
                     gmCanvas.drawBitmap(gmContents, null, destRect, null)
 
                     val newGm = android.graphics.Gainmap(newGmContents)
                     newGm.setRatioMin(
                         currentGainmap.ratioMin[0],
                         currentGainmap.ratioMin[1],
-                        currentGainmap.ratioMin[2]
+                        currentGainmap.ratioMin[2],
                     )
                     newGm.setRatioMax(
                         currentGainmap.ratioMax[0],
                         currentGainmap.ratioMax[1],
-                        currentGainmap.ratioMax[2]
+                        currentGainmap.ratioMax[2],
                     )
                     newGm.setGamma(
                         currentGainmap.gamma[0],
                         currentGainmap.gamma[1],
-                        currentGainmap.gamma[2]
+                        currentGainmap.gamma[2],
                     )
                     newGm.setEpsilonSdr(
                         currentGainmap.epsilonSdr[0],
                         currentGainmap.epsilonSdr[1],
-                        currentGainmap.epsilonSdr[2]
+                        currentGainmap.epsilonSdr[2],
                     )
                     newGm.setEpsilonHdr(
                         currentGainmap.epsilonHdr[0],
                         currentGainmap.epsilonHdr[1],
-                        currentGainmap.epsilonHdr[2]
+                        currentGainmap.epsilonHdr[2],
                     )
                     newGm.displayRatioForFullHdr = currentGainmap.displayRatioForFullHdr
                     newGm.minDisplayRatioForHdrTransition =
@@ -368,7 +389,11 @@ class WatermarkEngine(
             finalResult
         }
 
-    private fun drawOverlay(bitmap: Bitmap, exifData: ExifData, options: WatermarkOptions): Bitmap {
+    private fun drawOverlay(
+        bitmap: Bitmap,
+        exifData: ExifData,
+        options: WatermarkOptions,
+    ): Bitmap {
         val canvas = Canvas(bitmap)
 
         // Derive Colors
@@ -376,11 +401,12 @@ class WatermarkEngine(
         val shadowColor = colors.shadowColor
         val overlayTextColor = colors.overlayTextColor
 
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = overlayTextColor
-            textSize = bitmap.width * 0.03f // 3% of width
-            setShadowLayer(4f, 2f, 2f, shadowColor)
-        }
+        val paint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = overlayTextColor
+                textSize = bitmap.width * 0.03f // 3% of width
+                setShadowLayer(4f, 2f, 2f, shadowColor)
+            }
 
         val strokeSpacer = (bitmap.width * (options.borderStroke / 1000f))
         val margin = (bitmap.width * (options.padding / 1000f)) + strokeSpacer
@@ -430,10 +456,11 @@ class WatermarkEngine(
         // Draw Custom Text
         if (options.showCustomText && options.customText.isNotEmpty()) {
             val customScale = 0.5f + (options.customTextSize / 100f)
-            val customPaint = Paint(paint).apply {
-                textSize = baseSize * customScale
-                typeface = Typeface.DEFAULT
-            }
+            val customPaint =
+                Paint(paint).apply {
+                    textSize = baseSize * customScale
+                    typeface = Typeface.DEFAULT
+                }
             val textBounds = Rect()
             customPaint.getTextBounds(options.customText, 0, options.customText.length, textBounds)
             if (options.showExif) yPos -= (customPaint.textSize * 0.5f)
@@ -446,10 +473,11 @@ class WatermarkEngine(
         // Draw Brand
         if (options.showDeviceBrand) {
             val brandString = buildBrandString(exifData, options)
-            val brandPaint = Paint(paint).apply {
-                typeface = Typeface.DEFAULT_BOLD
-                textSize = baseSize * brandScale
-            }
+            val brandPaint =
+                Paint(paint).apply {
+                    typeface = Typeface.DEFAULT_BOLD
+                    textSize = baseSize * brandScale
+                }
             val textBounds = Rect()
             brandPaint.getTextBounds(brandString, 0, brandString.length, textBounds)
             val xPos =
@@ -466,13 +494,15 @@ class WatermarkEngine(
 
             val destRect = RectF(logoX, logoY, logoX + logoWidth, logoY + logoHeight)
 
-            val shadowPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                colorFilter = android.graphics.PorterDuffColorFilter(
-                    shadowColor,
-                    PorterDuff.Mode.SRC_IN
-                )
-                alpha = 128
-            }
+            val shadowPaint =
+                Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    colorFilter =
+                        android.graphics.PorterDuffColorFilter(
+                            shadowColor,
+                            PorterDuff.Mode.SRC_IN,
+                        )
+                    alpha = 128
+                }
             val shadowRect = RectF(destRect).apply { offset(2f, 2f) }
             canvas.drawBitmap(logoBitmap, null, shadowRect, shadowPaint)
 
@@ -482,7 +512,11 @@ class WatermarkEngine(
         return bitmap
     }
 
-    private fun drawFrame(bitmap: Bitmap, exifData: ExifData, options: WatermarkOptions): Bitmap {
+    private fun drawFrame(
+        bitmap: Bitmap,
+        exifData: ExifData,
+        options: WatermarkOptions,
+    ): Bitmap {
         var baseFrameHeight = (bitmap.height * 0.10f).roundToInt()
 
         // Derive Colors
@@ -496,24 +530,27 @@ class WatermarkEngine(
         val brandScale = 0.5f + (options.brandTextSize / 100f)
         val dataScale = 0.5f + (options.dataTextSize / 100f)
 
-        val brandPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = textColor
-            textSize = (baseFrameHeight * 0.3f) * brandScale
-            typeface = Typeface.DEFAULT_BOLD
-        }
+        val brandPaint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = textColor
+                textSize = (baseFrameHeight * 0.3f) * brandScale
+                typeface = Typeface.DEFAULT_BOLD
+            }
 
-        val exifPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = secondaryTextColor
-            textSize = (baseFrameHeight * 0.2f) * dataScale
-        }
+        val exifPaint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = secondaryTextColor
+                textSize = (baseFrameHeight * 0.2f) * dataScale
+            }
 
         val margin = bitmap.width * (options.padding / 1000f) // 0 to 10%
 
-        val maxAvailableWidth = if (options.showDeviceBrand) {
-            (bitmap.width - margin * 2) * 0.6f
-        } else {
-            (bitmap.width - margin * 2)
-        }
+        val maxAvailableWidth =
+            if (options.showDeviceBrand) {
+                (bitmap.width - margin * 2) * 0.6f
+            } else {
+                (bitmap.width - margin * 2)
+            }
 
         var exifRows: List<List<ExifItem>> = emptyList()
         var totalExifHeight = 0f
@@ -526,17 +563,18 @@ class WatermarkEngine(
             }
         }
 
-        // Dynamic Height Calculation 
+        // Dynamic Height Calculation
         var leftSideHeight = 0f
         if (options.showDeviceBrand) {
             leftSideHeight += brandPaint.textSize
         }
         if (options.showCustomText && options.customText.isNotEmpty()) {
-            val customTextPaint = Paint(brandPaint).apply {
-                val customScale = 0.5f + (options.customTextSize / 100f)
-                textSize = (baseFrameHeight * 0.3f) * customScale
-                typeface = Typeface.DEFAULT
-            }
+            val customTextPaint =
+                Paint(brandPaint).apply {
+                    val customScale = 0.5f + (options.customTextSize / 100f)
+                    textSize = (baseFrameHeight * 0.3f) * customScale
+                    typeface = Typeface.DEFAULT
+                }
             if (options.showDeviceBrand) {
                 leftSideHeight += (baseFrameHeight * 0.1f)
             }
@@ -563,22 +601,23 @@ class WatermarkEngine(
         canvas.drawColor(bgColor)
 
         // Create rounded version of source bitmap if needed
-        val sourceToDraw = if (options.borderCorner > 0) {
-            val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-            val srcCanvas = Canvas(output)
-            val srcPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-            val rect = RectF(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
+        val sourceToDraw =
+            if (options.borderCorner > 0) {
+                val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+                val srcCanvas = Canvas(output)
+                val srcPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+                val rect = RectF(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
 
-            val minDim = kotlin.math.min(bitmap.width, bitmap.height)
-            val radius = minDim * (options.borderCorner / 1000f)
+                val minDim = kotlin.math.min(bitmap.width, bitmap.height)
+                val radius = minDim * (options.borderCorner / 1000f)
 
-            srcCanvas.drawRoundRect(rect, radius, radius, srcPaint)
-            srcPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-            srcCanvas.drawBitmap(bitmap, 0f, 0f, srcPaint)
-            output
-        } else {
-            bitmap
-        }
+                srcCanvas.drawRoundRect(rect, radius, radius, srcPaint)
+                srcPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+                srcCanvas.drawBitmap(bitmap, 0f, 0f, srcPaint)
+                output
+            } else {
+                bitmap
+            }
 
         // Draw Image and Text
         if (options.moveToTop) {
@@ -588,10 +627,16 @@ class WatermarkEngine(
             // Draw Text in "Forehead"
             val centerY = (finalFrameHeight - strokeSpacer) / 2f
             drawFrameContent(
-                canvas, exifData, options, margin, centerY,
-                brandPaint, exifPaint, exifRows, bitmap.width
+                canvas,
+                exifData,
+                options,
+                margin,
+                centerY,
+                brandPaint,
+                exifPaint,
+                exifRows,
+                bitmap.width,
             )
-
         } else {
             // Draw Image at 0,0
             canvas.drawBitmap(sourceToDraw, 0f, 0f, null)
@@ -599,8 +644,15 @@ class WatermarkEngine(
             // Draw Text in "Chin"
             val centerY = bitmap.height + strokeSpacer + ((finalFrameHeight - strokeSpacer) / 2f)
             drawFrameContent(
-                canvas, exifData, options, margin, centerY,
-                brandPaint, exifPaint, exifRows, bitmap.width
+                canvas,
+                exifData,
+                options,
+                margin,
+                centerY,
+                brandPaint,
+                exifPaint,
+                exifRows,
+                bitmap.width,
             )
         }
 
@@ -612,11 +664,15 @@ class WatermarkEngine(
     }
 
     private fun drawFrameContent(
-        canvas: Canvas, exifData: ExifData, options: WatermarkOptions,
-        margin: Float, centerY: Float,
-        brandPaint: Paint, exifPaint: Paint,
-        exifRows: List<List<ExifItem>>, canvasWidth: Int
-
+        canvas: Canvas,
+        exifData: ExifData,
+        options: WatermarkOptions,
+        margin: Float,
+        centerY: Float,
+        brandPaint: Paint,
+        exifPaint: Paint,
+        exifRows: List<List<ExifItem>>,
+        canvasWidth: Int,
     ) {
         val colors = deriveColors(options)
         val textColor = colors.textColor
@@ -644,10 +700,11 @@ class WatermarkEngine(
         var currentLeftY = centerY
         var totalLeftHeight = 0f
         val customScale = 0.5f + (options.customTextSize / 100f)
-        val customPaint = Paint(brandPaint).apply {
-            textSize = brandPaint.textSize * (customScale / (0.5f + (options.brandTextSize / 100f)))
-            typeface = Typeface.DEFAULT
-        }
+        val customPaint =
+            Paint(brandPaint).apply {
+                textSize = brandPaint.textSize * (customScale / (0.5f + (options.brandTextSize / 100f)))
+                typeface = Typeface.DEFAULT
+            }
 
         if (options.showDeviceBrand) totalLeftHeight += brandPaint.textSize
         if (options.showCustomText && options.customText.isNotEmpty()) {
@@ -665,7 +722,7 @@ class WatermarkEngine(
                 logoBitmap,
                 null,
                 RectF(logoX, logoY, logoX + logoWidth, logoY + logoHeight),
-                null
+                null,
             )
         }
 
@@ -701,7 +758,7 @@ class WatermarkEngine(
     private fun wrapExifItems(
         items: List<ExifItem>,
         paint: Paint,
-        maxWidth: Float
+        maxWidth: Float,
     ): List<List<ExifItem>> {
         val rows = mutableListOf<List<ExifItem>>()
         if (items.isEmpty()) return rows
@@ -733,7 +790,10 @@ class WatermarkEngine(
         return rows
     }
 
-    private fun measureItemWidth(item: ExifItem, paint: Paint): Float {
+    private fun measureItemWidth(
+        item: ExifItem,
+        paint: Paint,
+    ): Float {
         // Icon + Padding + Text
         val iconSize = paint.textSize * 1.2f
         val padding = paint.textSize * 0.4f
@@ -741,7 +801,10 @@ class WatermarkEngine(
         return iconSize + padding + textWidth
     }
 
-    private fun measureRowWidth(row: List<ExifItem>, paint: Paint): Float {
+    private fun measureRowWidth(
+        row: List<ExifItem>,
+        paint: Paint,
+    ): Float {
         var width = 0f
         val itemSpacing = paint.textSize * 0.8f
         for (i in row.indices) {
@@ -751,14 +814,20 @@ class WatermarkEngine(
         return width
     }
 
-    private fun measureRowHeight(row: List<ExifItem>, paint: Paint): Float {
+    private fun measureRowHeight(
+        row: List<ExifItem>,
+        paint: Paint,
+    ): Float {
         return paint.textSize * 1.5f // Use standard height
     }
 
     private fun drawExifRow(
-        canvas: Canvas, row: List<ExifItem>,
-        xStart: Float, yPos: Float,
-        paint: Paint, shadowColor: Int?
+        canvas: Canvas,
+        row: List<ExifItem>,
+        xStart: Float,
+        yPos: Float,
+        paint: Paint,
+        shadowColor: Int?,
     ) {
         var currentX = xStart
         val iconSize = paint.textSize * 1.2f
@@ -771,21 +840,24 @@ class WatermarkEngine(
             // Draw Icon
             val iconBitmap = loadVectorBitmap(context, item.iconRes, paint.color)
             if (iconBitmap != null) {
-                val destRect = Rect(
-                    currentX.toInt(),
-                    iconY.toInt(),
-                    (currentX + iconSize).toInt(),
-                    (iconY + iconSize).toInt()
-                )
+                val destRect =
+                    Rect(
+                        currentX.toInt(),
+                        iconY.toInt(),
+                        (currentX + iconSize).toInt(),
+                        (iconY + iconSize).toInt(),
+                    )
 
                 if (shadowColor != null) {
-                    val shadowPaint = Paint(paint).apply {
-                        color = shadowColor
-                        colorFilter = android.graphics.PorterDuffColorFilter(
-                            shadowColor,
-                            PorterDuff.Mode.SRC_IN
-                        )
-                    }
+                    val shadowPaint =
+                        Paint(paint).apply {
+                            color = shadowColor
+                            colorFilter =
+                                android.graphics.PorterDuffColorFilter(
+                                    shadowColor,
+                                    PorterDuff.Mode.SRC_IN,
+                                )
+                        }
                     val shadowRect = Rect(destRect)
                     shadowRect.offset(2, 2)
                     canvas.drawBitmap(iconBitmap, null, shadowRect, shadowPaint)
@@ -795,7 +867,7 @@ class WatermarkEngine(
                     iconBitmap,
                     null,
                     destRect,
-                    null
+                    null,
                 ) // Already tinted if we created it tinted
             }
 
@@ -811,16 +883,21 @@ class WatermarkEngine(
     // Cache for bitmaps
     private val iconCache = mutableMapOf<Int, Bitmap>()
 
-    private fun loadVectorBitmap(context: Context, resId: Int, color: Int): Bitmap? {
-
+    private fun loadVectorBitmap(
+        context: Context,
+        resId: Int,
+        color: Int,
+    ): Bitmap? {
         try {
             val drawable =
-                androidx.core.content.ContextCompat.getDrawable(context, resId) ?: return null
-            val bitmap = Bitmap.createBitmap(
-                drawable.intrinsicWidth,
-                drawable.intrinsicHeight,
-                Bitmap.Config.ARGB_8888
-            )
+                androidx.core.content.ContextCompat
+                    .getDrawable(context, resId) ?: return null
+            val bitmap =
+                Bitmap.createBitmap(
+                    drawable.intrinsicWidth,
+                    drawable.intrinsicHeight,
+                    Bitmap.Config.ARGB_8888,
+                )
             val canvas = Canvas(bitmap)
             drawable.setBounds(0, 0, canvas.width, canvas.height)
             drawable.setTint(color)
@@ -831,7 +908,10 @@ class WatermarkEngine(
         }
     }
 
-    private fun buildBrandString(exif: ExifData, options: WatermarkOptions): String {
+    private fun buildBrandString(
+        exif: ExifData,
+        options: WatermarkOptions,
+    ): String {
         options.overriddenBrandText?.let { return it }
         return if (!exif.make.isNullOrEmpty() && !exif.model.isNullOrEmpty()) {
             if (exif.model.contains(exif.make, ignoreCase = true)) {
@@ -844,25 +924,41 @@ class WatermarkEngine(
         }
     }
 
-    private data class ExifItem(val text: String, val iconRes: Int)
+    private data class ExifItem(
+        val text: String,
+        val iconRes: Int,
+    )
 
-    private fun buildExifList(exif: ExifData, options: WatermarkOptions): List<ExifItem> {
+    private fun buildExifList(
+        exif: ExifData,
+        options: WatermarkOptions,
+    ): List<ExifItem> {
         val list = mutableListOf<ExifItem>()
 
-        if (options.showFocalLength) exif.focalLength?.let {
-            list.add(ExifItem(it, R.drawable.rounded_control_camera_24))
+        if (options.showFocalLength) {
+            exif.focalLength?.let {
+                list.add(ExifItem(it, R.drawable.rounded_control_camera_24))
+            }
         }
-        if (options.showAperture) exif.aperture?.let {
-            list.add(ExifItem(it, R.drawable.rounded_camera_24))
+        if (options.showAperture) {
+            exif.aperture?.let {
+                list.add(ExifItem(it, R.drawable.rounded_camera_24))
+            }
         }
-        if (options.showShutterSpeed) exif.shutterSpeed?.let {
-            list.add(ExifItem(formatShutterSpeed(it), R.drawable.rounded_shutter_speed_24))
+        if (options.showShutterSpeed) {
+            exif.shutterSpeed?.let {
+                list.add(ExifItem(formatShutterSpeed(it), R.drawable.rounded_shutter_speed_24))
+            }
         }
-        if (options.showIso) exif.iso?.let {
-            list.add(ExifItem(it, R.drawable.rounded_grain_24))
+        if (options.showIso) {
+            exif.iso?.let {
+                list.add(ExifItem(it, R.drawable.rounded_grain_24))
+            }
         }
-        if (options.showDate) (options.overriddenDateText ?: exif.date)?.let {
-            list.add(ExifItem(formatDate(it), R.drawable.rounded_date_range_24))
+        if (options.showDate) {
+            (options.overriddenDateText ?: exif.date)?.let {
+                list.add(ExifItem(formatDate(it), R.drawable.rounded_date_range_24))
+            }
         }
 
         return list
@@ -914,11 +1010,12 @@ class WatermarkEngine(
 
             if (exposureTime >= 1.0) {
                 // For 1.0s or more, show as integer if possible, else 1 decimal
-                val formatted = if (exposureTime % 1.0 == 0.0) {
-                    exposureTime.toInt().toString()
-                } else {
-                    java.lang.String.format(java.util.Locale.US, "%.1f", exposureTime)
-                }
+                val formatted =
+                    if (exposureTime % 1.0 == 0.0) {
+                        exposureTime.toInt().toString()
+                    } else {
+                        java.lang.String.format(java.util.Locale.US, "%.1f", exposureTime)
+                    }
                 "${formatted}s"
             } else {
                 // For sub-second, convert to 1/N format
@@ -930,51 +1027,56 @@ class WatermarkEngine(
         }
     }
 
-    private fun applyBorder(bitmap: Bitmap, options: WatermarkOptions): Bitmap {
+    private fun applyBorder(
+        bitmap: Bitmap,
+        options: WatermarkOptions,
+    ): Bitmap {
         if (options.borderStroke == 0 && options.borderCorner == 0) return bitmap
 
-        val roundedBitmap = if (options.borderCorner > 0 && options.style != WatermarkStyle.FRAME) {
-            val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(output)
-            val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-            val rect = RectF(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
+        val roundedBitmap =
+            if (options.borderCorner > 0 && options.style != WatermarkStyle.FRAME) {
+                val output = Bitmap.createBitmap(bitmap.width, bitmap.height, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(output)
+                val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+                val rect = RectF(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
 
-            // Mapping: 0-100slider -> 0-10% of min dimension
-            val minDim = kotlin.math.min(bitmap.width, bitmap.height)
-            val radius = minDim * (options.borderCorner / 1000f) // Max 10%
+                // Mapping: 0-100slider -> 0-10% of min dimension
+                val minDim = kotlin.math.min(bitmap.width, bitmap.height)
+                val radius = minDim * (options.borderCorner / 1000f) // Max 10%
 
-            canvas.drawRoundRect(rect, radius, radius, paint)
-            paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-            canvas.drawBitmap(bitmap, 0f, 0f, paint)
+                canvas.drawRoundRect(rect, radius, radius, paint)
+                paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+                canvas.drawBitmap(bitmap, 0f, 0f, paint)
 
-            if (bitmap != output) bitmap.recycle()
-            output
-        } else {
-            bitmap
-        }
+                if (bitmap != output) bitmap.recycle()
+                output
+            } else {
+                bitmap
+            }
 
         // Border Stroke  (Expand Canvas)
-        val finalBitmap = if (options.borderStroke > 0) {
-            val strokeWidth = (bitmap.width * (options.borderStroke / 1000f)).toInt()
+        val finalBitmap =
+            if (options.borderStroke > 0) {
+                val strokeWidth = (bitmap.width * (options.borderStroke / 1000f)).toInt()
 
-            val newWidth = roundedBitmap.width + (strokeWidth * 2)
-            val newHeight = roundedBitmap.height + (strokeWidth * 2)
+                val newWidth = roundedBitmap.width + (strokeWidth * 2)
+                val newHeight = roundedBitmap.height + (strokeWidth * 2)
 
-            val output = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(output)
+                val output = Bitmap.createBitmap(newWidth, newHeight, Bitmap.Config.ARGB_8888)
+                val canvas = Canvas(output)
 
-            val colors = deriveColors(options)
-            val bgColor = colors.bgColor
+                val colors = deriveColors(options)
+                val bgColor = colors.bgColor
 
-            canvas.drawColor(bgColor)
+                canvas.drawColor(bgColor)
 
-            canvas.drawBitmap(roundedBitmap, strokeWidth.toFloat(), strokeWidth.toFloat(), null)
+                canvas.drawBitmap(roundedBitmap, strokeWidth.toFloat(), strokeWidth.toFloat(), null)
 
-            if (roundedBitmap != output) roundedBitmap.recycle()
-            output
-        } else {
-            roundedBitmap
-        }
+                if (roundedBitmap != output) roundedBitmap.recycle()
+                output
+            } else {
+                roundedBitmap
+            }
 
         return finalBitmap
     }
@@ -984,54 +1086,71 @@ class WatermarkEngine(
         val textColor: Int,
         val secondaryTextColor: Int,
         val shadowColor: Int,
-        val overlayTextColor: Int
+        val overlayTextColor: Int,
     )
 
-    private fun deriveColors(options: WatermarkOptions): DerivedColors {
-        return when (options.colorMode) {
-            ColorMode.LIGHT -> DerivedColors(
-                Color.WHITE,
-                Color.BLACK,
-                Color.GRAY,
-                Color.BLACK,
-                Color.WHITE
-            )
+    private fun deriveColors(options: WatermarkOptions): DerivedColors =
+        when (options.colorMode) {
+            ColorMode.LIGHT ->
+                DerivedColors(
+                    Color.WHITE,
+                    Color.BLACK,
+                    Color.GRAY,
+                    Color.BLACK,
+                    Color.WHITE,
+                )
 
-            ColorMode.DARK -> DerivedColors(
-                Color.BLACK,
-                Color.WHITE,
-                Color.LTGRAY,
-                Color.WHITE,
-                Color.BLACK
-            )
+            ColorMode.DARK ->
+                DerivedColors(
+                    Color.BLACK,
+                    Color.WHITE,
+                    Color.LTGRAY,
+                    Color.WHITE,
+                    Color.BLACK,
+                )
 
             ColorMode.ACCENT_LIGHT -> getAccentColors(options.accentColor, false)
             ColorMode.ACCENT_DARK -> getAccentColors(options.accentColor, true)
         }
-    }
 
-    private fun getAccentColors(baseColor: Int, dark: Boolean): DerivedColors {
+    private fun getAccentColors(
+        baseColor: Int,
+        dark: Boolean,
+    ): DerivedColors {
         val hsl = FloatArray(3)
-        androidx.core.graphics.ColorUtils.colorToHSL(baseColor, hsl)
+        androidx.core.graphics.ColorUtils
+            .colorToHSL(baseColor, hsl)
 
         return if (dark) {
             // Accent Dark: Dark BG, Light Text
             hsl[2] = 0.15f // Dark BG
-            val bgColor = androidx.core.graphics.ColorUtils.HSLToColor(hsl)
+            val bgColor =
+                androidx.core.graphics.ColorUtils
+                    .HSLToColor(hsl)
             hsl[2] = 0.9f // Light Text
-            val textColor = androidx.core.graphics.ColorUtils.HSLToColor(hsl)
+            val textColor =
+                androidx.core.graphics.ColorUtils
+                    .HSLToColor(hsl)
             hsl[2] = 0.7f // Secondary Text
-            val secondaryTextColor = androidx.core.graphics.ColorUtils.HSLToColor(hsl)
+            val secondaryTextColor =
+                androidx.core.graphics.ColorUtils
+                    .HSLToColor(hsl)
 
             DerivedColors(bgColor, textColor, secondaryTextColor, Color.WHITE, bgColor)
         } else {
             // Accent Light: Light BG, Dark Text
             hsl[2] = 0.95f // Light BG
-            val bgColor = androidx.core.graphics.ColorUtils.HSLToColor(hsl)
+            val bgColor =
+                androidx.core.graphics.ColorUtils
+                    .HSLToColor(hsl)
             hsl[2] = 0.15f // Dark Text
-            val textColor = androidx.core.graphics.ColorUtils.HSLToColor(hsl)
+            val textColor =
+                androidx.core.graphics.ColorUtils
+                    .HSLToColor(hsl)
             hsl[2] = 0.4f // Secondary Text
-            val secondaryTextColor = androidx.core.graphics.ColorUtils.HSLToColor(hsl)
+            val secondaryTextColor =
+                androidx.core.graphics.ColorUtils
+                    .HSLToColor(hsl)
 
             DerivedColors(bgColor, textColor, secondaryTextColor, Color.BLACK, bgColor)
         }

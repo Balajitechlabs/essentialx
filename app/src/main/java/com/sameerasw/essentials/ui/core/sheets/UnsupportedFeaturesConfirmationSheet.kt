@@ -30,44 +30,45 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 fun UnsupportedFeaturesConfirmationSheet(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
-    featureTitleResIds: List<Int>
+    featureTitleResIds: List<Int>,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
         ) {
             Text(
                 text = "Enable unsupported features?",
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
                 text = "These features may not work on every device and could require extra permissions or root access. Proceed with caution!",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 ) {
                     items(featureTitleResIds) { titleRes ->
                         Text(
                             text = stringResource(titleRes),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
@@ -75,18 +76,16 @@ fun UnsupportedFeaturesConfirmationSheet(
 
             Button(
                 onClick = onConfirm,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Enable anyway")
             }
             OutlinedButton(
                 onClick = onDismissRequest,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text("Cancel")
             }
         }
     }
 }
-
-

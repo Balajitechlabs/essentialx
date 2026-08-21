@@ -42,7 +42,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
-import androidx.compose.ui.zIndex
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -50,6 +49,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
@@ -78,12 +78,11 @@ fun FeatureCard(
     additionalMenuItems: (@Composable (onDismiss: () -> Unit) -> Unit)? = null,
     customTrailingContent: (@Composable () -> Unit)? = null,
     iconPainter: androidx.compose.ui.graphics.painter.Painter? = null,
-    hasBadge: Boolean = false
+    hasBadge: Boolean = false,
 ) {
     val view = LocalView.current
     var showMenu by remember { mutableStateOf(false) }
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
-
 
     val menuState = com.sameerasw.essentials.ui.state.LocalMenuStateManager.current
     androidx.compose.runtime.DisposableEffect(showMenu) {
@@ -105,19 +104,20 @@ fun FeatureCard(
     val blurRadius by animateDpAsState(
         targetValue = if (isBlurred) 10.dp else 0.dp,
         animationSpec = tween(durationMillis = 500),
-        label = "blur"
+        label = "blur",
     )
     val alpha by animateFloatAsState(
         targetValue = if (isBlurred) 0.5f else 1f,
         animationSpec = tween(durationMillis = 500),
-        label = "alpha"
+        label = "alpha",
     )
 
-    val resolvedTitle = when (title) {
-        is Int -> stringResource(id = title)
-        is String -> title
-        else -> ""
-    }
+    val resolvedTitle =
+        when (title) {
+            is Int -> stringResource(id = title)
+            is String -> title
+            else -> ""
+        }
 
     androidx.compose.material3.ListItem(
         onClick = {
@@ -133,117 +133,132 @@ fun FeatureCard(
             showMenu = true
         },
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .alpha(alpha)
-            .blur(blurRadius),
-        leadingContent = if (iconPainter != null || iconRes != null) {
-            {
-                Box {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = ColorUtil.getPastelColorFor(resolvedTitle),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (iconPainter != null) {
-                            androidx.compose.foundation.Image(
-                                painter = iconPainter,
-                                contentDescription = resolvedTitle,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        } else if (iconRes != null) {
-                            val context = LocalContext.current
-                            val validIconRes = remember(iconRes) {
-                                try {
-                                    if (iconRes != 0 && context.resources.getResourceTypeName(iconRes) == "drawable") {
-                                        iconRes
-                                    } else {
-                                        R.drawable.rounded_settings_24
-                                    }
-                                } catch (e: Throwable) {
-                                    R.drawable.rounded_settings_24
-                                }
-                            }
-                            Icon(
-                                painter = painterResource(id = validIconRes),
-                                contentDescription = resolvedTitle,
-                                modifier = Modifier.size(24.dp),
-                                tint = ColorUtil.getVibrantColorFor(resolvedTitle)
-                            )
-                        }
-                    }
-
-                    if (hasBadge) {
-                        androidx.compose.material3.Badge(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .offset(x = 4.dp, y = (-4).dp)
-                                .size(18.dp),
-                            containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError
+        modifier =
+            modifier
+                .alpha(alpha)
+                .blur(blurRadius),
+        leadingContent =
+            if (iconPainter != null || iconRes != null) {
+                {
+                    Box {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(40.dp)
+                                    .background(
+                                        color = ColorUtil.getPastelColorFor(resolvedTitle),
+                                        shape = CircleShape,
+                                    ),
+                            contentAlignment = Alignment.Center,
                         ) {
-                            val composition by com.airbnb.lottie.compose.rememberLottieComposition(
-                                com.airbnb.lottie.compose.LottieCompositionSpec.RawRes(R.raw.update_motion)
-                            )
-                            val progress by com.airbnb.lottie.compose.animateLottieCompositionAsState(
-                                composition = composition,
-                                iterations = com.airbnb.lottie.compose.LottieConstants.IterateForever
-                            )
-                            val onErrorColor = MaterialTheme.colorScheme.onError
-                            val dynamicProperties =
-                                com.airbnb.lottie.compose.rememberLottieDynamicProperties(
-                                    com.airbnb.lottie.compose.rememberLottieDynamicProperty(
-                                        property = com.airbnb.lottie.LottieProperty.COLOR_FILTER,
-                                        value = android.graphics.PorterDuffColorFilter(
-                                            onErrorColor.toArgb(),
-                                            android.graphics.PorterDuff.Mode.SRC_ATOP
-                                        ),
-                                        keyPath = arrayOf("**")
-                                    )
+                            if (iconPainter != null) {
+                                androidx.compose.foundation.Image(
+                                    painter = iconPainter,
+                                    contentDescription = resolvedTitle,
+                                    modifier = Modifier.size(24.dp),
                                 )
+                            } else if (iconRes != null) {
+                                val context = LocalContext.current
+                                val validIconRes =
+                                    remember(iconRes) {
+                                        try {
+                                            if (iconRes != 0 && context.resources.getResourceTypeName(iconRes) == "drawable") {
+                                                iconRes
+                                            } else {
+                                                R.drawable.rounded_settings_24
+                                            }
+                                        } catch (e: Throwable) {
+                                            R.drawable.rounded_settings_24
+                                        }
+                                    }
+                                Icon(
+                                    painter = painterResource(id = validIconRes),
+                                    contentDescription = resolvedTitle,
+                                    modifier = Modifier.size(24.dp),
+                                    tint = ColorUtil.getVibrantColorFor(resolvedTitle),
+                                )
+                            }
+                        }
 
-                            com.airbnb.lottie.compose.LottieAnimation(
-                                composition = composition,
-                                progress = { progress },
-                                dynamicProperties = dynamicProperties,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(1.dp)
-                            )
+                        if (hasBadge) {
+                            androidx.compose.material3.Badge(
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.TopEnd)
+                                        .offset(x = 4.dp, y = (-4).dp)
+                                        .size(18.dp),
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError,
+                            ) {
+                                val composition by com.airbnb.lottie.compose.rememberLottieComposition(
+                                    com.airbnb.lottie.compose.LottieCompositionSpec
+                                        .RawRes(R.raw.update_motion),
+                                )
+                                val progress by com.airbnb.lottie.compose.animateLottieCompositionAsState(
+                                    composition = composition,
+                                    iterations = com.airbnb.lottie.compose.LottieConstants.IterateForever,
+                                )
+                                val onErrorColor = MaterialTheme.colorScheme.onError
+                                val dynamicProperties =
+                                    com.airbnb.lottie.compose.rememberLottieDynamicProperties(
+                                        com.airbnb.lottie.compose.rememberLottieDynamicProperty(
+                                            property = com.airbnb.lottie.LottieProperty.COLOR_FILTER,
+                                            value =
+                                                android.graphics.PorterDuffColorFilter(
+                                                    onErrorColor.toArgb(),
+                                                    android.graphics.PorterDuff.Mode.SRC_ATOP,
+                                                ),
+                                            keyPath = arrayOf("**"),
+                                        ),
+                                    )
+
+                                com.airbnb.lottie.compose.LottieAnimation(
+                                    composition = composition,
+                                    progress = { progress },
+                                    dynamicProperties = dynamicProperties,
+                                    modifier =
+                                        Modifier
+                                            .fillMaxSize()
+                                            .padding(1.dp),
+                                )
+                            }
                         }
                     }
                 }
-            }
-        } else null,
-        supportingContent = if (descriptionOverride != null || description != null) {
-            {
-                val desc = descriptionOverride ?: description
-                val resolvedDescription = when (desc) {
-                    is Int -> stringResource(id = desc)
-                    is String -> desc
-                    else -> ""
+            } else {
+                null
+            },
+        supportingContent =
+            if (descriptionOverride != null || description != null) {
+                {
+                    val desc = descriptionOverride ?: description
+                    val resolvedDescription =
+                        when (desc) {
+                            is Int -> stringResource(id = desc)
+                            is String -> desc
+                            else -> ""
+                        }
+                    Text(
+                        text = resolvedDescription,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
-                Text(
-                    text = resolvedDescription,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else null,
+            } else {
+                null
+            },
         trailingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.End,
             ) {
                 if (showToggle && hasMoreSettings) {
                     VerticalDivider(
-                        modifier = Modifier
-                            .height(32.dp)
-                            .width(1.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant
+                        modifier =
+                            Modifier
+                                .height(32.dp)
+                                .width(1.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant,
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                 }
@@ -258,21 +273,26 @@ fun FeatureCard(
                                     onToggle(checked)
                                 }
                             },
-                            enabled = isToggleEnabled
+                            enabled = isToggleEnabled,
                         )
 
                         if (!isToggleEnabled && onDisabledToggleClick != null) {
                             Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .zIndex(1f)
-                                    .clickable(
-                                        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                                        indication = null
-                                    ) {
-                                        HapticUtil.performVirtualKeyHaptic(view)
-                                        onDisabledToggleClick()
-                                    }
+                                modifier =
+                                    Modifier
+                                        .matchParentSize()
+                                        .zIndex(1f)
+                                        .clickable(
+                                            interactionSource =
+                                                remember {
+                                                    androidx.compose.foundation.interaction
+                                                        .MutableInteractionSource()
+                                                },
+                                            indication = null,
+                                        ) {
+                                            HapticUtil.performVirtualKeyHaptic(view)
+                                            onDisabledToggleClick()
+                                        },
                             )
                         }
                     }
@@ -283,37 +303,40 @@ fun FeatureCard(
                 }
             }
         },
-        colors = androidx.compose.material3.ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        ),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            horizontal = 16.dp,
-            vertical = 16.dp
-        ),
+        colors =
+            androidx.compose.material3.ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
+        contentPadding =
+            androidx.compose.foundation.layout.PaddingValues(
+                horizontal = 16.dp,
+                vertical = 16.dp,
+            ),
         content = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     text = resolvedTitle,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f, fill = false),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 if (isBeta) {
                     Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        ),
-                        shape = MaterialTheme.shapes.extraSmall
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                            ),
+                        shape = MaterialTheme.shapes.extraSmall,
                     ) {
                         Text(
                             text = stringResource(R.string.label_beta),
                             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }
@@ -321,7 +344,7 @@ fun FeatureCard(
 
             SegmentedDropdownMenu(
                 expanded = showMenu,
-                onDismissRequest = { showMenu = false }
+                onDismissRequest = { showMenu = false },
             ) {
                 val isTranslationModeActive by com.sameerasw.essentials.translation.TranslationManager.isTranslationModeEnabled
                 if (isTranslationModeActive) {
@@ -331,18 +354,21 @@ fun FeatureCard(
                         onSelectKey = { key ->
                             showMenu = false
                             translationSheetKey = key
-                        }
+                        },
                     )
                 }
-
 
                 if (onPinToggle != null) {
                     SegmentedDropdownMenuItem(
                         text = {
                             Text(
-                                if (isPinned) stringResource(R.string.action_unpin) else stringResource(
-                                    R.string.action_pin
-                                )
+                                if (isPinned) {
+                                    stringResource(R.string.action_unpin)
+                                } else {
+                                    stringResource(
+                                        R.string.action_pin,
+                                    )
+                                },
                             )
                         },
                         onClick = {
@@ -351,10 +377,13 @@ fun FeatureCard(
                         },
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(id = if (isPinned) R.drawable.rounded_bookmark_remove_24 else R.drawable.rounded_bookmark_24),
-                                contentDescription = null
+                                painter =
+                                    painterResource(
+                                        id = if (isPinned) R.drawable.rounded_bookmark_remove_24 else R.drawable.rounded_bookmark_24,
+                                    ),
+                                contentDescription = null,
                             )
-                        }
+                        },
                     )
                 }
 
@@ -370,9 +399,9 @@ fun FeatureCard(
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_help_24),
-                                contentDescription = null
+                                contentDescription = null,
                             )
-                        }
+                        },
                     )
                 }
 
@@ -380,14 +409,13 @@ fun FeatureCard(
                     additionalMenuItems { showMenu = false }
                 }
             }
-        }
+        },
     )
 
     if (translationSheetKey != null) {
         com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }
-

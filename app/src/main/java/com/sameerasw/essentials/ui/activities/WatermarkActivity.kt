@@ -32,7 +32,6 @@ import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.viewmodels.WatermarkViewModel
 
 class WatermarkActivity : ComponentActivity() {
-
     private var initialUri by mutableStateOf<Uri?>(null)
 
     private val pickMedia =
@@ -67,15 +66,16 @@ class WatermarkActivity : ComponentActivity() {
 
         setContent {
             val isPitchBlackThemeEnabled by settingsRepository.isPitchBlackThemeEnabled.collectAsState(
-                initial = false
+                initial = false,
             )
 
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
                     val context = LocalContext.current
-                    val viewModel: WatermarkViewModel = viewModel(
-                        factory = WatermarkViewModel.provideFactory(context)
-                    )
+                    val viewModel: WatermarkViewModel =
+                        viewModel(
+                            factory = WatermarkViewModel.provideFactory(context),
+                        )
 
                     WatermarkScreen(
                         initialUri = initialUri,
@@ -83,7 +83,7 @@ class WatermarkActivity : ComponentActivity() {
                             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                         },
                         onBack = { finish() },
-                        viewModel = viewModel
+                        viewModel = viewModel,
                     )
                 }
             }

@@ -26,7 +26,6 @@ import com.sameerasw.essentials.services.BatteryNotificationService
 import java.util.concurrent.TimeUnit
 
 object ServiceUtils {
-
     /**
      * Executes the start required services operation.
      *
@@ -42,7 +41,7 @@ object ServiceUtils {
 
     private fun startAppDetectionServiceIfNeeded(
         context: Context,
-        settingsRepository: SettingsRepository
+        settingsRepository: SettingsRepository,
     ) {
         val isAppLockEnabled =
             settingsRepository.getBoolean(SettingsRepository.KEY_APP_LOCK_ENABLED)
@@ -53,15 +52,17 @@ object ServiceUtils {
         val isUseUsageAccess =
             settingsRepository.getBoolean(SettingsRepository.KEY_USE_USAGE_ACCESS)
 
-        val hasAppAutomations = DIYRepository.automations.value.any {
-            it.isEnabled && it.type == Automation.Type.APP
-        }
+        val hasAppAutomations =
+            DIYRepository.automations.value.any {
+                it.isEnabled && it.type == Automation.Type.APP
+            }
 
         val shutUpConfigs = settingsRepository.loadShutUpConfigs()
         val hasShutUpApps = shutUpConfigs.any { it.isEnabled }
 
         val shouldRun =
-            (isUseUsageAccess && (isAppLockEnabled || isDynamicNightLightEnabled || isHideGestureBarOnLauncherEnabled || hasAppAutomations)) || hasShutUpApps
+            (isUseUsageAccess && (isAppLockEnabled || isDynamicNightLightEnabled || isHideGestureBarOnLauncherEnabled || hasAppAutomations)) ||
+                hasShutUpApps
 
         val intent = Intent(context, AppDetectionService::class.java)
         if (shouldRun) {
@@ -81,7 +82,7 @@ object ServiceUtils {
 
     private fun startBatteryNotificationServiceIfNeeded(
         context: Context,
-        settingsRepository: SettingsRepository
+        settingsRepository: SettingsRepository,
     ) {
         val isBatteryNotificationEnabled = settingsRepository.isBatteryNotificationEnabled()
 
@@ -101,25 +102,30 @@ object ServiceUtils {
 
     fun schedulePeriodicAppUpdateCheck(
         context: Context,
-        settingsRepository: SettingsRepository
+        settingsRepository: SettingsRepository,
     ) {
-        val isAutoUpdateEnabled = settingsRepository.getBoolean(
-            SettingsRepository.KEY_AUTO_UPDATE_ENABLED,
-            true
-        )
+        val isAutoUpdateEnabled =
+            settingsRepository.getBoolean(
+                SettingsRepository.KEY_AUTO_UPDATE_ENABLED,
+                true,
+            )
         if (isAutoUpdateEnabled) {
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
+            val constraints =
+                Constraints
+                    .Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
 
-            val workRequest = PeriodicWorkRequestBuilder<AppUpdateWorker>(
-                12, TimeUnit.HOURS
-            ).setConstraints(constraints).build()
+            val workRequest =
+                PeriodicWorkRequestBuilder<AppUpdateWorker>(
+                    12,
+                    TimeUnit.HOURS,
+                ).setConstraints(constraints).build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 "app_update_check_work",
                 ExistingPeriodicWorkPolicy.KEEP,
-                workRequest
+                workRequest,
             )
         }
     }

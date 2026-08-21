@@ -42,26 +42,28 @@ object CalendarSyncManager {
         }
 
         // Listen for preference changes to start/stop sync
-        repo.registerOnSharedPreferenceChangeListener(object :
-            SharedPreferences.OnSharedPreferenceChangeListener {
-            override fun onSharedPreferenceChanged(
-                sharedPreferences: SharedPreferences?,
-                key: String?
-            ) {
-                if (key == SettingsRepository.KEY_CALENDAR_SYNC_ENABLED) {
-                    val enabled = repo.getBoolean(key, false)
-                    if (enabled != isSyncEnabled) {
-                        isSyncEnabled = enabled
-                        if (isSyncEnabled) {
-                            startSync(context)
-                            forceSync(context)
-                        } else {
-                            stopSync(context)
+        repo.registerOnSharedPreferenceChangeListener(
+            object :
+                SharedPreferences.OnSharedPreferenceChangeListener {
+                override fun onSharedPreferenceChanged(
+                    sharedPreferences: SharedPreferences?,
+                    key: String?,
+                ) {
+                    if (key == SettingsRepository.KEY_CALENDAR_SYNC_ENABLED) {
+                        val enabled = repo.getBoolean(key, false)
+                        if (enabled != isSyncEnabled) {
+                            isSyncEnabled = enabled
+                            if (isSyncEnabled) {
+                                startSync(context)
+                                forceSync(context)
+                            } else {
+                                stopSync(context)
+                            }
                         }
                     }
                 }
-            }
-        })
+            },
+        )
     }
 
     private fun startSync(context: Context) {
@@ -70,18 +72,19 @@ object CalendarSyncManager {
         // Initial sync
         syncEvents(context)
 
-        observer = object : ContentObserver(Handler(Looper.getMainLooper())) {
-            override fun onChange(selfChange: Boolean) {
-                Log.d(TAG, "Calendar content changed, syncing...")
-                syncEvents(context)
+        observer =
+            object : ContentObserver(Handler(Looper.getMainLooper())) {
+                override fun onChange(selfChange: Boolean) {
+                    Log.d(TAG, "Calendar content changed, syncing...")
+                    syncEvents(context)
+                }
             }
-        }
 
         try {
             context.contentResolver.registerContentObserver(
                 CalendarContract.Events.CONTENT_URI,
                 true,
-                observer!!
+                observer!!,
             )
             Log.d(TAG, "Calendar observer registered")
         } catch (e: Exception) {
@@ -105,7 +108,7 @@ object CalendarSyncManager {
 
         if (androidx.core.content.ContextCompat.checkSelfPermission(
                 context,
-                android.Manifest.permission.READ_CALENDAR
+                android.Manifest.permission.READ_CALENDAR,
             ) != android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
             Log.w(TAG, "READ_CALENDAR permission not granted, skipping sync")
@@ -127,7 +130,7 @@ object CalendarSyncManager {
 
         Log.d(
             TAG,
-            "Found ${events.size} upcoming events, colors: P=$primaryColor, S=$secondaryColor, T=$tertiaryColor"
+            "Found ${events.size} upcoming events, colors: P=$primaryColor, S=$secondaryColor, T=$tertiaryColor",
         )
         sendToWearable(context, events, primaryColor, secondaryColor, tertiaryColor)
     }
@@ -137,14 +140,15 @@ object CalendarSyncManager {
         val startTime = System.currentTimeMillis()
         val endTime = startTime + 24 * 60 * 60 * 1000 * 7 // Next 7 days
 
-        val projection = arrayOf(
-            CalendarContract.Instances.EVENT_ID,
-            CalendarContract.Instances.TITLE,
-            CalendarContract.Instances.BEGIN,
-            CalendarContract.Instances.END,
-            CalendarContract.Instances.ALL_DAY,
-            CalendarContract.Instances.EVENT_LOCATION
-        )
+        val projection =
+            arrayOf(
+                CalendarContract.Instances.EVENT_ID,
+                CalendarContract.Instances.TITLE,
+                CalendarContract.Instances.BEGIN,
+                CalendarContract.Instances.END,
+                CalendarContract.Instances.ALL_DAY,
+                CalendarContract.Instances.EVENT_LOCATION,
+            )
 
         val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
         android.content.ContentUris.appendId(builder, startTime)
@@ -155,17 +159,21 @@ object CalendarSyncManager {
         val repo = SettingsRepository(context)
         val selectedIds = repo.getCalendarSyncSelectedCalendars()
 
-        val selection = if (selectedIds.isNotEmpty()) {
-            "${CalendarContract.Instances.CALENDAR_ID} IN (${selectedIds.joinToString(",")})"
-        } else null
+        val selection =
+            if (selectedIds.isNotEmpty()) {
+                "${CalendarContract.Instances.CALENDAR_ID} IN (${selectedIds.joinToString(",")})"
+            } else {
+                null
+            }
 
-        val cursor = context.contentResolver.query(
-            builder.build(),
-            projection,
-            selection,
-            null,
-            CalendarContract.Instances.BEGIN + " ASC"
-        )
+        val cursor =
+            context.contentResolver.query(
+                builder.build(),
+                projection,
+                selection,
+                null,
+                CalendarContract.Instances.BEGIN + " ASC",
+            )
 
         Log.d(TAG, "queryUpcomingEvents: selection=$selection, cursorCount=${cursor?.count ?: 0}")
 
@@ -191,7 +199,7 @@ object CalendarSyncManager {
         events: List<CalendarEvent>,
         primaryColor: Int?,
         secondaryColor: Int?,
-        tertiaryColor: Int?
+        tertiaryColor: Int?,
     ) {
         val putDataMapReq = PutDataMapRequest.create(SYNC_PATH)
         val dataMap = putDataMapReq.dataMap
@@ -217,11 +225,12 @@ object CalendarSyncManager {
         val putDataReq = putDataMapReq.asPutDataRequest()
         putDataReq.setUrgent()
 
-        Wearable.getDataClient(context).putDataItem(putDataReq)
+        Wearable
+            .getDataClient(context)
+            .putDataItem(putDataReq)
             .addOnSuccessListener {
                 Log.d(TAG, "Successfully synced ${events.size} events to wearable")
-            }
-            .addOnFailureListener { e ->
+            }.addOnFailureListener { e ->
                 Log.e(TAG, "Failed to sync events to wearable", e)
             }
     }
@@ -232,6 +241,6 @@ object CalendarSyncManager {
         val begin: Long,
         val end: Long,
         val allDay: Boolean,
-        val location: String?
+        val location: String?,
     )
 }

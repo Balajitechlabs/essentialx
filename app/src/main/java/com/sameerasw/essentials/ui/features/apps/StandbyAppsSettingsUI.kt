@@ -67,7 +67,7 @@ fun StandbyAppsSettingsUI(
     selectedPackages: Set<String> = emptySet(),
     onSelectionChange: (Set<String>) -> Unit = {},
     showMoveSheet: Boolean = false,
-    onShowMoveSheetChange: (Boolean) -> Unit = {}
+    onShowMoveSheetChange: (Boolean) -> Unit = {},
 ) {
     val context = LocalContext.current
     var requestingPermissionFor by remember { mutableStateOf(false) }
@@ -89,11 +89,12 @@ fun StandbyAppsSettingsUI(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.loadStandbyApps(context)
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    viewModel.loadStandbyApps(context)
+                }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -111,37 +112,46 @@ fun StandbyAppsSettingsUI(
                 } else {
                     requestingPermissionFor = true
                 }
-            }
+            },
         )
     }
 
     if (requestingPermissionFor) {
-        val shizukuPermission = PermissionItem(
-            iconRes = R.drawable.rounded_adb_24,
-            title = if (!viewModel.isShizukuAvailable.value) R.string.perm_shizuku_title else R.string.perm_shizuku_grant_title,
-            description = if (!viewModel.isShizukuAvailable.value) R.string.perm_shizuku_desc else R.string.perm_shizuku_grant_desc,
-            dependentFeatures = listOf(R.string.feat_standby_apps_title),
-            actionLabel = if (!viewModel.isShizukuAvailable.value) R.string.perm_shizuku_install_action else if (isShellGranted) R.string.perm_action_granted else R.string.perm_action_grant,
-            action = {
-                if (!viewModel.isShizukuAvailable.value) {
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api")
-                    ).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        val shizukuPermission =
+            PermissionItem(
+                iconRes = R.drawable.rounded_adb_24,
+                title = if (!viewModel.isShizukuAvailable.value) R.string.perm_shizuku_title else R.string.perm_shizuku_grant_title,
+                description = if (!viewModel.isShizukuAvailable.value) R.string.perm_shizuku_desc else R.string.perm_shizuku_grant_desc,
+                dependentFeatures = listOf(R.string.feat_standby_apps_title),
+                actionLabel =
+                    if (!viewModel.isShizukuAvailable.value) {
+                        R.string.perm_shizuku_install_action
+                    } else if (isShellGranted) {
+                        R.string.perm_action_granted
+                    } else {
+                        R.string.perm_action_grant
+                    },
+                action = {
+                    if (!viewModel.isShizukuAvailable.value) {
+                        val intent =
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"),
+                            ).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            }
+                        context.startActivity(intent)
+                    } else {
+                        viewModel.requestShizukuPermission()
                     }
-                    context.startActivity(intent)
-                } else {
-                    viewModel.requestShizukuPermission()
-                }
-            },
-            isGranted = isShellGranted
-        )
+                },
+                isGranted = isShellGranted,
+            )
 
         PermissionsBottomSheet(
             onDismissRequest = { requestingPermissionFor = false },
             featureTitle = R.string.feat_standby_apps_title,
-            permissions = listOf(shizukuPermission)
+            permissions = listOf(shizukuPermission),
         )
     }
 
@@ -150,54 +160,58 @@ fun StandbyAppsSettingsUI(
 
     if (isLoading) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 32.dp),
-            horizontalArrangement = Arrangement.Center
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 32.dp),
+            horizontalArrangement = Arrangement.Center,
         ) {
             LoadingIndicator()
         }
     } else {
         Column(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            val buckets = listOf(
-                10 to R.string.standby_bucket_active,
-                20 to R.string.standby_bucket_working_set,
-                30 to R.string.standby_bucket_frequent,
-                40 to R.string.standby_bucket_rare,
-                45 to R.string.standby_bucket_restricted
-            )
+            val buckets =
+                listOf(
+                    10 to R.string.standby_bucket_active,
+                    20 to R.string.standby_bucket_working_set,
+                    30 to R.string.standby_bucket_frequent,
+                    40 to R.string.standby_bucket_rare,
+                    45 to R.string.standby_bucket_restricted,
+                )
 
             buckets.forEach { (bucketCode, titleRes) ->
                 val bucketApps = appsList.filter { it.bucket == bucketCode }
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
                         text = stringResource(titleRes) + " (${bucketApps.size})",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+                        modifier = Modifier.padding(start = 16.dp, bottom = 4.dp),
                     )
 
                     RoundedCardContainer {
                         if (bucketApps.isEmpty()) {
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = stringResource(R.string.standby_apps_empty_bucket),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                 )
                             }
                         } else {
@@ -210,11 +224,12 @@ fun StandbyAppsSettingsUI(
                                     isMultiSelecting = isMultiSelecting,
                                     isSelected = isSelected,
                                     onToggleSelection = {
-                                        val newSet = if (isSelected) {
-                                            selectedPackages - app.packageName
-                                        } else {
-                                            selectedPackages + app.packageName
-                                        }
+                                        val newSet =
+                                            if (isSelected) {
+                                                selectedPackages - app.packageName
+                                            } else {
+                                                selectedPackages + app.packageName
+                                            }
                                         onSelectionChange(newSet)
                                     },
                                     onMoveBucket = { targetBucket ->
@@ -222,12 +237,12 @@ fun StandbyAppsSettingsUI(
                                             viewModel.setAppStandbyBucket(
                                                 app.packageName,
                                                 targetBucket,
-                                                context
+                                                context,
                                             )
                                         } else {
                                             requestingPermissionFor = true
                                         }
-                                    }
+                                    },
                                 )
                             }
                         }
@@ -246,7 +261,7 @@ private fun AppStandbyCardItem(
     isMultiSelecting: Boolean,
     isSelected: Boolean,
     onToggleSelection: () -> Unit,
-    onMoveBucket: (Int) -> Unit
+    onMoveBucket: (Int) -> Unit,
 ) {
     val view = LocalView.current
     var showMenu by remember { mutableStateOf(false) }
@@ -258,7 +273,7 @@ private fun AppStandbyCardItem(
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         },
         supportingContent = {
@@ -267,14 +282,14 @@ private fun AppStandbyCardItem(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         },
         leadingContent = {
             AsyncImage(
                 model = app.icon,
                 contentDescription = app.label,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
         },
         trailingContent = {
@@ -284,7 +299,7 @@ private fun AppStandbyCardItem(
                     onCheckedChange = {
                         HapticUtil.performVirtualKeyHaptic(view)
                         onToggleSelection()
-                    }
+                    },
                 )
             } else {
                 Box {
@@ -296,26 +311,27 @@ private fun AppStandbyCardItem(
                             } else {
                                 onMoveBucket(currentBucket)
                             }
-                        }
+                        },
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.rounded_mobiledata_arrows_24),
                             contentDescription = stringResource(R.string.action_move_bucket),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     }
 
                     SegmentedDropdownMenu(
                         expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        onDismissRequest = { showMenu = false },
                     ) {
-                        val menuOptions = listOf(
-                            10 to R.string.standby_bucket_active,
-                            20 to R.string.standby_bucket_working_set,
-                            30 to R.string.standby_bucket_frequent,
-                            40 to R.string.standby_bucket_rare,
-                            45 to R.string.standby_bucket_restricted
-                        )
+                        val menuOptions =
+                            listOf(
+                                10 to R.string.standby_bucket_active,
+                                20 to R.string.standby_bucket_working_set,
+                                30 to R.string.standby_bucket_frequent,
+                                40 to R.string.standby_bucket_rare,
+                                45 to R.string.standby_bucket_restricted,
+                            )
 
                         menuOptions.forEach { (targetBucket, titleRes) ->
                             val isCurrent = targetBucket == currentBucket
@@ -328,34 +344,36 @@ private fun AppStandbyCardItem(
                                     HapticUtil.performUIHaptic(view)
                                     showMenu = false
                                     onMoveBucket(targetBucket)
-                                }
+                                },
                             )
                         }
                     }
                 }
             }
         },
-        colors = ListItemDefaults.colors(
-            containerColor = if (isSelected) {
-                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-            } else {
-                MaterialTheme.colorScheme.surfaceBright
-            }
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = {
-                    if (isMultiSelecting) {
-                        HapticUtil.performVirtualKeyHaptic(view)
+        colors =
+            ListItemDefaults.colors(
+                containerColor =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+                    } else {
+                        MaterialTheme.colorScheme.surfaceBright
+                    },
+            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {
+                        if (isMultiSelecting) {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onToggleSelection()
+                        }
+                    },
+                    onLongClick = {
+                        HapticUtil.performHeavyHaptic(view)
                         onToggleSelection()
-                    }
-                },
-                onLongClick = {
-                    HapticUtil.performHeavyHaptic(view)
-                    onToggleSelection()
-                }
-            )
+                    },
+                ),
     )
 }
-

@@ -15,7 +15,10 @@ object StringLoader {
     // Map of key -> Map<locale, value>
     private var cachedTranslations: Map<String, Map<String, String>>? = null
 
-    fun getTranslationsForKey(context: Context, key: String): Map<String, String> {
+    fun getTranslationsForKey(
+        context: Context,
+        key: String,
+    ): Map<String, String> {
         val all = getAllTranslations(context)
         val map = all[key] ?: return emptyMap()
         val result = mutableMapOf<String, String>()
@@ -70,48 +73,82 @@ object StringLoader {
             val resDir = context.resources
             val assets = context.assets
             // Common bundled locale subfolders in res/values-*
-            val knownLocales = listOf(
-                "values-ach", "values-ach-rUG",
-                "values-af", "values-af-rZA",
-                "values-ar", "values-ar-rSA",
-                "values-bn-rBD",
-                "values-ca", "values-ca-rES",
-                "values-cs", "values-cs-rCZ",
-                "values-da", "values-da-rDK",
-                "values-de", "values-de-rDE",
-                "values-el", "values-el-rGR",
-                "values-en", "values-en-rUS",
-                "values-es", "values-es-rES",
-                "values-fi", "values-fi-rFI",
-                "values-fil-rPH",
-                "values-fr", "values-fr-rFR",
-                "values-he",
-                "values-hi-rIN",
-                "values-hu", "values-hu-rHU",
-                "values-id", "values-in-rID",
-                "values-it", "values-it-rIT",
-                "values-iw-rIL",
-                "values-ja", "values-ja-rJP",
-                "values-kk", "values-kk-rKZ",
-                "values-ko", "values-ko-rKR",
-                "values-ml-rIN",
-                "values-ne-rNP",
-                "values-nl", "values-nl-rNL",
-                "values-no", "values-no-rNO",
-                "values-pl", "values-pl-rPL",
-                "values-pt", "values-pt-rBR", "values-pt-rPT",
-                "values-ro", "values-ro-rRO",
-                "values-ru", "values-ru-rRU",
-                "values-si", "values-si-rLK",
-                "values-sk-rSK",
-                "values-sr", "values-sr-rSP",
-                "values-sv", "values-sv-rSE",
-                "values-ta-rIN",
-                "values-tr", "values-tr-rTR",
-                "values-uk", "values-uk-rUA",
-                "values-vi", "values-vi-rVN",
-                "values-zh", "values-zh-rCN", "values-zh-rTW"
-            )
+            val knownLocales =
+                listOf(
+                    "values-ach",
+                    "values-ach-rUG",
+                    "values-af",
+                    "values-af-rZA",
+                    "values-ar",
+                    "values-ar-rSA",
+                    "values-bn-rBD",
+                    "values-ca",
+                    "values-ca-rES",
+                    "values-cs",
+                    "values-cs-rCZ",
+                    "values-da",
+                    "values-da-rDK",
+                    "values-de",
+                    "values-de-rDE",
+                    "values-el",
+                    "values-el-rGR",
+                    "values-en",
+                    "values-en-rUS",
+                    "values-es",
+                    "values-es-rES",
+                    "values-fi",
+                    "values-fi-rFI",
+                    "values-fil-rPH",
+                    "values-fr",
+                    "values-fr-rFR",
+                    "values-he",
+                    "values-hi-rIN",
+                    "values-hu",
+                    "values-hu-rHU",
+                    "values-id",
+                    "values-in-rID",
+                    "values-it",
+                    "values-it-rIT",
+                    "values-iw-rIL",
+                    "values-ja",
+                    "values-ja-rJP",
+                    "values-kk",
+                    "values-kk-rKZ",
+                    "values-ko",
+                    "values-ko-rKR",
+                    "values-ml-rIN",
+                    "values-ne-rNP",
+                    "values-nl",
+                    "values-nl-rNL",
+                    "values-no",
+                    "values-no-rNO",
+                    "values-pl",
+                    "values-pl-rPL",
+                    "values-pt",
+                    "values-pt-rBR",
+                    "values-pt-rPT",
+                    "values-ro",
+                    "values-ro-rRO",
+                    "values-ru",
+                    "values-ru-rRU",
+                    "values-si",
+                    "values-si-rLK",
+                    "values-sk-rSK",
+                    "values-sr",
+                    "values-sr-rSP",
+                    "values-sv",
+                    "values-sv-rSE",
+                    "values-ta-rIN",
+                    "values-tr",
+                    "values-tr-rTR",
+                    "values-uk",
+                    "values-uk-rUA",
+                    "values-vi",
+                    "values-vi-rVN",
+                    "values-zh",
+                    "values-zh-rCN",
+                    "values-zh-rTW",
+                )
             list.addAll(knownLocales)
         } catch (e: Exception) {
             e.printStackTrace()
@@ -119,7 +156,10 @@ object StringLoader {
         return list
     }
 
-    private fun loadStringsForLocale(context: Context, dirName: String): Map<String, String> {
+    private fun loadStringsForLocale(
+        context: Context,
+        dirName: String,
+    ): Map<String, String> {
         val map = mutableMapOf<String, String>()
         try {
             // Using Android Resources identifier scan fallback or XML parser
@@ -128,11 +168,12 @@ object StringLoader {
             val config = android.content.res.Configuration(res.configuration)
 
             val localeParts = localeCode.split("-")
-            val locale = if (localeParts.size > 1) {
-                java.util.Locale(localeParts[0], localeParts[1])
-            } else {
-                java.util.Locale(localeParts[0])
-            }
+            val locale =
+                if (localeParts.size > 1) {
+                    java.util.Locale(localeParts[0], localeParts[1])
+                } else {
+                    java.util.Locale(localeParts[0])
+                }
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 config.setLocales(android.os.LocaleList(locale))

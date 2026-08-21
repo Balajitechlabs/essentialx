@@ -89,16 +89,20 @@ class AppFreezingActivity : ComponentActivity() {
 
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 CompositionLocalProvider(
-                    LocalMenuStateManager provides remember { MenuStateManager() }
+                    LocalMenuStateManager provides remember { MenuStateManager() },
                 ) {
                     Scaffold(
                         contentWindowInsets = WindowInsets(0, 0, 0, 0),
                         containerColor = MaterialTheme.colorScheme.surfaceContainer,
                     ) { innerPadding ->
                         val density = LocalDensity.current
-                        val statusBarHeightPx = with(density) {
-                            WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx()
-                        }
+                        val statusBarHeightPx =
+                            with(density) {
+                                WindowInsets.statusBars
+                                    .asPaddingValues()
+                                    .calculateTopPadding()
+                                    .toPx()
+                            }
 
                         val isShizukuAvailable by viewModel.isShizukuAvailable
                         val isShizukuPermissionGranted by viewModel.isShizukuPermissionGranted
@@ -108,30 +112,35 @@ class AppFreezingActivity : ComponentActivity() {
                         }
 
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .progressiveBlur(
-                                    blurRadius = if (isBlurEnabled) 40f else 0f,
-                                    height = statusBarHeightPx * 1.15f,
-                                    direction = BlurDirection.TOP
-                                )
-                                .progressiveBlur(
-                                    blurRadius = if (isBlurEnabled) 40f else 0f,
-                                    height = with(density) { 80.dp.toPx() },
-                                    direction = BlurDirection.BOTTOM
-                                )
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .progressiveBlur(
+                                        blurRadius = if (isBlurEnabled) 40f else 0f,
+                                        height = statusBarHeightPx * 1.15f,
+                                        direction = BlurDirection.TOP,
+                                    ).progressiveBlur(
+                                        blurRadius = if (isBlurEnabled) 40f else 0f,
+                                        height = with(density) { 80.dp.toPx() },
+                                        direction = BlurDirection.BOTTOM,
+                                    ),
                         ) {
                             FreezeGridUI(
                                 viewModel = viewModel,
                                 modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(
-                                    top = WindowInsets.statusBars.asPaddingValues()
-                                        .calculateTopPadding(),
-                                    bottom = WindowInsets.navigationBars.asPaddingValues()
-                                        .calculateBottomPadding() + 130.dp,
-                                    start = 0.dp,
-                                    end = 0.dp
-                                ),
+                                contentPadding =
+                                    PaddingValues(
+                                        top =
+                                            WindowInsets.statusBars
+                                                .asPaddingValues()
+                                                .calculateTopPadding(),
+                                        bottom =
+                                            WindowInsets.navigationBars
+                                                .asPaddingValues()
+                                                .calculateBottomPadding() + 130.dp,
+                                        start = 0.dp,
+                                        end = 0.dp,
+                                    ),
                                 onAppLaunched = {
                                     finish()
                                 },
@@ -141,16 +150,20 @@ class AppFreezingActivity : ComponentActivity() {
                                             putExtra("feature", "Freeze")
                                         }
                                     context.startActivity(intent)
-                                }
+                                },
                             )
 
                             Box(
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .padding(
-                                        bottom = WindowInsets.navigationBars.asPaddingValues()
-                                            .calculateBottomPadding() + 16.dp, end = 16.dp
-                                    )
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(
+                                            bottom =
+                                                WindowInsets.navigationBars
+                                                    .asPaddingValues()
+                                                    .calculateBottomPadding() + 16.dp,
+                                            end = 16.dp,
+                                        ),
                             ) {
                                 FloatingActionButton(
                                     onClick = {
@@ -158,25 +171,29 @@ class AppFreezingActivity : ComponentActivity() {
                                         fabMenuExpanded = !fabMenuExpanded
                                     },
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                 ) {
                                     Icon(
-                                        painter = painterResource(id = if (fabMenuExpanded) R.drawable.rounded_close_24 else R.drawable.rounded_more_vert_24),
+                                        painter =
+                                            painterResource(
+                                                id = if (fabMenuExpanded) R.drawable.rounded_close_24 else R.drawable.rounded_more_vert_24,
+                                            ),
                                         contentDescription = null,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(24.dp),
                                     )
                                 }
 
                                 SegmentedDropdownMenu(
                                     expanded = fabMenuExpanded,
                                     onDismissRequest = { fabMenuExpanded = false },
-                                    offset = DpOffset(0.dp, (-8).dp)
+                                    offset = DpOffset(0.dp, (-8).dp),
                                 ) {
-                                    val fabColors = MenuDefaults.itemColors(
-                                        textColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        leadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                        trailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                    )
+                                    val fabColors =
+                                        MenuDefaults.itemColors(
+                                            textColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            leadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            trailingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        )
                                     val itemBg = MaterialTheme.colorScheme.primaryContainer
 
                                     SegmentedDropdownMenuItem(
@@ -192,9 +209,9 @@ class AppFreezingActivity : ComponentActivity() {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.rounded_mode_cool_24),
                                                 contentDescription = null,
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
                                             )
-                                        }
+                                        },
                                     )
                                     SegmentedDropdownMenuItem(
                                         text = { Text(stringResource(R.string.action_unfreeze)) },
@@ -209,9 +226,9 @@ class AppFreezingActivity : ComponentActivity() {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.rounded_mode_cool_off_24),
                                                 contentDescription = null,
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
                                             )
-                                        }
+                                        },
                                     )
                                     SegmentedDropdownMenuItem(
                                         text = { Text(stringResource(R.string.action_freeze_all)) },
@@ -226,9 +243,9 @@ class AppFreezingActivity : ComponentActivity() {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.rounded_mode_cool_24),
                                                 contentDescription = null,
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
                                             )
-                                        }
+                                        },
                                     )
                                     SegmentedDropdownMenuItem(
                                         text = { Text(stringResource(R.string.action_unfreeze_all)) },
@@ -243,21 +260,22 @@ class AppFreezingActivity : ComponentActivity() {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.rounded_mode_cool_off_24),
                                                 contentDescription = null,
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
                                             )
-                                        }
+                                        },
                                     )
                                     SegmentedDropdownMenuItem(
                                         text = { Text(stringResource(R.string.label_settings)) },
                                         onClick = {
                                             HapticUtil.performVirtualKeyHaptic(view)
                                             fabMenuExpanded = false
-                                            val intent = Intent(
-                                                context,
-                                                FeatureSettingsActivity::class.java
-                                            ).apply {
-                                                putExtra("feature", "Freeze")
-                                            }
+                                            val intent =
+                                                Intent(
+                                                    context,
+                                                    FeatureSettingsActivity::class.java,
+                                                ).apply {
+                                                    putExtra("feature", "Freeze")
+                                                }
                                             context.startActivity(intent)
                                         },
                                         itemContainerColor = itemBg,
@@ -266,9 +284,9 @@ class AppFreezingActivity : ComponentActivity() {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.rounded_settings_24),
                                                 contentDescription = null,
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(18.dp),
                                             )
-                                        }
+                                        },
                                     )
                                 }
                             }

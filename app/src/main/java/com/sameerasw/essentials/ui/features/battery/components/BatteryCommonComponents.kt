@@ -63,7 +63,7 @@ import java.util.Locale
 @Composable
 fun SectionHeaderTitle(
     title: Any,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val view = LocalView.current
@@ -71,40 +71,44 @@ fun SectionHeaderTitle(
     var showMenu by remember { mutableStateOf(false) }
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
-    val displayTitle = when (title) {
-        is Int -> stringResource(title)
-        is String -> title
-        else -> title.toString()
-    }
+    val displayTitle =
+        when (title) {
+            is Int -> stringResource(title)
+            is String -> title
+            else -> title.toString()
+        }
 
     Box(modifier = modifier) {
         Text(
             text = displayTitle,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .combinedClickable(
-                    onClick = {},
-                    onLongClick = if (isTranslationModeActive) {
-                        {
-                            HapticUtil.performVirtualKeyHaptic(view)
-                            showMenu = true
-                        }
-                    } else null
-                )
-                .padding(start = 8.dp)
+            modifier =
+                Modifier
+                    .combinedClickable(
+                        onClick = {},
+                        onLongClick =
+                            if (isTranslationModeActive) {
+                                {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    showMenu = true
+                                }
+                            } else {
+                                null
+                            },
+                    ).padding(start = 8.dp),
         )
 
         com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu(
             expanded = showMenu,
-            onDismissRequest = { showMenu = false }
+            onDismissRequest = { showMenu = false },
         ) {
             com.sameerasw.essentials.translation.ui.TranslationMenuItems(
                 title = title,
                 onSelectKey = { key ->
                     showMenu = false
                     translationSheetKey = key
-                }
+                },
             )
         }
     }
@@ -113,7 +117,7 @@ fun SectionHeaderTitle(
     if (keyForSheet1 != null) {
         com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
             stringKey = keyForSheet1,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }
@@ -124,7 +128,7 @@ fun InfoDetailRow(
     title: Any,
     value: String,
     iconRes: Int,
-    onClick: (() -> Unit)? = null
+    onClick: (() -> Unit)? = null,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val view = LocalView.current
@@ -132,49 +136,52 @@ fun InfoDetailRow(
     var showMenu by remember { mutableStateOf(false) }
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
-    val displayTitle = when (title) {
-        is Int -> stringResource(title)
-        is String -> title
-        else -> title.toString()
-    }
+    val displayTitle =
+        when (title) {
+            is Int -> stringResource(title)
+            is String -> title
+            else -> title.toString()
+        }
 
     Box {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    MaterialTheme.colorScheme.surfaceBright,
-                    shape = Shapes.extraSmall
-                )
-                .combinedClickable(
-                    onClick = {
-                        if (onClick != null) {
-                            HapticUtil.performVirtualKeyHaptic(view)
-                            onClick()
-                        }
-                    },
-                    onLongClick = if (isTranslationModeActive) {
-                        {
-                            HapticUtil.performVirtualKeyHaptic(view)
-                            showMenu = true
-                        }
-                    } else null
-                )
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceBright,
+                        shape = Shapes.extraSmall,
+                    ).combinedClickable(
+                        onClick = {
+                            if (onClick != null) {
+                                HapticUtil.performVirtualKeyHaptic(view)
+                                onClick()
+                            }
+                        },
+                        onLongClick =
+                            if (isTranslationModeActive) {
+                                {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    showMenu = true
+                                }
+                            } else {
+                                null
+                            },
+                    ).padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(id = iconRes),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
                 text = displayTitle,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             Spacer(modifier = Modifier.width(16.dp))
             AnimatedContent(
@@ -198,27 +205,27 @@ fun InfoDetailRow(
                             .togetherWith(slideOutVertically { height -> -height } + fadeOut())
                     }
                 },
-                label = "info_row_value"
+                label = "info_row_value",
             ) { targetVal ->
                 Text(
                     text = targetVal,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
 
         com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu(
             expanded = showMenu,
-            onDismissRequest = { showMenu = false }
+            onDismissRequest = { showMenu = false },
         ) {
             com.sameerasw.essentials.translation.ui.TranslationMenuItems(
                 title = title,
                 onSelectKey = { key ->
                     showMenu = false
                     translationSheetKey = key
-                }
+                },
             )
         }
     }
@@ -227,7 +234,7 @@ fun InfoDetailRow(
     if (keyForSheet2 != null) {
         com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
             stringKey = keyForSheet2,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }
@@ -236,34 +243,34 @@ fun InfoDetailRow(
 @Composable
 fun BatteryLoadingIndicatorCard() {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.surfaceBright,
-                shape = Shapes.extraSmall
-            )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    MaterialTheme.colorScheme.surfaceBright,
+                    shape = Shapes.extraSmall,
+                ).padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         LinearWavyProgressIndicator(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
 
 @Composable
-fun TopAppsBreakdownHeader(
-    usageApps: List<com.sameerasw.essentials.utils.BatteryUsageApp>
-) {
+fun TopAppsBreakdownHeader(usageApps: List<com.sameerasw.essentials.utils.BatteryUsageApp>) {
     if (usageApps.isEmpty()) return
 
     val totalAllMah = remember(usageApps) { usageApps.sumOf { it.powerMah }.coerceAtLeast(0.0001) }
-    val majorApps = remember(usageApps, totalAllMah) {
-        usageApps.filter { (it.powerMah / totalAllMah) * 100.0 >= 2.5 }
-    }
-    val remainingApps = remember(usageApps, majorApps) {
-        usageApps.filterNot { majorApps.contains(it) }
-    }
+    val majorApps =
+        remember(usageApps, totalAllMah) {
+            usageApps.filter { (it.powerMah / totalAllMah) * 100.0 >= 2.5 }
+        }
+    val remainingApps =
+        remember(usageApps, majorApps) {
+            usageApps.filterNot { majorApps.contains(it) }
+        }
     val otherMah = remember(remainingApps) { remainingApps.sumOf { it.powerMah } }
 
     val hasOther = otherMah > 0.0001
@@ -271,17 +278,19 @@ fun TopAppsBreakdownHeader(
     val context = androidx.compose.ui.platform.LocalContext.current
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(88.dp)
-            .padding(vertical = 4.dp),
-        verticalArrangement = Arrangement.Center
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.Center,
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(40.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             majorApps.forEachIndexed { index, app ->
                 val weight = ((app.powerMah / totalAllMah) * 100.0).toFloat().coerceAtLeast(1f)
@@ -293,7 +302,7 @@ fun TopAppsBreakdownHeader(
                     if (app.packageName != null) {
                         com.sameerasw.essentials.utils.AppUtil.getAppBrandColor(
                             context,
-                            app.packageName
+                            app.packageName,
                         ) { argb ->
                             if (argb != android.graphics.Color.TRANSPARENT && argb != android.graphics.Color.GRAY) {
                                 brandColor = Color(argb)
@@ -304,20 +313,22 @@ fun TopAppsBreakdownHeader(
 
                 val barColor = brandColor ?: MaterialTheme.colorScheme.primaryContainer
 
-                val shape = when {
-                    totalSegments == 1 -> CircleShape
-                    index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes().shape
-                    index == totalSegments - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes().shape
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes().shape
-                }
+                val shape =
+                    when {
+                        totalSegments == 1 -> CircleShape
+                        index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes().shape
+                        index == totalSegments - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes().shape
+                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes().shape
+                    }
 
                 Box(
-                    modifier = Modifier
-                        .weight(weight)
-                        .fillMaxHeight()
-                        .clip(shape)
-                        .background(barColor),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .weight(weight)
+                            .fillMaxHeight()
+                            .clip(shape)
+                            .background(barColor),
+                    contentAlignment = Alignment.Center,
                 ) {
                     if (app.icon != null) {
                         val bitmap =
@@ -325,14 +336,14 @@ fun TopAppsBreakdownHeader(
                         Image(
                             bitmap = bitmap,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                     } else {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_info_24),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
@@ -343,11 +354,12 @@ fun TopAppsBreakdownHeader(
                 val otherShape =
                     if (majorApps.isEmpty()) CircleShape else ButtonGroupDefaults.connectedTrailingButtonShapes().shape
                 Box(
-                    modifier = Modifier
-                        .weight(otherWeight)
-                        .fillMaxHeight()
-                        .clip(otherShape)
-                        .background(MaterialTheme.colorScheme.outlineVariant)
+                    modifier =
+                        Modifier
+                            .weight(otherWeight)
+                            .fillMaxHeight()
+                            .clip(otherShape)
+                            .background(MaterialTheme.colorScheme.outlineVariant),
                 )
             }
         }
@@ -359,7 +371,7 @@ fun BatteryUsageBreakdownHeader(
     appsPct: Float,
     systemPct: Float,
     otherPct: Float,
-    activeTab: Int // 1: Apps, 2: System
+    activeTab: Int, // 1: Apps, 2: System
 ) {
     val safeApps = appsPct.coerceIn(0f, 100f)
     val safeSystem = systemPct.coerceIn(0f, 100f)
@@ -367,15 +379,15 @@ fun BatteryUsageBreakdownHeader(
 
     val animatedAppsWeight by animateFloatAsState(
         targetValue = safeApps.coerceAtLeast(1f),
-        label = "apps_weight"
+        label = "apps_weight",
     )
     val animatedSystemWeight by animateFloatAsState(
         targetValue = safeSystem.coerceAtLeast(1f),
-        label = "system_weight"
+        label = "system_weight",
     )
     val animatedOtherWeight by animateFloatAsState(
         targetValue = safeOther.coerceAtLeast(1f),
-        label = "other_weight"
+        label = "other_weight",
     )
 
     // Colors: Only selected tab gets Primary accent color, all unselected sections use outlineVariant
@@ -386,43 +398,48 @@ fun BatteryUsageBreakdownHeader(
     val otherColor = MaterialTheme.colorScheme.outlineVariant
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(88.dp)
-            .padding(vertical = 4.dp),
-        verticalArrangement = Arrangement.Center
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(88.dp)
+                .padding(vertical = 4.dp),
+        verticalArrangement = Arrangement.Center,
     ) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             // Multi-segment progress bar (Fully rounded outer ends, connected extraSmall inner joints)
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .clip(CircleShape),
-                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .clip(CircleShape),
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .weight(animatedAppsWeight)
-                        .fillMaxHeight()
-                        .clip(ButtonGroupDefaults.connectedLeadingButtonShapes().shape)
-                        .background(appsColor)
+                    modifier =
+                        Modifier
+                            .weight(animatedAppsWeight)
+                            .fillMaxHeight()
+                            .clip(ButtonGroupDefaults.connectedLeadingButtonShapes().shape)
+                            .background(appsColor),
                 )
                 Box(
-                    modifier = Modifier
-                        .weight(animatedSystemWeight)
-                        .fillMaxHeight()
-                        .clip(ButtonGroupDefaults.connectedMiddleButtonShapes().shape)
-                        .background(systemColor)
+                    modifier =
+                        Modifier
+                            .weight(animatedSystemWeight)
+                            .fillMaxHeight()
+                            .clip(ButtonGroupDefaults.connectedMiddleButtonShapes().shape)
+                            .background(systemColor),
                 )
                 Box(
-                    modifier = Modifier
-                        .weight(animatedOtherWeight)
-                        .fillMaxHeight()
-                        .clip(ButtonGroupDefaults.connectedTrailingButtonShapes().shape)
-                        .background(otherColor)
+                    modifier =
+                        Modifier
+                            .weight(animatedOtherWeight)
+                            .fillMaxHeight()
+                            .clip(ButtonGroupDefaults.connectedTrailingButtonShapes().shape)
+                            .background(otherColor),
                 )
             }
 
@@ -430,22 +447,22 @@ fun BatteryUsageBreakdownHeader(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 BreakdownLegendItem(
                     label = stringResource(R.string.label_battery_tab_apps),
                     percentage = safeApps,
-                    isSelected = activeTab == 1
+                    isSelected = activeTab == 1,
                 )
                 BreakdownLegendItem(
                     label = stringResource(R.string.label_battery_tab_system),
                     percentage = safeSystem,
-                    isSelected = activeTab == 2
+                    isSelected = activeTab == 2,
                 )
                 BreakdownLegendItem(
                     label = stringResource(R.string.label_battery_other),
                     percentage = safeOther,
-                    isSelected = false
+                    isSelected = false,
                 )
             }
         }
@@ -456,13 +473,12 @@ fun BatteryUsageBreakdownHeader(
 private fun BreakdownLegendItem(
     label: String,
     percentage: Float,
-    isSelected: Boolean
+    isSelected: Boolean,
 ) {
     Text(
         text = "$label ${String.format(Locale.getDefault(), "%.0f%%", percentage)}",
         style = MaterialTheme.typography.labelLarge,
         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
     )
 }
-

@@ -25,11 +25,13 @@ import androidx.compose.ui.platform.LocalContext
 import org.intellij.lang.annotations.Language
 
 enum class BlurDirection {
-    TOP, BOTTOM
+    TOP,
+    BOTTOM,
 }
 
 @Language("AGSL")
-private val PROGRESSIVE_BLUR_SKSL = """
+private val PROGRESSIVE_BLUR_SKSL =
+    """
     uniform shader content;
     uniform float blurRadius;
     uniform float height;
@@ -81,7 +83,7 @@ private val PROGRESSIVE_BLUR_SKSL = """
         
         return accum / weightSum;
     }
-""".trimIndent()
+    """.trimIndent()
 
 /**
  * Applies a progressive blur to the specified edge of the element.
@@ -91,53 +93,68 @@ fun Modifier.progressiveBlur(
     blurRadius: Float,
     height: Float,
     direction: BlurDirection = BlurDirection.TOP,
-    showGradientOverlay: Boolean = true
-): Modifier = composed {
-    val overlayColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.65f)
+    showGradientOverlay: Boolean = true,
+): Modifier =
+    composed {
+        val overlayColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.65f)
 
-    val context = LocalContext.current
-    val isPowerSave =
-        remember(context) { com.sameerasw.essentials.utils.DeviceUtils.isPowerSaveMode(context) }
-    val isSamsungOneUi7OrLess =
-        remember { com.sameerasw.essentials.utils.DeviceUtils.isBlurProblematicDevice() }
-
-    val blurModifier =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && blurRadius > 0f && !isPowerSave && !isSamsungOneUi7OrLess) {
-            Modifier.graphicsLayer {
-                val shader = RuntimeShader(PROGRESSIVE_BLUR_SKSL)
-                shader.setFloatUniform("blurRadius", blurRadius)
-                shader.setFloatUniform("height", height)
-                shader.setFloatUniform("contentHeight", size.height)
-                shader.setIntUniform("isTop", if (direction == BlurDirection.TOP) 1 else 0)
-
-                renderEffect = RenderEffect.createRuntimeShaderEffect(shader, "content")
-                    .asComposeRenderEffect()
+        val context = LocalContext.current
+        val isPowerSave =
+            remember(context) {
+                com.sameerasw.essentials.utils.DeviceUtils
+                    .isPowerSaveMode(context)
             }
-        } else Modifier
-
-    val gradientModifier = if (showGradientOverlay) {
-        Modifier.drawWithContent {
-            drawContent()
-            val (brush, _) = when (direction) {
-                BlurDirection.TOP -> {
-                    Brush.verticalGradient(
-                        colors = listOf(overlayColor, Color.Transparent),
-                        endY = height
-                    ) to height
-                }
-
-                BlurDirection.BOTTOM -> {
-                    Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, overlayColor),
-                        startY = size.height - height
-                    ) to height
-                }
+        val isSamsungOneUi7OrLess =
+            remember {
+                com.sameerasw.essentials.utils.DeviceUtils
+                    .isBlurProblematicDevice()
             }
-            drawRect(brush = brush)
-        }
-    } else Modifier
 
-    this
-        .then(blurModifier)
-        .then(gradientModifier)
-}
+        val blurModifier =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && blurRadius > 0f && !isPowerSave && !isSamsungOneUi7OrLess) {
+                Modifier.graphicsLayer {
+                    val shader = RuntimeShader(PROGRESSIVE_BLUR_SKSL)
+                    shader.setFloatUniform("blurRadius", blurRadius)
+                    shader.setFloatUniform("height", height)
+                    shader.setFloatUniform("contentHeight", size.height)
+                    shader.setIntUniform("isTop", if (direction == BlurDirection.TOP) 1 else 0)
+
+                    renderEffect =
+                        RenderEffect
+                            .createRuntimeShaderEffect(shader, "content")
+                            .asComposeRenderEffect()
+                }
+            } else {
+                Modifier
+            }
+
+        val gradientModifier =
+            if (showGradientOverlay) {
+                Modifier.drawWithContent {
+                    drawContent()
+                    val (brush, _) =
+                        when (direction) {
+                            BlurDirection.TOP -> {
+                                Brush.verticalGradient(
+                                    colors = listOf(overlayColor, Color.Transparent),
+                                    endY = height,
+                                ) to height
+                            }
+
+                            BlurDirection.BOTTOM -> {
+                                Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, overlayColor),
+                                    startY = size.height - height,
+                                ) to height
+                            }
+                        }
+                    drawRect(brush = brush)
+                }
+            } else {
+                Modifier
+            }
+
+        this
+            .then(blurModifier)
+            .then(gradientModifier)
+    }

@@ -30,38 +30,39 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun SnoozeNotificationsSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             viewModel.snoozeChannels.value.forEach { channel ->
                 IconToggleItem(
-                    iconRes = when (channel.id) {
-                        "DEVELOPER_OPTIONS" -> R.drawable.rounded_adb_24
-                        "USB_CONNECTION" -> R.drawable.rounded_usb_24
-                        "BATTERY" -> R.drawable.rounded_charger_24
-                        else -> R.drawable.rounded_notification_settings_24
-                    },
+                    iconRes =
+                        when (channel.id) {
+                            "DEVELOPER_OPTIONS" -> R.drawable.rounded_adb_24
+                            "USB_CONNECTION" -> R.drawable.rounded_usb_24
+                            "BATTERY" -> R.drawable.rounded_charger_24
+                            else -> R.drawable.rounded_notification_settings_24
+                        },
                     title = channel.name,
                     isChecked = channel.isBlocked,
                     onCheckedChange = { checked ->
                         HapticUtil.performVirtualKeyHaptic(view)
                         viewModel.setSnoozeChannelBlocked(channel.id, checked, context)
                     },
-                    modifier = Modifier.highlight(highlightSetting == channel.id)
+                    modifier = Modifier.highlight(highlightSetting == channel.id),
                 )
             }
 
@@ -70,7 +71,7 @@ fun SnoozeNotificationsSettingsUI(
                     text = stringResource(R.string.snooze_no_channels_discovered),
                     modifier = Modifier.padding(16.dp),
                     style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

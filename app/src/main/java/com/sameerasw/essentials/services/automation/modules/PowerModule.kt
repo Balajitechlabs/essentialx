@@ -36,58 +36,64 @@ class PowerModule : AutomationModule {
     private var isCharging = false
     private var isPowerSaving = false
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                Intent.ACTION_POWER_CONNECTED -> {
-                    if (!isCharging) {
-                        isCharging = true
-                        handleTrigger(context, Trigger.ChargerConnected)
-                        handleChargingStateChange(context, true)
+    private val receiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context,
+                intent: Intent,
+            ) {
+                when (intent.action) {
+                    Intent.ACTION_POWER_CONNECTED -> {
+                        if (!isCharging) {
+                            isCharging = true
+                            handleTrigger(context, Trigger.ChargerConnected)
+                            handleChargingStateChange(context, true)
+                        }
                     }
-                }
 
-                Intent.ACTION_POWER_DISCONNECTED -> {
-                    if (isCharging) {
-                        isCharging = false
-                        handleTrigger(context, Trigger.ChargerDisconnected)
-                        handleChargingStateChange(context, false)
+                    Intent.ACTION_POWER_DISCONNECTED -> {
+                        if (isCharging) {
+                            isCharging = false
+                            handleTrigger(context, Trigger.ChargerDisconnected)
+                            handleChargingStateChange(context, false)
+                        }
                     }
-                }
 
-                PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> {
-                    val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-                    val currentPowerSave = powerManager?.isPowerSaveMode == true
-                    if (currentPowerSave != isPowerSaving) {
-                        isPowerSaving = currentPowerSave
-                        if (isPowerSaving) {
-                            handleTrigger(context, Trigger.PowerSavingOn)
-                            handlePowerSavingStateChange(context, true)
-                        } else {
-                            handleTrigger(context, Trigger.PowerSavingOff)
-                            handlePowerSavingStateChange(context, false)
+                    PowerManager.ACTION_POWER_SAVE_MODE_CHANGED -> {
+                        val powerManager = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                        val currentPowerSave = powerManager?.isPowerSaveMode == true
+                        if (currentPowerSave != isPowerSaving) {
+                            isPowerSaving = currentPowerSave
+                            if (isPowerSaving) {
+                                handleTrigger(context, Trigger.PowerSavingOn)
+                                handlePowerSavingStateChange(context, true)
+                            } else {
+                                handleTrigger(context, Trigger.PowerSavingOff)
+                                handlePowerSavingStateChange(context, false)
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
     override fun start(context: Context) {
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_POWER_CONNECTED)
-            addAction(Intent.ACTION_POWER_DISCONNECTED)
-            addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
-        }
+        val filter =
+            IntentFilter().apply {
+                addAction(Intent.ACTION_POWER_CONNECTED)
+                addAction(Intent.ACTION_POWER_DISCONNECTED)
+                addAction(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED)
+            }
         context.registerReceiver(receiver, filter)
 
         // Initial check for charging
-        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
-            context.registerReceiver(null, ifilter)
-        }
+        val batteryStatus: Intent? =
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+                context.registerReceiver(null, ifilter)
+            }
         val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
         isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                status == BatteryManager.BATTERY_STATUS_FULL
+            status == BatteryManager.BATTERY_STATUS_FULL
 
         if (isCharging) {
             handleChargingStateChange(context, true)
@@ -113,9 +119,13 @@ class PowerModule : AutomationModule {
         this.automations = automations
     }
 
-    private fun handleTrigger(context: Context, trigger: Trigger) {
+    private fun handleTrigger(
+        context: Context,
+        trigger: Trigger,
+    ) {
         scope.launch {
-            automations.filter { it.type == Automation.Type.TRIGGER && it.trigger == trigger }
+            automations
+                .filter { it.type == Automation.Type.TRIGGER && it.trigger == trigger }
                 .forEach { automation ->
                     automation.actions.forEach { action ->
                         CombinedActionExecutor.execute(context, action)
@@ -124,9 +134,13 @@ class PowerModule : AutomationModule {
         }
     }
 
-    private fun handleChargingStateChange(context: Context, isActive: Boolean) {
+    private fun handleChargingStateChange(
+        context: Context,
+        isActive: Boolean,
+    ) {
         scope.launch {
-            automations.filter { it.type == Automation.Type.STATE }
+            automations
+                .filter { it.type == Automation.Type.STATE }
                 .forEach { automation ->
                     if (automation.state is DIYState.Charging) {
                         if (isActive) {
@@ -134,7 +148,7 @@ class PowerModule : AutomationModule {
                             automation.entryAction?.let {
                                 CombinedActionExecutor.execute(
                                     context,
-                                    it
+                                    it,
                                 )
                             }
                         } else {
@@ -142,7 +156,7 @@ class PowerModule : AutomationModule {
                             automation.exitAction?.let {
                                 CombinedActionExecutor.execute(
                                     context,
-                                    it
+                                    it,
                                 )
                             }
                         }
@@ -151,9 +165,13 @@ class PowerModule : AutomationModule {
         }
     }
 
-    private fun handlePowerSavingStateChange(context: Context, isActive: Boolean) {
+    private fun handlePowerSavingStateChange(
+        context: Context,
+        isActive: Boolean,
+    ) {
         scope.launch {
-            automations.filter { it.type == Automation.Type.STATE }
+            automations
+                .filter { it.type == Automation.Type.STATE }
                 .forEach { automation ->
                     if (automation.state is DIYState.PowerSaving) {
                         if (isActive) {
@@ -161,7 +179,7 @@ class PowerModule : AutomationModule {
                             automation.entryAction?.let {
                                 CombinedActionExecutor.execute(
                                     context,
-                                    it
+                                    it,
                                 )
                             }
                         } else {
@@ -169,7 +187,7 @@ class PowerModule : AutomationModule {
                             automation.exitAction?.let {
                                 CombinedActionExecutor.execute(
                                     context,
-                                    it
+                                    it,
                                 )
                             }
                         }

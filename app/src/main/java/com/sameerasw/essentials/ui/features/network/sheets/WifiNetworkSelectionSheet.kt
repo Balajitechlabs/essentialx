@@ -61,7 +61,7 @@ import kotlinx.coroutines.withContext
 fun WifiNetworkSelectionSheet(
     initialSsid: String? = null,
     onDismiss: () -> Unit,
-    onSave: (ssid: String) -> Unit
+    onSave: (ssid: String) -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -71,50 +71,54 @@ fun WifiNetworkSelectionSheet(
     var savedNetworks by remember { mutableStateOf<List<String>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        val networks = withContext(Dispatchers.IO) {
-            if (WifiUtil.canReadSavedNetworks(context)) {
-                WifiUtil.getSavedNetworkSsids(context)
-            } else {
-                emptyList()
+        val networks =
+            withContext(Dispatchers.IO) {
+                if (WifiUtil.canReadSavedNetworks(context)) {
+                    WifiUtil.getSavedNetworkSsids(context)
+                } else {
+                    emptyList()
+                }
             }
-        }
         savedNetworks = networks
         isLoadingSavedNetworks = false
     }
 
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            WifiUtil.getCurrentSsid(context)?.let { ssid = it }
+    val locationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { granted ->
+            if (granted) {
+                WifiUtil.getCurrentSsid(context)?.let { ssid = it }
+            }
         }
-    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        dragHandle = null
+        dragHandle = null,
     ) {
         Column(
-            modifier = Modifier
-                .padding(24.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.diy_select_wifi_network_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             when {
                 isLoadingSavedNetworks -> {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 24.dp),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 24.dp),
+                        contentAlignment = Alignment.Center,
                     ) {
                         CircularProgressIndicator()
                     }
@@ -124,17 +128,17 @@ fun WifiNetworkSelectionSheet(
                     Text(
                         text = stringResource(R.string.diy_saved_networks_via_shizuku),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     RoundedCardContainer {
                         LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                            verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
                             items(savedNetworks) { network ->
                                 SelectionCardItem(
                                     title = network,
                                     iconRes = R.drawable.rounded_android_wifi_4_bar_plus_24,
-                                    onClick = { onSave(network) }
+                                    onClick = { onSave(network) },
                                 )
                             }
                         }
@@ -147,28 +151,29 @@ fun WifiNetworkSelectionSheet(
                         onValueChange = { ssid = it },
                         label = { Text(stringResource(R.string.diy_wifi_ssid_label)) },
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                        singleLine = true,
                     )
 
                     OutlinedButton(
                         onClick = {
                             HapticUtil.performUIHaptic(view)
-                            val hasPermission = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.ACCESS_FINE_LOCATION
-                            ) == PackageManager.PERMISSION_GRANTED
+                            val hasPermission =
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.ACCESS_FINE_LOCATION,
+                                ) == PackageManager.PERMISSION_GRANTED
                             if (hasPermission) {
                                 WifiUtil.getCurrentSsid(context)?.let { ssid = it }
                             } else {
                                 locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.rounded_android_wifi_4_bar_plus_24),
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                         Spacer(modifier = Modifier.size(8.dp))
                         Text(stringResource(R.string.diy_use_current_network))
@@ -176,7 +181,7 @@ fun WifiNetworkSelectionSheet(
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         Button(
                             onClick = {
@@ -184,15 +189,16 @@ fun WifiNetworkSelectionSheet(
                                 onDismiss()
                             },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceBright,
-                                contentColor = MaterialTheme.colorScheme.onSurface
-                            )
+                            colors =
+                                ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                    contentColor = MaterialTheme.colorScheme.onSurface,
+                                ),
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_close_24),
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                             Spacer(modifier = Modifier.size(8.dp))
                             Text(stringResource(R.string.action_cancel))
@@ -206,12 +212,12 @@ fun WifiNetworkSelectionSheet(
                                 }
                             },
                             modifier = Modifier.weight(1f),
-                            enabled = ssid.isNotBlank()
+                            enabled = ssid.isNotBlank(),
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_check_24),
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                             Spacer(modifier = Modifier.size(8.dp))
                             Text(stringResource(R.string.action_save))

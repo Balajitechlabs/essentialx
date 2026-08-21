@@ -37,7 +37,7 @@ class CaffeinateViewModel : ViewModel() {
         CaffeinateController.check(context)
         postNotificationsGranted.value = ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.POST_NOTIFICATIONS
+            Manifest.permission.POST_NOTIFICATIONS,
         ) == PackageManager.PERMISSION_GRANTED
 
         val powerManager =
@@ -54,7 +54,10 @@ class CaffeinateViewModel : ViewModel() {
         enabledPresets.value = savedPresets?.map { it.toInt() }?.toSet() ?: timeoutPresets.toSet()
     }
 
-    fun togglePreset(preset: Int, context: Context) {
+    fun togglePreset(
+        preset: Int,
+        context: Context,
+    ) {
         val current = enabledPresets.value.toMutableSet()
         if (current.contains(preset)) {
             if (current.size > 1) current.remove(preset)
@@ -66,20 +69,27 @@ class CaffeinateViewModel : ViewModel() {
         prefs.edit().putStringSet("enabled_presets", current.map { it.toString() }.toSet()).apply()
     }
 
-    fun setAbortWithScreenOff(value: Boolean, context: Context) {
+    fun setAbortWithScreenOff(
+        value: Boolean,
+        context: Context,
+    ) {
         val prefs = context.getSharedPreferences("caffeinate_prefs", Context.MODE_PRIVATE)
         prefs.edit().putBoolean("abort_screen_off", value).apply()
         abortWithScreenOff.value = value
 
         if (isActive.value) {
-            val intent = Intent(context, CaffeinateWakeLockService::class.java).apply {
-                action = "UPDATE_PREFS"
-            }
+            val intent =
+                Intent(context, CaffeinateWakeLockService::class.java).apply {
+                    action = "UPDATE_PREFS"
+                }
             context.startService(intent)
         }
     }
 
-    fun setSkipCountdown(value: Boolean, context: Context) {
+    fun setSkipCountdown(
+        value: Boolean,
+        context: Context,
+    ) {
         val prefs = context.getSharedPreferences("caffeinate_prefs", Context.MODE_PRIVATE)
         prefs.edit().putBoolean("skip_countdown", value).apply()
         skipCountdown.value = value

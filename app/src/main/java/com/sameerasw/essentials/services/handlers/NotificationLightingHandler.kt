@@ -26,7 +26,7 @@ import com.sameerasw.essentials.utils.OverlayHelper
 import com.sameerasw.essentials.utils.ShellUtils
 
 class NotificationLightingHandler(
-    private val service: AccessibilityService
+    private val service: AccessibilityService,
 ) {
     private var windowManager: WindowManager? = null
     private val overlayViews = mutableListOf<View>()
@@ -105,27 +105,34 @@ class NotificationLightingHandler(
             intent.getFloatExtra("stroke_thickness_dp", OverlayHelper.STROKE_DP.toFloat())
         isPreview = intent.getBooleanExtra("is_preview", false)
         ignoreScreenState = intent.getBooleanExtra("ignore_screen_state", false)
-        colorMode = NotificationLightingColorMode.valueOf(
-            intent.getStringExtra("color_mode") ?: "SYSTEM"
-        )
+        colorMode =
+            NotificationLightingColorMode.valueOf(
+                intent.getStringExtra("color_mode") ?: "SYSTEM",
+            )
         customColor = intent.getIntExtra("custom_color", 0)
-        resolvedColor = if (intent.hasExtra("resolved_color")) intent.getIntExtra(
-            "resolved_color",
-            0
-        ) else null
+        resolvedColor =
+            if (intent.hasExtra("resolved_color")) {
+                intent.getIntExtra(
+                    "resolved_color",
+                    0,
+                )
+            } else {
+                null
+            }
         pulseCount = intent.getIntExtra("pulse_count", 1)
         pulseDuration = intent.getLongExtra("pulse_duration", 3000)
         val styleName = intent.getStringExtra("style")
         edgeLightingStyle =
             if (styleName != null) NotificationLightingStyle.valueOf(styleName) else NotificationLightingStyle.STROKE
         val glowSidesArray = intent.getStringArrayExtra("glow_sides")
-        glowSides = glowSidesArray?.mapNotNull {
-            try {
-                NotificationLightingSide.valueOf(it)
-            } catch (_: Exception) {
-                null
-            }
-        }?.toSet()
+        glowSides = glowSidesArray
+            ?.mapNotNull {
+                try {
+                    NotificationLightingSide.valueOf(it)
+                } catch (_: Exception) {
+                    null
+                }
+            }?.toSet()
             ?: setOf(NotificationLightingSide.LEFT, NotificationLightingSide.RIGHT)
         indicatorX = intent.getFloatExtra("indicator_x", 50f)
         indicatorY = intent.getFloatExtra("indicator_y", 2f)
@@ -190,43 +197,47 @@ class NotificationLightingHandler(
         windowManager = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val powerManager = service.getSystemService(Context.POWER_SERVICE) as PowerManager
 
-        val overlayType = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            try {
-                WindowManager.LayoutParams::class.java.getField("TYPE_ACCESSIBILITY_OVERLAY")
-                    .getInt(null)
-            } catch (_: Exception) {
+        val overlayType =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                try {
+                    WindowManager.LayoutParams::class.java
+                        .getField("TYPE_ACCESSIBILITY_OVERLAY")
+                        .getInt(null)
+                } catch (_: Exception) {
+                    WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            } else {
+                @Suppress("DEPRECATION")
+                WindowManager.LayoutParams.TYPE_PHONE
             }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        } else {
-            @Suppress("DEPRECATION")
-            WindowManager.LayoutParams.TYPE_PHONE
-        }
 
         try {
-            val color = when {
-                resolvedColor != null -> resolvedColor!!
-                colorMode == NotificationLightingColorMode.CUSTOM -> customColor
-                else -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        service.getColor(android.R.color.system_accent1_100)
-                    } else {
-                        service.getColor(com.sameerasw.essentials.R.color.purple_500)
+            val color =
+                when {
+                    resolvedColor != null -> resolvedColor!!
+                    colorMode == NotificationLightingColorMode.CUSTOM -> customColor
+                    else -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            service.getColor(android.R.color.system_accent1_100)
+                        } else {
+                            service.getColor(com.sameerasw.essentials.R.color.purple_500)
+                        }
                     }
                 }
-            }
 
-            val overlay = OverlayHelper.createOverlayView(
-                service,
-                color,
-                cornerRadiusDp = cornerRadiusDp,
-                style = edgeLightingStyle,
-                glowSides = glowSides,
-                indicatorScale = indicatorScale,
-                randomShapes = randomShapes,
-                strokeDp = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) sweepThickness else strokeThicknessDp,
-            )
+            val overlay =
+                OverlayHelper.createOverlayView(
+                    service,
+                    color,
+                    cornerRadiusDp = cornerRadiusDp,
+                    style = edgeLightingStyle,
+                    glowSides = glowSides,
+                    indicatorScale = indicatorScale,
+                    randomShapes = randomShapes,
+                    strokeDp = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) sweepThickness else strokeThicknessDp,
+                )
             val params = OverlayHelper.createOverlayLayoutParams(overlayType)
 
             val isScreenOn = powerManager.isInteractive
@@ -235,17 +246,18 @@ class NotificationLightingHandler(
 
             if (isAmbientDisplayRequested && !isScreenOn && !isPreview) {
                 if (showBackground) {
-                    val ambientOverlay = OverlayHelper.createOverlayView(
-                        service,
-                        color,
-                        strokeDp = strokeThicknessDp,
-                        cornerRadiusDp = cornerRadiusDp,
-                        style = edgeLightingStyle,
-                        glowSides = glowSides,
-                        indicatorScale = indicatorScale,
-                        randomShapes = randomShapes,
-                        showBackground = true
-                    )
+                    val ambientOverlay =
+                        OverlayHelper.createOverlayView(
+                            service,
+                            color,
+                            strokeDp = strokeThicknessDp,
+                            cornerRadiusDp = cornerRadiusDp,
+                            style = edgeLightingStyle,
+                            glowSides = glowSides,
+                            indicatorScale = indicatorScale,
+                            randomShapes = randomShapes,
+                            showBackground = true,
+                        )
                     val ambientParams =
                         OverlayHelper.createOverlayLayoutParams(overlayType, isTouchable = true)
 
@@ -258,17 +270,18 @@ class NotificationLightingHandler(
                     if (OverlayHelper.addOverlayView(
                             windowManager,
                             ambientOverlay,
-                            ambientParams
+                            ambientParams,
                         )
                     ) {
                         overlayViews.add(ambientOverlay)
 
                         try {
                             @Suppress("DEPRECATION")
-                            val wakeLock = powerManager.newWakeLock(
-                                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                                "essentials:NotificationLighting"
-                            )
+                            val wakeLock =
+                                powerManager.newWakeLock(
+                                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                                    "essentials:NotificationLighting",
+                                )
                             wakeLock.acquire(10000L)
                         } catch (e: Exception) {
                             Log.e("NotificationLighting", "Failed to wake screen", e)
@@ -286,10 +299,11 @@ class NotificationLightingHandler(
 
                         try {
                             @Suppress("DEPRECATION")
-                            val wakeLock = powerManager.newWakeLock(
-                                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-                                "essentials:NotificationLighting"
-                            )
+                            val wakeLock =
+                                powerManager.newWakeLock(
+                                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                                    "essentials:NotificationLighting",
+                                )
                             wakeLock.acquire(10000L)
                         } catch (e: Exception) {
                             Log.e("NotificationLighting", "Failed to wake screen", e)
@@ -317,17 +331,20 @@ class NotificationLightingHandler(
                             overlay,
                             edgeLightingStyle,
                             if (edgeLightingStyle == NotificationLightingStyle.SWEEP) sweepThickness else strokeThicknessDp,
-                            indicatorX = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) {
-                                when (sweepPosition) {
-                                    "LEFT" -> 0f
-                                    "RIGHT" -> 100f
-                                    else -> 50f
-                                }
-                            } else indicatorX,
+                            indicatorX =
+                                if (edgeLightingStyle == NotificationLightingStyle.SWEEP) {
+                                    when (sweepPosition) {
+                                        "LEFT" -> 0f
+                                        "RIGHT" -> 100f
+                                        else -> 50f
+                                    }
+                                } else {
+                                    indicatorX
+                                },
                             indicatorY,
                             indicatorScale,
                             randomShapes = randomShapes,
-                            pulseDurationMillis = pulseDuration
+                            pulseDurationMillis = pulseDuration,
                         ) {
                             currentPackageShowing = null
                             processQueue()
@@ -342,20 +359,26 @@ class NotificationLightingHandler(
         }
     }
 
-    private fun startPulsing(overlay: View, intent: Intent? = null) {
+    private fun startPulsing(
+        overlay: View,
+        intent: Intent? = null,
+    ) {
         OverlayHelper.pulseOverlay(
             overlay,
             maxPulses = if (isPreview) 1 else pulseCount,
             pulseDurationMillis = pulseDuration,
             style = edgeLightingStyle,
             strokeWidthDp = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) sweepThickness else strokeThicknessDp,
-            indicatorX = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) {
-                when (sweepPosition) {
-                    "LEFT" -> 0f
-                    "RIGHT" -> 100f
-                    else -> 50f
-                }
-            } else indicatorX,
+            indicatorX =
+                if (edgeLightingStyle == NotificationLightingStyle.SWEEP) {
+                    when (sweepPosition) {
+                        "LEFT" -> 0f
+                        "RIGHT" -> 100f
+                        else -> 50f
+                    }
+                } else {
+                    indicatorX
+                },
             indicatorY = indicatorY,
             indicatorScale = indicatorScale,
             randomShapes = randomShapes,
@@ -376,15 +399,16 @@ class NotificationLightingHandler(
         val centerX = metrics.widthPixels / 2
         val centerY = metrics.heightPixels / 2
 
-        val command = when (systemLightingMode) {
-            0 -> "cmd statusbar charging-ripple"
-            1 -> "cmd statusbar auth-ripple custom $centerX $centerY"
-            else -> {
-                val posX = (indicatorX / 100f * metrics.widthPixels).toInt()
-                val posY = (indicatorY / 100f * metrics.heightPixels).toInt()
-                "cmd statusbar auth-ripple custom $posX $posY"
+        val command =
+            when (systemLightingMode) {
+                0 -> "cmd statusbar charging-ripple"
+                1 -> "cmd statusbar auth-ripple custom $centerX $centerY"
+                else -> {
+                    val posX = (indicatorX / 100f * metrics.widthPixels).toInt()
+                    val posY = (indicatorY / 100f * metrics.heightPixels).toInt()
+                    "cmd statusbar auth-ripple custom $posX $posY"
+                }
             }
-        }
 
         ShellUtils.runCommand(service, command)
     }

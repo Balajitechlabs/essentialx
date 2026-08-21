@@ -50,7 +50,6 @@ import androidx.compose.ui.graphics.Color as ComposeColor
  * Provides a single unified implementation for both normal and accessibility service overlays.
  */
 object OverlayHelper {
-
     // Configuration constants
     const val STROKE_DP = 8
     const val CORNER_RADIUS_DP = 20
@@ -71,13 +70,14 @@ object OverlayHelper {
         strokeDp: Float = STROKE_DP.toFloat(),
         cornerRadiusDp: Float = CORNER_RADIUS_DP.toFloat(),
         style: NotificationLightingStyle = NotificationLightingStyle.STROKE,
-        glowSides: Set<NotificationLightingSide> = setOf(
-            NotificationLightingSide.LEFT,
-            NotificationLightingSide.RIGHT
-        ),
+        glowSides: Set<NotificationLightingSide> =
+            setOf(
+                NotificationLightingSide.LEFT,
+                NotificationLightingSide.RIGHT,
+            ),
         indicatorScale: Float = 1.0f,
         randomShapes: Boolean = false,
-        showBackground: Boolean = false
+        showBackground: Boolean = false,
     ): FrameLayout {
         if (style == NotificationLightingStyle.GLOW) {
             return createGlowOverlayView(context, color, glowSides, showBackground)
@@ -96,20 +96,23 @@ object OverlayHelper {
         val strokePx = (context.resources.displayMetrics.density * strokeDp).toInt()
         val cornerRadiusPx = (context.resources.displayMetrics.density * cornerRadiusDp).toInt()
 
-        val drawable = GradientDrawable().apply {
-            setColor(Color.TRANSPARENT)
-            setStroke(strokePx, color)
-            cornerRadius = cornerRadiusPx.toFloat()
-        }
+        val drawable =
+            GradientDrawable().apply {
+                setColor(Color.TRANSPARENT)
+                setStroke(strokePx, color)
+                cornerRadius = cornerRadiusPx.toFloat()
+            }
 
         if (showBackground) {
-            val strokeView = View(context).apply {
-                background = drawable
-                layoutParams = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-            }
+            val strokeView =
+                View(context).apply {
+                    background = drawable
+                    layoutParams =
+                        FrameLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                        )
+                }
             overlay.addView(strokeView)
         } else {
             overlay.background = drawable
@@ -122,7 +125,7 @@ object OverlayHelper {
         context: Context,
         color: Int,
         sides: Set<NotificationLightingSide>,
-        showBackground: Boolean
+        showBackground: Boolean,
     ): FrameLayout {
         val blurRadiusDp = 15f
         val overlay = FrameLayout(context)
@@ -139,7 +142,8 @@ object OverlayHelper {
                     tag = "left_glow"
                     alpha = 0.5f
                     layoutParams =
-                        FrameLayout.LayoutParams(glowSizePx, ViewGroup.LayoutParams.MATCH_PARENT)
+                        FrameLayout
+                            .LayoutParams(glowSizePx, ViewGroup.LayoutParams.MATCH_PARENT)
                             .apply {
                                 gravity = Gravity.START
                             }
@@ -153,7 +157,8 @@ object OverlayHelper {
                     tag = "right_glow"
                     alpha = 0.5f
                     layoutParams =
-                        FrameLayout.LayoutParams(glowSizePx, ViewGroup.LayoutParams.MATCH_PARENT)
+                        FrameLayout
+                            .LayoutParams(glowSizePx, ViewGroup.LayoutParams.MATCH_PARENT)
                             .apply {
                                 gravity = Gravity.END
                             }
@@ -167,7 +172,8 @@ object OverlayHelper {
                     tag = "top_glow"
                     alpha = 0.5f
                     layoutParams =
-                        FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, glowSizePx)
+                        FrameLayout
+                            .LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, glowSizePx)
                             .apply {
                                 gravity = Gravity.TOP
                             }
@@ -181,7 +187,8 @@ object OverlayHelper {
                     tag = "bottom_glow"
                     alpha = 0.5f
                     layoutParams =
-                        FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, glowSizePx)
+                        FrameLayout
+                            .LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, glowSizePx)
                             .apply {
                                 gravity = Gravity.BOTTOM
                             }
@@ -197,7 +204,7 @@ object OverlayHelper {
         context: Context,
         color: Int,
         indicatorScale: Float,
-        showBackground: Boolean
+        showBackground: Boolean,
     ): FrameLayout {
         // gettign the new LoadingIndicator on an overlay was not easy.... not at all :)
         val overlay = FrameLayout(context)
@@ -216,22 +223,24 @@ object OverlayHelper {
         val density = context.resources.displayMetrics.density
         val size = (INDICATOR_SIZE_DP * density * indicatorScale).toInt()
 
-        val composeView = ComposeView(context).apply {
-            tag = "loading_indicator"
-            layoutParams = FrameLayout.LayoutParams(size, size).apply {
-                gravity = Gravity.CENTER
+        val composeView =
+            ComposeView(context).apply {
+                tag = "loading_indicator"
+                layoutParams =
+                    FrameLayout.LayoutParams(size, size).apply {
+                        gravity = Gravity.CENTER
+                    }
+
+                // Dispose when removed from window
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+
+                setContent {
+                    LoadingIndicator(color = ComposeColor(color))
+                }
+
+                this.scaleX = 0f
+                this.scaleY = 0f
             }
-
-            // Dispose when removed from window
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
-
-            setContent {
-                LoadingIndicator(color = ComposeColor(color))
-            }
-
-            this.scaleX = 0f
-            this.scaleY = 0f
-        }
 
         overlay.addView(composeView)
         return overlay
@@ -242,7 +251,7 @@ object OverlayHelper {
         color: Int,
         strokeDp: Float,
         randomShapes: Boolean,
-        showBackground: Boolean
+        showBackground: Boolean,
     ): FrameLayout {
         val overlay = FrameLayout(context)
         if (showBackground) {
@@ -254,10 +263,11 @@ object OverlayHelper {
             SweepShapeView(context, color, strokeDp, randomShapes, selectedShapes).apply {
                 tag = "sweep_view"
                 alpha = 0f
-                layoutParams = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    )
             }
         overlay.addView(sweepView)
 
@@ -269,25 +279,30 @@ object OverlayHelper {
         val color: Int,
         val strokeDp: Float,
         val useRandomShapes: Boolean,
-        val selectedShapes: Set<String>
+        val selectedShapes: Set<String>,
     ) : View(context) {
         var centerX: Float = 0f
         var centerY: Float = 0f
 
-        private val polygon = if (useRandomShapes) {
-            AmbientMusicShapeHelper.getRandomPolygonFromSet(selectedShapes)
-        } else null
+        private val polygon =
+            if (useRandomShapes) {
+                AmbientMusicShapeHelper.getRandomPolygonFromSet(selectedShapes)
+            } else {
+                null
+            }
 
-        private val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            style = android.graphics.Paint.Style.STROKE
-            this.color = this@SweepShapeView.color
-            strokeWidth = context.resources.displayMetrics.density * strokeDp
+        private val paint =
+            android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                style = android.graphics.Paint.Style.STROKE
+                this.color = this@SweepShapeView.color
+                strokeWidth = context.resources.displayMetrics.density * strokeDp
 
-            maskFilter = android.graphics.BlurMaskFilter(
-                context.resources.displayMetrics.density * 15f,
-                android.graphics.BlurMaskFilter.Blur.NORMAL
-            )
-        }
+                maskFilter =
+                    android.graphics.BlurMaskFilter(
+                        context.resources.displayMetrics.density * 15f,
+                        android.graphics.BlurMaskFilter.Blur.NORMAL,
+                    )
+            }
 
         init {
             setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -326,17 +341,19 @@ object OverlayHelper {
         context: Context,
         val color: Int,
         val side: NotificationLightingSide,
-        val blurRadiusDp: Float
+        val blurRadiusDp: Float,
     ) : View(context) {
-        private val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            style = android.graphics.Paint.Style.FILL
-            if (blurRadiusDp > 0) {
-                maskFilter = android.graphics.BlurMaskFilter(
-                    context.resources.displayMetrics.density * blurRadiusDp,
-                    android.graphics.BlurMaskFilter.Blur.NORMAL
-                )
+        private val paint =
+            android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                style = android.graphics.Paint.Style.FILL
+                if (blurRadiusDp > 0) {
+                    maskFilter =
+                        android.graphics.BlurMaskFilter(
+                            context.resources.displayMetrics.density * blurRadiusDp,
+                            android.graphics.BlurMaskFilter.Blur.NORMAL,
+                        )
+                }
             }
-        }
 
         init {
             setLayerType(LAYER_TYPE_SOFTWARE, null)
@@ -348,27 +365,52 @@ object OverlayHelper {
             val h = height.toFloat()
 
             // Define the gradient based on side
-            val shader = when (side) {
-                NotificationLightingSide.LEFT -> android.graphics.LinearGradient(
-                    0f, 0f, w, 0f,
-                    color, Color.TRANSPARENT, android.graphics.Shader.TileMode.CLAMP
-                )
+            val shader =
+                when (side) {
+                    NotificationLightingSide.LEFT ->
+                        android.graphics.LinearGradient(
+                            0f,
+                            0f,
+                            w,
+                            0f,
+                            color,
+                            Color.TRANSPARENT,
+                            android.graphics.Shader.TileMode.CLAMP,
+                        )
 
-                NotificationLightingSide.RIGHT -> android.graphics.LinearGradient(
-                    w, 0f, 0f, 0f,
-                    color, Color.TRANSPARENT, android.graphics.Shader.TileMode.CLAMP
-                )
+                    NotificationLightingSide.RIGHT ->
+                        android.graphics.LinearGradient(
+                            w,
+                            0f,
+                            0f,
+                            0f,
+                            color,
+                            Color.TRANSPARENT,
+                            android.graphics.Shader.TileMode.CLAMP,
+                        )
 
-                NotificationLightingSide.TOP -> android.graphics.LinearGradient(
-                    0f, 0f, 0f, h,
-                    color, Color.TRANSPARENT, android.graphics.Shader.TileMode.CLAMP
-                )
+                    NotificationLightingSide.TOP ->
+                        android.graphics.LinearGradient(
+                            0f,
+                            0f,
+                            0f,
+                            h,
+                            color,
+                            Color.TRANSPARENT,
+                            android.graphics.Shader.TileMode.CLAMP,
+                        )
 
-                NotificationLightingSide.BOTTOM -> android.graphics.LinearGradient(
-                    0f, h, 0f, 0f,
-                    color, Color.TRANSPARENT, android.graphics.Shader.TileMode.CLAMP
-                )
-            }
+                    NotificationLightingSide.BOTTOM ->
+                        android.graphics.LinearGradient(
+                            0f,
+                            h,
+                            0f,
+                            0f,
+                            color,
+                            Color.TRANSPARENT,
+                            android.graphics.Shader.TileMode.CLAMP,
+                        )
+                }
             paint.shader = shader
 
             canvas.drawRect(0f, 0f, w, h, paint)
@@ -379,7 +421,9 @@ object OverlayHelper {
      * A lightweight implementation of the owners required by Jetpack Compose
      * to run inside a WindowManager overlay.
      */
-    private class OverlayLifecycleOwner : LifecycleOwner, SavedStateRegistryOwner,
+    private class OverlayLifecycleOwner :
+        LifecycleOwner,
+        SavedStateRegistryOwner,
         ViewModelStoreOwner {
         private val lifecycleRegistry = LifecycleRegistry(this)
         private val savedStateRegistryController = SavedStateRegistryController.create(this)
@@ -411,7 +455,6 @@ object OverlayHelper {
         }
     }
 
-
     /**
      * Creates WindowManager.LayoutParams configured for an notification lighting overlay.
      *
@@ -422,9 +465,10 @@ object OverlayHelper {
     fun createOverlayLayoutParams(
         overlayType: Int,
         flags: Int = 0,
-        isTouchable: Boolean = false
+        isTouchable: Boolean = false,
     ): WindowManager.LayoutParams {
-        var baseFlags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+        var baseFlags =
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
@@ -434,13 +478,14 @@ object OverlayHelper {
             baseFlags = baseFlags or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
         }
 
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
-            overlayType,
-            baseFlags or flags,
-            android.graphics.PixelFormat.TRANSLUCENT
-        )
+        val params =
+            WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                overlayType,
+                baseFlags or flags,
+                android.graphics.PixelFormat.TRANSLUCENT,
+            )
         params.gravity = Gravity.TOP or Gravity.START
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -465,16 +510,15 @@ object OverlayHelper {
     fun addOverlayView(
         windowManager: WindowManager?,
         view: View,
-        params: WindowManager.LayoutParams
-    ): Boolean {
-        return try {
+        params: WindowManager.LayoutParams,
+    ): Boolean =
+        try {
             windowManager?.addView(view, params)
             true
         } catch (e: Exception) {
             e.printStackTrace()
             false
         }
-    }
 
     /**
      * Removes an overlay view from the WindowManager.
@@ -482,7 +526,10 @@ object OverlayHelper {
      * @param windowManager [WindowManager?] The WindowManager instance
      * @param view [View] The overlay view to remove
      */
-    fun removeOverlayView(windowManager: WindowManager?, view: View) {
+    fun removeOverlayView(
+        windowManager: WindowManager?,
+        view: View,
+    ) {
         try {
             windowManager?.removeView(view)
         } catch (_: Exception) {
@@ -495,7 +542,10 @@ object OverlayHelper {
      * @param windowManager [WindowManager?] The WindowManager instance
      * @param overlayViews [MutableList<View>] The list of overlay views to remove
      */
-    fun removeAllOverlays(windowManager: WindowManager?, overlayViews: MutableList<View>) {
+    fun removeAllOverlays(
+        windowManager: WindowManager?,
+        overlayViews: MutableList<View>,
+    ) {
         try {
             overlayViews.forEach { removeOverlayView(windowManager, it) }
         } catch (e: Exception) {
@@ -518,7 +568,7 @@ object OverlayHelper {
         indicatorScale: Float = 1.0f,
         randomShapes: Boolean = false,
         pulseDurationMillis: Long = 3000L,
-        onAnimationEnd: (() -> Unit)? = null
+        onAnimationEnd: (() -> Unit)? = null,
     ) {
         if (style == NotificationLightingStyle.GLOW) {
             val vg = view as? ViewGroup
@@ -556,7 +606,7 @@ object OverlayHelper {
                 pulseDurationMillis = pulseDurationMillis,
                 strokeWidthDp = strokeWidthDp,
                 sweepPositionX = indicatorX,
-                onAnimationEnd = onAnimationEnd
+                onAnimationEnd = onAnimationEnd,
             )
         }
 
@@ -569,15 +619,20 @@ object OverlayHelper {
      * @param view [View] The overlay view to animate
      * @param onAnimationEnd [((] Optional callback when animation completes
      */
-    fun fadeInOverlay(view: View, onAnimationEnd: (() -> Unit)? = null) {
+    fun fadeInOverlay(
+        view: View,
+        onAnimationEnd: (() -> Unit)? = null,
+    ) {
         view.alpha = 0f
         ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
             duration = 1000 // 1 second
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    onAnimationEnd?.invoke()
-                }
-            })
+            addListener(
+                object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        onAnimationEnd?.invoke()
+                    }
+                },
+            )
             start()
         }
     }
@@ -594,17 +649,19 @@ object OverlayHelper {
         windowManager: WindowManager?,
         view: View,
         overlayViews: MutableList<View>,
-        onAnimationEnd: (() -> Unit)? = null
+        onAnimationEnd: (() -> Unit)? = null,
     ) {
         ObjectAnimator.ofFloat(view, "alpha", view.alpha, 0f).apply {
             duration = 1000 // 1 second
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    removeOverlayView(windowManager, view)
-                    overlayViews.remove(view)
-                    onAnimationEnd?.invoke()
-                }
-            })
+            addListener(
+                object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        removeOverlayView(windowManager, view)
+                        overlayViews.remove(view)
+                        onAnimationEnd?.invoke()
+                    }
+                },
+            )
             start()
         }
     }
@@ -627,7 +684,7 @@ object OverlayHelper {
         indicatorY: Float = 2f,
         indicatorScale: Float = 1.0f,
         randomShapes: Boolean = false,
-        onAnimationEnd: (() -> Unit)? = null
+        onAnimationEnd: (() -> Unit)? = null,
     ) {
         if (style == NotificationLightingStyle.GLOW) {
             pulseGlowOverlay(
@@ -635,7 +692,7 @@ object OverlayHelper {
                 maxPulses,
                 pulseDurationMillis,
                 strokeWidthDp,
-                onAnimationEnd
+                onAnimationEnd,
             )
             return
         }
@@ -647,7 +704,7 @@ object OverlayHelper {
                 indicatorX,
                 indicatorY,
                 indicatorScale,
-                onAnimationEnd
+                onAnimationEnd,
             )
             return
         }
@@ -659,7 +716,7 @@ object OverlayHelper {
                 pulseDurationMillis,
                 strokeWidthDp,
                 indicatorX,
-                onAnimationEnd
+                onAnimationEnd,
             )
             return
         }
@@ -684,24 +741,28 @@ object OverlayHelper {
             // Fade in
             ObjectAnimator.ofFloat(view, "alpha", 0f, 1f).apply {
                 duration = durationIn
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        // Stay visible for hold duration, then fade out
-                        view.postDelayed({
-                            // Fade out
-                            ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
-                                duration = durationOut
-                                addListener(object : AnimatorListenerAdapter() {
-                                    override fun onAnimationEnd(animation: Animator) {
-                                        // Start next pulse immediately
-                                        startPulse()
-                                    }
-                                })
-                                start()
-                            }
-                        }, durationHold)
-                    }
-                })
+                addListener(
+                    object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            // Stay visible for hold duration, then fade out
+                            view.postDelayed({
+                                // Fade out
+                                ObjectAnimator.ofFloat(view, "alpha", 1f, 0f).apply {
+                                    duration = durationOut
+                                    addListener(
+                                        object : AnimatorListenerAdapter() {
+                                            override fun onAnimationEnd(animation: Animator) {
+                                                // Start next pulse immediately
+                                                startPulse()
+                                            }
+                                        },
+                                    )
+                                    start()
+                                }
+                            }, durationHold)
+                        }
+                    },
+                )
                 start()
             }
         }
@@ -714,7 +775,7 @@ object OverlayHelper {
         maxPulses: Int,
         pulseDurationMillis: Long,
         strokeWidthDp: Float,
-        onAnimationEnd: (() -> Unit)?
+        onAnimationEnd: (() -> Unit)?,
     ) {
         val leftGlow = view.findViewWithTag<View>("left_glow")
         val rightGlow = view.findViewWithTag<View>("right_glow")
@@ -741,42 +802,48 @@ object OverlayHelper {
             pulseCount++
 
             // Expand
-            val expandAnimator = ValueAnimator.ofInt(0, maxPixels).apply {
-                duration = expandDuration
-                interpolator = AccelerateDecelerateInterpolator()
-                addUpdateListener { animator ->
-                    val dim = animator.animatedValue as Int
-                    leftGlow?.updateLayoutParams { this.width = dim }
-                    rightGlow?.updateLayoutParams { this.width = dim }
-                    topGlow?.updateLayoutParams { this.height = dim }
-                    bottomGlow?.updateLayoutParams { this.height = dim }
-                }
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        // Hold
-                        view.postDelayed({
-                            // Shrink
-                            val shrinkAnimator = ValueAnimator.ofInt(maxPixels, 0).apply {
-                                duration = shrinkDuration
-                                interpolator = AccelerateDecelerateInterpolator()
-                                addUpdateListener { animator ->
-                                    val dim = animator.animatedValue as Int
-                                    leftGlow?.updateLayoutParams { this.width = dim }
-                                    rightGlow?.updateLayoutParams { this.width = dim }
-                                    topGlow?.updateLayoutParams { this.height = dim }
-                                    bottomGlow?.updateLayoutParams { this.height = dim }
-                                }
-                                addListener(object : AnimatorListenerAdapter() {
-                                    override fun onAnimationEnd(animation: Animator) {
-                                        startPulse()
-                                    }
-                                })
-                            }
-                            shrinkAnimator.start()
-                        }, holdDuration)
+            val expandAnimator =
+                ValueAnimator.ofInt(0, maxPixels).apply {
+                    duration = expandDuration
+                    interpolator = AccelerateDecelerateInterpolator()
+                    addUpdateListener { animator ->
+                        val dim = animator.animatedValue as Int
+                        leftGlow?.updateLayoutParams { this.width = dim }
+                        rightGlow?.updateLayoutParams { this.width = dim }
+                        topGlow?.updateLayoutParams { this.height = dim }
+                        bottomGlow?.updateLayoutParams { this.height = dim }
                     }
-                })
-            }
+                    addListener(
+                        object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                // Hold
+                                view.postDelayed({
+                                    // Shrink
+                                    val shrinkAnimator =
+                                        ValueAnimator.ofInt(maxPixels, 0).apply {
+                                            duration = shrinkDuration
+                                            interpolator = AccelerateDecelerateInterpolator()
+                                            addUpdateListener { animator ->
+                                                val dim = animator.animatedValue as Int
+                                                leftGlow?.updateLayoutParams { this.width = dim }
+                                                rightGlow?.updateLayoutParams { this.width = dim }
+                                                topGlow?.updateLayoutParams { this.height = dim }
+                                                bottomGlow?.updateLayoutParams { this.height = dim }
+                                            }
+                                            addListener(
+                                                object : AnimatorListenerAdapter() {
+                                                    override fun onAnimationEnd(animation: Animator) {
+                                                        startPulse()
+                                                    }
+                                                },
+                                            )
+                                        }
+                                    shrinkAnimator.start()
+                                }, holdDuration)
+                            }
+                        },
+                    )
+                }
             expandAnimator.start()
         }
 
@@ -789,7 +856,7 @@ object OverlayHelper {
         indicatorX: Float,
         indicatorY: Float,
         indicatorScale: Float,
-        onAnimationEnd: (() -> Unit)? = null
+        onAnimationEnd: (() -> Unit)? = null,
     ) {
         val indicator = view.findViewWithTag<View>("loading_indicator") ?: return
 
@@ -801,26 +868,32 @@ object OverlayHelper {
 
         view.alpha = 1f
 
-        indicator.animate()
+        indicator
+            .animate()
             .scaleX(indicatorScale)
             .scaleY(indicatorScale)
             .setDuration(400) // Slightly slower for the morphing effect to catch the eye
             .setInterpolator(AccelerateDecelerateInterpolator())
-            .setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    view.postDelayed({
-                        indicator.animate()
-                            .scaleX(0.0f)
-                            .scaleY(0.0f)
-                            .setDuration(400)
-                            .setListener(object : AnimatorListenerAdapter() {
-                                override fun onAnimationEnd(animation: Animator) {
-                                    onAnimationEnd?.invoke()
-                                }
-                            }).start()
-                    }, (durationMillis - 800).coerceAtLeast(0))
-                }
-            }).start()
+            .setListener(
+                object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        view.postDelayed({
+                            indicator
+                                .animate()
+                                .scaleX(0.0f)
+                                .scaleY(0.0f)
+                                .setDuration(400)
+                                .setListener(
+                                    object : AnimatorListenerAdapter() {
+                                        override fun onAnimationEnd(animation: Animator) {
+                                            onAnimationEnd?.invoke()
+                                        }
+                                    },
+                                ).start()
+                        }, (durationMillis - 800).coerceAtLeast(0))
+                    }
+                },
+            ).start()
     }
 
     private fun pulseSweepOverlay(
@@ -829,18 +902,19 @@ object OverlayHelper {
         pulseDurationMillis: Long,
         strokeWidthDp: Float,
         sweepPositionX: Float,
-        onAnimationEnd: (() -> Unit)? = null
+        onAnimationEnd: (() -> Unit)? = null,
     ) {
         val sweepView = view.findViewWithTag<View>("sweep_view") as? SweepShapeView ?: return
         val displayMetrics = view.resources.displayMetrics
         val screenWidth = displayMetrics.widthPixels
         val screenHeight = displayMetrics.heightPixels
 
-        val startX = when {
-            sweepPositionX < 34f -> 0f
-            sweepPositionX > 66f -> screenWidth.toFloat()
-            else -> screenWidth / 2f
-        }
+        val startX =
+            when {
+                sweepPositionX < 34f -> 0f
+                sweepPositionX > 66f -> screenWidth.toFloat()
+                else -> screenWidth / 2f
+            }
         val startY = 16f * displayMetrics.density // top gap
 
         sweepView.centerX = startX
@@ -849,8 +923,10 @@ object OverlayHelper {
         // Max radius to cover the whole screen from the start point
         val maxDistX = Math.max(startX, screenWidth - startX)
         val maxDistY = Math.max(startY, screenHeight - startY)
-        val maxRadius = Math.sqrt((maxDistX * maxDistX + maxDistY * maxDistY).toDouble())
-            .toFloat() + (15f * displayMetrics.density)
+        val maxRadius =
+            Math
+                .sqrt((maxDistX * maxDistX + maxDistY * maxDistY).toDouble())
+                .toFloat() + (15f * displayMetrics.density)
 
         var pulseCount = 0
 
@@ -867,20 +943,23 @@ object OverlayHelper {
             sweepView.alpha = 1f
             sweepView.currentRadius = 0f
 
-            val animator = ValueAnimator.ofFloat(0f, maxRadius).apply {
-                duration = pulseDurationMillis
-                interpolator = AccelerateDecelerateInterpolator()
-                addUpdateListener { anim ->
-                    val radius = anim.animatedValue as Float
-                    sweepView.currentRadius = radius
-                    sweepView.alpha = 1f - (radius / maxRadius)
-                }
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        startPulse()
+            val animator =
+                ValueAnimator.ofFloat(0f, maxRadius).apply {
+                    duration = pulseDurationMillis
+                    interpolator = AccelerateDecelerateInterpolator()
+                    addUpdateListener { anim ->
+                        val radius = anim.animatedValue as Float
+                        sweepView.currentRadius = radius
+                        sweepView.alpha = 1f - (radius / maxRadius)
                     }
-                })
-            }
+                    addListener(
+                        object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                startPulse()
+                            }
+                        },
+                    )
+                }
             animator.start()
         }
 

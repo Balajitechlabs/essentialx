@@ -51,18 +51,19 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.utils.HapticUtil
 import java.util.UUID
 
-val PRESET_PASTEL_COLORS = listOf(
-    "#FFB3BA", // Light Pink
-    "#FFDFBA", // Light Peach
-    "#FFFFBA", // Light Yellow
-    "#BAFFC9", // Mint Green
-    "#BAE1FF", // Light Blue
-    "#E8AEFF", // Light Purple
-    "#FFC6FF", // Soft Magenta
-    "#BDB2FF", // Periwinkle
-    "#FFD6A5", // Soft Orange
-    "#CAFFBF"  // Soft Lime
-)
+val PRESET_PASTEL_COLORS =
+    listOf(
+        "#FFB3BA", // Light Pink
+        "#FFDFBA", // Light Peach
+        "#FFFFBA", // Light Yellow
+        "#BAFFC9", // Mint Green
+        "#BAE1FF", // Light Blue
+        "#E8AEFF", // Light Purple
+        "#FFC6FF", // Soft Magenta
+        "#BDB2FF", // Periwinkle
+        "#FFD6A5", // Soft Orange
+        "#CAFFBF", // Soft Lime
+    )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +71,7 @@ fun FreezeTagEditorSheet(
     tagToEdit: AppTag? = null,
     onDismissRequest: () -> Unit,
     onSave: (AppTag) -> Unit,
-    onDelete: ((String) -> Unit)? = null
+    onDelete: ((String) -> Unit)? = null,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val view = LocalView.current
@@ -78,7 +79,7 @@ fun FreezeTagEditorSheet(
     var name by remember { mutableStateOf(tagToEdit?.name ?: "") }
     var selectedColorHex by remember {
         mutableStateOf(
-            tagToEdit?.colorHex ?: PRESET_PASTEL_COLORS.random()
+            tagToEdit?.colorHex ?: PRESET_PASTEL_COLORS.random(),
         )
     }
     var selectedIconName by remember { mutableStateOf(tagToEdit?.iconName ?: "rounded_tag_24") }
@@ -87,26 +88,31 @@ fun FreezeTagEditorSheet(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = if (tagToEdit == null) stringResource(R.string.action_create_tag)
-                    else stringResource(R.string.action_update_tag),
+                    text =
+                        if (tagToEdit == null) {
+                            stringResource(R.string.action_create_tag)
+                        } else {
+                            stringResource(R.string.action_update_tag)
+                        },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 if (tagToEdit != null && onDelete != null) {
                     IconButton(
@@ -114,12 +120,12 @@ fun FreezeTagEditorSheet(
                             HapticUtil.performVirtualKeyHaptic(view)
                             onDelete(tagToEdit.id)
                             onDismissRequest()
-                        }
+                        },
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_delete_24),
                             contentDescription = stringResource(R.string.action_remove),
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MaterialTheme.colorScheme.error,
                         )
                     }
                 }
@@ -128,13 +134,13 @@ fun FreezeTagEditorSheet(
             RoundedCardContainer(spacing = 2.dp) {
                 // Name
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = MaterialTheme.shapes.extraSmall
-                        )
-                        .padding(12.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = MaterialTheme.shapes.extraSmall,
+                            ).padding(12.dp),
                 ) {
                     OutlinedTextField(
                         value = name,
@@ -143,45 +149,47 @@ fun FreezeTagEditorSheet(
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
                         shape = MaterialTheme.shapes.medium,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Words
-                        )
+                        colors =
+                            OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                            ),
+                        keyboardOptions =
+                            KeyboardOptions(
+                                capitalization = KeyboardCapitalization.Words,
+                            ),
                     )
                 }
 
                 // Color Picker
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = MaterialTheme.shapes.extraSmall
-                        )
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = MaterialTheme.shapes.extraSmall,
+                            ).padding(16.dp),
                 ) {
                     com.sameerasw.essentials.ui.components.FreezeTagColorPicker(
                         selectedColorHex = selectedColorHex,
-                        onColorSelected = { selectedColorHex = it }
+                        onColorSelected = { selectedColorHex = it },
                     )
                 }
 
                 // Icon Picker
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = MaterialTheme.shapes.extraSmall
-                        )
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = MaterialTheme.shapes.extraSmall,
+                            ).padding(16.dp),
                 ) {
                     FreezeTagIconPicker(
                         selectedIconName = selectedIconName,
-                        onIconSelected = { selectedIconName = it }
+                        onIconSelected = { selectedIconName = it },
                     )
                 }
 
@@ -192,20 +200,20 @@ fun FreezeTagEditorSheet(
                     subtitle = stringResource(R.string.freeze_tag_never_auto_freeze_desc),
                     isChecked = neverAutoFreeze,
                     onCheckedChange = { neverAutoFreeze = it },
-                    enabled = true
+                    enabled = true,
                 )
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextButton(
                     onClick = {
                         HapticUtil.performVirtualKeyHaptic(view)
                         onDismissRequest()
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.action_cancel))
                 }
@@ -213,17 +221,18 @@ fun FreezeTagEditorSheet(
                 Button(
                     onClick = {
                         HapticUtil.performVirtualKeyHaptic(view)
-                        val finalTag = AppTag(
-                            id = tagToEdit?.id ?: UUID.randomUUID().toString(),
-                            name = name.ifBlank { "Tag" },
-                            colorHex = selectedColorHex,
-                            iconName = selectedIconName,
-                            neverAutoFreeze = neverAutoFreeze
-                        )
+                        val finalTag =
+                            AppTag(
+                                id = tagToEdit?.id ?: UUID.randomUUID().toString(),
+                                name = name.ifBlank { "Tag" },
+                                colorHex = selectedColorHex,
+                                iconName = selectedIconName,
+                                neverAutoFreeze = neverAutoFreeze,
+                            )
                         onSave(finalTag)
                         onDismissRequest()
                     },
-                    enabled = name.isNotBlank()
+                    enabled = name.isNotBlank(),
                 ) {
                     Text(stringResource(R.string.action_save))
                 }

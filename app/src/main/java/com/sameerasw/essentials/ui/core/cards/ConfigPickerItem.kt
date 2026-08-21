@@ -52,9 +52,8 @@ fun ConfigPickerItem(
     isEnabled: Boolean = true,
     onDisabledClick: (() -> Unit)? = null,
     options: List<Any> = emptyList(),
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
-
     val view = LocalView.current
     val context = LocalContext.current
     val isTranslationModeActive by TranslationManager.isTranslationModeEnabled
@@ -62,12 +61,15 @@ fun ConfigPickerItem(
     var isMenuExpanded by remember { mutableStateOf(false) }
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
-    val onLongClickAction: (() -> Unit)? = if (isTranslationModeActive) {
-        {
-            HapticUtil.performVirtualKeyHaptic(view)
-            isMenuExpanded = true
+    val onLongClickAction: (() -> Unit)? =
+        if (isTranslationModeActive) {
+            {
+                HapticUtil.performVirtualKeyHaptic(view)
+                isMenuExpanded = true
+            }
+        } else {
+            null
         }
-    } else null
 
     ListItem(
         onClick = {
@@ -83,29 +85,36 @@ fun ConfigPickerItem(
         enabled = isEnabled,
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        leadingContent = if (iconRes != null && iconRes != 0) {
-            {
-                Icon(
-                    painter = painterResource(id = iconRes),
-                    contentDescription = title,
-                    modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        } else null,
-        contentPadding = PaddingValues(
-            horizontal = 16.dp,
-            vertical = 16.dp
-        ),
-        supportingContent = if (description != null) {
-            {
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        } else null,
+        leadingContent =
+            if (iconRes != null && iconRes != 0) {
+                {
+                    Icon(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = title,
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            } else {
+                null
+            },
+        contentPadding =
+            PaddingValues(
+                horizontal = 16.dp,
+                vertical = 16.dp,
+            ),
+        supportingContent =
+            if (description != null) {
+                {
+                    Text(
+                        text = description,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            } else {
+                null
+            },
         trailingContent = {
             Box {
                 Surface(
@@ -118,18 +127,18 @@ fun ConfigPickerItem(
                     enabled = isEnabled,
                     shape = RoundedCornerShape(12.dp),
                     color = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ) {
                     Text(
                         text = selectedValue,
                         style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
                     )
                 }
 
                 SegmentedDropdownMenu(
                     expanded = isMenuExpanded,
-                    onDismissRequest = { isMenuExpanded = false }
+                    onDismissRequest = { isMenuExpanded = false },
                 ) {
                     if (isTranslationModeActive) {
                         com.sameerasw.essentials.translation.ui.TranslationMenuItems(
@@ -139,36 +148,35 @@ fun ConfigPickerItem(
                             onSelectKey = { key ->
                                 isMenuExpanded = false
                                 translationSheetKey = key
-                            }
+                            },
                         )
                     }
 
-
-
                     CompositionLocalProvider(
-                        LocalDropdownMenuDismiss provides { isMenuExpanded = false }
+                        LocalDropdownMenuDismiss provides { isMenuExpanded = false },
                     ) {
                         content()
                     }
                 }
             }
         },
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        ),
+        colors =
+            ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
         content = {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-        }
+        },
     )
 
     if (translationSheetKey != null) {
         TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

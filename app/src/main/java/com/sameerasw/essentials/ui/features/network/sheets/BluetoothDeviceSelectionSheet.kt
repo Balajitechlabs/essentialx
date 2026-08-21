@@ -45,23 +45,24 @@ import com.sameerasw.essentials.utils.BluetoothPairedDevicesUtil
 @Composable
 fun BluetoothDeviceSelectionSheet(
     onDismiss: () -> Unit,
-    onSave: (address: String, name: String) -> Unit
+    onSave: (address: String, name: String) -> Unit,
 ) {
     val context = LocalContext.current
 
     var hasPermission by remember {
         mutableStateOf(
             Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
-                    ContextCompat.checkSelfPermission(
-                        context,
-                        Manifest.permission.BLUETOOTH_CONNECT
-                    ) == PackageManager.PERMISSION_GRANTED
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                ) == PackageManager.PERMISSION_GRANTED,
         )
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted -> hasPermission = granted }
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { granted -> hasPermission = granted }
 
     LaunchedEffect(Unit) {
         if (!hasPermission) {
@@ -69,51 +70,53 @@ fun BluetoothDeviceSelectionSheet(
         }
     }
 
-    val devices = remember(hasPermission) {
-        if (hasPermission) BluetoothPairedDevicesUtil.getPairedDevices(context) else emptyList()
-    }
+    val devices =
+        remember(hasPermission) {
+            if (hasPermission) BluetoothPairedDevicesUtil.getPairedDevices(context) else emptyList()
+        }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        dragHandle = null
+        dragHandle = null,
     ) {
         Column(
-            modifier = Modifier
-                .padding(24.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.diy_select_bluetooth_device_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             if (!hasPermission) {
                 Text(
                     text = stringResource(R.string.diy_bluetooth_permission_required),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else if (devices.isEmpty()) {
                 Text(
                     text = stringResource(R.string.diy_no_paired_bluetooth_devices),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
                 RoundedCardContainer {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         items(devices) { device ->
                             SelectionCardItem(
                                 title = device.name,
                                 description = device.address,
                                 iconRes = R.drawable.rounded_bluetooth_24,
-                                onClick = { onSave(device.address, device.name) }
+                                onClick = { onSave(device.address, device.name) },
                             )
                         }
                     }

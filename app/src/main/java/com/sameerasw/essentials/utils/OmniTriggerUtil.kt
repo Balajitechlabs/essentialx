@@ -34,7 +34,8 @@ object OmniTriggerUtil {
         runCatching {
             iVimsClass = Class.forName("com.android.internal.app.IVoiceInteractionManagerService")
             vimsInterfaceMethod =
-                Class.forName("com.android.internal.app.IVoiceInteractionManagerService\$Stub")
+                Class
+                    .forName("com.android.internal.app.IVoiceInteractionManagerService\$Stub")
                     .getMethod("asInterface", IBinder::class.java)
             serviceManagerClass = Class.forName("android.os.ServiceManager")
             getServiceMethod = serviceManagerClass?.getMethod("getService", String::class.java)
@@ -44,23 +45,27 @@ object OmniTriggerUtil {
     fun trigger(context: Context): Boolean {
         ensureReflection()
 
-        val bundle = Bundle().apply {
-            putLong("invocation_time_ms", SystemClock.elapsedRealtime())
-            putInt("omni.entry_point", 1)
-            putBoolean("micts_trigger", true)
-        }
+        val bundle =
+            Bundle().apply {
+                putLong("invocation_time_ms", SystemClock.elapsedRealtime())
+                putInt("omni.entry_point", 1)
+                putBoolean("micts_trigger", true)
+            }
 
         // 1. Try Shizuku logic
         val shizukuHelper = ShizukuPermissionHelper(context)
         if (shizukuHelper.isReady() && shizukuHelper.hasPermission()) {
-            val result = runCatching {
-                val vis = ShizukuUtils.getSystemBinder("voiceinteraction")
-                val vims = vimsInterfaceMethod?.invoke(null, vis)
-                val clazz = iVimsClass
-                if (vims != null && clazz != null) {
-                    invokeShowSession(clazz, vims, bundle)
-                } else false
-            }.getOrDefault(false)
+            val result =
+                runCatching {
+                    val vis = ShizukuUtils.getSystemBinder("voiceinteraction")
+                    val vims = vimsInterfaceMethod?.invoke(null, vis)
+                    val clazz = iVimsClass
+                    if (vims != null && clazz != null) {
+                        invokeShowSession(clazz, vims, bundle)
+                    } else {
+                        false
+                    }
+                }.getOrDefault(false)
 
             if (result) return true
         }
@@ -72,14 +77,20 @@ object OmniTriggerUtil {
             val clazz = iVimsClass
             if (vims != null && clazz != null) {
                 invokeShowSession(clazz, vims, bundle)
-            } else false
+            } else {
+                false
+            }
         }.onFailure { e ->
             Log.e(TAG, "Trigger failed", e)
         }.getOrDefault(false)
     }
 
-    private fun invokeShowSession(clazz: Class<*>, vims: Any, bundle: Bundle): Boolean {
-        return runCatching {
+    private fun invokeShowSession(
+        clazz: Class<*>,
+        vims: Any,
+        bundle: Bundle,
+    ): Boolean =
+        runCatching {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 HiddenApiBypass.invoke(
                     clazz,
@@ -88,7 +99,7 @@ object OmniTriggerUtil {
                     null,
                     bundle,
                     7,
-                    "hyperOS_home"
+                    "hyperOS_home",
                 ) as Boolean? ?: false
             } else {
                 HiddenApiBypass.invoke(
@@ -97,9 +108,8 @@ object OmniTriggerUtil {
                     "showSessionFromSession",
                     null,
                     bundle,
-                    7
+                    7,
                 ) as Boolean? ?: false
             }
         }.getOrDefault(false)
-    }
 }

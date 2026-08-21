@@ -15,7 +15,6 @@ import androidx.fragment.app.FragmentActivity
 import com.sameerasw.essentials.utils.BiometricHelper
 
 class TileAuthActivity : FragmentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -36,13 +35,15 @@ class TileAuthActivity : FragmentActivity() {
                 onSuccess = {
                     if (targetFeature != null) {
                         // Navigate to settings
-                        val settingsIntent = android.content.Intent(
-                            this,
-                            com.sameerasw.essentials.FeatureSettingsActivity::class.java
-                        ).apply {
-                            flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-                            putExtra("feature", targetFeature)
-                        }
+                        val settingsIntent =
+                            android.content
+                                .Intent(
+                                    this,
+                                    com.sameerasw.essentials.FeatureSettingsActivity::class.java,
+                                ).apply {
+                                    flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                                    putExtra("feature", targetFeature)
+                                }
                         startActivity(settingsIntent)
                     } else if (feature != null) {
                         // Toggle preference
@@ -55,7 +56,7 @@ class TileAuthActivity : FragmentActivity() {
                 },
                 onError = {
                     finish()
-                }
+                },
             )
         } else {
             finish()

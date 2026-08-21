@@ -87,7 +87,7 @@ fun LinkPickerScreen(
     uri: Uri,
     onFinish: () -> Unit,
     modifier: Modifier = Modifier,
-    demo: Boolean = false
+    demo: Boolean = false,
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
@@ -126,17 +126,19 @@ fun LinkPickerScreen(
     val pinnedPackages = remember { mutableStateOf(getPinnedPackages(context)) }
 
     // Sorted and filtered apps
-    val openWithApps = remember(baseOpenWithApps, pinnedPackages.value, searchQuery) {
-        baseOpenWithApps
-            .filter { searchQuery.isEmpty() || it.label.contains(searchQuery, ignoreCase = true) }
-            .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
-    }
+    val openWithApps =
+        remember(baseOpenWithApps, pinnedPackages.value, searchQuery) {
+            baseOpenWithApps
+                .filter { searchQuery.isEmpty() || it.label.contains(searchQuery, ignoreCase = true) }
+                .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
+        }
 
-    val shareWithApps = remember(baseShareWithApps, pinnedPackages.value, searchQuery) {
-        baseShareWithApps
-            .filter { searchQuery.isEmpty() || it.label.contains(searchQuery, ignoreCase = true) }
-            .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
-    }
+    val shareWithApps =
+        remember(baseShareWithApps, pinnedPackages.value, searchQuery) {
+            baseShareWithApps
+                .filter { searchQuery.isEmpty() || it.label.contains(searchQuery, ignoreCase = true) }
+                .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
+        }
 
     // toggle pin
     val togglePin: (String) -> Unit = { packageName ->
@@ -156,7 +158,8 @@ fun LinkPickerScreen(
     val scope = rememberCoroutineScope()
 
     val mainViewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-        androidx.lifecycle.viewmodel.compose.viewModel()
+        androidx.lifecycle.viewmodel.compose
+            .viewModel()
     val isBlurEnabled by mainViewModel.isBlurEnabled
 
     val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
@@ -164,33 +167,35 @@ fun LinkPickerScreen(
 
     var cardHeightPx by androidx.compose.runtime.remember {
         androidx.compose.runtime.mutableStateOf(
-            0
+            0,
         )
     }
     val listTopPadding = with(density) { statusBarHeight + 16.dp + cardHeightPx.toDp() + 16.dp }
     val topBlurHeightPx = with(density) { (statusBarHeight * 1.15f).toPx() }
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .progressiveBlur(
-                    blurRadius = if (isBlurEnabled) 40f else 0f,
-                    height = with(density) { topBlurHeightPx },
-                    direction = BlurDirection.TOP
-                )
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .progressiveBlur(
+                        blurRadius = if (isBlurEnabled) 40f else 0f,
+                        height = with(density) { topBlurHeightPx },
+                        direction = BlurDirection.TOP,
+                    ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .progressiveBlur(
-                        blurRadius = if (isBlurEnabled) 80f else 0f,
-                        height = with(LocalDensity.current) { 350.dp.toPx() },
-                        direction = BlurDirection.BOTTOM
-                    )
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .progressiveBlur(
+                            blurRadius = if (isBlurEnabled) 80f else 0f,
+                            height = with(LocalDensity.current) { 350.dp.toPx() },
+                            direction = BlurDirection.BOTTOM,
+                        ),
             ) {
                 LaunchedEffect(pagerState.currentPage) {
                     snapshotFlow { pagerState.currentPage }.collect { _ ->
@@ -206,7 +211,7 @@ fun LinkPickerScreen(
                     HorizontalPager(
                         modifier = Modifier.fillMaxSize(),
                         state = pagerState,
-                        verticalAlignment = Alignment.Top
+                        verticalAlignment = Alignment.Top,
                     ) { page ->
                         when (page) {
                             0 -> {
@@ -240,103 +245,112 @@ fun LinkPickerScreen(
 
         // bottom card
         Card(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(
-                    bottom = WindowInsets.navigationBars.asPaddingValues()
-                        .calculateBottomPadding() + 84.dp, start = 16.dp, end = 16.dp
-                )
-                .onGloballyPositioned { coordinates ->
-                    cardHeightPx = coordinates.size.height
-                },
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(
+                        bottom =
+                            WindowInsets.navigationBars
+                                .asPaddingValues()
+                                .calculateBottomPadding() + 84.dp,
+                        start = 16.dp,
+                        end = 16.dp,
+                    ).onGloballyPositioned { coordinates ->
+                        cardHeightPx = coordinates.size.height
+                    },
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceTint
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceTint,
+                ),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Card(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable {
-                                val clipboard =
-                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                clipboard.setPrimaryClip(
-                                    ClipData.newPlainText(
-                                        "Link",
-                                        currentUri.toString()
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .clickable {
+                                    val clipboard =
+                                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    clipboard.setPrimaryClip(
+                                        ClipData.newPlainText(
+                                            "Link",
+                                            currentUri.toString(),
+                                        ),
                                     )
-                                )
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "Link copied to clipboard",
-                                        Toast.LENGTH_SHORT
-                                    )
-                                    .show()
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                        ),
-                        shape = RoundedCornerShape(16.dp)
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Link copied to clipboard",
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            ),
+                        shape = RoundedCornerShape(16.dp),
                     ) {
                         Row(
                             modifier = Modifier.padding(12.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_link_24),
                                 contentDescription = "Link Icon",
                                 modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
 
                             Text(
-                                text = if (demo) {
-                                    "Long press an app to pin/ unpin"
-                                } else {
-                                    currentUri.toString()
-                                },
+                                text =
+                                    if (demo) {
+                                        "Long press an app to pin/ unpin"
+                                    } else {
+                                        currentUri.toString()
+                                    },
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
                                 maxLines = 2,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
 
                     Card(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clickable {
-                                editingText = currentUri.toString()
-                                showEditSheet = true
-                            },
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                        ),
-                        shape = RoundedCornerShape(16.dp)
+                        modifier =
+                            Modifier
+                                .size(48.dp)
+                                .clickable {
+                                    editingText = currentUri.toString()
+                                    showEditSheet = true
+                                },
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                            ),
+                        shape = RoundedCornerShape(16.dp),
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_edit_24),
                                 contentDescription = "Edit Link",
                                 modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
@@ -350,34 +364,35 @@ fun LinkPickerScreen(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_search_24),
-                            contentDescription = "Search"
+                            contentDescription = "Search",
                         )
                     },
                     singleLine = true,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
                 )
             }
         }
 
         // toolbar
-        val toolbarItems = remember {
-            listOf(
-                ToolbarItem(
-                    iconRes = R.drawable.rounded_open_in_browser_24,
-                    labelRes = R.string.label_open_with,
-                    onClick = {
-                        scope.launch { pagerState.animateScrollToPage(0) }
-                    }
-                ),
-                ToolbarItem(
-                    iconRes = R.drawable.rounded_share_24,
-                    labelRes = R.string.label_share_with,
-                    onClick = {
-                        scope.launch { pagerState.animateScrollToPage(1) }
-                    }
+        val toolbarItems =
+            remember {
+                listOf(
+                    ToolbarItem(
+                        iconRes = R.drawable.rounded_open_in_browser_24,
+                        labelRes = R.string.label_open_with,
+                        onClick = {
+                            scope.launch { pagerState.animateScrollToPage(0) }
+                        },
+                    ),
+                    ToolbarItem(
+                        iconRes = R.drawable.rounded_share_24,
+                        labelRes = R.string.label_share_with,
+                        onClick = {
+                            scope.launch { pagerState.animateScrollToPage(1) }
+                        },
+                    ),
                 )
-            )
-        }
+            }
 
         EssentialsFloatingToolbar(
             modifier = Modifier.align(Alignment.BottomCenter),
@@ -385,7 +400,7 @@ fun LinkPickerScreen(
             items = toolbarItems,
             fabAction = { onFinish() },
             fabIconRes = R.drawable.rounded_arrow_back_24,
-            fabContentDescription = "Back"
+            fabContentDescription = "Back",
         )
     }
 
@@ -400,23 +415,24 @@ fun LinkPickerScreen(
         ModalBottomSheet(
             onDismissRequest = { showEditSheet = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = "Edit Link",
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     FilledIconButton(
@@ -424,11 +440,12 @@ fun LinkPickerScreen(
                             var text = editingText.trim()
 
                             if (text.contains(" ")) {
-                                Toast.makeText(
-                                    context,
-                                    "Invalid Link: Contains spaces",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "Invalid Link: Contains spaces",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
                                 return@FilledIconButton
                             }
 
@@ -442,27 +459,29 @@ fun LinkPickerScreen(
                                     val newUri = Uri.parse(text)
                                     // Validate scheme
                                     if (newUri.scheme.isNullOrBlank()) {
-                                        Toast.makeText(
-                                            context,
-                                            "Invalid Link: Missing scheme",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "Invalid Link: Missing scheme",
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
                                     } else {
                                         currentUri = newUri
                                         showEditSheet = false
                                     }
                                 } catch (_: Exception) {
-                                    Toast.makeText(context, "Invalid URI", Toast.LENGTH_SHORT)
+                                    Toast
+                                        .makeText(context, "Invalid URI", Toast.LENGTH_SHORT)
                                         .show()
                                 }
                             }
-                        }
+                        },
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_save_24),
                             contentDescription = "Save changes",
                             modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 }
@@ -470,19 +489,23 @@ fun LinkPickerScreen(
                 OutlinedTextField(
                     value = editingText,
                     onValueChange = { editingText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
                     label = { Text("URL") },
                     maxLines = 5,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
                 )
             }
         }
     }
 }
 
-private fun queryOpenWithApps(context: Context, uri: Uri): List<ResolvedAppInfo> {
+private fun queryOpenWithApps(
+    context: Context,
+    uri: Uri,
+): List<ResolvedAppInfo> {
     if (uri.scheme.isNullOrBlank()) return emptyList()
     return try {
         val pm = context.packageManager
@@ -493,40 +516,43 @@ private fun queryOpenWithApps(context: Context, uri: Uri): List<ResolvedAppInfo>
         Log.d(TAG, "Our package: $ourPackageName")
 
         // Try different flags combinations
-        val resolves = try {
-            pm.queryIntentActivities(
-                intent,
-                PackageManager.MATCH_ALL or PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS
-            )
-        } catch (_: Exception) {
-            Log.d(TAG, "MATCH_ALL | MATCH_DISABLED_UNTIL_USED_COMPONENTS failed, trying MATCH_ALL")
-            pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-        }
+        val resolves =
+            try {
+                pm.queryIntentActivities(
+                    intent,
+                    PackageManager.MATCH_ALL or PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS,
+                )
+            } catch (_: Exception) {
+                Log.d(TAG, "MATCH_ALL | MATCH_DISABLED_UNTIL_USED_COMPONENTS failed, trying MATCH_ALL")
+                pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+            }
 
         Log.d(TAG, "Total apps before filtering: ${resolves.size}")
 
-        val filtered = resolves
-            .filter {
-                val shouldInclude = it.activityInfo.packageName != ourPackageName
-                if (!shouldInclude) {
-                    Log.d(TAG, "Filtering out our own app: ${it.activityInfo.packageName}")
-                }
-                shouldInclude
-            }
-            .distinctBy { it.activityInfo.packageName }
+        val filtered =
+            resolves
+                .filter {
+                    val shouldInclude = it.activityInfo.packageName != ourPackageName
+                    if (!shouldInclude) {
+                        Log.d(TAG, "Filtering out our own app: ${it.activityInfo.packageName}")
+                    }
+                    shouldInclude
+                }.distinctBy { it.activityInfo.packageName }
 
         Log.d(TAG, "Apps after filtering: ${filtered.size}")
 
         // Map to ResolvedAppInfo and sort
         val collator = Collator.getInstance(Locale.getDefault())
-        val resolvedList = filtered.map {
-            ResolvedAppInfo(it, it.loadLabel(pm).toString())
-        }.sortedWith { o1, o2 ->
-            collator.compare(
-                o1.label.lowercase(Locale.getDefault()),
-                o2.label.lowercase(Locale.getDefault())
-            )
-        }
+        val resolvedList =
+            filtered
+                .map {
+                    ResolvedAppInfo(it, it.loadLabel(pm).toString())
+                }.sortedWith { o1, o2 ->
+                    collator.compare(
+                        o1.label.lowercase(Locale.getDefault()),
+                        o2.label.lowercase(Locale.getDefault()),
+                    )
+                }
 
         Log.d(TAG, "Final open with apps: ${resolvedList.size}")
         resolvedList
@@ -536,56 +562,63 @@ private fun queryOpenWithApps(context: Context, uri: Uri): List<ResolvedAppInfo>
     }
 }
 
-private fun queryShareWithApps(context: Context, uri: Uri): List<ResolvedAppInfo> {
+private fun queryShareWithApps(
+    context: Context,
+    uri: Uri,
+): List<ResolvedAppInfo> {
     if (uri.scheme.isNullOrBlank()) return emptyList()
     return try {
         val pm = context.packageManager
         val ourPackageName = context.packageName
 
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, uri.toString())
-        }
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(Intent.EXTRA_TEXT, uri.toString())
+            }
 
         Log.d(TAG, "Querying SHARE_WITH for: $uri")
 
-        val resolves = try {
-            pm.queryIntentActivities(
-                intent,
-                PackageManager.MATCH_ALL or PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS
-            )
-        } catch (_: Exception) {
-            Log.d(TAG, "MATCH_ALL | MATCH_DISABLED_UNTIL_USED_COMPONENTS failed, trying MATCH_ALL")
-            pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
-        }
+        val resolves =
+            try {
+                pm.queryIntentActivities(
+                    intent,
+                    PackageManager.MATCH_ALL or PackageManager.MATCH_DISABLED_UNTIL_USED_COMPONENTS,
+                )
+            } catch (_: Exception) {
+                Log.d(TAG, "MATCH_ALL | MATCH_DISABLED_UNTIL_USED_COMPONENTS failed, trying MATCH_ALL")
+                pm.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+            }
 
         Log.d(TAG, "Total share apps before filtering: ${resolves.size}")
 
-        val filtered = resolves
-            .filter {
-                val shouldInclude = it.activityInfo.packageName != ourPackageName
-                if (!shouldInclude) {
-                    Log.d(
-                        TAG,
-                        "Filtering out our own app from share: ${it.activityInfo.packageName}"
-                    )
-                }
-                shouldInclude
-            }
-            .distinctBy { it.activityInfo.packageName }
+        val filtered =
+            resolves
+                .filter {
+                    val shouldInclude = it.activityInfo.packageName != ourPackageName
+                    if (!shouldInclude) {
+                        Log.d(
+                            TAG,
+                            "Filtering out our own app from share: ${it.activityInfo.packageName}",
+                        )
+                    }
+                    shouldInclude
+                }.distinctBy { it.activityInfo.packageName }
 
         Log.d(TAG, "Share apps after filtering: ${filtered.size}")
 
         // Map to ResolvedAppInfo and sort
         val collator = Collator.getInstance(Locale.getDefault())
-        val resolvedList = filtered.map {
-            ResolvedAppInfo(it, it.loadLabel(pm).toString())
-        }.sortedWith { o1, o2 ->
-            collator.compare(
-                o1.label.lowercase(Locale.getDefault()),
-                o2.label.lowercase(Locale.getDefault())
-            )
-        }
+        val resolvedList =
+            filtered
+                .map {
+                    ResolvedAppInfo(it, it.loadLabel(pm).toString())
+                }.sortedWith { o1, o2 ->
+                    collator.compare(
+                        o1.label.lowercase(Locale.getDefault()),
+                        o2.label.lowercase(Locale.getDefault()),
+                    )
+                }
 
         Log.d(TAG, "Final share with apps: ${resolvedList.size}")
         resolvedList
@@ -600,7 +633,10 @@ private fun getPinnedPackages(context: Context): Set<String> {
     return prefs.getStringSet("pinned_packages", emptySet()) ?: emptySet()
 }
 
-private fun setPinnedPackages(context: Context, packages: Set<String>) {
+private fun setPinnedPackages(
+    context: Context,
+    packages: Set<String>,
+) {
     val prefs: SharedPreferences = context.getSharedPreferences("link_prefs", Context.MODE_PRIVATE)
     prefs.edit { putStringSet("pinned_packages", packages) }
 }

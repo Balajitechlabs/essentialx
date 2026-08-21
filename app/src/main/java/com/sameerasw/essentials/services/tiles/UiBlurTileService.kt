@@ -18,12 +18,9 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.utils.DeviceUtils
 
 class UiBlurTileService : BaseTileService() {
-
     override fun getTileLabel(): String = "UI Blur"
 
-    override fun getTileSubtitle(): String {
-        return if (isBlurEnabled()) "On" else "Off"
-    }
+    override fun getTileSubtitle(): String = if (isBlurEnabled()) "On" else "Off"
 
     override fun hasFeaturePermission(): Boolean {
         if (DeviceUtils.isBlurProblematicDevice()) return false
@@ -36,9 +33,7 @@ class UiBlurTileService : BaseTileService() {
         return Icon.createWithResource(this, iconRes)
     }
 
-    override fun getTileState(): Int {
-        return if (isBlurEnabled()) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-    }
+    override fun getTileState(): Int = if (isBlurEnabled()) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
 
     override fun onTileClick() {
         if (DeviceUtils.isBlurProblematicDevice()) return

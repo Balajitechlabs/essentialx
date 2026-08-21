@@ -41,15 +41,16 @@ fun OpenWithContent(
     togglePin: (String) -> Unit,
     pinnedPackages: Set<String>,
     demo: Boolean = false,
-    topPadding: Dp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    topPadding: Dp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
 ) {
     Log.d("LinkPicker", "OpenWithContent: ${resolveInfos.size} apps found")
     val context = LocalContext.current
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
     ) {
         Spacer(modifier = Modifier.height(topPadding))
 
@@ -58,13 +59,14 @@ fun OpenWithContent(
                 text = "No apps found to open this link",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
         } else {
             RoundedCardContainer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
             ) {
                 resolveInfos.forEach { info ->
                     AppPickerItem(
@@ -76,11 +78,11 @@ fun OpenWithContent(
                             val intent = Intent(Intent.ACTION_VIEW, uri)
                             intent.setClassName(
                                 info.resolveInfo.activityInfo.packageName,
-                                info.resolveInfo.activityInfo.name
+                                info.resolveInfo.activityInfo.name,
                             )
                             context.startActivity(intent)
                             onFinish()
-                        }
+                        },
                     )
                 }
             }

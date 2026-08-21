@@ -27,7 +27,8 @@ class BatteryDetailsActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val viewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val context = LocalContext.current
             LaunchedEffect(Unit) {
                 viewModel.check(context)
@@ -37,7 +38,7 @@ class BatteryDetailsActivity : ComponentActivity() {
                 val basicDetails = remember { BatteryInfoUtil.getBasicDetails(context) }
                 BatteryDetailsBottomSheet(
                     initialDetails = basicDetails,
-                    onDismiss = { finish() }
+                    onDismiss = { finish() },
                 )
             }
         }

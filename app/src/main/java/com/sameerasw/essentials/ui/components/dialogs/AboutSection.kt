@@ -52,60 +52,63 @@ fun AboutSection(
     appName: String = "Essentials",
     developerName: String = stringResource(R.string.app_developer_name),
     description: String = stringResource(R.string.app_description),
-    onAvatarLongClick: () -> Unit = {}
+    onAvatarLongClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    val versionName = try {
-        context.packageManager.getPackageInfo(context.packageName, 0).versionName
-    } catch (_: Exception) {
-        "Unknown"
-    }
+    val versionName =
+        try {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        } catch (_: Exception) {
+            "Unknown"
+        }
 
     Surface(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceBright
+        color = MaterialTheme.colorScheme.surfaceBright,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(text = "$appName v$versionName", style = MaterialTheme.typography.headlineLarge)
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             Image(
                 painter = painterResource(id = R.drawable.avatar),
                 contentDescription = "Developer Avatar",
                 contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.primary)
-                    .combinedClickable(
-                        onClick = {},
-                        onLongClick = {
-                            onAvatarLongClick()
-                        }
-                    )
+                modifier =
+                    Modifier
+                        .size(120.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.primary)
+                        .combinedClickable(
+                            onClick = {},
+                            onLongClick = {
+                                onAvatarLongClick()
+                            },
+                        ),
             )
 
             Text(
                 text = stringResource(R.string.developed_by_format, developerName),
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalArrangement = Arrangement.spacedBy(6.dp),
-                maxItemsInEachRow = 3
+                maxItemsInEachRow = 3,
             ) {
                 Button(
                     onClick = {
@@ -113,12 +116,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_web_traffic_24),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.action_website))
@@ -130,12 +133,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.brand_github),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.action_view_on_github))
@@ -145,28 +148,30 @@ fun AboutSection(
                     onClick = {
                         // Use mailto: URI so the system opens an email client
                         val mailUri = "mailto:mail@sameerasw.com".toUri()
-                        val emailIntent = Intent(Intent.ACTION_SENDTO, mailUri).apply {
-                            putExtra(Intent.EXTRA_SUBJECT, "Hello from Essentials")
-                        }
+                        val emailIntent =
+                            Intent(Intent.ACTION_SENDTO, mailUri).apply {
+                                putExtra(Intent.EXTRA_SUBJECT, "Hello from Essentials")
+                            }
                         try {
                             context.startActivity(
                                 Intent.createChooser(
                                     emailIntent,
-                                    context.getString(R.string.send_email_chooser_title)
-                                )
+                                    context.getString(R.string.send_email_chooser_title),
+                                ),
                             )
                         } catch (e: ActivityNotFoundException) {
                             Log.w("AboutSection", "No email app available", e)
-                            Toast.makeText(context, R.string.error_no_email_app, Toast.LENGTH_SHORT)
+                            Toast
+                                .makeText(context, R.string.error_no_email_app, Toast.LENGTH_SHORT)
                                 .show()
                         }
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_mail_24),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.action_contact))
@@ -178,12 +183,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.brand_telegram),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.action_telegram))
@@ -195,12 +200,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_heart_smile_24),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.action_support))
@@ -210,16 +215,15 @@ fun AboutSection(
             Text(
                 text = stringResource(R.string.label_other_apps),
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalArrangement = Arrangement.spacedBy(6.dp),
-                maxItemsInEachRow = 3
+                maxItemsInEachRow = 3,
             ) {
-
                 OutlinedButton(
                     onClick = {
                         val websiteUrl =
@@ -227,12 +231,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_devices_24),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.app_airsync))
@@ -244,12 +248,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_web_24),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.app_zenzero))
@@ -261,12 +265,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_draw_24),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.app_canvas))
@@ -278,12 +282,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_task_alt_24),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.app_tasks))
@@ -295,12 +299,12 @@ fun AboutSection(
                         val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                         context.startActivity(intent)
                     },
-                    modifier = Modifier.padding(horizontal = 4.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.outline_highlight_mouse_cursor_24),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(stringResource(R.string.app_zero))

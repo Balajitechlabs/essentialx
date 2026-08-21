@@ -19,9 +19,8 @@ import java.time.LocalDateTime
 
 class DailyWallpaperWorker(
     appContext: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
-
     override suspend fun doWork(): Result {
         Log.d("DailyWallpaperWorker", "Executing daily wallpaper sync")
         val context = applicationContext
@@ -29,10 +28,11 @@ class DailyWallpaperWorker(
         val wallpaperRepository = WallpaperRepository()
 
         return try {
-            val isEnabled = settingsRepository.getBoolean(
-                SettingsRepository.KEY_DAILY_WALLPAPER_AUTO_UPDATE,
-                false
-            )
+            val isEnabled =
+                settingsRepository.getBoolean(
+                    SettingsRepository.KEY_DAILY_WALLPAPER_AUTO_UPDATE,
+                    false,
+                )
             if (!isEnabled) {
                 return Result.success()
             }
@@ -54,55 +54,56 @@ class DailyWallpaperWorker(
                     if (applyLock) flags = flags or android.app.WallpaperManager.FLAG_LOCK
 
                     if (flags != 0) {
-                        val applied = wallpaperRepository.autoApplyWallpaper(
-                            context,
-                            todayWallpaper.urlMobile,
-                            flags
-                        )
+                        val applied =
+                            wallpaperRepository.autoApplyWallpaper(
+                                context,
+                                todayWallpaper.urlMobile,
+                                flags,
+                            )
                         if (applied) {
                             newWallpaperApplied = true
                             settingsRepository.putString(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_LAST_ID,
-                                todayWallpaper.id
+                                todayWallpaper.id,
                             )
                             settingsRepository.putString(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_LAST_URL,
-                                todayWallpaper.url
+                                todayWallpaper.url,
                             )
                             settingsRepository.putString(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_LAST_URL_MOBILE,
-                                todayWallpaper.urlMobile
+                                todayWallpaper.urlMobile,
                             )
                             settingsRepository.putString(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_AUTHOR_NAME,
-                                todayWallpaper.authorName
+                                todayWallpaper.authorName,
                             )
                             settingsRepository.putString(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_AUTHOR_LINK,
-                                todayWallpaper.authorLink
+                                todayWallpaper.authorLink,
                             )
                             settingsRepository.putString(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_PHOTO_LINK,
-                                todayWallpaper.photoLink
+                                todayWallpaper.photoLink,
                             )
                             settingsRepository.putString(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_UPDATED_AT,
-                                todayWallpaper.updatedAt
+                                todayWallpaper.updatedAt,
                             )
 
                             val currentTime = LocalDateTime.now().toString()
                             settingsRepository.putString(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_AUTO_UPDATE_TIME,
-                                currentTime
+                                currentTime,
                             )
                             settingsRepository.putInt(
                                 SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT,
-                                0
+                                0,
                             )
 
                             Log.d(
                                 "DailyWallpaperWorker",
-                                "Successfully auto-applied wallpaper (force=$force, flags=$flags): ${todayWallpaper.id}"
+                                "Successfully auto-applied wallpaper (force=$force, flags=$flags): ${todayWallpaper.id}",
                             )
                         }
                     }
@@ -115,25 +116,27 @@ class DailyWallpaperWorker(
                 if (retryCount < 2) {
                     settingsRepository.putInt(
                         SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT,
-                        retryCount + 1
+                        retryCount + 1,
                     )
-                    val retryWork = androidx.work.OneTimeWorkRequestBuilder<DailyWallpaperWorker>()
-                        .setInitialDelay(30, java.util.concurrent.TimeUnit.MINUTES)
-                        .build()
+                    val retryWork =
+                        androidx.work
+                            .OneTimeWorkRequestBuilder<DailyWallpaperWorker>()
+                            .setInitialDelay(30, java.util.concurrent.TimeUnit.MINUTES)
+                            .build()
                     androidx.work.WorkManager.getInstance(context).enqueueUniqueWork(
                         "daily_wallpaper_retry_work",
                         androidx.work.ExistingWorkPolicy.REPLACE,
-                        retryWork
+                        retryWork,
                     )
                     Log.d(
                         "DailyWallpaperWorker",
-                        "No new wallpaper found. Scheduled retry #${retryCount + 1} in 30 mins"
+                        "No new wallpaper found. Scheduled retry #${retryCount + 1} in 30 mins",
                     )
                 } else {
                     settingsRepository.putInt(SettingsRepository.KEY_DAILY_WALLPAPER_RETRY_COUNT, 0)
                     Log.d(
                         "DailyWallpaperWorker",
-                        "Reached max retries (3 total checks). Waiting for next daily cycle."
+                        "Reached max retries (3 total checks). Waiting for next daily cycle.",
                     )
                 }
             }

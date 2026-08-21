@@ -23,7 +23,10 @@ class CallVibrationReceiver : BroadcastReceiver() {
         private var isOutgoing = false
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         if (!prefs.getBoolean(SettingsRepository.KEY_CALL_VIBRATIONS_ENABLED, false)) return
 
@@ -36,12 +39,13 @@ class CallVibrationReceiver : BroadcastReceiver() {
 
         val stateStr = intent.getStringExtra(TelephonyManager.EXTRA_STATE) ?: return
 
-        val currentState = when (stateStr) {
-            TelephonyManager.EXTRA_STATE_RINGING -> TelephonyManager.CALL_STATE_RINGING
-            TelephonyManager.EXTRA_STATE_OFFHOOK -> TelephonyManager.CALL_STATE_OFFHOOK
-            TelephonyManager.EXTRA_STATE_IDLE -> TelephonyManager.CALL_STATE_IDLE
-            else -> TelephonyManager.CALL_STATE_IDLE
-        }
+        val currentState =
+            when (stateStr) {
+                TelephonyManager.EXTRA_STATE_RINGING -> TelephonyManager.CALL_STATE_RINGING
+                TelephonyManager.EXTRA_STATE_OFFHOOK -> TelephonyManager.CALL_STATE_OFFHOOK
+                TelephonyManager.EXTRA_STATE_IDLE -> TelephonyManager.CALL_STATE_IDLE
+                else -> TelephonyManager.CALL_STATE_IDLE
+            }
 
         val lastState = prefs.getInt("vibration_last_call_state", TelephonyManager.CALL_STATE_IDLE)
 

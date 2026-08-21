@@ -26,7 +26,7 @@ object FlashlightUtil {
     private fun safeSetTorchMode(
         cameraManager: CameraManager,
         cameraId: String,
-        enabled: Boolean
+        enabled: Boolean,
     ): Boolean {
         try {
             cameraManager.setTorchMode(cameraId, enabled)
@@ -45,7 +45,7 @@ object FlashlightUtil {
     private fun safeSetTorchStrength(
         cameraManager: CameraManager,
         cameraId: String,
-        level: Int
+        level: Int,
     ): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return true
         try {
@@ -62,7 +62,10 @@ object FlashlightUtil {
         return true
     }
 
-    fun isIntensitySupported(context: Context, cameraId: String): Boolean {
+    fun isIntensitySupported(
+        context: Context,
+        cameraId: String,
+    ): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return false
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         return try {
@@ -76,7 +79,10 @@ object FlashlightUtil {
         }
     }
 
-    fun getMaxLevel(context: Context, cameraId: String): Int {
+    fun getMaxLevel(
+        context: Context,
+        cameraId: String,
+    ): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return 1
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         return try {
@@ -87,7 +93,10 @@ object FlashlightUtil {
         }
     }
 
-    fun getDefaultLevel(context: Context, cameraId: String): Int {
+    fun getDefaultLevel(
+        context: Context,
+        cameraId: String,
+    ): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return 1
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         return try {
@@ -98,7 +107,10 @@ object FlashlightUtil {
         }
     }
 
-    fun getCurrentLevel(context: Context, cameraId: String): Int {
+    fun getCurrentLevel(
+        context: Context,
+        cameraId: String,
+    ): Int {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return 1
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         return try {
@@ -118,52 +130,54 @@ object FlashlightUtil {
         fromLevel: Int,
         toLevel: Int,
         durationMs: Long = 250L,
-        steps: Int = 10
-    ): Boolean = withContext(Dispatchers.Default) {
-        Log.d(
-            TAG,
-            "fadeFlashlight: from=$fromLevel, to=$toLevel, duration=${durationMs}ms, steps=$steps"
-        )
-        val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
+        steps: Int = 10,
+    ): Boolean =
+        withContext(Dispatchers.Default) {
+            Log.d(
+                TAG,
+                "fadeFlashlight: from=$fromLevel, to=$toLevel, duration=${durationMs}ms, steps=$steps",
+            )
+            val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || DeviceUtils.isMediatekDevice()) {
-            return@withContext safeSetTorchMode(cameraManager, cameraId, toLevel > 0)
-        }
-
-        val effectiveSteps = steps.coerceAtLeast(1)
-        val delayPerStep = (durationMs / effectiveSteps).coerceAtLeast(10L)
-        try {
-            var success = true
-            for (i in 1..effectiveSteps) {
-                val level = fromLevel + ((toLevel - fromLevel) * i / effectiveSteps)
-                success = if (level > 0) {
-                    safeSetTorchStrength(cameraManager, cameraId, level)
-                } else if (i == effectiveSteps) {
-                    safeSetTorchMode(cameraManager, cameraId, false)
-                } else {
-                    true
-                }
-
-                if (!success) return@withContext false
-
-                delay(delayPerStep)
-            }
-
-            if (toLevel > 0) {
-                safeSetTorchStrength(cameraManager, cameraId, toLevel)
-            } else {
-                safeSetTorchMode(cameraManager, cameraId, false)
-            }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            if (e !is CameraAccessException || e.reason != CameraAccessException.CAMERA_IN_USE) {
-                Log.e(TAG, "Error during flashlight fade", e)
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || DeviceUtils.isMediatekDevice()) {
                 return@withContext safeSetTorchMode(cameraManager, cameraId, toLevel > 0)
             }
-            false
+
+            val effectiveSteps = steps.coerceAtLeast(1)
+            val delayPerStep = (durationMs / effectiveSteps).coerceAtLeast(10L)
+            try {
+                var success = true
+                for (i in 1..effectiveSteps) {
+                    val level = fromLevel + ((toLevel - fromLevel) * i / effectiveSteps)
+                    success =
+                        if (level > 0) {
+                            safeSetTorchStrength(cameraManager, cameraId, level)
+                        } else if (i == effectiveSteps) {
+                            safeSetTorchMode(cameraManager, cameraId, false)
+                        } else {
+                            true
+                        }
+
+                    if (!success) return@withContext false
+
+                    delay(delayPerStep)
+                }
+
+                if (toLevel > 0) {
+                    safeSetTorchStrength(cameraManager, cameraId, toLevel)
+                } else {
+                    safeSetTorchMode(cameraManager, cameraId, false)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (e !is CameraAccessException || e.reason != CameraAccessException.CAMERA_IN_USE) {
+                    Log.e(TAG, "Error during flashlight fade", e)
+                    return@withContext safeSetTorchMode(cameraManager, cameraId, toLevel > 0)
+                }
+                false
+            }
         }
-    }
 
     /**
      * Legacy wrapper for backward compatibility or simpler calls.
@@ -174,7 +188,7 @@ object FlashlightUtil {
         targetOn: Boolean,
         maxLevel: Int = getMaxLevel(context, cameraId),
         durationMs: Long = 400L,
-        steps: Int = 20
+        steps: Int = 20,
     ): Boolean {
         val currentLevel = if (targetOn) 0 else getCurrentLevel(context, cameraId)
         val targetLevel = if (targetOn) maxLevel else 0
@@ -209,5 +223,4 @@ object FlashlightUtil {
         }
         return null
     }
-
 }

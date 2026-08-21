@@ -43,7 +43,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun FlashlightPulseSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -51,12 +51,11 @@ fun FlashlightPulseSettingsUI(
     var showAppSelectionSheet by remember { mutableStateOf(false) }
 
     Column(modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-
         Text(
             text = stringResource(R.string.settings_section_flashlight_pulse),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
@@ -67,7 +66,7 @@ fun FlashlightPulseSettingsUI(
                 onCheckedChange = { checked ->
                     viewModel.setFlashlightPulseEnabled(checked, context)
                 },
-                modifier = Modifier.highlight(highlightSetting == "flashlight_pulse" || highlightSetting == "flashlight_pulse_enabled")
+                modifier = Modifier.highlight(highlightSetting == "flashlight_pulse" || highlightSetting == "flashlight_pulse_enabled"),
             )
             if (viewModel.isFlashlightPulseEnabled.value) {
                 IconToggleItem(
@@ -77,7 +76,10 @@ fun FlashlightPulseSettingsUI(
                     onCheckedChange = { checked ->
                         viewModel.setFlashlightPulseFacedownOnly(checked, context)
                     },
-                    modifier = Modifier.highlight(highlightSetting == "flashlight_pulse_facedown" || highlightSetting == "flashlight_pulse_facedown_only")
+                    modifier =
+                        Modifier.highlight(
+                            highlightSetting == "flashlight_pulse_facedown" || highlightSetting == "flashlight_pulse_facedown_only",
+                        ),
                 )
 
                 IconToggleItem(
@@ -87,7 +89,7 @@ fun FlashlightPulseSettingsUI(
                     onCheckedChange = { checked ->
                         viewModel.setFlashlightPulseDisableOnDnd(checked, context)
                     },
-                    modifier = Modifier.highlight(highlightSetting == "flashlight_pulse_disable_on_dnd")
+                    modifier = Modifier.highlight(highlightSetting == "flashlight_pulse_disable_on_dnd"),
                 )
 
                 ConfigSliderItem(
@@ -97,7 +99,7 @@ fun FlashlightPulseSettingsUI(
                     valueRange = 0.01f..1f,
                     valueFormatter = { "${Math.round(it * 100)}%" },
                     increment = 0.01f,
-                    modifier = Modifier.highlight(highlightSetting == "flashlight_pulse_max_intensity")
+                    modifier = Modifier.highlight(highlightSetting == "flashlight_pulse_max_intensity"),
                 )
             }
             IconToggleItem(
@@ -107,7 +109,7 @@ fun FlashlightPulseSettingsUI(
                 onCheckedChange = { checked ->
                     viewModel.setFlashlightPulseUseLightingApps(checked, context)
                 },
-                modifier = Modifier.highlight(highlightSetting == "flashlight_pulse_same_apps")
+                modifier = Modifier.highlight(highlightSetting == "flashlight_pulse_same_apps"),
             )
         }
 
@@ -118,7 +120,7 @@ fun FlashlightPulseSettingsUI(
                 showAppSelectionSheet = true
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = viewModel.isFlashlightPulseEnabled.value && !viewModel.isFlashlightPulseUseLightingApps.value
+            enabled = viewModel.isFlashlightPulseEnabled.value && !viewModel.isFlashlightPulseUseLightingApps.value,
         ) {
             Text(stringResource(R.string.action_select_apps))
         }
@@ -133,7 +135,7 @@ fun FlashlightPulseSettingsUI(
                     HapticUtil.performVirtualKeyHaptic(view)
                     viewModel.previewFlashlightPulse(context)
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.flashlight_pulse_preview))
             }
@@ -150,10 +152,10 @@ fun FlashlightPulseSettingsUI(
                     viewModel.updateFlashlightPulseAppEnabled(
                         ctx,
                         pkg,
-                        enabled
+                        enabled,
                     )
                 },
-                context = context
+                context = context,
             )
         }
     }

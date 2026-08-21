@@ -29,6 +29,8 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
           PR_MERGED: ${{ github.event.pull_request.merged }}
+          PR_ADDITIONS: ${{ github.event.pull_request.additions }}
+          PR_DELETIONS: ${{ github.event.pull_request.deletions }}
           EVENT_ACTION: ${{ github.event.action }}
           EVENT_SENDER: ${{ github.event.sender.login }}
         run: |
@@ -76,10 +78,15 @@ jobs:
           elif [[ "$EVENT" == "pull_request" || "$EVENT" == "pull_request_target" ]]; then
             ACTION="$EVENT_ACTION"
             [[ "$ACTION" == "closed" && "$PR_MERGED" == "true" ]] && STATUS="💜 MERGED PR" || STATUS="🔵 PR $ACTION"
+            
+            ADDITIONS=$(printf "%'d" "${PR_ADDITIONS:-0}" 2>/dev/null || echo "${PR_ADDITIONS:-0}")
+            DELETIONS=$(printf "%'d" "${PR_DELETIONS:-0}" 2>/dev/null || echo "${PR_DELETIONS:-0}")
+
             {
               echo "full_message<<EOF"
               echo "<b>$STATUS: $REPO</b>"
               echo "<a href='$PR_URL'>PR: $PR_TITLE</a> by @$EVENT_SENDER"
+              echo "<code>(+$ADDITIONS -$DELETIONS)</code>"
               echo "EOF"
             } >> "$GITHUB_OUTPUT"
           fi

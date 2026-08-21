@@ -42,15 +42,17 @@ class InputEventListenerService : Service() {
     private lateinit var shizukuHelper: ShizukuPermissionHelper
     private var isTorchOn = false
 
-    private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
-        Log.d("InputEventListener", "Shizuku binder received, attempting to start listening")
-        startListening()
-    }
+    private val binderReceivedListener =
+        Shizuku.OnBinderReceivedListener {
+            Log.d("InputEventListener", "Shizuku binder received, attempting to start listening")
+            startListening()
+        }
 
-    private val binderDeadListener = Shizuku.OnBinderDeadListener {
-        Log.w("InputEventListener", "Shizuku binder died, stopping listener")
-        stopListening()
-    }
+    private val binderDeadListener =
+        Shizuku.OnBinderDeadListener {
+            Log.w("InputEventListener", "Shizuku binder died, stopping listener")
+            stopListening()
+        }
 
     override fun onCreate() {
         super.onCreate()
@@ -58,37 +60,46 @@ class InputEventListenerService : Service() {
         scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            val channel = android.app.NotificationChannel(
-                "service_channel",
-                "Background Service",
-                android.app.NotificationManager.IMPORTANCE_MIN
-            )
+            val channel =
+                android.app.NotificationChannel(
+                    "service_channel",
+                    "Background Service",
+                    android.app.NotificationManager.IMPORTANCE_MIN,
+                )
             val manager = getSystemService(android.app.NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }
 
-        val notification = NotificationCompat.Builder(this, "service_channel")
-            .setContentTitle("Volume Listener Running")
-            .setContentText("Listening for volume button long presses")
-            .setSmallIcon(android.R.drawable.star_on)
-            .setPriority(NotificationCompat.PRIORITY_MIN)
-            .build()
+        val notification =
+            NotificationCompat
+                .Builder(this, "service_channel")
+                .setContentTitle("Volume Listener Running")
+                .setContentText("Listening for volume button long presses")
+                .setSmallIcon(android.R.drawable.star_on)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .build()
 
         val cameraManager =
             getSystemService(CAMERA_SERVICE) as android.hardware.camera2.CameraManager
-        cameraManager.registerTorchCallback(object :
-            android.hardware.camera2.CameraManager.TorchCallback() {
-            override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
-                super.onTorchModeChanged(cameraId, enabled)
-                isTorchOn = enabled
-            }
-        }, null)
+        cameraManager.registerTorchCallback(
+            object :
+                android.hardware.camera2.CameraManager.TorchCallback() {
+                override fun onTorchModeChanged(
+                    cameraId: String,
+                    enabled: Boolean,
+                ) {
+                    super.onTorchModeChanged(cameraId, enabled)
+                    isTorchOn = enabled
+                }
+            },
+            null,
+        )
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
                 NOTIFICATION_ID,
                 notification,
-                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
             )
         } else {
             startForeground(NOTIFICATION_ID, notification)
@@ -107,19 +118,24 @@ class InputEventListenerService : Service() {
         scope?.launch {
             stopListening()
 
-            if (!com.sameerasw.essentials.utils.ShellUtils.hasPermission(this@InputEventListenerService)) {
+            if (!com.sameerasw.essentials.utils.ShellUtils
+                    .hasPermission(this@InputEventListenerService)
+            ) {
                 Log.e("InputEventListener", "Shell permission not granted")
                 return@launch
             }
 
-            val devices = withContext(Dispatchers.IO) {
-                InputDeviceScanner().scanForVolumeDevices()
-            }
+            val devices =
+                withContext(Dispatchers.IO) {
+                    InputDeviceScanner().scanForVolumeDevices()
+                }
 
             if (devices.isEmpty()) {
                 Log.e("InputEventListener", "No devices found")
                 getSharedPreferences("essentials_prefs", MODE_PRIVATE)
-                    .edit().remove("shizuku_detected_device_path").apply()
+                    .edit()
+                    .remove("shizuku_detected_device_path")
+                    .apply()
                 return@launch
             }
 
@@ -127,7 +143,9 @@ class InputEventListenerService : Service() {
             Log.d("InputEventListener", "Listening on device: $devicePath")
 
             getSharedPreferences("essentials_prefs", MODE_PRIVATE)
-                .edit().putString("shizuku_detected_device_path", devicePath).apply()
+                .edit()
+                .putString("shizuku_detected_device_path", devicePath)
+                .apply()
 
             val activeDetector = VolumeLongPressDetector(devicePath, 500)
             detector = activeDetector
@@ -136,11 +154,12 @@ class InputEventListenerService : Service() {
                 activeDetector.events.collect { event ->
                     val powerManager =
                         getSystemService(POWER_SERVICE) as android.os.PowerManager
-                    val isScreenInteractive = try {
-                        powerManager.isInteractive
-                    } catch (e: Exception) {
-                        false
-                    }
+                    val isScreenInteractive =
+                        try {
+                            powerManager.isInteractive
+                        } catch (e: Exception) {
+                            false
+                        }
                     val isAod = isAodShowing()
 
                     if (isScreenInteractive || isAod) {
@@ -149,17 +168,20 @@ class InputEventListenerService : Service() {
 
                     if (event is VolumePressEvent.LongPress) {
                         Log.i("InputEventListener", "# LONG PRESS: ${event.direction}")
-                        sendBroadcast(Intent(ACTION_VOLUME_LONG_PRESSED).apply {
-                            putExtra(EXTRA_DIRECTION, event.direction.name)
-                            putExtra(EXTRA_DURATION_MS, event.durationMs)
-                            setPackage(packageName)
-                        })
+                        sendBroadcast(
+                            Intent(ACTION_VOLUME_LONG_PRESSED).apply {
+                                putExtra(EXTRA_DIRECTION, event.direction.name)
+                                putExtra(EXTRA_DURATION_MS, event.durationMs)
+                                setPackage(packageName)
+                            },
+                        )
                     } else if (event is VolumePressEvent.ShortPress) {
                         if (isTorchOn) {
-                            val prefs = getSharedPreferences(
-                                "essentials_prefs",
-                                MODE_PRIVATE
-                            )
+                            val prefs =
+                                getSharedPreferences(
+                                    "essentials_prefs",
+                                    MODE_PRIVATE,
+                                )
                             val isAdjustEnabled =
                                 prefs.getBoolean("flashlight_adjust_intensity_enabled", false)
                             val isGlobalEnabled =
@@ -167,33 +189,36 @@ class InputEventListenerService : Service() {
 
                             if (isAdjustEnabled || isGlobalEnabled) {
                                 val action =
-                                    if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP)
+                                    if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP) {
                                         "com.sameerasw.essentials.ACTION_FLASHLIGHT_INCREASE"
-                                    else
+                                    } else {
                                         "com.sameerasw.essentials.ACTION_FLASHLIGHT_DECREASE"
+                                    }
                                 sendBroadcast(Intent(action).setPackage(packageName))
                             } else {
                                 val pm =
                                     getSystemService(POWER_SERVICE) as android.os.PowerManager
                                 val isScreenOn = pm.isInteractive
-                                val key = if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP) {
-                                    if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
-                                } else {
-                                    if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
-                                }
+                                val key =
+                                    if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP) {
+                                        if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
+                                    } else {
+                                        if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
+                                    }
                                 val action = SettingsRepository(this@InputEventListenerService).getRemapAction(key)
                                 if (action != null) {
                                     val am =
                                         getSystemService(AUDIO_SERVICE) as android.media.AudioManager
                                     val direction =
-                                        if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP)
+                                        if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP) {
                                             android.media.AudioManager.ADJUST_RAISE
-                                        else
+                                        } else {
                                             android.media.AudioManager.ADJUST_LOWER
+                                        }
                                     am.adjustSuggestedStreamVolume(
                                         direction,
                                         android.media.AudioManager.USE_DEFAULT_STREAM_TYPE,
-                                        android.media.AudioManager.FLAG_SHOW_UI
+                                        android.media.AudioManager.FLAG_SHOW_UI,
                                     )
                                 }
                             }
@@ -201,25 +226,27 @@ class InputEventListenerService : Service() {
                             val pm =
                                 getSystemService(POWER_SERVICE) as android.os.PowerManager
                             val isScreenOn = pm.isInteractive
-                            val key = if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP) {
-                                if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
-                            } else {
-                                if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
-                            }
+                            val key =
+                                if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP) {
+                                    if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
+                                } else {
+                                    if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
+                                }
                             val action = SettingsRepository(this@InputEventListenerService).getRemapAction(key)
 
                             if (action != null) {
                                 val am =
                                     getSystemService(AUDIO_SERVICE) as android.media.AudioManager
                                 val dirKey =
-                                    if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP)
+                                    if (event.direction == com.sameerasw.essentials.input.VolumeDirection.UP) {
                                         android.media.AudioManager.ADJUST_RAISE
-                                    else
+                                    } else {
                                         android.media.AudioManager.ADJUST_LOWER
+                                    }
                                 am.adjustSuggestedStreamVolume(
                                     dirKey,
                                     android.media.AudioManager.USE_DEFAULT_STREAM_TYPE,
-                                    android.media.AudioManager.FLAG_SHOW_UI
+                                    android.media.AudioManager.FLAG_SHOW_UI,
                                 )
                             }
                         }
@@ -236,18 +263,24 @@ class InputEventListenerService : Service() {
         detector = null
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         // Reinforce foreground
-        val notification = NotificationCompat.Builder(this, "service_channel")
-            .setContentTitle("Volume Listener Running")
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setOngoing(true)
-            .build()
+        val notification =
+            NotificationCompat
+                .Builder(this, "service_channel")
+                .setContentTitle("Volume Listener Running")
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setOngoing(true)
+                .build()
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
                 NOTIFICATION_ID,
                 notification,
-                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
             )
         } else {
             startForeground(NOTIFICATION_ID, notification)
@@ -263,8 +296,8 @@ class InputEventListenerService : Service() {
         super.onDestroy()
     }
 
-    private fun isAodShowing(): Boolean {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT_WATCH) {
+    private fun isAodShowing(): Boolean =
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT_WATCH) {
             val windowManager =
                 getSystemService(WINDOW_SERVICE) as android.view.WindowManager
             val display = windowManager.defaultDisplay
@@ -272,7 +305,6 @@ class InputEventListenerService : Service() {
         } else {
             false
         }
-    }
 
     override fun onBind(intent: Intent?): IBinder? = null
 }

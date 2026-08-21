@@ -28,7 +28,10 @@ class TimeAutomationReceiver : BroadcastReceiver() {
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action != ACTION_TRIGGER) return
 
         val automationId = intent.getStringExtra(EXTRA_AUTOMATION_ID) ?: return

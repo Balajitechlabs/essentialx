@@ -53,7 +53,7 @@ fun ListExpandToggleButton(
     description: Any? = R.string.action_show_all,
     expandedText: String? = null,
     collapsedText: String? = null,
-    iconRes: Int? = null
+    iconRes: Int? = null,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val view = LocalView.current
@@ -64,33 +64,39 @@ fun ListExpandToggleButton(
 
     val rotationDegree by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
-        label = "list_expand_chevron_rotation"
+        label = "list_expand_chevron_rotation",
     )
 
-    val expText = expandedText ?: when (title) {
-        is Int -> stringResource(title)
-        is String -> title
-        else -> title.toString()
-    }
-    val colText = collapsedText ?: when (description) {
-        is Int -> stringResource(description)
-        is String -> description
-        null -> expText
-        else -> description.toString()
-    }
+    val expText =
+        expandedText ?: when (title) {
+            is Int -> stringResource(title)
+            is String -> title
+            else -> title.toString()
+        }
+    val colText =
+        collapsedText ?: when (description) {
+            is Int -> stringResource(description)
+            is String -> description
+            null -> expText
+            else -> description.toString()
+        }
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = {},
-                onLongClick = if (isTranslationModeActive) {
-                    {
-                        HapticUtil.performVirtualKeyHaptic(view)
-                        showMenu = true
-                    }
-                } else null
-            )
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick =
+                        if (isTranslationModeActive) {
+                            {
+                                HapticUtil.performVirtualKeyHaptic(view)
+                                showMenu = true
+                            }
+                        } else {
+                            null
+                        },
+                ),
     ) {
         Button(
             onClick = {
@@ -98,36 +104,42 @@ fun ListExpandToggleButton(
                 onToggle()
             },
             modifier = Modifier.padding(start = 4.dp, top = 4.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright,
-                contentColor = MaterialTheme.colorScheme.primary
-            ),
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp)
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                ),
+            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 14.dp),
         ) {
             Icon(
-                painter = painterResource(
-                    id = iconRes ?: R.drawable.rounded_keyboard_arrow_down_24
-                ),
+                painter =
+                    painterResource(
+                        id = iconRes ?: R.drawable.rounded_keyboard_arrow_down_24,
+                    ),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .size(22.dp)
-                    .then(
-                        if (iconRes == null) Modifier.graphicsLayer { rotationZ = rotationDegree }
-                        else Modifier
-                    )
+                modifier =
+                    Modifier
+                        .size(22.dp)
+                        .then(
+                            if (iconRes == null) {
+                                Modifier.graphicsLayer { rotationZ = rotationDegree }
+                            } else {
+                                Modifier
+                            },
+                        ),
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = if (isExpanded) expText else colText,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
         }
 
         SegmentedDropdownMenu(
             expanded = showMenu,
-            onDismissRequest = { showMenu = false }
+            onDismissRequest = { showMenu = false },
         ) {
             TranslationMenuItems(
                 title = title,
@@ -135,19 +147,20 @@ fun ListExpandToggleButton(
                 onSelectKey = { key ->
                     showMenu = false
                     translationSheetKey = key
-                }
+                },
             )
         }
     }
 
     val targetKey = translationSheetKey
     if (targetKey != null) {
-        val resolvedKey = remember(targetKey) {
-            TranslationManager.resolveKey(context, targetKey) ?: targetKey
-        }
+        val resolvedKey =
+            remember(targetKey) {
+                TranslationManager.resolveKey(context, targetKey) ?: targetKey
+            }
         TranslationBottomSheet(
             stringKey = resolvedKey,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

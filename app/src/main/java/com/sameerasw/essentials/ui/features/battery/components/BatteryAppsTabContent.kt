@@ -65,7 +65,7 @@ fun BatteryAppsTabContent(
     currentLevel: Int = 100,
     chargeTimeRemainingMs: Long? = null,
     avgCurrentMa: Int? = null,
-    isPlugged: Boolean = false
+    isPlugged: Boolean = false,
 ) {
     if (isLoadingAdvanced) {
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
@@ -76,68 +76,70 @@ fun BatteryAppsTabContent(
             InfoDetailRow(
                 title = stringResource(R.string.label_usage_data),
                 value = stringResource(R.string.label_no_data),
-                iconRes = R.drawable.rounded_info_24
+                iconRes = R.drawable.rounded_info_24,
             )
         }
     } else {
         val displayedApps = if (showAllApps) usageApps else usageApps.take(20)
         val totalMah = usageApps.sumOf { it.powerMah }.coerceAtLeast(0.0001)
 
-
-
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             displayedApps.forEach { app ->
-                val displayValue = if (showPercentage) {
-                    val pct = (app.powerMah / totalMah) * 100.0
-                    String.format(Locale.getDefault(), "%.1f %%", pct)
-                } else {
-                    String.format(Locale.getDefault(), "%.2f mAh", app.powerMah)
-                }
+                val displayValue =
+                    if (showPercentage) {
+                        val pct = (app.powerMah / totalMah) * 100.0
+                        String.format(Locale.getDefault(), "%.1f %%", pct)
+                    } else {
+                        String.format(Locale.getDefault(), "%.2f mAh", app.powerMah)
+                    }
 
                 val isTranslationModeActive by com.sameerasw.essentials.translation.TranslationManager.isTranslationModeEnabled
                 var showMenu by remember { mutableStateOf(false) }
                 var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
                 val context = LocalContext.current
-                val canOpenAppInfo = remember(app.packageName) {
-                    app.packageName != null && app.packageName.contains(".")
-                }
+                val canOpenAppInfo =
+                    remember(app.packageName) {
+                        app.packageName != null && app.packageName.contains(".")
+                    }
 
                 Box {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                MaterialTheme.colorScheme.surfaceBright,
-                                shape = Shapes.extraSmall
-                            )
-                            .combinedClickable(
-                                onClick = {
-                                    HapticUtil.performVirtualKeyHaptic(view)
-                                    onToggleUnit()
-                                },
-                                onLongClick = if (isTranslationModeActive || canOpenAppInfo) {
-                                    {
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    MaterialTheme.colorScheme.surfaceBright,
+                                    shape = Shapes.extraSmall,
+                                ).combinedClickable(
+                                    onClick = {
                                         HapticUtil.performVirtualKeyHaptic(view)
-                                        showMenu = true
-                                    }
-                                } else null
-                            )
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                                        onToggleUnit()
+                                    },
+                                    onLongClick =
+                                        if (isTranslationModeActive || canOpenAppInfo) {
+                                            {
+                                                HapticUtil.performVirtualKeyHaptic(view)
+                                                showMenu = true
+                                            }
+                                        } else {
+                                            null
+                                        },
+                                ).padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (app.icon != null) {
                             Image(
                                 bitmap = app.icon.toBitmap(48, 48).asImageBitmap(),
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         } else {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_info_24),
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
@@ -147,7 +149,7 @@ fun BatteryAppsTabContent(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         )
                         Spacer(modifier = Modifier.width(16.dp))
                         AnimatedContent(
@@ -171,20 +173,20 @@ fun BatteryAppsTabContent(
                                         .togetherWith(slideOutVertically { height -> -height } + fadeOut())
                                 }
                             },
-                            label = "app_value_anim"
+                            label = "app_value_anim",
                         ) { targetVal ->
                             Text(
                                 text = targetVal,
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
 
                     com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu(
                         expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        onDismissRequest = { showMenu = false },
                     ) {
                         if (canOpenAppInfo && app.packageName != null) {
                             com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem(
@@ -193,13 +195,15 @@ fun BatteryAppsTabContent(
                                     showMenu = false
                                     try {
                                         val intent =
-                                            android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                                            android.content
+                                                .Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                                                 .apply {
-                                                    data = android.net.Uri.fromParts(
-                                                        "package",
-                                                        app.packageName,
-                                                        null
-                                                    )
+                                                    data =
+                                                        android.net.Uri.fromParts(
+                                                            "package",
+                                                            app.packageName,
+                                                            null,
+                                                        )
                                                     addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                                                 }
                                         context.startActivity(intent)
@@ -209,9 +213,9 @@ fun BatteryAppsTabContent(
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(id = R.drawable.rounded_info_24),
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
-                                }
+                                },
                             )
                         }
 
@@ -221,7 +225,7 @@ fun BatteryAppsTabContent(
                                 onSelectKey = { key ->
                                     showMenu = false
                                     translationSheetKey = key
-                                }
+                                },
                             )
                         }
                     }
@@ -230,7 +234,7 @@ fun BatteryAppsTabContent(
                 if (translationSheetKey != null) {
                     com.sameerasw.essentials.translation.ui.TranslationBottomSheet(
                         stringKey = translationSheetKey!!,
-                        onDismissRequest = { translationSheetKey = null }
+                        onDismissRequest = { translationSheetKey = null },
                     )
                 }
             }
@@ -239,7 +243,7 @@ fun BatteryAppsTabContent(
         if (usageApps.size > 20) {
             com.sameerasw.essentials.ui.components.buttons.ListExpandToggleButton(
                 isExpanded = showAllApps,
-                onToggle = onToggleShowAll
+                onToggle = onToggleShowAll,
             )
         }
     }

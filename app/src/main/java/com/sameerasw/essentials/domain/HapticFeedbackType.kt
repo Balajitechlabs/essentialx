@@ -14,5 +14,5 @@ enum class HapticFeedbackType {
     SUBTLE,
     DOUBLE,
     CLICK,
-    TICK
+    TICK,
 }

@@ -20,7 +20,6 @@ import androidx.core.graphics.drawable.toBitmap
 import kotlin.math.PI
 
 object BatteryRingDrawer {
-
     /**
      * Optimized ring drawing for Glance components.
      * Only draws the arcs, leaving icons and backgrounds to Glance native primitives.
@@ -32,7 +31,7 @@ object BatteryRingDrawer {
         @ColorInt trackColor: Int,
         hasStatusIcon: Boolean,
         width: Int,
-        height: Int
+        height: Int,
     ): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -51,7 +50,7 @@ object BatteryRingDrawer {
         @ColorInt color: Int,
         hasStatusIcon: Boolean,
         width: Int,
-        height: Int
+        height: Int,
     ): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -63,12 +62,13 @@ object BatteryRingDrawer {
         val rect = RectF(padding, padding, width - padding, height - padding)
         val radius = rect.width() / 2f
 
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
-            strokeCap = Paint.Cap.ROUND
-            this.strokeWidth = strokeWidth
-            this.color = color
-        }
+        val paint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeCap = Paint.Cap.ROUND
+                this.strokeWidth = strokeWidth
+                this.color = color
+            }
 
         val topGapDegrees = if (hasStatusIcon) 60f else 0f
         val capAngleDegrees = ((strokeWidth / 2f) / radius) * (180f / PI.toFloat())
@@ -109,7 +109,7 @@ object BatteryRingDrawer {
         @ColorInt color: Int,
         hasStatusIcon: Boolean,
         width: Int,
-        height: Int
+        height: Int,
     ): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -122,12 +122,13 @@ object BatteryRingDrawer {
         val rect = RectF(padding, padding, width - padding, height - padding)
         val radius = rect.width() / 2f
 
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.STROKE
-            strokeCap = Paint.Cap.ROUND
-            this.strokeWidth = trackStrokeWidth
-            this.color = color
-        }
+        val paint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.STROKE
+                strokeCap = Paint.Cap.ROUND
+                this.strokeWidth = trackStrokeWidth
+                this.color = color
+            }
 
         val topGapDegrees = if (hasStatusIcon) 60f else 0f
         val trackCapAngleDegrees = ((trackStrokeWidth / 2f) / radius) * (180f / PI.toFloat())
@@ -136,8 +137,9 @@ object BatteryRingDrawer {
         val progressSweepRaw = (clampedLevel / 100f) * totalAvailableSweep
         val segmentGapDegrees = 8f
 
-        val visualStart = (startAngle + progressSweepRaw + (segmentGapDegrees / 2))
-            .coerceAtMost(startAngle + totalAvailableSweep)
+        val visualStart =
+            (startAngle + progressSweepRaw + (segmentGapDegrees / 2))
+                .coerceAtMost(startAngle + totalAvailableSweep)
 
         val topPadding = if (!hasStatusIcon) segmentGapDegrees / 2f else 0f
         val visualEnd = startAngle + totalAvailableSweep - topPadding
@@ -167,7 +169,7 @@ object BatteryRingDrawer {
         deviceIcon: Drawable?,
         statusIcon: Drawable?,
         width: Int,
-        height: Int
+        height: Int,
     ): Bitmap {
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
@@ -177,19 +179,27 @@ object BatteryRingDrawer {
         val centerY = height / 2f
 
         // 1. Draw Background
-        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.FILL
-            color = backgroundColor
-        }
+        val bgPaint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.FILL
+                color = backgroundColor
+            }
         val padding = strokeWidth + (width * 0.05f)
         val rect = RectF(padding, padding, width - padding, height - padding)
         val bubbleRadius = (rect.width() / 2f) + (strokeWidth / 2f)
         canvas.drawCircle(centerX, centerY, bubbleRadius, bgPaint)
 
         // 2. Draw Ring
-        val ringBitmap = drawBatteryRing(
-            context, batteryLevel, ringColor, trackColor, statusIcon != null, width, height
-        )
+        val ringBitmap =
+            drawBatteryRing(
+                context,
+                batteryLevel,
+                ringColor,
+                trackColor,
+                statusIcon != null,
+                width,
+                height,
+            )
         canvas.drawBitmap(ringBitmap, 0f, 0f, null)
 
         // 3. Draw Status Icon Bubble
@@ -206,7 +216,7 @@ object BatteryRingDrawer {
                 (centerX - iconOffset).toInt(),
                 (iconCenterY - iconOffset).toInt(),
                 (centerX + iconOffset).toInt(),
-                (iconCenterY + iconOffset).toInt()
+                (iconCenterY + iconOffset).toInt(),
             )
             statusIcon.setTint(backgroundColor)
             statusIcon.draw(canvas)
@@ -218,17 +228,19 @@ object BatteryRingDrawer {
             val iconSize = (rect.width() - innerPadding * 2).toInt()
             val iconBitmap = it.toBitmap(iconSize, iconSize)
 
-            val iconPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-                colorFilter = android.graphics.PorterDuffColorFilter(
-                    iconTint,
-                    android.graphics.PorterDuff.Mode.SRC_IN
-                )
-            }
+            val iconPaint =
+                Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                    colorFilter =
+                        android.graphics.PorterDuffColorFilter(
+                            iconTint,
+                            android.graphics.PorterDuff.Mode.SRC_IN,
+                        )
+                }
             canvas.drawBitmap(
                 iconBitmap,
                 (width - iconBitmap.width) / 2f,
                 (height - iconBitmap.height) / 2f,
-                iconPaint
+                iconPaint,
             )
         }
 

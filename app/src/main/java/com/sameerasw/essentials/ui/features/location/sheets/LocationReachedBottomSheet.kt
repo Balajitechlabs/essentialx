@@ -47,7 +47,7 @@ import com.sameerasw.essentials.viewmodels.LocationReachedViewModel
 @Composable
 fun LocationReachedBottomSheet(
     viewModel: LocationReachedViewModel,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     val tempAlarm by viewModel.tempAlarm
     val currentAlarm = tempAlarm
@@ -58,53 +58,58 @@ fun LocationReachedBottomSheet(
     if (currentAlarm == null && !isProcessing) return
 
     EssentialsBottomSheet(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
-                text = if (currentAlarm != null && viewModel.savedAlarms.value.any { it.id == currentAlarm.id })
-                    stringResource(R.string.location_reached_edit_title)
-                else stringResource(R.string.location_reached_add_title),
+                text =
+                    if (currentAlarm != null && viewModel.savedAlarms.value.any { it.id == currentAlarm.id }) {
+                        stringResource(R.string.location_reached_edit_title)
+                    } else {
+                        stringResource(R.string.location_reached_add_title)
+                    },
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             if (isProcessing && currentAlarm == null) {
                 RoundedCardContainer(
                     containerColor = MaterialTheme.colorScheme.surfaceBright,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
                     ) {
                         LoadingIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = stringResource(R.string.location_reached_resolving),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
             } else if (currentAlarm != null) {
                 RoundedCardContainer(
                     containerColor = MaterialTheme.colorScheme.surfaceBright,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         OutlinedTextField(
                             value = currentAlarm.name,
@@ -113,14 +118,14 @@ fun LocationReachedBottomSheet(
                             placeholder = { Text(stringResource(R.string.location_reached_name_placeholder)) },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
-                            shape = MaterialTheme.shapes.large
+                            shape = MaterialTheme.shapes.large,
                         )
 
                         LocationIconPicker(
                             selectedIconName = currentAlarm.iconResName,
                             onIconSelected = {
                                 viewModel.setTempAlarm(currentAlarm.copy(iconResName = it))
-                            }
+                            },
                         )
 
                         // Coordinates Display
@@ -128,41 +133,43 @@ fun LocationReachedBottomSheet(
                             Text(
                                 text = "Coordinates",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
-                                text = "%.5f, %.5f".format(
-                                    currentAlarm.latitude,
-                                    currentAlarm.longitude
-                                ),
+                                text =
+                                    "%.5f, %.5f".format(
+                                        currentAlarm.latitude,
+                                        currentAlarm.longitude,
+                                    ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
                             )
                         }
 
                         // Radius Slider
                         Column {
                             Text(
-                                text = stringResource(
-                                    R.string.location_reached_radius_label,
-                                    currentAlarm.radius
-                                ),
+                                text =
+                                    stringResource(
+                                        R.string.location_reached_radius_label,
+                                        currentAlarm.radius,
+                                    ),
                                 style = MaterialTheme.typography.labelLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Slider(
                                 value = currentAlarm.radius.toFloat(),
                                 onValueChange = {
                                     if (it.toInt() != currentAlarm.radius) {
                                         com.sameerasw.essentials.utils.HapticUtil.performSliderHaptic(
-                                            view
+                                            view,
                                         )
                                     }
                                     viewModel.setTempAlarm(currentAlarm.copy(radius = it.toInt()))
                                 },
                                 valueRange = 100f..5000f,
-                                steps = 49
+                                steps = 49,
                             )
                         }
                     }
@@ -175,37 +182,41 @@ fun LocationReachedBottomSheet(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (isEditing) {
                     IconButton(
                         onClick = {
-                            com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
+                            com.sameerasw.essentials.utils.HapticUtil
+                                .performVirtualKeyHaptic(view)
                             viewModel.deleteAlarm(currentAlarm.id)
                             onDismissRequest()
                         },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.error
-                        ),
-                        modifier = Modifier.size(56.dp) // Slightly larger for better touch target
+                        colors =
+                            IconButtonDefaults.iconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.error,
+                            ),
+                        modifier = Modifier.size(56.dp), // Slightly larger for better touch target
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.rounded_delete_24),
-                            contentDescription = stringResource(R.string.action_delete)
+                            contentDescription = stringResource(R.string.action_delete),
                         )
                     }
                 }
 
                 OutlinedButton(
                     onClick = {
-                        com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
+                        com.sameerasw.essentials.utils.HapticUtil
+                            .performVirtualKeyHaptic(view)
                         onDismissRequest()
                     },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = androidx.compose.foundation.shape.CircleShape
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                    shape = androidx.compose.foundation.shape.CircleShape,
                 ) {
                     Text(stringResource(R.string.location_reached_cancel_btn))
                 }
@@ -214,15 +225,17 @@ fun LocationReachedBottomSheet(
                     onClick = {
                         val alarm = tempAlarm
                         if (alarm != null) {
-                            com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
+                            com.sameerasw.essentials.utils.HapticUtil
+                                .performVirtualKeyHaptic(view)
                             viewModel.saveAlarm(alarm)
                         }
                     },
                     enabled = currentAlarm != null,
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(56.dp),
-                    shape = androidx.compose.foundation.shape.CircleShape
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(56.dp),
+                    shape = androidx.compose.foundation.shape.CircleShape,
                 ) {
                     Text(stringResource(R.string.location_reached_save_btn))
                 }

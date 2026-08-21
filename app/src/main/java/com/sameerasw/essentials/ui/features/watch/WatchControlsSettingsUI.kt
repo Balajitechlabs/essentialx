@@ -51,18 +51,20 @@ import kotlin.math.min
 @Composable
 fun WatchControlsSettingsUI(
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
-    val prefs = remember {
-        context.getSharedPreferences("essentials_prefs", android.content.Context.MODE_PRIVATE)
-    }
+    val prefs =
+        remember {
+            context.getSharedPreferences("essentials_prefs", android.content.Context.MODE_PRIVATE)
+        }
 
     val defaultLayout = "LOCK,SOUND,FLASHLIGHT,FLASHLIGHT_PULSE,AOD,TAP_TO_WAKE"
     val savedLayout = prefs.getString("watch_controls_layout", defaultLayout) ?: defaultLayout
     var activeControls by remember {
         mutableStateOf(
-            savedLayout.split(",").filter { it.isNotBlank() })
+            savedLayout.split(",").filter { it.isNotBlank() },
+        )
     }
 
     val allPossible =
@@ -71,23 +73,25 @@ fun WatchControlsSettingsUI(
         mutableStateOf(allPossible.filter { it !in activeControls })
     }
 
-    val controlIcons = mapOf(
-        "LOCK" to R.drawable.rounded_lock_24,
-        "SOUND" to R.drawable.rounded_volume_up_24,
-        "FLASHLIGHT" to R.drawable.rounded_flashlight_on_24,
-        "FLASHLIGHT_PULSE" to R.drawable.outline_backlight_high_24,
-        "AOD" to R.drawable.rounded_mobile_text_2_24,
-        "TAP_TO_WAKE" to R.drawable.rounded_touch_app_24
-    )
+    val controlIcons =
+        mapOf(
+            "LOCK" to R.drawable.rounded_lock_24,
+            "SOUND" to R.drawable.rounded_volume_up_24,
+            "FLASHLIGHT" to R.drawable.rounded_flashlight_on_24,
+            "FLASHLIGHT_PULSE" to R.drawable.outline_backlight_high_24,
+            "AOD" to R.drawable.rounded_mobile_text_2_24,
+            "TAP_TO_WAKE" to R.drawable.rounded_touch_app_24,
+        )
 
-    val controlNames = mapOf(
-        "LOCK" to R.string.feat_lock_from_watch_title,
-        "SOUND" to R.string.tile_sound_mode,
-        "FLASHLIGHT" to R.string.tile_flashlight,
-        "FLASHLIGHT_PULSE" to R.string.tile_flashlight_pulse,
-        "AOD" to R.string.feat_always_on_display_title,
-        "TAP_TO_WAKE" to R.string.tile_tap_to_wake
-    )
+    val controlNames =
+        mapOf(
+            "LOCK" to R.string.feat_lock_from_watch_title,
+            "SOUND" to R.string.tile_sound_mode,
+            "FLASHLIGHT" to R.string.tile_flashlight,
+            "FLASHLIGHT_PULSE" to R.string.tile_flashlight_pulse,
+            "AOD" to R.string.feat_always_on_display_title,
+            "TAP_TO_WAKE" to R.string.tile_tap_to_wake,
+        )
 
     fun save() {
         prefs.edit {
@@ -98,114 +102,124 @@ fun WatchControlsSettingsUI(
 
     val hapticFeedback = LocalHapticFeedback.current
     val lazyListState = rememberLazyListState()
-    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
-        val originalActiveSize = activeControls.size
-        val fromKey: String = when {
-            from.index < originalActiveSize -> activeControls.getOrNull(from.index)
-                ?: return@rememberReorderableLazyListState
+    val reorderableLazyListState =
+        rememberReorderableLazyListState(lazyListState) { from, to ->
+            val originalActiveSize = activeControls.size
+            val fromKey: String =
+                when {
+                    from.index < originalActiveSize ->
+                        activeControls.getOrNull(from.index)
+                            ?: return@rememberReorderableLazyListState
 
-            from.index == originalActiveSize -> "separator"
-            else -> disabledControls.getOrNull(from.index - originalActiveSize - 1)
-                ?: return@rememberReorderableLazyListState
+                    from.index == originalActiveSize -> "separator"
+                    else ->
+                        disabledControls.getOrNull(from.index - originalActiveSize - 1)
+                            ?: return@rememberReorderableLazyListState
+                }
+            if (fromKey == "separator") return@rememberReorderableLazyListState
+
+            if (from.index < originalActiveSize) {
+                activeControls = activeControls.toMutableList().apply { removeAt(from.index) }
+            } else {
+                disabledControls =
+                    disabledControls
+                        .toMutableList()
+                        .apply { removeAt(from.index - originalActiveSize - 1) }
+            }
+
+            val newActiveSize = activeControls.size
+            val newDisabledSize = disabledControls.size
+            if (to.index < newActiveSize) {
+                activeControls = activeControls.toMutableList().apply { add(to.index, fromKey) }
+            } else if (to.index == newActiveSize) {
+                activeControls = activeControls.toMutableList().apply { add(newActiveSize, fromKey) }
+            } else {
+                val pos = min(to.index - newActiveSize - 1, newDisabledSize)
+                disabledControls = disabledControls.toMutableList().apply { add(pos, fromKey) }
+            }
+
+            // Enforce at least 1 active
+            if (from.index < originalActiveSize && activeControls.isEmpty() && disabledControls.isNotEmpty()) {
+                val restore = disabledControls[0]
+                activeControls = listOf(restore)
+                disabledControls = disabledControls.drop(1)
+            }
+
+            save()
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
         }
-        if (fromKey == "separator") return@rememberReorderableLazyListState
-
-        if (from.index < originalActiveSize) {
-            activeControls = activeControls.toMutableList().apply { removeAt(from.index) }
-        } else {
-            disabledControls = disabledControls.toMutableList()
-                .apply { removeAt(from.index - originalActiveSize - 1) }
-        }
-
-        val newActiveSize = activeControls.size
-        val newDisabledSize = disabledControls.size
-        if (to.index < newActiveSize) {
-            activeControls = activeControls.toMutableList().apply { add(to.index, fromKey) }
-        } else if (to.index == newActiveSize) {
-            activeControls = activeControls.toMutableList().apply { add(newActiveSize, fromKey) }
-        } else {
-            val pos = min(to.index - newActiveSize - 1, newDisabledSize)
-            disabledControls = disabledControls.toMutableList().apply { add(pos, fromKey) }
-        }
-
-        // Enforce at least 1 active
-        if (from.index < originalActiveSize && activeControls.isEmpty() && disabledControls.isNotEmpty()) {
-            val restore = disabledControls[0]
-            activeControls = listOf(restore)
-            disabledControls = disabledControls.drop(1)
-        }
-
-        save()
-        hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
-    }
 
     Text(
         text = stringResource(R.string.watch_controls_reorder_title),
         style = MaterialTheme.typography.titleMedium,
         modifier = Modifier.padding(start = 24.dp, top = 16.dp, end = 24.dp),
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
     )
 
     LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
         state = lazyListState,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items(activeControls.size, key = { activeControls[it] }) { index ->
             val key = activeControls[index]
             ReorderableItem(reorderableLazyListState, key = key) { _ ->
                 Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .pointerInput(Unit) {
-                            detectTapGestures(onLongPress = {
-                                if (activeControls.size > 1) {
-                                    val toDisable = activeControls[index]
-                                    activeControls =
-                                        activeControls.toMutableList().apply { removeAt(index) }
-                                    disabledControls = disabledControls + toDisable
-                                }
-                                save()
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                            })
-                        }
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = {
+                                    if (activeControls.size > 1) {
+                                        val toDisable = activeControls[index]
+                                        activeControls =
+                                            activeControls.toMutableList().apply { removeAt(index) }
+                                        disabledControls = disabledControls + toDisable
+                                    }
+                                    save()
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                })
+                            },
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            painter = painterResource(
-                                id = controlIcons[key] ?: R.drawable.rounded_watch_24
-                            ),
+                            painter =
+                                painterResource(
+                                    id = controlIcons[key] ?: R.drawable.rounded_watch_24,
+                                ),
                             contentDescription = key,
                             modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             stringResource(controlNames[key] ?: R.string.feat_watch_controls_title),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(
-                            modifier = Modifier.draggableHandle(
-                                onDragStarted = {
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
-                                },
-                                onDragStopped = {
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
-                                }
-                            ),
-                            onClick = {}
+                            modifier =
+                                Modifier.draggableHandle(
+                                    onDragStarted = {
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                    },
+                                    onDragStopped = {
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                                    },
+                                ),
+                            onClick = {},
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_drag_handle_24),
                                 contentDescription = null,
                                 modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
@@ -220,10 +234,11 @@ fun WatchControlsSettingsUI(
                         text = stringResource(R.string.watch_controls_long_press_hint),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        modifier =
+                            Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -233,54 +248,57 @@ fun WatchControlsSettingsUI(
             val key = disabledControls[index]
             ReorderableItem(reorderableLazyListState, key = key) { _ ->
                 OutlinedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .pointerInput(Unit) {
-                            detectTapGestures(onLongPress = {
-                                val toEnable = disabledControls[index]
-                                disabledControls =
-                                    disabledControls.toMutableList().apply { removeAt(index) }
-                                activeControls = activeControls + toEnable
-                                save()
-                                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                            })
-                        }
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .pointerInput(Unit) {
+                                detectTapGestures(onLongPress = {
+                                    val toEnable = disabledControls[index]
+                                    disabledControls =
+                                        disabledControls.toMutableList().apply { removeAt(index) }
+                                    activeControls = activeControls + toEnable
+                                    save()
+                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                                })
+                            },
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
-                            painter = painterResource(
-                                id = controlIcons[key] ?: R.drawable.rounded_watch_24
-                            ),
+                            painter =
+                                painterResource(
+                                    id = controlIcons[key] ?: R.drawable.rounded_watch_24,
+                                ),
                             contentDescription = key,
                             modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             stringResource(controlNames[key] ?: R.string.feat_watch_controls_title),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         IconButton(
-                            modifier = Modifier.draggableHandle(
-                                onDragStarted = {
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
-                                },
-                                onDragStopped = {
-                                    hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
-                                }
-                            ),
-                            onClick = {}
+                            modifier =
+                                Modifier.draggableHandle(
+                                    onDragStarted = {
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                                    },
+                                    onDragStopped = {
+                                        hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                                    },
+                                ),
+                            onClick = {},
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_drag_handle_24),
                                 contentDescription = null,
                                 modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                             )
                         }
                     }

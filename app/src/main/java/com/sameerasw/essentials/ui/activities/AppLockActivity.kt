@@ -45,7 +45,6 @@ import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import java.util.concurrent.Executor
 
 class AppLockActivity : AppCompatActivity() {
-
     private lateinit var executor: Executor
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
@@ -61,12 +60,13 @@ class AppLockActivity : AppCompatActivity() {
             return
         }
 
-        val appLabel = try {
-            val appInfo = packageManager.getApplicationInfo(packageToLock!!, 0)
-            packageManager.getApplicationLabel(appInfo).toString()
-        } catch (e: PackageManager.NameNotFoundException) {
-            packageToLock
-        }
+        val appLabel =
+            try {
+                val appInfo = packageManager.getApplicationInfo(packageToLock!!, 0)
+                packageManager.getApplicationLabel(appInfo).toString()
+            } catch (e: PackageManager.NameNotFoundException) {
+                packageToLock
+            }
 
         setContent {
             EssentialsTheme {
@@ -75,33 +75,43 @@ class AppLockActivity : AppCompatActivity() {
         }
 
         executor = ContextCompat.getMainExecutor(this)
-        biometricPrompt = BiometricPrompt(
-            this, executor,
-            object : BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    Log.d("AppLock", "Authentication error: $errString ($errorCode)")
-                    notifyFailureAndFinish()
-                }
+        biometricPrompt =
+            BiometricPrompt(
+                this,
+                executor,
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationError(
+                        errorCode: Int,
+                        errString: CharSequence,
+                    ) {
+                        super.onAuthenticationError(errorCode, errString)
+                        Log.d("AppLock", "Authentication error: $errString ($errorCode)")
+                        notifyFailureAndFinish()
+                    }
 
-                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    Log.d("AppLock", "Authentication succeeded!")
-                    notifySuccessAndFinish()
-                }
+                    override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                        super.onAuthenticationSucceeded(result)
+                        Log.d("AppLock", "Authentication succeeded!")
+                        notifySuccessAndFinish()
+                    }
 
-                override fun onAuthenticationFailed() {
-                    super.onAuthenticationFailed()
-                    Log.d("AppLock", "Authentication failed")
-                }
-            })
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        Log.d("AppLock", "Authentication failed")
+                    }
+                },
+            )
 
-        promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("App Lock")
-            .setSubtitle("Unlock to access $appLabel")
-            .setAllowedAuthenticators(androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG or androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL)
-            .setConfirmationRequired(false)
-            .build()
+        promptInfo =
+            BiometricPrompt.PromptInfo
+                .Builder()
+                .setTitle("App Lock")
+                .setSubtitle("Unlock to access $appLabel")
+                .setAllowedAuthenticators(
+                    androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                        androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL,
+                ).setConfirmationRequired(false)
+                .build()
 
         biometricPrompt.authenticate(promptInfo)
     }
@@ -109,37 +119,41 @@ class AppLockActivity : AppCompatActivity() {
     @Composable
     private fun AppLockScreen() {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 140.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(top = 140.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
-                    modifier = Modifier.size(96.dp)
+                    modifier = Modifier.size(96.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_shield_lock_24),
                         contentDescription = "Lock Icon",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .size(80.dp)
-                            .align(Alignment.Center)
+                        modifier =
+                            Modifier
+                                .size(80.dp)
+                                .align(Alignment.Center),
                     )
 
                     AsyncImage(
                         model = R.mipmap.ic_launcher_round,
                         contentDescription = "Essentials App Icon",
-                        modifier = Modifier
-                            .size(32.dp)
-                            .align(Alignment.BottomEnd)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.background)
-                            .padding(2.dp)
+                        modifier =
+                            Modifier
+                                .size(32.dp)
+                                .align(Alignment.BottomEnd)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(2.dp),
                     )
                 }
 
@@ -148,7 +162,7 @@ class AppLockActivity : AppCompatActivity() {
                 Text(
                     text = "App is locked",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -158,25 +172,28 @@ class AppLockActivity : AppCompatActivity() {
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(horizontal = 48.dp)
-                        .alpha(0.6f)
+                    modifier =
+                        Modifier
+                            .padding(horizontal = 48.dp)
+                            .alpha(0.6f),
                 )
             }
         }
     }
 
     private fun notifySuccessAndFinish() {
-        val intent = Intent("APP_AUTHENTICATED").apply {
-            `package` = packageName
-            putExtra("package_name", packageToLock)
-        }
+        val intent =
+            Intent("APP_AUTHENTICATED").apply {
+                `package` = packageName
+                putExtra("package_name", packageToLock)
+            }
         sendBroadcast(intent)
 
-        val accessibilityIntent = Intent(this, ScreenOffAccessibilityService::class.java).apply {
-            action = "APP_AUTHENTICATED"
-            putExtra("package_name", packageToLock)
-        }
+        val accessibilityIntent =
+            Intent(this, ScreenOffAccessibilityService::class.java).apply {
+                action = "APP_AUTHENTICATED"
+                putExtra("package_name", packageToLock)
+            }
         startService(accessibilityIntent)
 
         finish()
@@ -189,14 +206,16 @@ class AppLockActivity : AppCompatActivity() {
     }
 
     private fun notifyFailureAndFinish() {
-        val intent = Intent("APP_AUTHENTICATION_FAILED").apply {
-            `package` = packageName
-        }
+        val intent =
+            Intent("APP_AUTHENTICATION_FAILED").apply {
+                `package` = packageName
+            }
         sendBroadcast(intent)
 
-        val serviceIntent = Intent(this, ScreenOffAccessibilityService::class.java).apply {
-            action = "APP_AUTHENTICATION_FAILED"
-        }
+        val serviceIntent =
+            Intent(this, ScreenOffAccessibilityService::class.java).apply {
+                action = "APP_AUTHENTICATION_FAILED"
+            }
         startService(serviceIntent)
         finish()
         if (Build.VERSION.SDK_INT >= 34) {

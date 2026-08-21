@@ -17,7 +17,7 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 data class BatteryHistoryPoint(
     val timestamp: Long,
     val level: Int,
-    val isPlugged: Boolean
+    val isPlugged: Boolean,
 )
 
 object BatteryHistoryManager {
@@ -29,18 +29,20 @@ object BatteryHistoryManager {
         val json = repo.getString(KEY_HISTORY_POINTS, "[]")
         val lastResetTime = repo.getLong("last_battery_stats_reset_time", -1L)
 
-        val list = try {
-            val type = object : TypeToken<List<BatteryHistoryPoint>>() {}.type
-            Gson().fromJson<List<BatteryHistoryPoint>>(json, type) ?: emptyList()
-        } catch (_: Exception) {
-            emptyList()
-        }
+        val list =
+            try {
+                val type = object : TypeToken<List<BatteryHistoryPoint>>() {}.type
+                Gson().fromJson<List<BatteryHistoryPoint>>(json, type) ?: emptyList()
+            } catch (_: Exception) {
+                emptyList()
+            }
 
-        val filtered = if (lastResetTime > 0L) {
-            list.filter { it.timestamp >= lastResetTime }
-        } else {
-            list
-        }
+        val filtered =
+            if (lastResetTime > 0L) {
+                list.filter { it.timestamp >= lastResetTime }
+            } else {
+                list
+            }
 
         return filtered.sortedBy { it.timestamp }
     }
@@ -49,7 +51,7 @@ object BatteryHistoryManager {
         context: Context,
         level: Int,
         isPlugged: Boolean,
-        forceRecord: Boolean = false
+        forceRecord: Boolean = false,
     ) {
         val repo = SettingsRepository(context)
         val now = System.currentTimeMillis()
@@ -67,12 +69,13 @@ object BatteryHistoryManager {
 
         currentHistory.add(BatteryHistoryPoint(now, level, isPlugged))
 
-        // Keep last 100 
-        val trimmedHistory = if (currentHistory.size > 100) {
-            currentHistory.takeLast(100)
-        } else {
-            currentHistory
-        }
+        // Keep last 100
+        val trimmedHistory =
+            if (currentHistory.size > 100) {
+                currentHistory.takeLast(100)
+            } else {
+                currentHistory
+            }
 
         repo.putString(KEY_HISTORY_POINTS, Gson().toJson(trimmedHistory))
     }

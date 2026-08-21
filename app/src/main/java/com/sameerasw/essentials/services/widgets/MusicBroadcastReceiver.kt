@@ -25,7 +25,10 @@ import java.io.File
 import java.io.FileOutputStream
 
 class MusicBroadcastReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val settings = SettingsRepository(context)
         val type = settings.getPixelSearchbarType()
         if (type != "music") return
@@ -35,20 +38,23 @@ class MusicBroadcastReceiver : BroadcastReceiver() {
             val manager =
                 context.getSystemService(Context.MEDIA_SESSION_SERVICE) as? MediaSessionManager
                     ?: return
-            val componentName = android.content.ComponentName(
-                context,
-                com.sameerasw.essentials.services.NotificationListener::class.java
-            )
+            val componentName =
+                android.content.ComponentName(
+                    context,
+                    com.sameerasw.essentials.services.NotificationListener::class.java,
+                )
             val sessions = manager.getActiveSessions(componentName)
-            val activeSession = sessions?.sortedWith(
-                compareByDescending<MediaController> {
-                    val state = it.playbackState?.state
-                    state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING
-                }.thenByDescending {
-                    val state = it.playbackState?.state
-                    state == PlaybackState.STATE_PAUSED
-                }
-            )?.firstOrNull()
+            val activeSession =
+                sessions
+                    ?.sortedWith(
+                        compareByDescending<MediaController> {
+                            val state = it.playbackState?.state
+                            state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING
+                        }.thenByDescending {
+                            val state = it.playbackState?.state
+                            state == PlaybackState.STATE_PAUSED
+                        },
+                    )?.firstOrNull()
 
             if (activeSession != null) {
                 val metadata = activeSession.metadata
@@ -56,9 +62,10 @@ class MusicBroadcastReceiver : BroadcastReceiver() {
                 val artist = metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: ""
                 val packageName = activeSession.packageName
 
-                val artwork = metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
-                    ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART)
-                    ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
+                val artwork =
+                    metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+                        ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART)
+                        ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
 
                 val filesDirFile = File(context.filesDir, "music_artwork.png")
                 if (artwork != null) {

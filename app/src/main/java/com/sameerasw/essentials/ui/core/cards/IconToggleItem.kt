@@ -55,7 +55,7 @@ fun IconToggleItem(
     onClick: (() -> Unit)? = null,
     subtitle: String? = null,
     icon: Int? = null,
-    checked: Boolean? = null
+    checked: Boolean? = null,
 ) {
     val view = LocalView.current
     val context = LocalContext.current
@@ -81,17 +81,20 @@ fun IconToggleItem(
         }
     }
 
-    val onLongClickAction: (() -> Unit)? = if (isTranslationModeActive) {
-        {
-            HapticUtil.performVirtualKeyHaptic(view)
-            showMenu = true
+    val onLongClickAction: (() -> Unit)? =
+        if (isTranslationModeActive) {
+            {
+                HapticUtil.performVirtualKeyHaptic(view)
+                showMenu = true
+            }
+        } else {
+            null
         }
-    } else null
 
     val renderMenu: @Composable () -> Unit = {
         SegmentedDropdownMenu(
             expanded = showMenu,
-            onDismissRequest = { showMenu = false }
+            onDismissRequest = { showMenu = false },
         ) {
             com.sameerasw.essentials.translation.ui.TranslationMenuItems(
                 title = title,
@@ -99,11 +102,10 @@ fun IconToggleItem(
                 onSelectKey = { key ->
                     showMenu = false
                     translationSheetKey = key
-                }
+                },
             )
         }
     }
-
 
     if (showToggle) {
         if (onClick != null) {
@@ -121,35 +123,42 @@ fun IconToggleItem(
                 enabled = enabled,
                 modifier = modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                leadingContent = if (finalIconRes != 0) {
-                    {
-                        Icon(
-                            painter = painterResource(id = finalIconRes),
-                            contentDescription = title,
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                } else null,
-                supportingContent = if (finalDescription != null) {
-                    {
-                        Text(
-                            text = finalDescription,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                } else null,
+                leadingContent =
+                    if (finalIconRes != 0) {
+                        {
+                            Icon(
+                                painter = painterResource(id = finalIconRes),
+                                contentDescription = title,
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                supportingContent =
+                    if (finalDescription != null) {
+                        {
+                            Text(
+                                text = finalDescription,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else {
+                        null
+                    },
                 trailingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         VerticalDivider(
-                            modifier = Modifier
-                                .height(32.dp)
-                                .width(1.dp),
-                            color = MaterialTheme.colorScheme.outlineVariant
+                            modifier =
+                                Modifier
+                                    .height(32.dp)
+                                    .width(1.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant,
                         )
                         Switch(
                             checked = if (enabled) finalIsChecked else false,
@@ -159,21 +168,22 @@ fun IconToggleItem(
                                     onCheckedChange(c)
                                 }
                             },
-                            enabled = enabled
+                            enabled = enabled,
                         )
                     }
                 },
-                colors = ListItemDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                ),
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
                 content = {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     renderMenu()
-                }
+                },
             )
         } else {
             ListItem(
@@ -191,43 +201,50 @@ fun IconToggleItem(
                 enabled = enabled,
                 modifier = modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                leadingContent = if (finalIconRes != 0) {
-                    {
-                        Icon(
-                            painter = painterResource(id = finalIconRes),
-                            contentDescription = title,
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                } else null,
-                supportingContent = if (finalDescription != null) {
-                    {
-                        Text(
-                            text = finalDescription,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                } else null,
+                leadingContent =
+                    if (finalIconRes != 0) {
+                        {
+                            Icon(
+                                painter = painterResource(id = finalIconRes),
+                                contentDescription = title,
+                                modifier = Modifier.size(24.dp),
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                supportingContent =
+                    if (finalDescription != null) {
+                        {
+                            Text(
+                                text = finalDescription,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    } else {
+                        null
+                    },
                 trailingContent = {
                     Switch(
                         checked = if (enabled) finalIsChecked else false,
                         onCheckedChange = null,
-                        enabled = enabled
+                        enabled = enabled,
                     )
                 },
-                colors = ListItemDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                ),
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
                 content = {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     renderMenu()
-                }
+                },
             )
         }
     } else {
@@ -237,43 +254,50 @@ fun IconToggleItem(
             enabled = enabled,
             modifier = modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            leadingContent = if (finalIconRes != 0) {
-                {
-                    Icon(
-                        painter = painterResource(id = finalIconRes),
-                        contentDescription = title,
-                        modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            } else null,
-            supportingContent = if (finalDescription != null) {
-                {
-                    Text(
-                        text = finalDescription,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            } else null,
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
-            ),
+            leadingContent =
+                if (finalIconRes != 0) {
+                    {
+                        Icon(
+                            painter = painterResource(id = finalIconRes),
+                            contentDescription = title,
+                            modifier = Modifier.size(24.dp),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                } else {
+                    null
+                },
+            supportingContent =
+                if (finalDescription != null) {
+                    {
+                        Text(
+                            text = finalDescription,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                } else {
+                    null
+                },
+            colors =
+                ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                ),
             content = {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 renderMenu()
-            }
+            },
         )
     }
 
     if (translationSheetKey != null) {
         TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

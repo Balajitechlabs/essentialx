@@ -37,44 +37,46 @@ import com.sameerasw.essentials.utils.HapticUtil
 @Composable
 fun StandbyAppsMoveSheet(
     onDismissRequest: () -> Unit,
-    onBucketSelected: (Int) -> Unit
+    onBucketSelected: (Int) -> Unit,
 ) {
     val view = LocalView.current
 
-    val buckets = listOf(
-        10 to R.string.standby_bucket_active,
-        20 to R.string.standby_bucket_working_set,
-        30 to R.string.standby_bucket_frequent,
-        40 to R.string.standby_bucket_rare,
-        45 to R.string.standby_bucket_restricted
-    )
+    val buckets =
+        listOf(
+            10 to R.string.standby_bucket_active,
+            20 to R.string.standby_bucket_working_set,
+            30 to R.string.standby_bucket_frequent,
+            40 to R.string.standby_bucket_rare,
+            45 to R.string.standby_bucket_restricted,
+        )
 
     EssentialsBottomSheet(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(R.string.standby_apps_move_sheet_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
 
             RoundedCardContainer(
                 spacing = 2.dp,
-                cornerRadius = 24.dp
+                cornerRadius = 24.dp,
             ) {
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     itemsIndexed(buckets) { _, (bucketCode, titleRes) ->
                         ListItem(
@@ -92,23 +94,25 @@ fun StandbyAppsMoveSheet(
                             trailingContent = {
                                 RadioButton(
                                     selected = false,
-                                    onClick = null
+                                    onClick = null,
                                 )
                             },
-                            colors = ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.surfaceBright
-                            ),
-                            contentPadding = PaddingValues(
-                                horizontal = 16.dp,
-                                vertical = 16.dp
-                            ),
+                            colors =
+                                ListItemDefaults.colors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                ),
+                            contentPadding =
+                                PaddingValues(
+                                    horizontal = 16.dp,
+                                    vertical = 16.dp,
+                                ),
                             content = {
                                 Text(
                                     text = stringResource(titleRes),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
-                            }
+                            },
                         )
                     }
                 }

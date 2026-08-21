@@ -28,36 +28,41 @@ import androidx.compose.ui.graphics.drawOutline
 fun Modifier.highlight(
     enabled: Boolean,
     color: Color = Color.Unspecified,
-    shape: Shape = RectangleShape
-): Modifier = composed {
-    if (!enabled) return@composed Modifier
+    shape: Shape = RectangleShape,
+): Modifier =
+    composed {
+        if (!enabled) return@composed Modifier
 
-    val highlightColor = if (color == Color.Unspecified) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else color
+        val highlightColor =
+            if (color == Color.Unspecified) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                color
+            }
 
-    val alpha = remember { Animatable(0f) }
+        val alpha = remember { Animatable(0f) }
 
-    LaunchedEffect(enabled) {
-        if (enabled) {
-            alpha.animateTo(
-                targetValue = 0.7f,
-                animationSpec = repeatable(
-                    iterations = 3,
-                    animation = tween(800, easing = FastOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse
+        LaunchedEffect(enabled) {
+            if (enabled) {
+                alpha.animateTo(
+                    targetValue = 0.7f,
+                    animationSpec =
+                        repeatable(
+                            iterations = 3,
+                            animation = tween(800, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse,
+                        ),
                 )
+                alpha.animateTo(0f) // Reset to 0 after pulses
+            }
+        }
+
+        this.drawWithContent {
+            drawContent()
+            val outline = shape.createOutline(size, layoutDirection, this)
+            drawOutline(
+                outline = outline,
+                color = highlightColor.copy(alpha = alpha.value),
             )
-            alpha.animateTo(0f) // Reset to 0 after pulses
         }
     }
-
-    this.drawWithContent {
-        drawContent()
-        val outline = shape.createOutline(size, layoutDirection, this)
-        drawOutline(
-            outline = outline,
-            color = highlightColor.copy(alpha = alpha.value)
-        )
-    }
-}

@@ -34,8 +34,7 @@ enum class NetworkType {
     NETWORK_5G,
     NETWORK_4G,
     NETWORK_3G,
-    NETWORK_OTHER;
-
+    NETWORK_OTHER,
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -43,29 +42,31 @@ enum class NetworkType {
 fun NetworkTypePicker(
     selectedTypes: Set<NetworkType>,
     onTypesSelected: (Set<NetworkType>) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val view = LocalView.current
-    val labels = listOf(
-        stringResource(R.string.network_type_5g),
-        stringResource(R.string.network_type_4g),
-        stringResource(R.string.network_type_3g),
-        stringResource(R.string.network_type_other)
-    )
-    val types = listOf(
-        NetworkType.NETWORK_5G,
-        NetworkType.NETWORK_4G,
-        NetworkType.NETWORK_3G,
-        NetworkType.NETWORK_OTHER
-    )
+    val labels =
+        listOf(
+            stringResource(R.string.network_type_5g),
+            stringResource(R.string.network_type_4g),
+            stringResource(R.string.network_type_3g),
+            stringResource(R.string.network_type_other),
+        )
+    val types =
+        listOf(
+            NetworkType.NETWORK_5G,
+            NetworkType.NETWORK_4G,
+            NetworkType.NETWORK_3G,
+            NetworkType.NETWORK_OTHER,
+        )
 
     Row(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceBright,
-                shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-            )
-            .padding(8.dp),
+        modifier =
+            modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceBright,
+                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                ).padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
     ) {
         val modifiers = List(labels.size) { Modifier.weight(1f) }
@@ -78,24 +79,25 @@ fun NetworkTypePicker(
                 checked = isSelected,
                 onCheckedChange = { checked ->
                     HapticUtil.performUIHaptic(view)
-                    val newSelection = if (checked) {
-                        selectedTypes + type
-                    } else {
-                        selectedTypes - type
-                    }
+                    val newSelection =
+                        if (checked) {
+                            selectedTypes + type
+                        } else {
+                            selectedTypes - type
+                        }
                     println("Selected Types: $newSelection , current mode: ")
                     onTypesSelected(newSelection)
                 },
                 modifier = modifiers[index].semantics { role = Role.Checkbox },
-                shapes = when (index) {
-                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                    labels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                },
+                shapes =
+                    when (index) {
+                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                        labels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                    },
             ) {
                 Text(label)
             }
         }
     }
 }
-

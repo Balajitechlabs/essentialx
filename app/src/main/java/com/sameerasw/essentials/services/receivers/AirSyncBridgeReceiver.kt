@@ -16,7 +16,10 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import kotlinx.coroutines.launch
 
 class AirSyncBridgeReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action == "com.sameerasw.essentials.action.UPDATE_MAC_BATTERY") {
             val pendingResult = goAsync()
             val level = intent.getIntExtra("level", -1)
@@ -26,7 +29,7 @@ class AirSyncBridgeReceiver : BroadcastReceiver() {
 
             android.util.Log.d(
                 "AirSyncBridge",
-                "Received Mac status: level=$level, connected=$isConnected"
+                "Received Mac status: level=$level, connected=$isConnected",
             )
 
             val repository = SettingsRepository(context)
@@ -34,7 +37,7 @@ class AirSyncBridgeReceiver : BroadcastReceiver() {
 
             android.util.Log.d(
                 "AirSyncBridge",
-                "Received Mac status broadcast. Bridge enabled: $isEnabled, level=$level, charging=$isCharging"
+                "Received Mac status broadcast. Bridge enabled: $isEnabled, level=$level, charging=$isCharging",
             )
 
             if (isEnabled) {
@@ -59,13 +62,14 @@ class AirSyncBridgeReceiver : BroadcastReceiver() {
                         // Define keys matching BatteriesWidget
                         val KEY_AIRSYNC_ENABLED =
                             androidx.datastore.preferences.core.booleanPreferencesKey(
-                                SettingsRepository.KEY_AIRSYNC_CONNECTION_ENABLED
+                                SettingsRepository.KEY_AIRSYNC_CONNECTION_ENABLED,
                             )
                         val KEY_MAC_LEVEL =
-                            androidx.datastore.preferences.core.intPreferencesKey(SettingsRepository.KEY_MAC_BATTERY_LEVEL)
+                            androidx.datastore.preferences.core
+                                .intPreferencesKey(SettingsRepository.KEY_MAC_BATTERY_LEVEL)
                         val KEY_MAC_CONNECTED =
                             androidx.datastore.preferences.core.booleanPreferencesKey(
-                                SettingsRepository.KEY_AIRSYNC_MAC_CONNECTED
+                                SettingsRepository.KEY_AIRSYNC_MAC_CONNECTED,
                             )
 
                         val glanceIds =
@@ -73,13 +77,13 @@ class AirSyncBridgeReceiver : BroadcastReceiver() {
 
                         android.util.Log.d(
                             "AirSyncBridge",
-                            "Found ${glanceIds.size} widgets to update"
+                            "Found ${glanceIds.size} widgets to update",
                         )
 
                         glanceIds.forEach { glanceId ->
                             androidx.glance.appwidget.state.updateAppWidgetState(
                                 context,
-                                glanceId
+                                glanceId,
                             ) { prefs ->
                                 prefs[KEY_AIRSYNC_ENABLED] = true
                                 prefs[KEY_MAC_LEVEL] = level
@@ -87,16 +91,17 @@ class AirSyncBridgeReceiver : BroadcastReceiver() {
                                 // Add charging state
                                 val KEY_MAC_IS_CHARGING =
                                     androidx.datastore.preferences.core.booleanPreferencesKey(
-                                        SettingsRepository.KEY_MAC_BATTERY_IS_CHARGING
+                                        SettingsRepository.KEY_MAC_BATTERY_IS_CHARGING,
                                     )
                                 prefs[KEY_MAC_IS_CHARGING] = isCharging
                             }
 
                             android.util.Log.d(
                                 "AirSyncBridge",
-                                "Triggering update for glanceId: $glanceId"
+                                "Triggering update for glanceId: $glanceId",
                             )
-                            com.sameerasw.essentials.services.widgets.BatteriesWidget()
+                            com.sameerasw.essentials.services.widgets
+                                .BatteriesWidget()
                                 .update(context, glanceId)
                         }
                     } catch (e: Exception) {

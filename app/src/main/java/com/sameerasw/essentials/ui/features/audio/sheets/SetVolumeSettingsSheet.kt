@@ -50,7 +50,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun SetVolumeSettingsSheet(
     initialAction: Action.SetVolume,
     onDismiss: () -> Unit,
-    onSave: (Action.SetVolume) -> Unit
+    onSave: (Action.SetVolume) -> Unit,
 ) {
     val view = LocalView.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -62,19 +62,20 @@ fun SetVolumeSettingsSheet(
 
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.diy_action_set_volume),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             RoundedCardContainer(spacing = 2.dp) {
@@ -87,46 +88,50 @@ fun SetVolumeSettingsSheet(
                     },
                     labelProvider = { "" },
                     iconProvider = { channel ->
-                        val iconRes = when (channel) {
-                            Action.VolumeChannel.MUSIC -> R.drawable.rounded_music_note_24
-                            Action.VolumeChannel.RING -> R.drawable.rounded_ring_volume_24
-                            Action.VolumeChannel.ALARM -> R.drawable.rounded_alarm_24
-                            Action.VolumeChannel.CALL -> R.drawable.rounded_call_24
-                            Action.VolumeChannel.NOTIFICATION -> R.drawable.rounded_notifications_unread_24
-                            Action.VolumeChannel.SYSTEM -> R.drawable.rounded_android_24
-                        }
+                        val iconRes =
+                            when (channel) {
+                                Action.VolumeChannel.MUSIC -> R.drawable.rounded_music_note_24
+                                Action.VolumeChannel.RING -> R.drawable.rounded_ring_volume_24
+                                Action.VolumeChannel.ALARM -> R.drawable.rounded_alarm_24
+                                Action.VolumeChannel.CALL -> R.drawable.rounded_call_24
+                                Action.VolumeChannel.NOTIFICATION -> R.drawable.rounded_notifications_unread_24
+                                Action.VolumeChannel.SYSTEM -> R.drawable.rounded_android_24
+                            }
                         Icon(
                             painter = painterResource(iconRes),
-                            contentDescription = when (channel) {
-                                Action.VolumeChannel.MUSIC -> stringResource(R.string.diy_volume_channel_music)
-                                Action.VolumeChannel.RING -> stringResource(R.string.diy_volume_channel_ring)
-                                Action.VolumeChannel.ALARM -> stringResource(R.string.diy_volume_channel_alarm)
-                                Action.VolumeChannel.CALL -> stringResource(R.string.diy_volume_channel_call)
-                                Action.VolumeChannel.NOTIFICATION -> stringResource(R.string.diy_volume_channel_notification)
-                                Action.VolumeChannel.SYSTEM -> stringResource(R.string.diy_volume_channel_system)
-                            },
-                            modifier = Modifier.size(20.dp)
+                            contentDescription =
+                                when (channel) {
+                                    Action.VolumeChannel.MUSIC -> stringResource(R.string.diy_volume_channel_music)
+                                    Action.VolumeChannel.RING -> stringResource(R.string.diy_volume_channel_ring)
+                                    Action.VolumeChannel.ALARM -> stringResource(R.string.diy_volume_channel_alarm)
+                                    Action.VolumeChannel.CALL -> stringResource(R.string.diy_volume_channel_call)
+                                    Action.VolumeChannel.NOTIFICATION -> stringResource(R.string.diy_volume_channel_notification)
+                                    Action.VolumeChannel.SYSTEM -> stringResource(R.string.diy_volume_channel_system)
+                                },
+                            modifier = Modifier.size(20.dp),
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
-                val channelTitleRes = when (selectedChannel) {
-                    Action.VolumeChannel.MUSIC -> R.string.diy_volume_channel_music
-                    Action.VolumeChannel.RING -> R.string.diy_volume_channel_ring
-                    Action.VolumeChannel.ALARM -> R.string.diy_volume_channel_alarm
-                    Action.VolumeChannel.CALL -> R.string.diy_volume_channel_call
-                    Action.VolumeChannel.NOTIFICATION -> R.string.diy_volume_channel_notification
-                    Action.VolumeChannel.SYSTEM -> R.string.diy_volume_channel_system
-                }
-                val channelIconRes = when (selectedChannel) {
-                    Action.VolumeChannel.MUSIC -> R.drawable.rounded_music_note_24
-                    Action.VolumeChannel.RING -> R.drawable.rounded_ring_volume_24
-                    Action.VolumeChannel.ALARM -> R.drawable.rounded_alarm_24
-                    Action.VolumeChannel.CALL -> R.drawable.rounded_call_24
-                    Action.VolumeChannel.NOTIFICATION -> R.drawable.rounded_notifications_unread_24
-                    Action.VolumeChannel.SYSTEM -> R.drawable.rounded_android_24
-                }
+                val channelTitleRes =
+                    when (selectedChannel) {
+                        Action.VolumeChannel.MUSIC -> R.string.diy_volume_channel_music
+                        Action.VolumeChannel.RING -> R.string.diy_volume_channel_ring
+                        Action.VolumeChannel.ALARM -> R.string.diy_volume_channel_alarm
+                        Action.VolumeChannel.CALL -> R.string.diy_volume_channel_call
+                        Action.VolumeChannel.NOTIFICATION -> R.string.diy_volume_channel_notification
+                        Action.VolumeChannel.SYSTEM -> R.string.diy_volume_channel_system
+                    }
+                val channelIconRes =
+                    when (selectedChannel) {
+                        Action.VolumeChannel.MUSIC -> R.drawable.rounded_music_note_24
+                        Action.VolumeChannel.RING -> R.drawable.rounded_ring_volume_24
+                        Action.VolumeChannel.ALARM -> R.drawable.rounded_alarm_24
+                        Action.VolumeChannel.CALL -> R.drawable.rounded_call_24
+                        Action.VolumeChannel.NOTIFICATION -> R.drawable.rounded_notifications_unread_24
+                        Action.VolumeChannel.SYSTEM -> R.drawable.rounded_android_24
+                    }
 
                 ConfigSliderItem(
                     title = stringResource(channelTitleRes),
@@ -136,13 +141,13 @@ fun SetVolumeSettingsSheet(
                     increment = 5f,
                     steps = 19,
                     valueFormatter = { "${it.toInt()}%" },
-                    iconRes = channelIconRes
+                    iconRes = channelIconRes,
                 )
             }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Button(
                     onClick = {
@@ -150,15 +155,16 @@ fun SetVolumeSettingsSheet(
                         onDismiss()
                     },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceBright,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.rounded_close_24),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(stringResource(R.string.action_cancel))
@@ -169,12 +175,12 @@ fun SetVolumeSettingsSheet(
                         HapticUtil.performVirtualKeyHaptic(view)
                         onSave(initialAction.copy(channel = selectedChannel, level = selectedLevel))
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.rounded_check_24),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(stringResource(R.string.action_save))

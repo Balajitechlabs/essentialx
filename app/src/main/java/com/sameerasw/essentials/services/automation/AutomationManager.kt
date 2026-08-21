@@ -154,9 +154,10 @@ object AutomationManager {
 
         // Power Module
         if (requiredModuleIds.contains(PowerModule.ID)) {
-            val module = activeModules.getOrPut(PowerModule.ID) {
-                PowerModule().also { it.start(context) }
-            }
+            val module =
+                activeModules.getOrPut(PowerModule.ID) {
+                    PowerModule().also { it.start(context) }
+                }
             module.updateAutomations(powerAutomations)
         } else {
             activeModules.remove(PowerModule.ID)?.stop(context)
@@ -164,9 +165,10 @@ object AutomationManager {
 
         // Display Module
         if (requiredModuleIds.contains(DisplayModule.ID)) {
-            val module = activeModules.getOrPut(DisplayModule.ID) {
-                DisplayModule().also { it.start(context) }
-            }
+            val module =
+                activeModules.getOrPut(DisplayModule.ID) {
+                    DisplayModule().also { it.start(context) }
+                }
             module.updateAutomations(displayAutomations)
         } else {
             activeModules.remove(DisplayModule.ID)?.stop(context)
@@ -174,9 +176,10 @@ object AutomationManager {
 
         // Time Module
         if (requiredModuleIds.contains(TimeModule.ID)) {
-            val module = activeModules.getOrPut(TimeModule.ID) {
-                TimeModule().also { it.start(context) }
-            }
+            val module =
+                activeModules.getOrPut(TimeModule.ID) {
+                    TimeModule().also { it.start(context) }
+                }
             module.updateAutomations(timeAutomations)
         } else {
             activeModules.remove(TimeModule.ID)?.stop(context)
@@ -184,9 +187,10 @@ object AutomationManager {
 
         // Bluetooth Module
         if (requiredModuleIds.contains(BluetoothModule.ID)) {
-            val module = activeModules.getOrPut(BluetoothModule.ID) {
-                BluetoothModule().also { it.start(context) }
-            }
+            val module =
+                activeModules.getOrPut(BluetoothModule.ID) {
+                    BluetoothModule().also { it.start(context) }
+                }
             module.updateAutomations(bluetoothAutomations)
         } else {
             activeModules.remove(BluetoothModule.ID)?.stop(context)
@@ -194,9 +198,10 @@ object AutomationManager {
 
         // Wifi Module
         if (requiredModuleIds.contains(WifiModule.ID)) {
-            val module = activeModules.getOrPut(WifiModule.ID) {
-                WifiModule().also { it.start(context) }
-            }
+            val module =
+                activeModules.getOrPut(WifiModule.ID) {
+                    WifiModule().also { it.start(context) }
+                }
             module.updateAutomations(wifiAutomations)
         } else {
             activeModules.remove(WifiModule.ID)?.stop(context)
@@ -205,9 +210,10 @@ object AutomationManager {
 
     private fun startService(context: Context) {
         if (!AutomationService.isRunning) {
-            val intent = Intent(context, AutomationService::class.java).apply {
-                putExtra("is_foreground_start", true)
-            }
+            val intent =
+                Intent(context, AutomationService::class.java).apply {
+                    putExtra("is_foreground_start", true)
+                }
             try {
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                     context.startForegroundService(intent)

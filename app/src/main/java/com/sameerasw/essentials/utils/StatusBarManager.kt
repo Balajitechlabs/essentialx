@@ -33,7 +33,11 @@ object StatusBarManager {
      * @param requesterId [String] Unique ID of the module (e.g., "ScreenLockedSecurity")
      * @param flags [Set<String>] Set of flags to disable
      */
-    fun requestDisable(context: Context, requesterId: String, flags: Set<String>) {
+    fun requestDisable(
+        context: Context,
+        requesterId: String,
+        flags: Set<String>,
+    ) {
         disableRequests[requesterId] = flags
         update(context)
     }
@@ -43,7 +47,10 @@ object StatusBarManager {
      * @param context [Context] Context to run shell commands
      * @param requesterId [String] Unique ID of the module
      */
-    fun requestRestore(context: Context, requesterId: String) {
+    fun requestRestore(
+        context: Context,
+        requesterId: String,
+    ) {
         if (disableRequests.containsKey(requesterId)) {
             disableRequests.remove(requesterId)
             update(context)
@@ -55,11 +62,12 @@ object StatusBarManager {
      */
     private fun update(context: Context) {
         val allFlags = disableRequests.values.flatten().toSet()
-        val command = if (allFlags.isEmpty()) {
-            "cmd statusbar send-disable-flag none"
-        } else {
-            "cmd statusbar send-disable-flag ${allFlags.joinToString(" ")}"
-        }
+        val command =
+            if (allFlags.isEmpty()) {
+                "cmd statusbar send-disable-flag none"
+            } else {
+                "cmd statusbar send-disable-flag ${allFlags.joinToString(" ")}"
+            }
         ShellUtils.runCommand(context, command)
     }
 

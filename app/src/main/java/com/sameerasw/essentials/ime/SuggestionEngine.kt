@@ -34,15 +34,18 @@ private const val TAG = "SuggestionEngine"
 enum class SuggestionType {
     Prediction,
     Correction,
-    Learned
+    Learned,
 }
 
 @androidx.annotation.Keep
-data class Suggestion(val text: String, val type: SuggestionType)
+data class Suggestion(
+    val text: String,
+    val type: SuggestionType,
+)
 
-class SuggestionEngine(private val context: Context) :
-    SpellCheckerSession.SpellCheckerSessionListener {
-
+class SuggestionEngine(
+    private val context: Context,
+) : SpellCheckerSession.SpellCheckerSessionListener {
     private val userDictFile = File(context.filesDir, "user_dict.txt")
     private val userWords = mutableMapOf<String, Long>()
 
@@ -102,9 +105,10 @@ class SuggestionEngine(private val context: Context) :
                             try {
                                 checker.createDictionaryEntry(
                                     parts[0],
-                                    parts[1].toLongOrNull()?.toDouble() ?: 0.0
+                                    parts[1].toLongOrNull()?.toDouble() ?: 0.0,
                                 )
-                            } catch (e: Exception) { /* ignore */
+                            } catch (e: Exception) {
+                                // ignore
                             }
                         }
                     }
@@ -181,53 +185,55 @@ class SuggestionEngine(private val context: Context) :
         }
     }
 
-    suspend fun lookup(word: String) = withContext(Dispatchers.Main) {
-        currentWord = word
-        if (word.isBlank()) {
-            _suggestions.value = emptyList()
-            currentSymSpellSuggestions = emptyList()
-            return@withContext
-        }
+    suspend fun lookup(word: String) =
+        withContext(Dispatchers.Main) {
+            currentWord = word
+            if (word.isBlank()) {
+                _suggestions.value = emptyList()
+                currentSymSpellSuggestions = emptyList()
+                return@withContext
+            }
 
-        // 1. SymSpell (Fast, Predictive)
-        // Run on default dispatcher but wait for result to show immediately
-        val symResults = if (isSymSpellReady) {
-            withContext(Dispatchers.Default) {
-                try {
-                    // Max edit distance 2.0 for fuzzy
-                    symSpell?.lookup(word, Verbosity.Closest, 2.0)
-                        ?.map { item ->
-                            val term = item.term
-                            val type =
-                                if (userWords.containsKey(term)) SuggestionType.Learned else SuggestionType.Prediction
-                            Suggestion(term, type)
+            // 1. SymSpell (Fast, Predictive)
+            // Run on default dispatcher but wait for result to show immediately
+            val symResults =
+                if (isSymSpellReady) {
+                    withContext(Dispatchers.Default) {
+                        try {
+                            // Max edit distance 2.0 for fuzzy
+                            symSpell
+                                ?.lookup(word, Verbosity.Closest, 2.0)
+                                ?.map { item ->
+                                    val term = item.term
+                                    val type =
+                                        if (userWords.containsKey(term)) SuggestionType.Learned else SuggestionType.Prediction
+                                    Suggestion(term, type)
+                                }?.distinctBy { it.text }
+                                ?.take(6) ?: emptyList()
+                        } catch (e: Exception) {
+                            emptyList<Suggestion>()
                         }
-                        ?.distinctBy { it.text }
-                        ?.take(6) ?: emptyList()
+                    }
+                } else {
+                    emptyList()
+                }
+
+            currentSymSpellSuggestions = symResults
+            // Update immediately with SymSpell results (Native usually takes longer)
+            _suggestions.value = symResults
+
+            // 2. Android (Corrective, Slower)
+            val s = session
+            if (s != null) {
+                try {
+                    // Request suggestions. The callback onGetSuggestions will merge results
+                    @Suppress("DEPRECATION")
+                    s.getSuggestions(TextInfo(word), 5)
                 } catch (e: Exception) {
-                    emptyList<Suggestion>()
+                    Log.e(TAG, "Android lookup failed", e)
                 }
             }
-        } else {
-            emptyList()
         }
-
-        currentSymSpellSuggestions = symResults
-        // Update immediately with SymSpell results (Native usually takes longer)
-        _suggestions.value = symResults
-
-        // 2. Android (Corrective, Slower)
-        val s = session
-        if (s != null) {
-            try {
-                // Request suggestions. The callback onGetSuggestions will merge results
-                @Suppress("DEPRECATION")
-                s.getSuggestions(TextInfo(word), 5)
-            } catch (e: Exception) {
-                Log.e(TAG, "Android lookup failed", e)
-            }
-        }
-    }
 
     override fun onGetSuggestions(results: Array<out SuggestionsInfo>?) {
         // Runs on binder thread usually, switch to Main logic if needed, but StateFlow is thread safe.
@@ -251,9 +257,10 @@ class SuggestionEngine(private val context: Context) :
         // Deduplicate
         val androidSuggestionsList =
             androidSuggestions.map { Suggestion(it, SuggestionType.Correction) }
-        val merged = (currentSymSpellSuggestions + androidSuggestionsList)
-            .distinctBy { it.text }
-            .take(8)
+        val merged =
+            (currentSymSpellSuggestions + androidSuggestionsList)
+                .distinctBy { it.text }
+                .take(8)
 
         _suggestions.value = merged
     }

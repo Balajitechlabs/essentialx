@@ -54,7 +54,7 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 
 data class InstructionStep(
     val instruction: String,
-    val imageRes: Int
+    val imageRes: Int,
 )
 
 data class InstructionSection(
@@ -62,134 +62,137 @@ data class InstructionSection(
     val iconRes: Int,
     val description: String? = null,
     val steps: List<InstructionStep> = emptyList(),
-    val links: List<Pair<String, String>> = emptyList() // Pair(label, url)
+    val links: List<Pair<String, String>> = emptyList(), // Pair(label, url)
 )
 
 @Composable
 fun HelpAndGuidesContent() {
-    val sections = listOf(
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_perms_title),
-            iconRes = R.drawable.rounded_security_24,
-            steps = listOf(
-                InstructionStep(
-                    instruction = stringResource(R.string.instruction_step_perms_1),
-                    imageRes = R.drawable.accessibility_1
-                ),
-                InstructionStep(
-                    instruction = stringResource(R.string.instruction_step_perms_2),
-                    imageRes = R.drawable.accessibility_2
-                ),
-                InstructionStep(
-                    instruction = stringResource(R.string.instruction_step_perms_3),
-                    imageRes = R.drawable.accessibility_3
-                )
-            )
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_shizuku_title),
-            iconRes = R.drawable.rounded_adb_24,
-            description = stringResource(R.string.instruction_section_shizuku_desc),
-            links = listOf(
-                stringResource(R.string.perm_shizuku_title) to "https://github.com/thedjchi/Shizuku"
-            )
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_maps_title),
-            iconRes = R.drawable.rounded_navigation_24,
-            description = stringResource(R.string.instruction_section_maps_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_silent_title),
-            iconRes = R.drawable.rounded_volume_off_24,
-            description = stringResource(R.string.instruction_section_silent_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_freeze_title),
-            iconRes = R.drawable.rounded_mode_cool_24,
-            description = stringResource(R.string.instruction_section_freeze_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_security_title),
-            iconRes = R.drawable.rounded_security_24,
-            description = stringResource(R.string.instruction_section_security_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_statusbar_title),
-            iconRes = R.drawable.rounded_interests_24,
-            description = stringResource(R.string.instruction_section_statusbar_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_battery_saver_title),
-            iconRes = R.drawable.rounded_battery_charging_60_24,
-            description = stringResource(R.string.instruction_section_battery_saver_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_lighting_title),
-            iconRes = R.drawable.rounded_blur_linear_24,
-            description = stringResource(R.string.instruction_section_lighting_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_button_title),
-            iconRes = R.drawable.rounded_switch_access_3_24,
-            description = stringResource(R.string.instruction_section_button_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_flashlight_title),
-            iconRes = R.drawable.rounded_flashlight_on_24,
-            description = stringResource(R.string.instruction_section_flashlight_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_notification_snoozing_title),
-            iconRes = R.drawable.rounded_notifications_paused_24,
-            description = stringResource(R.string.instruction_section_notification_snoozing_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_safe_volume_title),
-            iconRes = R.drawable.rounded_sound_detection_loud_sound_24,
-            description = stringResource(R.string.instruction_section_safe_volume_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_genai_title),
-            iconRes = R.drawable.rounded_auto_awesome_24,
-            description = stringResource(R.string.instruction_section_genai_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_freezetags_title),
-            iconRes = R.drawable.rounded_bookmark_24,
-            description = stringResource(R.string.instruction_section_freezetags_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_diy_title),
-            iconRes = R.drawable.rounded_settings_24,
-            description = stringResource(R.string.instruction_section_diy_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_searchbar_title),
-            iconRes = R.drawable.rounded_search_24,
-            description = stringResource(R.string.instruction_section_searchbar_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_callvibes_title),
-            iconRes = R.drawable.rounded_mobile_vibrate_24,
-            description = stringResource(R.string.instruction_section_callvibes_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_backup_title),
-            iconRes = R.drawable.rounded_save_24,
-            description = stringResource(R.string.instruction_section_backup_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_pocketmode_title),
-            iconRes = R.drawable.rounded_mobile_off_24,
-            description = stringResource(R.string.instruction_section_pocketmode_desc)
-        ),
-        InstructionSection(
-            title = stringResource(R.string.instruction_section_about_title),
-            iconRes = R.drawable.ic_stat_name,
-            description = stringResource(R.string.instruction_section_about_desc)
+    val sections =
+        listOf(
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_perms_title),
+                iconRes = R.drawable.rounded_security_24,
+                steps =
+                    listOf(
+                        InstructionStep(
+                            instruction = stringResource(R.string.instruction_step_perms_1),
+                            imageRes = R.drawable.accessibility_1,
+                        ),
+                        InstructionStep(
+                            instruction = stringResource(R.string.instruction_step_perms_2),
+                            imageRes = R.drawable.accessibility_2,
+                        ),
+                        InstructionStep(
+                            instruction = stringResource(R.string.instruction_step_perms_3),
+                            imageRes = R.drawable.accessibility_3,
+                        ),
+                    ),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_shizuku_title),
+                iconRes = R.drawable.rounded_adb_24,
+                description = stringResource(R.string.instruction_section_shizuku_desc),
+                links =
+                    listOf(
+                        stringResource(R.string.perm_shizuku_title) to "https://github.com/thedjchi/Shizuku",
+                    ),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_maps_title),
+                iconRes = R.drawable.rounded_navigation_24,
+                description = stringResource(R.string.instruction_section_maps_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_silent_title),
+                iconRes = R.drawable.rounded_volume_off_24,
+                description = stringResource(R.string.instruction_section_silent_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_freeze_title),
+                iconRes = R.drawable.rounded_mode_cool_24,
+                description = stringResource(R.string.instruction_section_freeze_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_security_title),
+                iconRes = R.drawable.rounded_security_24,
+                description = stringResource(R.string.instruction_section_security_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_statusbar_title),
+                iconRes = R.drawable.rounded_interests_24,
+                description = stringResource(R.string.instruction_section_statusbar_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_battery_saver_title),
+                iconRes = R.drawable.rounded_battery_charging_60_24,
+                description = stringResource(R.string.instruction_section_battery_saver_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_lighting_title),
+                iconRes = R.drawable.rounded_blur_linear_24,
+                description = stringResource(R.string.instruction_section_lighting_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_button_title),
+                iconRes = R.drawable.rounded_switch_access_3_24,
+                description = stringResource(R.string.instruction_section_button_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_flashlight_title),
+                iconRes = R.drawable.rounded_flashlight_on_24,
+                description = stringResource(R.string.instruction_section_flashlight_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_notification_snoozing_title),
+                iconRes = R.drawable.rounded_notifications_paused_24,
+                description = stringResource(R.string.instruction_section_notification_snoozing_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_safe_volume_title),
+                iconRes = R.drawable.rounded_sound_detection_loud_sound_24,
+                description = stringResource(R.string.instruction_section_safe_volume_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_genai_title),
+                iconRes = R.drawable.rounded_auto_awesome_24,
+                description = stringResource(R.string.instruction_section_genai_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_freezetags_title),
+                iconRes = R.drawable.rounded_bookmark_24,
+                description = stringResource(R.string.instruction_section_freezetags_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_diy_title),
+                iconRes = R.drawable.rounded_settings_24,
+                description = stringResource(R.string.instruction_section_diy_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_searchbar_title),
+                iconRes = R.drawable.rounded_search_24,
+                description = stringResource(R.string.instruction_section_searchbar_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_callvibes_title),
+                iconRes = R.drawable.rounded_mobile_vibrate_24,
+                description = stringResource(R.string.instruction_section_callvibes_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_backup_title),
+                iconRes = R.drawable.rounded_save_24,
+                description = stringResource(R.string.instruction_section_backup_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_pocketmode_title),
+                iconRes = R.drawable.rounded_mobile_off_24,
+                description = stringResource(R.string.instruction_section_pocketmode_desc),
+            ),
+            InstructionSection(
+                title = stringResource(R.string.instruction_section_about_title),
+                iconRes = R.drawable.ic_stat_name,
+                description = stringResource(R.string.instruction_section_about_desc),
+            ),
         )
-    )
 
     RoundedCardContainer {
         sections.forEach { section ->
@@ -204,38 +207,40 @@ fun ExpandableGuideSection(section: InstructionSection) {
     var expanded by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 180f else 0f,
-        label = "arrow_rotation"
+        label = "arrow_rotation",
     )
     val context = LocalContext.current
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(2.dp))
-            .clickable { expanded = !expanded },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(2.dp))
+                .clickable { expanded = !expanded },
         shape = RoundedCornerShape(2.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (expanded) MaterialTheme.colorScheme.surfaceBright else MaterialTheme.colorScheme.surfaceContainerLow
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = if (expanded) MaterialTheme.colorScheme.surfaceBright else MaterialTheme.colorScheme.surfaceContainerLow,
+            ),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Surface(
                     color = MaterialTheme.colorScheme.primaryContainer,
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(40.dp),
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
                             painter = painterResource(id = section.iconRes),
                             contentDescription = null,
                             tint = if (expanded) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.background,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         )
                     }
                 }
@@ -244,46 +249,52 @@ fun ExpandableGuideSection(section: InstructionSection) {
                     text = section.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_keyboard_arrow_down_24),
-                    contentDescription = if (expanded) stringResource(R.string.action_collapse) else stringResource(
-                        R.string.action_expand
-                    ),
-                    modifier = Modifier.rotate(rotation)
+                    contentDescription =
+                        if (expanded) {
+                            stringResource(R.string.action_collapse)
+                        } else {
+                            stringResource(
+                                R.string.action_expand,
+                            )
+                        },
+                    modifier = Modifier.rotate(rotation),
                 )
             }
 
             // Content
             AnimatedVisibility(visible = expanded) {
                 Column(
-                    modifier = Modifier
-                        .padding(top = 24.dp)
-                        .fillMaxWidth(),
+                    modifier =
+                        Modifier
+                            .padding(top = 24.dp)
+                            .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     if (section.description != null) {
                         Text(
                             text = section.description,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.fillMaxWidth(fraction = 0.95f)
+                            modifier = Modifier.fillMaxWidth(fraction = 0.95f),
                         )
                     }
 
                     if (section.steps.isNotEmpty()) {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             section.steps.forEachIndexed { index, step ->
                                 InstructionStepItem(
                                     stepNumber = index + 1,
                                     instruction = step.instruction,
-                                    imageRes = step.imageRes
+                                    imageRes = step.imageRes,
                                 )
                             }
                         }
@@ -293,7 +304,7 @@ fun ExpandableGuideSection(section: InstructionSection) {
                         FlowRow(
                             modifier = Modifier.fillMaxWidth(fraction = 0.95f),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             section.links.forEach { (label, url) ->
                                 OutlinedButton(
@@ -301,12 +312,12 @@ fun ExpandableGuideSection(section: InstructionSection) {
                                         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                                         context.startActivity(intent)
                                     },
-                                    shape = RoundedCornerShape(12.dp)
+                                    shape = RoundedCornerShape(12.dp),
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.brand_github),
                                         contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(18.dp),
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(label)
@@ -324,12 +335,12 @@ fun ExpandableGuideSection(section: InstructionSection) {
 private fun InstructionStepItem(
     stepNumber: Int,
     instruction: String,
-    imageRes: Int
+    imageRes: Int,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Text(
             text = instruction,
@@ -340,14 +351,16 @@ private fun InstructionStepItem(
 
         Image(
             painter = painterResource(id = imageRes),
-            contentDescription = stringResource(
-                R.string.instruction_step_image_description,
-                stepNumber
-            ),
-            modifier = Modifier
-                .fillMaxWidth(fraction = 0.95f)
-                .clip(RoundedCornerShape(12.dp)),
-            contentScale = ContentScale.FillWidth
+            contentDescription =
+                stringResource(
+                    R.string.instruction_step_image_description,
+                    stepNumber,
+                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth(fraction = 0.95f)
+                    .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.FillWidth,
         )
     }
 }

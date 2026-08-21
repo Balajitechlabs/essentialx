@@ -42,29 +42,30 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun PocketModeSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
     var showAppSelectionSheet by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Text(
             text = stringResource(R.string.feat_pocket_mode_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             IconToggleItem(
                 title = stringResource(R.string.feat_pocket_mode_title),
@@ -75,7 +76,7 @@ fun PocketModeSettingsUI(
                 },
                 enabled = true,
                 iconRes = R.drawable.ic_pocket_mode,
-                modifier = Modifier.highlight(highlightSetting == "pocket_mode_toggle")
+                modifier = Modifier.highlight(highlightSetting == "pocket_mode_toggle"),
             )
 
             IconToggleItem(
@@ -87,7 +88,7 @@ fun PocketModeSettingsUI(
                 },
                 enabled = viewModel.isPocketModeEnabled.value,
                 iconRes = R.drawable.ic_light_sensor,
-                modifier = Modifier.highlight(highlightSetting == "pocket_mode_use_light_sensor")
+                modifier = Modifier.highlight(highlightSetting == "pocket_mode_use_light_sensor"),
             )
 
             ConfigSliderItem(
@@ -99,7 +100,7 @@ fun PocketModeSettingsUI(
                 increment = 1f,
                 valueFormatter = { "${it.toInt()}s" },
                 enabled = viewModel.isPocketModeEnabled.value,
-                iconRes = R.drawable.rounded_timer_24
+                iconRes = R.drawable.rounded_timer_24,
             )
 
             IconToggleItem(
@@ -108,7 +109,7 @@ fun PocketModeSettingsUI(
                 isChecked = viewModel.isPocketModeLockScreenOnly.value,
                 onCheckedChange = { viewModel.setPocketModeLockScreenOnly(it) },
                 enabled = viewModel.isPocketModeEnabled.value,
-                iconRes = R.drawable.rounded_lock_24
+                iconRes = R.drawable.rounded_lock_24,
             )
         }
 
@@ -118,7 +119,7 @@ fun PocketModeSettingsUI(
             text = stringResource(R.string.pocket_mode_exclude_apps_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Button(
@@ -126,7 +127,7 @@ fun PocketModeSettingsUI(
                 HapticUtil.performVirtualKeyHaptic(view)
                 showAppSelectionSheet = true
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(stringResource(R.string.action_select_apps))
         }
@@ -135,7 +136,7 @@ fun PocketModeSettingsUI(
             text = stringResource(R.string.pocket_mode_exclude_apps_desc),
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         if (showAppSelectionSheet) {
@@ -148,34 +149,39 @@ fun PocketModeSettingsUI(
                 onAppToggle = { ctx, pkg, enabled ->
                     viewModel.updatePocketModeExcludedAppEnabled(ctx, pkg, enabled)
                 },
-                context = context
+                context = context,
             )
         }
 
-        androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(8.dp))
+        androidx.compose.foundation.layout
+            .Spacer(modifier = Modifier.padding(8.dp))
 
         RoundedCardContainer(
             modifier = Modifier.fillMaxWidth(),
             containerColor = MaterialTheme.colorScheme.errorContainer,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             androidx.compose.foundation.layout.Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
             ) {
                 androidx.compose.material3.Icon(
-                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.rounded_info_24),
+                    painter =
+                        androidx.compose.ui.res
+                            .painterResource(id = R.drawable.rounded_info_24),
                     contentDescription = "Warning",
                     tint = MaterialTheme.colorScheme.onErrorContainer,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
-                androidx.compose.foundation.layout.Spacer(modifier = Modifier.width(16.dp))
+                androidx.compose.foundation.layout
+                    .Spacer(modifier = Modifier.width(16.dp))
                 Text(
                     text = stringResource(R.string.pocket_mode_warning),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onErrorContainer
+                    color = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
         }

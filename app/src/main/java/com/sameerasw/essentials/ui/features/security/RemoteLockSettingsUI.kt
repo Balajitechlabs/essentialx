@@ -37,7 +37,7 @@ fun RemoteLockSettingsUI(
     mainViewModel: MainViewModel,
     watchViewModel: WatchViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val settingsRepository = remember { SettingsRepository(context) }
@@ -55,39 +55,41 @@ fun RemoteLockSettingsUI(
         com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet(
             onDismissRequest = { showPermissionSheet = false },
             featureTitle = R.string.feat_lock_from_watch_title,
-            permissions = listOf(
-                com.sameerasw.essentials.ui.core.sheets.PermissionItem(
-                    iconRes = R.drawable.rounded_settings_accessibility_24,
-                    title = R.string.perm_accessibility_title,
-                    description = R.string.perm_accessibility_desc_common,
-                    dependentFeatures = listOf(R.string.feat_lock_from_watch_title),
-                    actionLabel = R.string.perm_action_enable,
-                    action = { PermissionUtils.openAccessibilitySettings(context) },
-                    isGranted = isAccessibilityEnabled
+            permissions =
+                listOf(
+                    com.sameerasw.essentials.ui.core.sheets.PermissionItem(
+                        iconRes = R.drawable.rounded_settings_accessibility_24,
+                        title = R.string.perm_accessibility_title,
+                        description = R.string.perm_accessibility_desc_common,
+                        dependentFeatures = listOf(R.string.feat_lock_from_watch_title),
+                        actionLabel = R.string.perm_action_enable,
+                        action = { PermissionUtils.openAccessibilitySettings(context) },
+                        isGranted = isAccessibilityEnabled,
+                    ),
+                    com.sameerasw.essentials.ui.core.sheets.PermissionItem(
+                        iconRes = R.drawable.rounded_security_24,
+                        title = R.string.perm_device_admin_title,
+                        description = R.string.perm_device_admin_desc,
+                        dependentFeatures = listOf(R.string.feat_lock_from_watch_title),
+                        actionLabel = R.string.perm_action_grant,
+                        action = { mainViewModel.requestDeviceAdmin(context) },
+                        isGranted = isDeviceAdminEnabled,
+                    ),
                 ),
-                com.sameerasw.essentials.ui.core.sheets.PermissionItem(
-                    iconRes = R.drawable.rounded_security_24,
-                    title = R.string.perm_device_admin_title,
-                    description = R.string.perm_device_admin_desc,
-                    dependentFeatures = listOf(R.string.feat_lock_from_watch_title),
-                    actionLabel = R.string.perm_action_grant,
-                    action = { mainViewModel.requestDeviceAdmin(context) },
-                    isGranted = isDeviceAdminEnabled
-                )
-            )
         )
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(16.dp),
     ) {
         Text(
             text = stringResource(R.string.remote_lock_mode_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
@@ -95,11 +97,12 @@ fun RemoteLockSettingsUI(
                 items = listOf(0, 1),
                 selectedItem = remoteLockMode,
                 onItemSelected = { mode ->
-                    val hasPermission = when (mode) {
-                        0 -> isAccessibilityEnabled
-                        1 -> isDeviceAdminEnabled
-                        else -> false
-                    }
+                    val hasPermission =
+                        when (mode) {
+                            0 -> isAccessibilityEnabled
+                            1 -> isDeviceAdminEnabled
+                            else -> false
+                        }
                     if (!hasPermission) {
                         showPermissionSheet = true
                     } else {
@@ -113,7 +116,7 @@ fun RemoteLockSettingsUI(
                         else -> ""
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "remote_lock_mode")
+                modifier = Modifier.highlight(highlightSetting == "remote_lock_mode"),
             )
         }
 
@@ -121,7 +124,7 @@ fun RemoteLockSettingsUI(
             text = stringResource(R.string.remote_lock_mode_admin_note),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 12.dp, start = 16.dp, end = 16.dp)
+            modifier = Modifier.padding(top = 12.dp, start = 16.dp, end = 16.dp),
         )
     }
 }

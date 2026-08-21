@@ -21,7 +21,6 @@ import androidx.core.app.NotificationCompat
 import com.sameerasw.essentials.R
 
 class AutomationService : Service() {
-
     companion object {
         private const val CHANNEL_ID = "automation_service_channel"
         private const val NOTIFICATION_ID = 999
@@ -30,13 +29,18 @@ class AutomationService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         val isForegroundStart = intent?.getBooleanExtra("is_foreground_start", false) ?: false
         if (isForegroundStart) {
             try {
                 startForeground(
-                    NOTIFICATION_ID, createNotification(),
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0
+                    NOTIFICATION_ID,
+                    createNotification(),
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE else 0,
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -63,22 +67,23 @@ class AutomationService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.automation_service_channel_name),
-                NotificationManager.IMPORTANCE_LOW
-            )
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.automation_service_channel_name),
+                    NotificationManager.IMPORTANCE_LOW,
+                )
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
         }
     }
 
-    private fun createNotification(): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+    private fun createNotification(): Notification =
+        NotificationCompat
+            .Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.automation_service_running_title))
             .setContentText(getString(R.string.automation_service_running_desc))
             .setSmallIcon(R.drawable.outline_bubble_chart_24)
             .setOngoing(true)
             .build()
-    }
 }

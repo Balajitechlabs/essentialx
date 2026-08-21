@@ -9,7 +9,6 @@
 
 package com.sameerasw.essentials.ui.activities
 
-import android.content.Context
 import android.content.Intent
 import android.database.ContentObserver
 import android.net.Uri
@@ -86,28 +85,26 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
     val view = LocalView.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    fun isUsbDebuggingEnabled(): Boolean {
-        return try {
+    fun isUsbDebuggingEnabled(): Boolean =
+        try {
             Settings.Global.getInt(context.contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
         } catch (_: Exception) {
             false
         }
-    }
 
-    fun isWifiDebuggingEnabled(): Boolean {
-        return try {
+    fun isWifiDebuggingEnabled(): Boolean =
+        try {
             Settings.Global.getInt(context.contentResolver, "adb_wifi_enabled", 0) == 1
         } catch (_: Exception) {
             false
         }
-    }
 
     fun setUsbDebuggingEnabled(enabled: Boolean) {
         try {
             Settings.Global.putInt(
                 context.contentResolver,
                 Settings.Global.ADB_ENABLED,
-                if (enabled) 1 else 0
+                if (enabled) 1 else 0,
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -119,7 +116,7 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
             Settings.Global.putInt(
                 context.contentResolver,
                 "adb_wifi_enabled",
-                if (enabled) 1 else 0
+                if (enabled) 1 else 0,
             )
         } catch (e: Exception) {
             e.printStackTrace()
@@ -131,13 +128,17 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
 
     DisposableEffect(Unit) {
         val handler = Handler(Looper.getMainLooper())
-        val observer = object : ContentObserver(handler) {
-            override fun onChange(selfChange: Boolean, uri: Uri?) {
-                super.onChange(selfChange, uri)
-                isUsbEnabled = isUsbDebuggingEnabled()
-                isWifiEnabled = isWifiDebuggingEnabled()
+        val observer =
+            object : ContentObserver(handler) {
+                override fun onChange(
+                    selfChange: Boolean,
+                    uri: Uri?,
+                ) {
+                    super.onChange(selfChange, uri)
+                    isUsbEnabled = isUsbDebuggingEnabled()
+                    isWifiEnabled = isWifiDebuggingEnabled()
+                }
             }
-        }
 
         val adbUri = Settings.Global.getUriFor(Settings.Global.ADB_ENABLED)
         val adbWifiUri = Settings.Global.getUriFor("adb_wifi_enabled")
@@ -157,34 +158,36 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .navigationBarsPadding()
-                .padding(bottom = 32.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .navigationBarsPadding()
+                    .padding(bottom = 32.dp)
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_adb_24),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(28.dp),
                 )
                 Text(
                     text = stringResource(R.string.tile_usb_debugging),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
 
@@ -198,7 +201,7 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
                         HapticUtil.performUIHaptic(view)
                         isUsbEnabled = enabled
                         setUsbDebuggingEnabled(enabled)
-                    }
+                    },
                 )
 
                 IconToggleItem(
@@ -210,33 +213,35 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
                         HapticUtil.performUIHaptic(view)
                         isWifiEnabled = enabled
                         setWifiDebuggingEnabled(enabled)
-                    }
+                    },
                 )
             }
 
-            val settingsRepository = remember {
-                SettingsRepository(context)
-            }
+            val settingsRepository =
+                remember {
+                    SettingsRepository(context)
+                }
             var tapAction by remember {
                 mutableStateOf(
                     settingsRepository.getString(
                         SettingsRepository.KEY_DEBUGGING_TILE_TAP_ACTION,
-                        "both"
-                    ) ?: "both"
+                        "both",
+                    ) ?: "both",
                 )
             }
 
-            val tapActionOptions = listOf(
-                "both" to R.string.debugging_tap_action_both,
-                "usb" to R.string.debugging_tap_action_usb,
-                "wireless" to R.string.debugging_tap_action_wireless
-            )
+            val tapActionOptions =
+                listOf(
+                    "both" to R.string.debugging_tap_action_both,
+                    "usb" to R.string.debugging_tap_action_usb,
+                    "wireless" to R.string.debugging_tap_action_wireless,
+                )
 
             Text(
                 text = stringResource(R.string.debugging_default_tap_action_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 4.dp)
+                modifier = Modifier.padding(start = 4.dp),
             )
 
             RoundedCardContainer(spacing = 0.dp) {
@@ -247,39 +252,42 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
                         tapAction = selected
                         settingsRepository.putString(
                             SettingsRepository.KEY_DEBUGGING_TILE_TAP_ACTION,
-                            selected
+                            selected,
                         )
                     },
                     labelProvider = { optionKey ->
-                        val stringRes = tapActionOptions.firstOrNull { it.first == optionKey }?.second
-                            ?: R.string.debugging_tap_action_both
+                        val stringRes =
+                            tapActionOptions.firstOrNull { it.first == optionKey }?.second
+                                ?: R.string.debugging_tap_action_both
                         context.getString(stringRes)
-                    }
+                    },
                 )
             }
 
             Button(
                 onClick = {
                     HapticUtil.performVirtualKeyHaptic(view)
-                    val devIntent = Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                    }
+                    val devIntent =
+                        Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        }
                     context.startActivity(devIntent)
                     onDismiss()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                shape = MaterialTheme.shapes.extraLarge
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                shape = MaterialTheme.shapes.extraLarge,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_mobile_code_24),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Text(
                     text = stringResource(R.string.tile_developer_options),
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp),
                 )
             }
         }

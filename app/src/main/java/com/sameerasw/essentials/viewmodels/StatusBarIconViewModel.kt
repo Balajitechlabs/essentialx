@@ -44,7 +44,6 @@ class StatusBarIconViewModel : ViewModel() {
     val isHideClockEnabled = mutableStateOf(false)
     val isHideNotificationIconsEnabled = mutableStateOf(false)
 
-
     // Dynamic icon visibility states based on registry
     private val iconVisibilities =
         mutableMapOf<String, androidx.compose.runtime.MutableState<Boolean>>()
@@ -80,16 +79,12 @@ class StatusBarIconViewModel : ViewModel() {
     /**
      * Get visibility state for a specific icon by ID
      */
-    fun getIconVisibility(iconId: String): androidx.compose.runtime.MutableState<Boolean>? {
-        return iconVisibilities[iconId]
-    }
+    fun getIconVisibility(iconId: String): androidx.compose.runtime.MutableState<Boolean>? = iconVisibilities[iconId]
 
     /**
      * Get all visibility states as a map
      */
-    fun getIconVisibilities(): Map<String, Boolean> {
-        return iconVisibilities.mapValues { it.value.value }
-    }
+    fun getIconVisibilities(): Map<String, Boolean> = iconVisibilities.mapValues { it.value.value }
 
     // Backward compatibility properties for UI
     val isMobileDataVisible get() = iconVisibilities["mobile_data"] ?: mutableStateOf(true)
@@ -116,14 +111,19 @@ class StatusBarIconViewModel : ViewModel() {
      */
     fun check(context: Context) {
         isWriteSecureSettingsEnabled.value = canWriteSecureSettings(context)
-        isShizukuAvailable.value = com.sameerasw.essentials.utils.ShizukuUtils.hasPermission()
-        isRootAvailable.value = com.sameerasw.essentials.utils.RootUtils.isRootPermissionGranted()
+        isShizukuAvailable.value =
+            com.sameerasw.essentials.utils.ShizukuUtils
+                .hasPermission()
+        isRootAvailable.value =
+            com.sameerasw.essentials.utils.RootUtils
+                .isRootPermissionGranted()
         loadIconVisibilityState(context)
         loadSmartWiFiPref(context)
         loadSmartDataPref(context)
         loadSelectedNetworkTypes(context)
         isWriteSettingsEnabled.value =
-            com.sameerasw.essentials.utils.PermissionUtils.canWriteSystemSettings(context)
+            com.sameerasw.essentials.utils.PermissionUtils
+                .canWriteSystemSettings(context)
         loadStatusBarSettings(context)
         loadAdvancedFlags(context)
 
@@ -138,7 +138,11 @@ class StatusBarIconViewModel : ViewModel() {
      * Generic method to set icon visibility
      * Reduces code duplication by handling all icon types
      */
-    fun setIconVisibility(iconId: String, visible: Boolean, context: Context) {
+    fun setIconVisibility(
+        iconId: String,
+        visible: Boolean,
+        context: Context,
+    ) {
         val iconState = iconVisibilities[iconId] ?: return
         iconState.value = visible
 
@@ -146,7 +150,8 @@ class StatusBarIconViewModel : ViewModel() {
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
             putBoolean(
                 StatusBarIconRegistry.getIconById(iconId)?.preferencesKey
-                    ?: "icon_${iconId}_visible", visible
+                    ?: "icon_${iconId}_visible",
+                visible,
             )
         }
 
@@ -154,7 +159,10 @@ class StatusBarIconViewModel : ViewModel() {
     }
 
     // Backward compatibility methods
-    fun setMobileDataVisible(visible: Boolean, context: Context) {
+    fun setMobileDataVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("mobile_data", visible, context)
     }
 
@@ -164,7 +172,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setWiFiVisible(visible: Boolean, context: Context) {
+    fun setWiFiVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("wifi", visible, context)
     }
 
@@ -174,7 +185,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setVpnVisible(visible: Boolean, context: Context) {
+    fun setVpnVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("vpn", visible, context)
     }
 
@@ -184,7 +198,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setAlarmClockVisible(visible: Boolean, context: Context) {
+    fun setAlarmClockVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("alarm", visible, context)
     }
 
@@ -194,7 +211,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setHotspotVisible(visible: Boolean, context: Context) {
+    fun setHotspotVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("hotspot", visible, context)
     }
 
@@ -204,7 +224,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setBluetoothVisible(visible: Boolean, context: Context) {
+    fun setBluetoothVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("bluetooth", visible, context)
     }
 
@@ -214,7 +237,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setDataSaverVisible(visible: Boolean, context: Context) {
+    fun setDataSaverVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("data_saver", visible, context)
     }
 
@@ -224,7 +250,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setHeadsetVisible(visible: Boolean, context: Context) {
+    fun setHeadsetVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("headset", visible, context)
     }
 
@@ -234,7 +263,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setRotateVisible(visible: Boolean, context: Context) {
+    fun setRotateVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("rotate", visible, context)
     }
 
@@ -244,7 +276,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setVolteVisible(visible: Boolean, context: Context) {
+    fun setVolteVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("volte", visible, context)
     }
 
@@ -254,7 +289,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setCastVisible(visible: Boolean, context: Context) {
+    fun setCastVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("cast", visible, context)
     }
 
@@ -264,7 +302,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setClockVisible(visible: Boolean, context: Context) {
+    fun setClockVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("clock", visible, context)
     }
 
@@ -274,7 +315,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param visible [Boolean] Target visible.
      * @param context [Context] Target context.
      */
-    fun setAirplaneVisible(visible: Boolean, context: Context) {
+    fun setAirplaneVisible(
+        visible: Boolean,
+        context: Context,
+    ) {
         setIconVisibility("airplane_mode", visible, context)
     }
 
@@ -284,7 +328,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param enabled [Boolean] Target enabled.
      * @param context [Context] Target context.
      */
-    fun setSmartWiFiEnabled(enabled: Boolean, context: Context) {
+    fun setSmartWiFiEnabled(
+        enabled: Boolean,
+        context: Context,
+    ) {
         isSmartWiFiEnabled.value = enabled
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
             putBoolean(PREF_SMART_WIFI_ENABLED, enabled)
@@ -298,7 +345,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param enabled [Boolean] Target enabled.
      * @param context [Context] Target context.
      */
-    fun setSmartDataEnabled(enabled: Boolean, context: Context) {
+    fun setSmartDataEnabled(
+        enabled: Boolean,
+        context: Context,
+    ) {
         isSmartDataEnabled.value = enabled
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
             putBoolean(PREF_SMART_DATA_ENABLED, enabled)
@@ -313,12 +363,17 @@ class StatusBarIconViewModel : ViewModel() {
      * @param context [Context] Target context.
      * @param enabled [Boolean] Target enabled.
      */
-    fun updateSelectedNetworkTypes(context: Context, enabled: Boolean) {
+    fun updateSelectedNetworkTypes(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-        val currentTypes = prefs.getStringSet(
-            PREF_SELECTED_NETWORK_TYPES,
-            setOf(NetworkType.NETWORK_4G.name, NetworkType.NETWORK_5G.name)
-        )?.toMutableSet() ?: mutableSetOf()
+        val currentTypes =
+            prefs
+                .getStringSet(
+                    PREF_SELECTED_NETWORK_TYPES,
+                    setOf(NetworkType.NETWORK_4G.name, NetworkType.NETWORK_5G.name),
+                )?.toMutableSet() ?: mutableSetOf()
 
         if (enabled) {
             currentTypes.add(NetworkType.NETWORK_5G.name)
@@ -370,7 +425,9 @@ class StatusBarIconViewModel : ViewModel() {
             val network = connectivityManager.activeNetwork ?: return false
             val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
             capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
-        } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: Exception,
+        ) {
             false
         }
     }
@@ -395,24 +452,23 @@ class StatusBarIconViewModel : ViewModel() {
 
     private fun loadSelectedNetworkTypes(context: Context) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-        val currentTypes = prefs.getStringSet(
-            PREF_SELECTED_NETWORK_TYPES,
-            setOf(NetworkType.NETWORK_4G.name, NetworkType.NETWORK_5G.name)
-        ) ?: setOf()
+        val currentTypes =
+            prefs.getStringSet(
+                PREF_SELECTED_NETWORK_TYPES,
+                setOf(NetworkType.NETWORK_4G.name, NetworkType.NETWORK_5G.name),
+            ) ?: setOf()
         selectedNetworkTypes.value = currentTypes.map { NetworkType.valueOf(it) }.toSet()
     }
 
-    private fun canWriteSecureSettings(context: Context): Boolean {
-        return com.sameerasw.essentials.utils.PermissionUtils.canWriteSecureSettings(context)
-    }
+    private fun canWriteSecureSettings(context: Context): Boolean =
+        com.sameerasw.essentials.utils.PermissionUtils
+            .canWriteSecureSettings(context)
 
     /**
      * Executes the get adb command operation.
      * @return The resulting String data.
      */
-    fun getAdbCommand(): String {
-        return "adb shell pm grant com.sameerasw.essentials android.permission.WRITE_SECURE_SETTINGS"
-    }
+    fun getAdbCommand(): String = "adb shell pm grant com.sameerasw.essentials android.permission.WRITE_SECURE_SETTINGS"
 
     override fun onCleared() {
         super.onCleared()
@@ -428,7 +484,9 @@ class StatusBarIconViewModel : ViewModel() {
         // Reset blacklist setting
         try {
             Settings.Secure.putString(context.contentResolver, ICON_BLACKLIST_SETTING, null)
-        } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: Exception,
+        ) {
             e.printStackTrace()
         }
 
@@ -467,17 +525,21 @@ class StatusBarIconViewModel : ViewModel() {
 
         // Load Clock Seconds
         isClockSecondsEnabled.value =
-            (Settings.Secure.getInt(context.contentResolver, "clock_seconds", 0) == 1 ||
-                    Settings.System.getInt(context.contentResolver, "clock_seconds", 0) == 1)
+            (
+                Settings.Secure.getInt(context.contentResolver, "clock_seconds", 0) == 1 ||
+                    Settings.System.getInt(context.contentResolver, "clock_seconds", 0) == 1
+            )
 
         // Load Privacy Chip
         isPrivacyChipEnabled.value =
-            (Settings.Secure.getInt(context.contentResolver, "privacy_chip_2447_enabled", 1) == 1 ||
+            (
+                Settings.Secure.getInt(context.contentResolver, "privacy_chip_2447_enabled", 1) == 1 ||
                     Settings.System.getInt(
                         context.contentResolver,
                         "privacy_chip_2447_enabled",
-                        1
-                    ) == 1)
+                        1,
+                    ) == 1
+            )
     }
 
     /**
@@ -486,7 +548,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param position [Int] Target position.
      * @param context [Context] Target context.
      */
-    fun setClockPosition(position: Int, context: Context) {
+    fun setClockPosition(
+        position: Int,
+        context: Context,
+    ) {
         clockPosition.value = position
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
             putInt(PREF_CLOCK_POSITION, position)
@@ -500,7 +565,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param enabled [Boolean] Target enabled.
      * @param context [Context] Target context.
      */
-    fun setClockSecondsEnabled(enabled: Boolean, context: Context) {
+    fun setClockSecondsEnabled(
+        enabled: Boolean,
+        context: Context,
+    ) {
         isClockSecondsEnabled.value = enabled
         updateSettingsValue(context, "clock_seconds", if (enabled) 1 else 0)
     }
@@ -511,7 +579,10 @@ class StatusBarIconViewModel : ViewModel() {
      * @param enabled [Boolean] Target enabled.
      * @param context [Context] Target context.
      */
-    fun setPrivacyChipEnabled(enabled: Boolean, context: Context) {
+    fun setPrivacyChipEnabled(
+        enabled: Boolean,
+        context: Context,
+    ) {
         isPrivacyChipEnabled.value = enabled
         updateSettingsValue(context, "privacy_chip_2447_enabled", if (enabled) 1 else 0)
     }
@@ -522,32 +593,41 @@ class StatusBarIconViewModel : ViewModel() {
      * @param mode [Int] Target mode.
      * @param context [Context] Target context.
      */
-    fun setBatteryPercentageMode(mode: Int, context: Context) {
+    fun setBatteryPercentageMode(
+        mode: Int,
+        context: Context,
+    ) {
         batteryPercentageMode.value = mode
         context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE).edit {
             putInt(PREF_BATTERY_PERCENT_MODE, mode)
         }
 
-        val systemValue = when (mode) {
-            1 -> 1 // Always
-            2 -> { // Charging
-                val batteryStatus: Intent? =
-                    IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
-                        context.registerReceiver(null, ifilter)
-                    }
-                val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
-                val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
-                        status == BatteryManager.BATTERY_STATUS_FULL
-                if (isCharging) 1 else 0
-            }
+        val systemValue =
+            when (mode) {
+                1 -> 1 // Always
+                2 -> { // Charging
+                    val batteryStatus: Intent? =
+                        IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+                            context.registerReceiver(null, ifilter)
+                        }
+                    val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+                    val isCharging =
+                        status == BatteryManager.BATTERY_STATUS_CHARGING ||
+                            status == BatteryManager.BATTERY_STATUS_FULL
+                    if (isCharging) 1 else 0
+                }
 
-            else -> 0 // Never
-        }
+                else -> 0 // Never
+            }
 
         updateSettingsValue(context, "status_bar_show_battery_percent", systemValue)
     }
 
-    private fun updateSettingsValue(context: Context, key: String, value: Int) {
+    private fun updateSettingsValue(
+        context: Context,
+        key: String,
+        value: Int,
+    ) {
         var success = false
         // Try System first
         try {
@@ -561,20 +641,29 @@ class StatusBarIconViewModel : ViewModel() {
             }
         }
 
-        val currentValue = try {
-            Settings.System.getInt(context.contentResolver, key, -1)
-        } catch (e: Exception) {
-            -1
-        }
+        val currentValue =
+            try {
+                Settings.System.getInt(context.contentResolver, key, -1)
+            } catch (e: Exception) {
+                -1
+            }
 
         // If standard API failed, fallback to Shizuku OR Root
         if (!success || currentValue != value) {
-            if (com.sameerasw.essentials.utils.ShizukuUtils.hasPermission()) {
-                com.sameerasw.essentials.utils.ShizukuUtils.runCommand("settings put system $key $value")
-                com.sameerasw.essentials.utils.ShizukuUtils.runCommand("settings put secure $key $value")
-            } else if (com.sameerasw.essentials.utils.RootUtils.isRootPermissionGranted()) {
-                com.sameerasw.essentials.utils.RootUtils.runCommand("settings put system $key $value")
-                com.sameerasw.essentials.utils.RootUtils.runCommand("settings put secure $key $value")
+            if (com.sameerasw.essentials.utils.ShizukuUtils
+                    .hasPermission()
+            ) {
+                com.sameerasw.essentials.utils.ShizukuUtils
+                    .runCommand("settings put system $key $value")
+                com.sameerasw.essentials.utils.ShizukuUtils
+                    .runCommand("settings put secure $key $value")
+            } else if (com.sameerasw.essentials.utils.RootUtils
+                    .isRootPermissionGranted()
+            ) {
+                com.sameerasw.essentials.utils.RootUtils
+                    .runCommand("settings put system $key $value")
+                com.sameerasw.essentials.utils.RootUtils
+                    .runCommand("settings put secure $key $value")
             }
         }
     }
@@ -596,7 +685,11 @@ class StatusBarIconViewModel : ViewModel() {
      * @param flagKey [String] Target flag key.
      * @param enabled [Boolean] Target enabled.
      */
-    fun setAdvancedFlagEnabled(context: Context, flagKey: String, enabled: Boolean) {
+    fun setAdvancedFlagEnabled(
+        context: Context,
+        flagKey: String,
+        enabled: Boolean,
+    ) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         when (flagKey) {
             PREF_HIDE_SYSTEM_ICONS -> isHideSystemIconsEnabled.value = enabled
@@ -620,14 +713,13 @@ class StatusBarIconViewModel : ViewModel() {
             com.sameerasw.essentials.utils.StatusBarManager.requestDisable(
                 context,
                 ADVANCED_FLAGS_REQUESTER_ID,
-                flags
+                flags,
             )
         } else {
             com.sameerasw.essentials.utils.StatusBarManager.requestRestore(
                 context,
-                ADVANCED_FLAGS_REQUESTER_ID
+                ADVANCED_FLAGS_REQUESTER_ID,
             )
         }
     }
 }
-

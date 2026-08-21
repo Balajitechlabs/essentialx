@@ -37,25 +37,25 @@ data class DeviceInfo(
     val securityPatch: String = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) Build.VERSION.SECURITY_PATCH else "Unknown",
     val osCodename: String = Build.VERSION.CODENAME,
     val buildTag: String = "",
-    val supportedDevices: String = ""
+    val supportedDevices: String = "",
 )
 
 object DeviceUtils {
     private val isGoogleDeviceLazy: Boolean by lazy {
         Build.MANUFACTURER.equals("google", ignoreCase = true) ||
-                Build.BRAND.equals("google", ignoreCase = true) ||
-                Build.PRODUCT.contains("pixel", ignoreCase = true)
+            Build.BRAND.equals("google", ignoreCase = true) ||
+            Build.PRODUCT.contains("pixel", ignoreCase = true)
     }
 
     private val isSamsungDeviceLazy: Boolean by lazy {
         Build.MANUFACTURER.equals("samsung", ignoreCase = true) ||
-                Build.BRAND.equals("samsung", ignoreCase = true)
+            Build.BRAND.equals("samsung", ignoreCase = true)
     }
 
     private val isTclDeviceLazy: Boolean by lazy {
         Build.MANUFACTURER.equals("tcl", ignoreCase = true) ||
-                Build.BRAND.equals("tcl", ignoreCase = true) ||
-                Build.PRODUCT.contains("tcl", ignoreCase = true)
+            Build.BRAND.equals("tcl", ignoreCase = true) ||
+            Build.PRODUCT.contains("tcl", ignoreCase = true)
     }
 
     private val isMediatekDeviceLazy: Boolean by lazy {
@@ -63,35 +63,46 @@ object DeviceUtils {
         val board = Build.BOARD.lowercase()
         val brand = Build.BRAND.lowercase()
         val manufacturer = Build.MANUFACTURER.lowercase()
-        val socManufacturer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Build.SOC_MANUFACTURER.lowercase()
-        } else {
-            ""
-        }
+        val socManufacturer =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                Build.SOC_MANUFACTURER.lowercase()
+            } else {
+                ""
+            }
 
-        hardware.contains("mt") || hardware.contains("mediatek") || hardware.contains("dimensity") ||
-                board.contains("mt") || board.contains("mediatek") || board.contains("dimensity") ||
-                brand.contains("mediatek") || manufacturer.contains("mediatek") ||
-                socManufacturer.contains("mediatek") || socManufacturer.contains("mtk")
+        hardware.contains("mt") ||
+            hardware.contains("mediatek") ||
+            hardware.contains("dimensity") ||
+            board.contains("mt") ||
+            board.contains("mediatek") ||
+            board.contains("dimensity") ||
+            brand.contains("mediatek") ||
+            manufacturer.contains("mediatek") ||
+            socManufacturer.contains("mediatek") ||
+            socManufacturer.contains("mtk")
     }
 
     fun isGoogleDevice(): Boolean = isGoogleDeviceLazy
+
     fun isSamsungDevice(): Boolean = isSamsungDeviceLazy
+
     fun isMediatekDevice(): Boolean = isMediatekDeviceLazy
+
     fun isTclDevice(): Boolean = isTclDeviceLazy
 
     fun getDeviceInfo(context: Context): DeviceInfo {
-        val deviceName = try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
-                Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME)
-                    ?: Settings.Secure.getString(context.contentResolver, "bluetooth_name")
-                    ?: Build.MODEL
-            } else {
-                Settings.Secure.getString(context.contentResolver, "bluetooth_name") ?: Build.MODEL
+        val deviceName =
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+                    Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME)
+                        ?: Settings.Secure.getString(context.contentResolver, "bluetooth_name")
+                        ?: Build.MODEL
+                } else {
+                    Settings.Secure.getString(context.contentResolver, "bluetooth_name") ?: Build.MODEL
+                }
+            } catch (e: Exception) {
+                Build.MODEL
             }
-        } catch (e: Exception) {
-            Build.MODEL
-        }
 
         val stat = StatFs(Environment.getDataDirectory().path)
         val blockSize = stat.blockSizeLong
@@ -110,12 +121,15 @@ object DeviceUtils {
         val deviceOsCodename = Build.VERSION.CODENAME
         val matchedVersion = buildInfo?.optString("version")
 
-        val androidVersion = matchedVersion?.let {
-            if (it.startsWith("Android ")) {
-                val v = it.removePrefix("Android ").substringBefore(" ")
-                if (v.firstOrNull()?.isDigit() == true) v else null
-            } else null
-        } ?: Build.VERSION.RELEASE
+        val androidVersion =
+            matchedVersion?.let {
+                if (it.startsWith("Android ")) {
+                    val v = it.removePrefix("Android ").substringBefore(" ")
+                    if (v.firstOrNull()?.isDigit() == true) v else null
+                } else {
+                    null
+                }
+            } ?: Build.VERSION.RELEASE
 
         return DeviceInfo(
             deviceName = deviceName,
@@ -124,18 +138,25 @@ object DeviceUtils {
             totalRam = memoryInfo.totalMem,
             availableRam = memoryInfo.availMem,
             androidVersion = androidVersion,
-            securityPatch = buildInfo?.optString("patch")?.takeIf { it.isNotBlank() }
-                ?: deviceSecurityPatch,
+            securityPatch =
+                buildInfo?.optString("patch")?.takeIf { it.isNotBlank() }
+                    ?: deviceSecurityPatch,
             osCodename = matchedVersion?.takeIf { it.isNotBlank() } ?: deviceOsCodename,
             buildTag = buildInfo?.optString("tag") ?: "",
-            supportedDevices = buildInfo?.optString("devices") ?: ""
+            supportedDevices = buildInfo?.optString("devices") ?: "",
         )
     }
 
-    private fun findBuildInfo(context: Context, buildId: String): org.json.JSONObject? {
+    private fun findBuildInfo(
+        context: Context,
+        buildId: String,
+    ): org.json.JSONObject? {
         return try {
             val jsonString =
-                context.assets.open("android_builds.json").bufferedReader().use { it.readText() }
+                context.assets
+                    .open("android_builds.json")
+                    .bufferedReader()
+                    .use { it.readText() }
             val jsonArray = JSONArray(jsonString)
             for (i in 0 until jsonArray.length()) {
                 val obj = jsonArray.getJSONObject(i)
@@ -156,37 +177,43 @@ object DeviceUtils {
         return java.lang.String.format(
             "%.1f %s",
             size / Math.pow(1024.0, digitGroups.toDouble()),
-            units[digitGroups]
+            units[digitGroups],
         )
     }
 
-    fun getOSName(sdkInt: Int, defaultCodename: String): String {
+    fun getOSName(
+        sdkInt: Int,
+        defaultCodename: String,
+    ): String {
         // Try to determine by version string first (most accurate for betas)
         val name = defaultCodename.lowercase()
         if (name.contains("17") || name.contains("cinnamon")) return "CinnamonBun"
         if (name.contains("16") || name.contains("baklava")) return "Baklava"
 
-        val dessert = when (sdkInt) {
-            37 -> "CinnamonBun"
-            36 -> "Baklava"
-            35 -> "Vanilla Ice Cream"
-            34 -> "Upside Down Cake"
-            33 -> "Tiramisu"
-            32 -> "Snow Cone v2"
-            31 -> "Snow Cone"
-            30 -> "R"
-            29 -> "Q"
-            28 -> "Pie"
-            27 -> "Oreo"
-            26 -> "Oreo"
-            else -> null
-        }
+        val dessert =
+            when (sdkInt) {
+                37 -> "CinnamonBun"
+                36 -> "Baklava"
+                35 -> "Vanilla Ice Cream"
+                34 -> "Upside Down Cake"
+                33 -> "Tiramisu"
+                32 -> "Snow Cone v2"
+                31 -> "Snow Cone"
+                30 -> "R"
+                29 -> "Q"
+                28 -> "Pie"
+                27 -> "Oreo"
+                26 -> "Oreo"
+                else -> null
+            }
 
         if (dessert != null) return dessert
 
         // If SDK mapping fails, try to use the provided codename
-        if (defaultCodename.contains("Beta") || defaultCodename.contains("Canary") || defaultCodename.contains(
-                "QPR"
+        if (defaultCodename.contains("Beta") ||
+            defaultCodename.contains("Canary") ||
+            defaultCodename.contains(
+                "QPR",
             )
         ) {
             return defaultCodename
@@ -230,7 +257,7 @@ object DeviceUtils {
         // Samsung devices on One UI 7 (Android 15) or below have a broken blur implementation
         // that causes a gray screen overlay. Disable it for them. (╯°□°）╯︵ ┻━┻
         return Build.MANUFACTURER.equalsIgnoreCase("samsung") &&
-                Build.VERSION.SDK_INT <= 35 // Android 15
+            Build.VERSION.SDK_INT <= 35 // Android 15
     }
 
     fun isPowerSaveMode(context: Context): Boolean {
@@ -239,7 +266,5 @@ object DeviceUtils {
         return powerManager?.isPowerSaveMode == true
     }
 
-    private fun String.equalsIgnoreCase(other: String): Boolean {
-        return this.equals(other, ignoreCase = true)
-    }
+    private fun String.equalsIgnoreCase(other: String): Boolean = this.equals(other, ignoreCase = true)
 }

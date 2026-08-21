@@ -10,8 +10,6 @@
 package com.sameerasw.essentials.services.handlers
 
 import android.accessibilityservice.AccessibilityService
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -28,42 +26,45 @@ import android.view.WindowManager
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.services.NotificationListener
 
-class SmartPixelsHandler(private val service: AccessibilityService) {
-
+class SmartPixelsHandler(
+    private val service: AccessibilityService,
+) {
     private var windowManager: WindowManager? = null
     private var displayManager: DisplayManager? = null
     private var overlayView: SmartPixelsOverlayView? = null
     private var isOverlayAdded = false
 
     private val handler = Handler(Looper.getMainLooper())
-    private val shiftPatternRunnable = object : Runnable {
-        override fun run() {
-            overlayView?.shiftPattern()
-            handler.postDelayed(this, 30 * 60 * 1000L) // Shift pattern every 30 minutes to prevent burn-in
+    private val shiftPatternRunnable =
+        object : Runnable {
+            override fun run() {
+                overlayView?.shiftPattern()
+                handler.postDelayed(this, 30 * 60 * 1000L) // Shift pattern every 30 minutes to prevent burn-in
+            }
         }
-    }
 
     private var isScreenRecordingActive = false
     private var screenRecordingCallback: java.util.function.Consumer<Int>? = null
 
-    private val displayListener = object : DisplayManager.DisplayListener {
-        override fun onDisplayAdded(displayId: Int) {
-            updateState()
-        }
+    private val displayListener =
+        object : DisplayManager.DisplayListener {
+            override fun onDisplayAdded(displayId: Int) {
+                updateState()
+            }
 
-        override fun onDisplayRemoved(displayId: Int) {
-            updateState()
-        }
+            override fun onDisplayRemoved(displayId: Int) {
+                updateState()
+            }
 
-        override fun onDisplayChanged(displayId: Int) {
-            updateState()
+            override fun onDisplayChanged(displayId: Int) {
+                updateState()
+            }
         }
-    }
 
     private val prefs by lazy {
         service.getSharedPreferences(
             SettingsRepository.PREFS_NAME,
-            AccessibilityService.MODE_PRIVATE
+            AccessibilityService.MODE_PRIVATE,
         )
     }
 
@@ -76,14 +77,15 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
 
         if (android.os.Build.VERSION.SDK_INT >= 35 && windowManager != null) {
             try {
-                val callback = java.util.function.Consumer<Int> { state ->
-                    isScreenRecordingActive = (state == WindowManager.SCREEN_RECORDING_STATE_VISIBLE)
-                    updateState()
-                }
+                val callback =
+                    java.util.function.Consumer<Int> { state ->
+                        isScreenRecordingActive = (state == WindowManager.SCREEN_RECORDING_STATE_VISIBLE)
+                        updateState()
+                    }
                 screenRecordingCallback = callback
                 windowManager?.addScreenRecordingCallback(
                     { command -> handler.post(command) },
-                    callback
+                    callback,
                 )
             } catch (e: Exception) {
                 Log.e("SmartPixelsHandler", "Failed to register screen recording callback", e)
@@ -130,24 +132,26 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
         overlayView?.setIntensity(intensity)
 
         if (!isOverlayAdded && windowManager != null && overlayView != null) {
-            val params = WindowManager.LayoutParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                        WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                        WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
-                        WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
-                PixelFormat.TRANSLUCENT
-            ).apply {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-                    layoutInDisplayCutoutMode =
-                        WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-                }
-            }
+            val params =
+                WindowManager
+                    .LayoutParams(
+                        WindowManager.LayoutParams.MATCH_PARENT,
+                        WindowManager.LayoutParams.MATCH_PARENT,
+                        WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                            WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS or
+                            WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED,
+                        PixelFormat.TRANSLUCENT,
+                    ).apply {
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                            layoutInDisplayCutoutMode =
+                                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                        }
+                    }
 
             try {
                 overlayView?.visibility = View.VISIBLE
@@ -204,7 +208,9 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
         displayManager = null
     }
 
-    private class SmartPixelsOverlayView(context: AccessibilityService) : View(context) {
+    private class SmartPixelsOverlayView(
+        context: AccessibilityService,
+    ) : View(context) {
         private val paint = Paint()
         private var cachedPatternBitmap: Bitmap? = null
         private var lastWidth = 0
@@ -232,7 +238,12 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
             invalidate()
         }
 
-        override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        override fun onSizeChanged(
+            w: Int,
+            h: Int,
+            oldw: Int,
+            oldh: Int,
+        ) {
             super.onSizeChanged(w, h, oldw, oldh)
             if (w != lastWidth || h != lastHeight) {
                 lastWidth = w
@@ -242,23 +253,28 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
             }
         }
 
-        private fun createPatternBitmap(w: Int, h: Int): Bitmap {
+        private fun createPatternBitmap(
+            w: Int,
+            h: Int,
+        ): Bitmap {
             val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
             val canvas = Canvas(bmp)
-            val p = Paint().apply {
-                color = Color.BLACK
-                style = Paint.Style.FILL
-                isAntiAlias = false
-            }
+            val p =
+                Paint().apply {
+                    color = Color.BLACK
+                    style = Paint.Style.FILL
+                    isAntiAlias = false
+                }
             val alphaValue = (currentIntensity / 100f * 255).toInt().coerceIn(20, 230)
             p.alpha = alphaValue
 
-            val step = when {
-                currentIntensity >= 75f -> 2
-                currentIntensity >= 50f -> 3
-                currentIntensity >= 30f -> 4
-                else -> 6
-            }
+            val step =
+                when {
+                    currentIntensity >= 75f -> 2
+                    currentIntensity >= 50f -> 3
+                    currentIntensity >= 30f -> 4
+                    else -> 6
+                }
 
             val offsetX = (patternOffset % 2) * step
             val offsetY = (patternOffset / 2) * step
@@ -272,7 +288,7 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
                         (y + offsetY).toFloat(),
                         (x + step).toFloat(),
                         (y + offsetY + step).toFloat(),
-                        p
+                        p,
                     )
                     x += step * 2
                 }

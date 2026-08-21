@@ -17,16 +17,12 @@ import android.service.quicksettings.Tile
 import com.sameerasw.essentials.R
 
 class PrivateNotificationsTileService : BaseTileService() {
-
     override fun getTileLabel(): String = "Sensitive Content"
 
-    override fun getTileSubtitle(): String {
-        return if (arePrivateNotificationsAllowed()) "Shown on lock screen" else "Hidden on lock screen"
-    }
+    override fun getTileSubtitle(): String = if (arePrivateNotificationsAllowed()) "Shown on lock screen" else "Hidden on lock screen"
 
-    override fun hasFeaturePermission(): Boolean {
-        return checkCallingOrSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED
-    }
+    override fun hasFeaturePermission(): Boolean =
+        checkCallingOrSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED
 
     override fun getTileIcon(): Icon {
         val iconRes =
@@ -34,9 +30,7 @@ class PrivateNotificationsTileService : BaseTileService() {
         return Icon.createWithResource(this, iconRes)
     }
 
-    override fun getTileState(): Int {
-        return if (arePrivateNotificationsAllowed()) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-    }
+    override fun getTileState(): Int = if (arePrivateNotificationsAllowed()) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
 
     override fun onTileClick() {
         val newState = if (arePrivateNotificationsAllowed()) 0 else 1
@@ -48,7 +42,7 @@ class PrivateNotificationsTileService : BaseTileService() {
         return Settings.Secure.getInt(
             contentResolver,
             "lock_screen_allow_private_notifications",
-            1
+            1,
         ) == 1
     }
 }

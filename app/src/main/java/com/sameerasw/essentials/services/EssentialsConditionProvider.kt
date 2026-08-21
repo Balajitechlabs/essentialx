@@ -18,14 +18,16 @@ import android.util.Log
 
 @Suppress("DEPRECATION")
 class EssentialsConditionProvider : ConditionProviderService() {
-
     companion object {
         private const val TAG = "EssentialsCPS"
         val CONDITION_URI: Uri = Uri.parse("condition://com.sameerasw.essentials/focus")
 
         private var instance: EssentialsConditionProvider? = null
 
-        fun setConditionState(context: Context, isActive: Boolean) {
+        fun setConditionState(
+            context: Context,
+            isActive: Boolean,
+        ) {
             Log.d(TAG, "Requesting condition state: $isActive")
             val provider = instance
             if (provider != null) {
@@ -42,7 +44,6 @@ class EssentialsConditionProvider : ConditionProviderService() {
 
     @Deprecated("Deprecated in Java")
     override fun onConnected() {
-
         Log.d(TAG, "onConnected")
         instance = this
     }

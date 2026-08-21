@@ -19,111 +19,128 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class UpdateRepository {
-
     suspend fun checkForUpdates(
         context: Context,
         isPreReleaseCheckEnabled: Boolean,
-        currentVersion: String
-    ): UpdateInfo? = withContext(Dispatchers.IO) {
-        try {
-            val autoUpdateHelper = AutoUpdateManagerHelper(context)
-            val updateFeatures =
-                autoUpdateHelper.checkForUpdate("https://sameerasw.com/essentials-update.json")
+        currentVersion: String,
+    ): UpdateInfo? =
+        withContext(Dispatchers.IO) {
+            try {
+                val autoUpdateHelper = AutoUpdateManagerHelper(context)
+                val updateFeatures =
+                    autoUpdateHelper.checkForUpdate("https://sameerasw.com/essentials-update.json")
 
-            if (updateFeatures != null && updateFeatures.latestversion.isNotEmpty()) {
-                val latestVersion = updateFeatures.latestversion
-                val hasUpdate = isNewerVersion(currentVersion, latestVersion)
-                return@withContext UpdateInfo(
-                    versionName = latestVersion,
-                    releaseNotes = updateFeatures.changelog,
-                    downloadUrl = updateFeatures.apk_url,
-                    releaseUrl = if (updateFeatures.changelog.startsWith("http")) updateFeatures.changelog else "https://github.com/sameerasw/essentials/releases",
-                    isUpdateAvailable = hasUpdate
-                )
+                if (updateFeatures != null && updateFeatures.latestversion.isNotEmpty()) {
+                    val latestVersion = updateFeatures.latestversion
+                    val hasUpdate = isNewerVersion(currentVersion, latestVersion)
+                    return@withContext UpdateInfo(
+                        versionName = latestVersion,
+                        releaseNotes = updateFeatures.changelog,
+                        downloadUrl = updateFeatures.apk_url,
+                        releaseUrl =
+                            if (updateFeatures.changelog.startsWith(
+                                    "http",
+                                )
+                            ) {
+                                updateFeatures.changelog
+                            } else {
+                                "https://github.com/sameerasw/essentials/releases"
+                            },
+                        isUpdateAvailable = hasUpdate,
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
 
-        checkForUpdatesFromGitHub(isPreReleaseCheckEnabled, currentVersion)
-    }
+            checkForUpdatesFromGitHub(isPreReleaseCheckEnabled, currentVersion)
+        }
 
     private suspend fun checkForUpdatesFromGitHub(
         isPreReleaseCheckEnabled: Boolean,
-        currentVersion: String
-    ): UpdateInfo? = withContext(Dispatchers.IO) {
-        try {
-            val urlString = if (isPreReleaseCheckEnabled) {
-                "https://api.github.com/repos/sameerasw/essentials/releases"
-            } else {
-                "https://api.github.com/repos/sameerasw/essentials/releases/latest"
-            }
+        currentVersion: String,
+    ): UpdateInfo? =
+        withContext(Dispatchers.IO) {
+            try {
+                val urlString =
+                    if (isPreReleaseCheckEnabled) {
+                        "https://api.github.com/repos/sameerasw/essentials/releases"
+                    } else {
+                        "https://api.github.com/repos/sameerasw/essentials/releases/latest"
+                    }
 
-            val url = URL(urlString)
-            val connection = url.openConnection() as HttpURLConnection
+                val url = URL(urlString)
+                val connection = url.openConnection() as HttpURLConnection
 
-            if (connection.responseCode != 200) {
-                return@withContext null
-            }
-
-            val releaseData = connection.inputStream.bufferedReader().readText()
-
-            val release: Map<String, Any>? = if (isPreReleaseCheckEnabled) {
-                val releases = Gson().fromJson(releaseData, Array<Any>::class.java)
-                    .filterIsInstance<Map<String, Any>>()
-
-                releases.maxByOrNull { rel ->
-                    val tagName = (rel["tag_name"] as? String)?.removePrefix("v") ?: "0.0.0"
-                    SemanticVersion.parse(tagName)
+                if (connection.responseCode != 200) {
+                    return@withContext null
                 }
-            } else {
-                Gson().fromJson(releaseData, Map::class.java) as? Map<String, Any>
+
+                val releaseData = connection.inputStream.bufferedReader().readText()
+
+                val release: Map<String, Any>? =
+                    if (isPreReleaseCheckEnabled) {
+                        val releases =
+                            Gson()
+                                .fromJson(releaseData, Array<Any>::class.java)
+                                .filterIsInstance<Map<String, Any>>()
+
+                        releases.maxByOrNull { rel ->
+                            val tagName = (rel["tag_name"] as? String)?.removePrefix("v") ?: "0.0.0"
+                            SemanticVersion.parse(tagName)
+                        }
+                    } else {
+                        Gson().fromJson(releaseData, Map::class.java) as? Map<String, Any>
+                    }
+
+                if (release == null) return@withContext null
+
+                val latestVersion = (release["tag_name"] as? String)?.removePrefix("v") ?: "0.0"
+                val body = release["body"] as? String ?: ""
+                val releaseUrl = release["html_url"] as? String ?: ""
+                val assets = (release["assets"] as? List<*>)?.filterIsInstance<Map<String, Any>>()
+                val downloadUrl =
+                    assets
+                        ?.firstOrNull { it["name"].toString() == "app-release.apk" }
+                        ?.get("browser_download_url") as? String
+                        ?: assets
+                            ?.firstOrNull { it["name"].toString().endsWith(".apk") }
+                            ?.get("browser_download_url") as? String
+                        ?: ""
+
+                val hasUpdate = isNewerVersion(currentVersion, latestVersion)
+
+                UpdateInfo(
+                    versionName = latestVersion,
+                    releaseNotes = body,
+                    downloadUrl = downloadUrl,
+                    releaseUrl = releaseUrl,
+                    isUpdateAvailable = hasUpdate,
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
             }
-
-            if (release == null) return@withContext null
-
-            val latestVersion = (release["tag_name"] as? String)?.removePrefix("v") ?: "0.0"
-            val body = release["body"] as? String ?: ""
-            val releaseUrl = release["html_url"] as? String ?: ""
-            val assets = (release["assets"] as? List<*>)?.filterIsInstance<Map<String, Any>>()
-            val downloadUrl = assets?.firstOrNull { it["name"].toString() == "app-release.apk" }
-                ?.get("browser_download_url") as? String
-                ?: assets?.firstOrNull { it["name"].toString().endsWith(".apk") }
-                    ?.get("browser_download_url") as? String
-                ?: ""
-
-            val hasUpdate = isNewerVersion(currentVersion, latestVersion)
-
-            UpdateInfo(
-                versionName = latestVersion,
-                releaseNotes = body,
-                downloadUrl = downloadUrl,
-                releaseUrl = releaseUrl,
-                isUpdateAvailable = hasUpdate
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
         }
-    }
 
-    private fun isNewerVersion(current: String, latest: String): Boolean {
-        return try {
+    private fun isNewerVersion(
+        current: String,
+        latest: String,
+    ): Boolean =
+        try {
             val currentVer = SemanticVersion.parse(current)
             val latestVer = SemanticVersion.parse(latest)
             latestVer > currentVer
         } catch (e: Exception) {
             latest != current
         }
-    }
 
     private data class SemanticVersion(
         val major: Int,
         val minor: Int,
         val patch: Int,
-        val preRelease: String? = null
+        val preRelease: String? = null,
     ) : Comparable<SemanticVersion> {
-
         override fun compareTo(other: SemanticVersion): Int {
             if (major != other.major) return major - other.major
             if (minor != other.minor) return minor - other.minor
@@ -133,7 +150,7 @@ class UpdateRepository {
             if (preRelease == null && other.preRelease != null) return 1
             if (preRelease != null && other.preRelease == null) return -1
 
-            // Compare pre-release strings naturally if both exist 
+            // Compare pre-release strings naturally if both exist
             // (e.g. beta.1 < beta.2) - String comparison matches lexical order
             if (preRelease != null && other.preRelease != null) {
                 return preRelease.compareTo(other.preRelease)

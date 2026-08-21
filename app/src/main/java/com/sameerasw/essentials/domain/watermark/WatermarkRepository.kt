@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.map
 private val Context.dataStore by preferencesDataStore(name = "watermark_prefs")
 
 class WatermarkRepository(
-    private val context: Context
+    private val context: Context,
 ) {
     private val PREF_STYLE = stringPreferencesKey("watermark_style")
     private val PREF_SHOW_BRAND = booleanPreferencesKey("show_brand")
@@ -33,66 +33,81 @@ class WatermarkRepository(
     private val PREF_SHOW_DATE = booleanPreferencesKey("show_date")
     private val PREF_COLOR_MODE = stringPreferencesKey("color_mode")
     private val PREF_ACCENT_COLOR =
-        androidx.datastore.preferences.core.intPreferencesKey("accent_color")
+        androidx.datastore.preferences.core
+            .intPreferencesKey("accent_color")
     private val PREF_MOVE_TO_TOP = booleanPreferencesKey("move_to_top")
     private val PREF_LEFT_ALIGN = booleanPreferencesKey("left_align")
     private val PREF_BRAND_TEXT_SIZE =
-        androidx.datastore.preferences.core.intPreferencesKey("brand_text_size")
+        androidx.datastore.preferences.core
+            .intPreferencesKey("brand_text_size")
     private val PREF_DATA_TEXT_SIZE =
-        androidx.datastore.preferences.core.intPreferencesKey("data_text_size")
+        androidx.datastore.preferences.core
+            .intPreferencesKey("data_text_size")
     private val PREF_SHOW_CUSTOM_TEXT = booleanPreferencesKey("show_custom_text")
     private val PREF_CUSTOM_TEXT = stringPreferencesKey("custom_text")
     private val PREF_CUSTOM_TEXT_SIZE =
-        androidx.datastore.preferences.core.intPreferencesKey("custom_text_size")
-    private val PREF_PADDING = androidx.datastore.preferences.core.intPreferencesKey("padding")
+        androidx.datastore.preferences.core
+            .intPreferencesKey("custom_text_size")
+    private val PREF_PADDING =
+        androidx.datastore.preferences.core
+            .intPreferencesKey("padding")
     private val PREF_BORDER_STROKE =
-        androidx.datastore.preferences.core.intPreferencesKey("border_stroke")
+        androidx.datastore.preferences.core
+            .intPreferencesKey("border_stroke")
     private val PREF_BORDER_CORNER =
-        androidx.datastore.preferences.core.intPreferencesKey("border_corner")
+        androidx.datastore.preferences.core
+            .intPreferencesKey("border_corner")
     private val PREF_SHOW_LOGO = booleanPreferencesKey("show_logo")
-    private val PREF_LOGO_SIZE = androidx.datastore.preferences.core.intPreferencesKey("logo_size")
-    private val PREF_ROTATION = androidx.datastore.preferences.core.intPreferencesKey("rotation")
+    private val PREF_LOGO_SIZE =
+        androidx.datastore.preferences.core
+            .intPreferencesKey("logo_size")
+    private val PREF_ROTATION =
+        androidx.datastore.preferences.core
+            .intPreferencesKey("rotation")
 
-    val watermarkOptions: Flow<WatermarkOptions> = context.dataStore.data
-        .map { preferences ->
-            val styleStr = preferences[PREF_STYLE] ?: WatermarkStyle.FRAME.name
-            val style = try {
-                WatermarkStyle.valueOf(styleStr)
-            } catch (e: Exception) {
-                WatermarkStyle.FRAME
+    val watermarkOptions: Flow<WatermarkOptions> =
+        context.dataStore.data
+            .map { preferences ->
+                val styleStr = preferences[PREF_STYLE] ?: WatermarkStyle.FRAME.name
+                val style =
+                    try {
+                        WatermarkStyle.valueOf(styleStr)
+                    } catch (e: Exception) {
+                        WatermarkStyle.FRAME
+                    }
+
+                WatermarkOptions(
+                    style = style,
+                    showDeviceBrand = preferences[PREF_SHOW_BRAND] ?: true,
+                    showExif = preferences[PREF_SHOW_EXIF] ?: true,
+                    showFocalLength = preferences[PREF_SHOW_FOCAL_LENGTH] ?: true,
+                    showAperture = preferences[PREF_SHOW_APERTURE] ?: true,
+                    showIso = preferences[PREF_SHOW_ISO] ?: true,
+                    showShutterSpeed = preferences[PREF_SHOW_SHUTTER] ?: true,
+                    showDate = preferences[PREF_SHOW_DATE] ?: false,
+                    colorMode =
+                        try {
+                            ColorMode.valueOf(preferences[PREF_COLOR_MODE] ?: ColorMode.LIGHT.name)
+                        } catch (e: Exception) {
+                            ColorMode.LIGHT
+                        },
+                    accentColor = preferences[PREF_ACCENT_COLOR] ?: android.graphics.Color.GRAY,
+                    moveToTop = preferences[PREF_MOVE_TO_TOP] ?: false,
+                    leftAlignOverlay = preferences[PREF_LEFT_ALIGN] ?: false,
+                    brandTextSize = preferences[PREF_BRAND_TEXT_SIZE] ?: 50,
+                    dataTextSize = preferences[PREF_DATA_TEXT_SIZE] ?: 50,
+                    showCustomText = preferences[PREF_SHOW_CUSTOM_TEXT] ?: false,
+                    customText = preferences[PREF_CUSTOM_TEXT] ?: "",
+                    customTextSize = preferences[PREF_CUSTOM_TEXT_SIZE] ?: 50,
+                    padding = preferences[PREF_PADDING] ?: 50,
+                    borderStroke = preferences[PREF_BORDER_STROKE] ?: 0,
+                    borderCorner = preferences[PREF_BORDER_CORNER] ?: 0,
+                    showLogo = preferences[PREF_SHOW_LOGO] ?: false,
+                    logoResId = null,
+                    logoSize = preferences[PREF_LOGO_SIZE] ?: 50,
+                    rotation = preferences[PREF_ROTATION] ?: 0,
+                )
             }
-
-            WatermarkOptions(
-                style = style,
-                showDeviceBrand = preferences[PREF_SHOW_BRAND] ?: true,
-                showExif = preferences[PREF_SHOW_EXIF] ?: true,
-                showFocalLength = preferences[PREF_SHOW_FOCAL_LENGTH] ?: true,
-                showAperture = preferences[PREF_SHOW_APERTURE] ?: true,
-                showIso = preferences[PREF_SHOW_ISO] ?: true,
-                showShutterSpeed = preferences[PREF_SHOW_SHUTTER] ?: true,
-                showDate = preferences[PREF_SHOW_DATE] ?: false,
-                colorMode = try {
-                    ColorMode.valueOf(preferences[PREF_COLOR_MODE] ?: ColorMode.LIGHT.name)
-                } catch (e: Exception) {
-                    ColorMode.LIGHT
-                },
-                accentColor = preferences[PREF_ACCENT_COLOR] ?: android.graphics.Color.GRAY,
-                moveToTop = preferences[PREF_MOVE_TO_TOP] ?: false,
-                leftAlignOverlay = preferences[PREF_LEFT_ALIGN] ?: false,
-                brandTextSize = preferences[PREF_BRAND_TEXT_SIZE] ?: 50,
-                dataTextSize = preferences[PREF_DATA_TEXT_SIZE] ?: 50,
-                showCustomText = preferences[PREF_SHOW_CUSTOM_TEXT] ?: false,
-                customText = preferences[PREF_CUSTOM_TEXT] ?: "",
-                customTextSize = preferences[PREF_CUSTOM_TEXT_SIZE] ?: 50,
-                padding = preferences[PREF_PADDING] ?: 50,
-                borderStroke = preferences[PREF_BORDER_STROKE] ?: 0,
-                borderCorner = preferences[PREF_BORDER_CORNER] ?: 0,
-                showLogo = preferences[PREF_SHOW_LOGO] ?: false,
-                logoResId = null,
-                logoSize = preferences[PREF_LOGO_SIZE] ?: 50,
-                rotation = preferences[PREF_ROTATION] ?: 0
-            )
-        }
 
     suspend fun updateStyle(style: WatermarkStyle) {
         context.dataStore.edit { it[PREF_STYLE] = style.name }
@@ -111,7 +126,7 @@ class WatermarkRepository(
         aperture: Boolean,
         iso: Boolean,
         shutterSpeed: Boolean,
-        date: Boolean
+        date: Boolean,
     ) {
         context.dataStore.edit {
             it[PREF_SHOW_FOCAL_LENGTH] = focalLength
@@ -146,7 +161,11 @@ class WatermarkRepository(
         context.dataStore.edit { it[PREF_DATA_TEXT_SIZE] = size }
     }
 
-    suspend fun updateCustomTextSettings(show: Boolean, text: String, size: Int) {
+    suspend fun updateCustomTextSettings(
+        show: Boolean,
+        text: String,
+        size: Int,
+    ) {
         context.dataStore.edit {
             it[PREF_SHOW_CUSTOM_TEXT] = show
             it[PREF_CUSTOM_TEXT] = text
@@ -170,7 +189,10 @@ class WatermarkRepository(
         context.dataStore.edit { it[PREF_BORDER_CORNER] = corner }
     }
 
-    suspend fun updateLogoSettings(show: Boolean, size: Int) {
+    suspend fun updateLogoSettings(
+        show: Boolean,
+        size: Int,
+    ) {
         context.dataStore.edit {
             it[PREF_SHOW_LOGO] = show
             it[PREF_LOGO_SIZE] = size
@@ -180,7 +202,6 @@ class WatermarkRepository(
     suspend fun updateLogoShow(show: Boolean) {
         context.dataStore.edit { it[PREF_SHOW_LOGO] = show }
     }
-
 
     suspend fun updateLogoSize(size: Int) {
         context.dataStore.edit { it[PREF_LOGO_SIZE] = size }

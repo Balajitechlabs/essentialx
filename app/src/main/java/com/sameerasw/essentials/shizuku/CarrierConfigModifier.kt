@@ -25,7 +25,6 @@ import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 
 class CarrierConfigModifier : Instrumentation() {
-
     override fun onCreate(arguments: Bundle?) {
         try {
             HiddenApiBypass.setHiddenApiExemptions("")
@@ -74,8 +73,9 @@ class CarrierConfigModifier : Instrumentation() {
 
     @Throws(Exception::class)
     private fun overrideConfig(arguments: Bundle) {
-        val binder = SystemServiceHelper.getSystemService(Context.ACTIVITY_SERVICE)
-            ?: throw IllegalStateException("Activity service binder not found")
+        val binder =
+            SystemServiceHelper.getSystemService(Context.ACTIVITY_SERVICE)
+                ?: throw IllegalStateException("Activity service binder not found")
         val am = IActivityManager.Stub.asInterface(ShizukuBinderWrapper(binder))
 
         am.startDelegateShellPermissionIdentity(Process.myUid(), null)
@@ -87,28 +87,31 @@ class CarrierConfigModifier : Instrumentation() {
             val selectedSubId = arguments.getInt(BUNDLE_SELECT_SIM_ID, -1)
             arguments.remove(BUNDLE_SELECT_SIM_ID)
 
-            val subIds: IntArray = if (selectedSubId == -1) {
-                sm.javaClass.getMethod("getActiveSubscriptionIdList").invoke(sm) as IntArray
-            } else {
-                intArrayOf(selectedSubId)
-            }
+            val subIds: IntArray =
+                if (selectedSubId == -1) {
+                    sm.javaClass.getMethod("getActiveSubscriptionIdList").invoke(sm) as IntArray
+                } else {
+                    intArrayOf(selectedSubId)
+                }
 
             val values = toPersistableBundle(arguments)
 
             for (subId in subIds) {
                 try {
-                    cm.javaClass.getMethod(
-                        "overrideConfig",
-                        Int::class.javaPrimitiveType,
-                        PersistableBundle::class.java,
-                        Boolean::class.javaPrimitiveType
-                    ).invoke(cm, subId, values, false)
+                    cm.javaClass
+                        .getMethod(
+                            "overrideConfig",
+                            Int::class.javaPrimitiveType,
+                            PersistableBundle::class.java,
+                            Boolean::class.javaPrimitiveType,
+                        ).invoke(cm, subId, values, false)
                 } catch (_: NoSuchMethodException) {
-                    cm.javaClass.getMethod(
-                        "overrideConfig",
-                        Int::class.javaPrimitiveType,
-                        PersistableBundle::class.java
-                    ).invoke(cm, subId, values)
+                    cm.javaClass
+                        .getMethod(
+                            "overrideConfig",
+                            Int::class.javaPrimitiveType,
+                            PersistableBundle::class.java,
+                        ).invoke(cm, subId, values)
                 }
             }
         } finally {
@@ -144,24 +147,29 @@ class CarrierConfigModifier : Instrumentation() {
         const val BUNDLE_RESULT = "result"
         const val BUNDLE_RESULT_MSG = "result_msg"
 
-        fun buildOverrideBundle(subId: Int, carrierName: String?): Bundle = Bundle().apply {
-            putInt(BUNDLE_SELECT_SIM_ID, subId)
-            if (!carrierName.isNullOrBlank()) {
-                putBoolean(CarrierConfigManager.KEY_CARRIER_NAME_OVERRIDE_BOOL, true)
-                putString(CarrierConfigManager.KEY_CARRIER_NAME_STRING, carrierName)
-                putString(CarrierConfigManager.KEY_CARRIER_CONFIG_VERSION_STRING, System.currentTimeMillis().toString())
-            } else {
+        fun buildOverrideBundle(
+            subId: Int,
+            carrierName: String?,
+        ): Bundle =
+            Bundle().apply {
+                putInt(BUNDLE_SELECT_SIM_ID, subId)
+                if (!carrierName.isNullOrBlank()) {
+                    putBoolean(CarrierConfigManager.KEY_CARRIER_NAME_OVERRIDE_BOOL, true)
+                    putString(CarrierConfigManager.KEY_CARRIER_NAME_STRING, carrierName)
+                    putString(CarrierConfigManager.KEY_CARRIER_CONFIG_VERSION_STRING, System.currentTimeMillis().toString())
+                } else {
+                    putBoolean(CarrierConfigManager.KEY_CARRIER_NAME_OVERRIDE_BOOL, false)
+                    putString(CarrierConfigManager.KEY_CARRIER_NAME_STRING, "")
+                    putString(CarrierConfigManager.KEY_CARRIER_CONFIG_VERSION_STRING, System.currentTimeMillis().toString())
+                }
+            }
+
+        fun buildResetBundle(subId: Int): Bundle =
+            Bundle().apply {
+                putInt(BUNDLE_SELECT_SIM_ID, subId)
                 putBoolean(CarrierConfigManager.KEY_CARRIER_NAME_OVERRIDE_BOOL, false)
                 putString(CarrierConfigManager.KEY_CARRIER_NAME_STRING, "")
                 putString(CarrierConfigManager.KEY_CARRIER_CONFIG_VERSION_STRING, System.currentTimeMillis().toString())
             }
-        }
-
-        fun buildResetBundle(subId: Int): Bundle = Bundle().apply {
-            putInt(BUNDLE_SELECT_SIM_ID, subId)
-            putBoolean(CarrierConfigManager.KEY_CARRIER_NAME_OVERRIDE_BOOL, false)
-            putString(CarrierConfigManager.KEY_CARRIER_NAME_STRING, "")
-            putString(CarrierConfigManager.KEY_CARRIER_CONFIG_VERSION_STRING, System.currentTimeMillis().toString())
-        }
     }
 }

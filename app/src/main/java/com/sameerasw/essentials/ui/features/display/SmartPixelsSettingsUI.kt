@@ -36,16 +36,15 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun SmartPixelsSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
 
     Column(modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-
         RoundedCardContainer(
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             IconToggleItem(
                 iconRes = R.drawable.rounded_grain_24,
@@ -55,7 +54,7 @@ fun SmartPixelsSettingsUI(
                     HapticUtil.performUIHaptic(view)
                     viewModel.setSmartPixelsEnabled(context, checked)
                 },
-                modifier = Modifier.highlight(highlightSetting == "smart_pixels_enable_toggle")
+                modifier = Modifier.highlight(highlightSetting == "smart_pixels_enable_toggle"),
             )
         }
 
@@ -65,7 +64,7 @@ fun SmartPixelsSettingsUI(
 
         RoundedCardContainer(
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             ConfigSliderItem(
                 title = stringResource(R.string.smart_pixels_intensity_title),
@@ -80,13 +79,13 @@ fun SmartPixelsSettingsUI(
                 valueRange = 10f..90f,
                 increment = 5f,
                 iconRes = R.drawable.rounded_blur_linear_24,
-                modifier = Modifier.highlight(highlightSetting == "smart_pixels_intensity_slider")
+                modifier = Modifier.highlight(highlightSetting == "smart_pixels_intensity_slider"),
             )
         }
 
         RoundedCardContainer(
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             IconToggleItem(
                 iconRes = R.drawable.rounded_cast_24,
@@ -97,7 +96,7 @@ fun SmartPixelsSettingsUI(
                     HapticUtil.performUIHaptic(view)
                     viewModel.setSmartPixelsDisableOnCastEnabled(context, checked)
                 },
-                modifier = Modifier.highlight(highlightSetting == "smart_pixels_disable_on_cast_toggle")
+                modifier = Modifier.highlight(highlightSetting == "smart_pixels_disable_on_cast_toggle"),
             )
         }
     }

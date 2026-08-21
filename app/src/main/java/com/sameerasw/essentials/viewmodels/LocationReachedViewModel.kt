@@ -34,7 +34,9 @@ import kotlin.math.sin
 import kotlin.math.sqrt
 
 @androidx.annotation.Keep
-class LocationReachedViewModel(application: Application) : AndroidViewModel(application) {
+class LocationReachedViewModel(
+    application: Application,
+) : AndroidViewModel(application) {
     private val repository = LocationReachedRepository(application)
     private val fusedLocationClient = LocationServices.getFusedLocationProviderClient(application)
 
@@ -177,13 +179,17 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         repository.updateLastTravelled(alarmId, now)
 
         // Refreshed start distance logic
-        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
+        fusedLocationClient
+            .getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
             .addOnSuccessListener { location ->
                 location?.let {
-                    val dist = calculateDistance(
-                        it.latitude, it.longitude,
-                        alarm.latitude, alarm.longitude
-                    )
+                    val dist =
+                        calculateDistance(
+                            it.latitude,
+                            it.longitude,
+                            alarm.latitude,
+                            alarm.longitude,
+                        )
                     startDistance.value = dist
                     repository.saveStartDistance(dist)
                 }
@@ -223,9 +229,10 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
      */
     fun pauseTracking() {
         val id = activeAlarmId.value ?: return
-        val intent = Intent(getApplication(), LocationReachedService::class.java).apply {
-            action = LocationReachedService.ACTION_PAUSE
-        }
+        val intent =
+            Intent(getApplication(), LocationReachedService::class.java).apply {
+                action = LocationReachedService.ACTION_PAUSE
+            }
         getApplication<Application>().startService(intent)
         repository.updatePausedState(id, true)
     }
@@ -235,9 +242,10 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
      */
     fun resumeTracking() {
         val id = activeAlarmId.value ?: return
-        val intent = Intent(getApplication(), LocationReachedService::class.java).apply {
-            action = LocationReachedService.ACTION_RESUME
-        }
+        val intent =
+            Intent(getApplication(), LocationReachedService::class.java).apply {
+                action = LocationReachedService.ACTION_RESUME
+            }
         getApplication<Application>().startService(intent)
         repository.updatePausedState(id, false)
         updateCurrentDistance()
@@ -251,16 +259,17 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
     fun startUiTracking() {
         if (distanceTrackingJob?.isActive == true) return
 
-        distanceTrackingJob = viewModelScope.launch {
-            while (true) {
-                if (activeAlarmId.value != null) {
-                    updateCurrentDistance()
-                } else {
-                    currentDistance.value = null
+        distanceTrackingJob =
+            viewModelScope.launch {
+                while (true) {
+                    if (activeAlarmId.value != null) {
+                        updateCurrentDistance()
+                    } else {
+                        currentDistance.value = null
+                    }
+                    delay(10000) // Update every 10 seconds while UI is active
                 }
-                delay(10000) // Update every 10 seconds while UI is active
             }
-        }
     }
 
     /**
@@ -276,23 +285,27 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
         super.onCleared()
     }
 
+    /**
+     * Executes the update current distance operation.
+     */
     @android.annotation.SuppressLint("MissingPermission")
-            /**
-             * Executes the update current distance operation.
-             */
     fun updateCurrentDistance() {
         val id = activeAlarmId.value
         val activeAlarm = savedAlarms.value.find { it.id == id } ?: tempAlarm.value ?: return
 
         if (activeAlarm.isPaused) return
 
-        fusedLocationClient.getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
+        fusedLocationClient
+            .getCurrentLocation(Priority.PRIORITY_BALANCED_POWER_ACCURACY, null)
             .addOnSuccessListener { location ->
                 location?.let {
-                    val distance = calculateDistance(
-                        it.latitude, it.longitude,
-                        activeAlarm.latitude, activeAlarm.longitude
-                    )
+                    val distance =
+                        calculateDistance(
+                            it.latitude,
+                            it.longitude,
+                            activeAlarm.latitude,
+                            activeAlarm.longitude,
+                        )
                     currentDistance.value = distance
                     calculateEta(distance)
                 }
@@ -328,14 +341,20 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
      * @param lon2 [Double] Target lon2.
      * @return The resulting Float data.
      */
-    fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+    fun calculateDistance(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double,
+    ): Float {
         val r = 6371e3 // Earth's radius in meters
         val phi1 = lat1 * PI / 180
         val phi2 = lat2 * PI / 180
         val deltaPhi = (lat2 - lat1) * PI / 180
         val deltaLambda = (lon2 - lon1) * PI / 180
 
-        val a = sin(deltaPhi / 2).pow(2) +
+        val a =
+            sin(deltaPhi / 2).pow(2) +
                 cos(phi1) * cos(phi2) *
                 sin(deltaLambda / 2).pow(2)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
@@ -356,26 +375,31 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
 
         android.util.Log.d(
             "LocationReachedVM",
-            "handleIntent: action=$action, type=$type, data=$data"
+            "handleIntent: action=$action, type=$type, data=$data",
         )
 
-        val textToParse = when {
-            action == Intent.ACTION_SEND && type == "text/plain" -> {
-                intent.getStringExtra(Intent.EXTRA_TEXT)
-            }
+        val textToParse =
+            when {
+                action == Intent.ACTION_SEND && type == "text/plain" -> {
+                    intent.getStringExtra(Intent.EXTRA_TEXT)
+                }
 
-            action == Intent.ACTION_VIEW && data?.scheme == "geo" -> {
-                data.toString()
-            }
+                action == Intent.ACTION_VIEW && data?.scheme == "geo" -> {
+                    data.toString()
+                }
 
-            action == Intent.ACTION_VIEW && (data?.host?.contains("google.com") == true || data?.host?.contains(
-                "goo.gl"
-            ) == true) -> {
-                data.toString()
-            }
+                action == Intent.ACTION_VIEW &&
+                    (
+                        data?.host?.contains("google.com") == true ||
+                            data?.host?.contains(
+                                "goo.gl",
+                            ) == true
+                    ) -> {
+                    data.toString()
+                }
 
-            else -> null
-        }
+                else -> null
+            }
 
         if (textToParse == null) return false
 
@@ -406,8 +430,8 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
                         latitude = lat,
                         longitude = lng,
                         name = "New Destination",
-                        isEnabled = false
-                    )
+                        isEnabled = false,
+                    ),
                 )
                 repository.setShowBottomSheet(true)
                 updateCurrentDistance()
@@ -423,20 +447,21 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
     private fun resolveAndParse(shortUrl: String) {
         repository.setIsProcessing(true)
         viewModelScope.launch {
-            val resolvedUrl = withContext(Dispatchers.IO) {
-                try {
-                    val url = URL(shortUrl)
-                    val connection = url.openConnection() as HttpURLConnection
-                    connection.instanceFollowRedirects = false
-                    connection.connect()
-                    val location = connection.getHeaderField("Location")
-                    connection.disconnect()
-                    location ?: shortUrl
-                } catch (e: Exception) {
-                    android.util.Log.e("LocationReachedVM", "Error resolving URL", e)
-                    shortUrl
+            val resolvedUrl =
+                withContext(Dispatchers.IO) {
+                    try {
+                        val url = URL(shortUrl)
+                        val connection = url.openConnection() as HttpURLConnection
+                        connection.instanceFollowRedirects = false
+                        connection.connect()
+                        val location = connection.getHeaderField("Location")
+                        connection.disconnect()
+                        location ?: shortUrl
+                    } catch (e: Exception) {
+                        android.util.Log.e("LocationReachedVM", "Error resolving URL", e)
+                        shortUrl
+                    }
                 }
-            }
             android.util.Log.d("LocationReachedVM", "Resolved URL: $resolvedUrl")
             if (!tryParseAndSet(resolvedUrl)) {
                 val pathRegex = Regex("@(-?\\d+\\.\\d+),(-?\\d+\\.\\d+)")
@@ -450,8 +475,8 @@ class LocationReachedViewModel(application: Application) : AndroidViewModel(appl
                                 latitude = lat,
                                 longitude = lng,
                                 name = "New Destination",
-                                isEnabled = false
-                            )
+                                isEnabled = false,
+                            ),
                         )
                         repository.setShowBottomSheet(true)
                         updateCurrentDistance()

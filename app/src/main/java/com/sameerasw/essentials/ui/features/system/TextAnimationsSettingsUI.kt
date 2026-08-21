@@ -43,19 +43,18 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun TextAnimationsSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-
-
         RoundedCardContainer(spacing = 2.dp) {
             SegmentedPicker(
                 items = listOf("default", "glove"),
@@ -73,7 +72,7 @@ fun TextAnimationsSettingsUI(
                         else -> Icon(painterResource(R.drawable.rounded_front_hand_24), null)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 
@@ -83,14 +82,14 @@ fun TextAnimationsSettingsUI(
                 subtitle = stringResource(R.string.desc_increase_touch_sensitivity),
                 icon = R.drawable.rounded_touch_app_24,
                 checked = viewModel.isTouchSensitivityEnabled.value,
-                onCheckedChange = { viewModel.setTouchSensitivityEnabled(it) }
+                onCheckedChange = { viewModel.setTouchSensitivityEnabled(it) },
             )
             com.sameerasw.essentials.ui.core.cards.IconToggleItem(
                 title = stringResource(R.string.label_auto_rotate),
                 subtitle = stringResource(R.string.desc_auto_rotate),
                 icon = R.drawable.rounded_mobile_rotate_24,
                 checked = viewModel.isAutoRotateEnabled.value,
-                onCheckedChange = { viewModel.setAutoRotateEnabled(it) }
+                onCheckedChange = { viewModel.setAutoRotateEnabled(it) },
             )
 
             val timeoutValues = listOf(15000L, 30000L, 60000L, 120000L, 300000L, 600000L, 1800000L)
@@ -113,7 +112,7 @@ fun TextAnimationsSettingsUI(
                         else -> context.getString(R.string.unit_minutes, (ms / 60000).toInt())
                     }
                 },
-                icon = R.drawable.rounded_timer_24
+                icon = R.drawable.rounded_timer_24,
             )
         }
 
@@ -122,7 +121,7 @@ fun TextAnimationsSettingsUI(
             text = stringResource(R.string.settings_section_text),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(spacing = 2.dp) {
@@ -139,7 +138,7 @@ fun TextAnimationsSettingsUI(
                 valueRange = 0.25f..5.0f,
                 steps = 0,
                 increment = 0.05f,
-                valueFormatter = { String.format("%.2fx", it) }
+                valueFormatter = { String.format("%.2fx", it) },
             )
 
             ConfigSliderItem(
@@ -152,18 +151,18 @@ fun TextAnimationsSettingsUI(
                 valueRange = 0f..500f,
                 steps = 10,
                 increment = 10f,
-                valueFormatter = { it.toInt().toString() }
+                valueFormatter = { it.toInt().toString() },
             )
 
             Row(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceBright,
-                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                    )
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.End
+                modifier =
+                    Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                        ).fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.End,
             ) {
                 Button(
                     onClick = {
@@ -171,11 +170,11 @@ fun TextAnimationsSettingsUI(
                         HapticUtil.performSliderHaptic(view)
                     },
                     colors = ButtonDefaults.filledTonalButtonColors(),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                 ) {
                     Text(
                         text = stringResource(R.string.label_reset_default),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 }
             }
@@ -186,7 +185,7 @@ fun TextAnimationsSettingsUI(
             text = stringResource(R.string.settings_section_scale),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(spacing = 2.dp) {
@@ -206,19 +205,19 @@ fun TextAnimationsSettingsUI(
                 steps = 0,
                 increment = 10f,
                 valueFormatter = { String.format("%d dp", it.toInt()) },
-                enabled = isEnabled
+                enabled = isEnabled,
             )
 
             Row(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceBright,
-                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                    )
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                        ).fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = if (isEnabled) Arrangement.End else Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (isEnabled) {
                     Button(
@@ -227,11 +226,11 @@ fun TextAnimationsSettingsUI(
                             HapticUtil.performSliderHaptic(view)
                         },
                         colors = ButtonDefaults.filledTonalButtonColors(),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.label_reset_default),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
                         )
                     }
                 } else {
@@ -239,9 +238,10 @@ fun TextAnimationsSettingsUI(
                         text = stringResource(R.string.msg_shizuku_permission_required),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp)
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp),
                     )
                     Button(
                         onClick = {
@@ -249,11 +249,11 @@ fun TextAnimationsSettingsUI(
                             HapticUtil.performSliderHaptic(view)
                         },
                         colors = ButtonDefaults.filledTonalButtonColors(),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.label_grant_permission),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
                         )
                     }
                 }
@@ -265,7 +265,7 @@ fun TextAnimationsSettingsUI(
             text = stringResource(R.string.settings_section_animations),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(spacing = 2.dp) {
@@ -275,14 +275,14 @@ fun TextAnimationsSettingsUI(
                 onValueChange = {
                     viewModel.setAnimationScale(
                         android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
-                        it
+                        it,
                     )
                     HapticUtil.performSliderHaptic(view)
                 },
                 valueRange = 0f..10f,
                 steps = 0,
                 increment = 0.05f,
-                valueFormatter = { String.format("%.2fx", it) }
+                valueFormatter = { String.format("%.2fx", it) },
             )
 
             ConfigSliderItem(
@@ -291,14 +291,14 @@ fun TextAnimationsSettingsUI(
                 onValueChange = {
                     viewModel.setAnimationScale(
                         android.provider.Settings.Global.TRANSITION_ANIMATION_SCALE,
-                        it
+                        it,
                     )
                     HapticUtil.performSliderHaptic(view)
                 },
                 valueRange = 0f..10f,
                 steps = 0,
                 increment = 0.05f,
-                valueFormatter = { String.format("%.2fx", it) }
+                valueFormatter = { String.format("%.2fx", it) },
             )
 
             ConfigSliderItem(
@@ -307,25 +307,25 @@ fun TextAnimationsSettingsUI(
                 onValueChange = {
                     viewModel.setAnimationScale(
                         android.provider.Settings.Global.WINDOW_ANIMATION_SCALE,
-                        it
+                        it,
                     )
                     HapticUtil.performSliderHaptic(view)
                 },
                 valueRange = 0f..10f,
                 steps = 0,
                 increment = 0.05f,
-                valueFormatter = { String.format("%.2fx", it) }
+                valueFormatter = { String.format("%.2fx", it) },
             )
 
             Row(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceBright,
-                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                    )
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.End
+                modifier =
+                    Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                        ).fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.End,
             ) {
                 Button(
                     onClick = {
@@ -333,11 +333,11 @@ fun TextAnimationsSettingsUI(
                         HapticUtil.performSliderHaptic(view)
                     },
                     colors = ButtonDefaults.filledTonalButtonColors(),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                 ) {
                     Text(
                         text = stringResource(R.string.label_reset_default),
-                        style = MaterialTheme.typography.labelSmall
+                        style = MaterialTheme.typography.labelSmall,
                     )
                 }
             }

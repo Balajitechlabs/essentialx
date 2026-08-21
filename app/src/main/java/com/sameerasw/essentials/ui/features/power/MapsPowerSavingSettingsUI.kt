@@ -31,28 +31,29 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun MapsPowerSavingSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
             text = "Detection Channels",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 16.dp)
+            modifier = Modifier.padding(start = 16.dp),
         )
 
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             viewModel.mapsChannels.value.forEach { channel ->
                 IconToggleItem(
@@ -63,7 +64,7 @@ fun MapsPowerSavingSettingsUI(
                         HapticUtil.performVirtualKeyHaptic(view)
                         viewModel.setMapsChannelDetected(channel.id, checked, context)
                     },
-                    modifier = Modifier.highlight(highlightSetting == channel.id)
+                    modifier = Modifier.highlight(highlightSetting == channel.id),
                 )
             }
 
@@ -72,7 +73,7 @@ fun MapsPowerSavingSettingsUI(
                     text = "No Maps channels discovered yet. They will appear here once detected while navigating.",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

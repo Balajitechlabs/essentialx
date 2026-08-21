@@ -50,7 +50,7 @@ import kotlinx.coroutines.withContext
 fun KeyboardSelectionSheet(
     onDismissRequest: (ime: String?) -> Unit,
     selectedIme: String? = null,
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
 ) {
     var isLoadingKeyboards by remember { mutableStateOf(true) }
     var defaultInputMethod by remember { mutableStateOf<String?>(null) }
@@ -61,24 +61,27 @@ fun KeyboardSelectionSheet(
     LaunchedEffect(Unit) {
         isLoadingKeyboards = true
         try {
-            val list = withContext(Dispatchers.IO) {
-                val imes =
-                    context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                val defaultIme =
-                    if (isDeprecated)
-                        imes.currentInputMethodInfo?.id
-                    else
-                        Settings.Secure.getString(
-                            context.contentResolver,
-                            Settings.Secure.DEFAULT_INPUT_METHOD
-                        )
-                defaultIme to imes
-            }
+            val list =
+                withContext(Dispatchers.IO) {
+                    val imes =
+                        context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    val defaultIme =
+                        if (isDeprecated) {
+                            imes.currentInputMethodInfo?.id
+                        } else {
+                            Settings.Secure.getString(
+                                context.contentResolver,
+                                Settings.Secure.DEFAULT_INPUT_METHOD,
+                            )
+                        }
+                    defaultIme to imes
+                }
             defaultInputMethod = selectedIme ?: (list.first ?: "")
             imesList = list.second.inputMethodList
         } catch (e: Exception) {
             Log.e(
-                "KeyboardSelectionSheet", "Error loading input methods list: ${e.message ?: ""}"
+                "KeyboardSelectionSheet",
+                "Error loading input methods list: ${e.message ?: ""}",
             )
         } finally {
             isLoadingKeyboards = false
@@ -89,40 +92,43 @@ fun KeyboardSelectionSheet(
         onDismissRequest = { onDismissRequest(defaultInputMethod) },
     ) {
         Column(
-            modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(R.string.diy_set_keyboard_sheet_title),
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
 
             if (isLoadingKeyboards) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    horizontalArrangement = Arrangement.Center
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp),
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     LoadingIndicator()
                 }
             } else {
                 RoundedCardContainer(
                     spacing = 2.dp,
-                    cornerRadius = 24.dp
+                    cornerRadius = 24.dp,
                 ) {
                     LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1f, fill = false),
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .weight(1f, fill = false),
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         items(imesList, key = { it.id }) { ime ->
                             val isEnabled = ime.serviceInfo.enabled
@@ -135,11 +141,12 @@ fun KeyboardSelectionSheet(
                                     if (isEnabled) {
                                         defaultInputMethod = ime.id
                                     } else {
-                                        Toast.makeText(
-                                            context,
-                                            R.string.diy_set_keyboard_input_method_disabled,
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                R.string.diy_set_keyboard_input_method_disabled,
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
                                     }
                                 },
                                 onLongClick = null,
@@ -148,11 +155,14 @@ fun KeyboardSelectionSheet(
                                 verticalAlignment = Alignment.CenterVertically,
                                 leadingContent = {
                                     Image(
-                                        bitmap = ime.loadIcon(context.packageManager).toBitmap()
-                                            .asImageBitmap(),
+                                        bitmap =
+                                            ime
+                                                .loadIcon(context.packageManager)
+                                                .toBitmap()
+                                                .asImageBitmap(),
                                         contentDescription = ime.serviceInfo.name,
                                         modifier = Modifier.size(24.dp),
-                                        contentScale = ContentScale.Fit
+                                        contentScale = ContentScale.Fit,
                                     )
                                 },
                                 supportingContent = null,
@@ -160,28 +170,30 @@ fun KeyboardSelectionSheet(
                                     RadioButton(
                                         selected = if (isEnabled) isSelected else false,
                                         onClick = null,
-                                        enabled = isEnabled
+                                        enabled = isEnabled,
                                     )
                                 },
-                                colors = ListItemDefaults.colors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                                ),
-                                contentPadding = PaddingValues(
-                                    horizontal = 16.dp,
-                                    vertical = 16.dp
-                                ),
+                                colors =
+                                    ListItemDefaults.colors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                    ),
+                                contentPadding =
+                                    PaddingValues(
+                                        horizontal = 16.dp,
+                                        vertical = 16.dp,
+                                    ),
                                 content = {
                                     Row(
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                                     ) {
                                         Text(
                                             text = ime.loadLabel(context.packageManager).toString(),
                                             style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurface
+                                            color = MaterialTheme.colorScheme.onSurface,
                                         )
                                     }
-                                }
+                                },
                             )
                         }
                     }

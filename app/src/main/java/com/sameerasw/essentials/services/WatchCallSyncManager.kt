@@ -34,33 +34,42 @@ object WatchCallSyncManager {
         return prefs.getBoolean("watch_call_sync_enabled", true)
     }
 
-    fun onCallStateChanged(context: Context, state: Int, phoneNumber: String?) {
+    fun onCallStateChanged(
+        context: Context,
+        state: Int,
+        phoneNumber: String?,
+    ) {
         if (!isCallSyncEnabled(context)) return
 
-        val stateStr = when (state) {
-            TelephonyManager.CALL_STATE_RINGING -> "RINGING"
-            TelephonyManager.CALL_STATE_OFFHOOK -> "OFFHOOK"
-            TelephonyManager.CALL_STATE_IDLE -> "IDLE"
-            else -> "IDLE"
-        }
+        val stateStr =
+            when (state) {
+                TelephonyManager.CALL_STATE_RINGING -> "RINGING"
+                TelephonyManager.CALL_STATE_OFFHOOK -> "OFFHOOK"
+                TelephonyManager.CALL_STATE_IDLE -> "IDLE"
+                else -> "IDLE"
+            }
 
         val contactName = lookupContactName(context, phoneNumber)
         val contactPhoto = lookupContactPhotoBase64(context, phoneNumber)
 
-        val json = JSONObject().apply {
-            put("state", stateStr)
-            put("number", phoneNumber ?: "")
-            put("contactName", contactName ?: "")
-            put("contactPhoto", contactPhoto ?: "")
-            put("isIncoming", state == TelephonyManager.CALL_STATE_RINGING)
-            put("timestamp", System.currentTimeMillis())
-        }
+        val json =
+            JSONObject().apply {
+                put("state", stateStr)
+                put("number", phoneNumber ?: "")
+                put("contactName", contactName ?: "")
+                put("contactPhoto", contactPhoto ?: "")
+                put("isIncoming", state == TelephonyManager.CALL_STATE_RINGING)
+                put("timestamp", System.currentTimeMillis())
+            }
 
         Log.d(TAG, "Sending call state to watch: state=$stateStr, number=$phoneNumber, name=$contactName")
         sendMessageToWatch(context, PATH_WATCH_CALL_STATE, json.toString().toByteArray())
     }
 
-    fun handleCallAction(context: Context, action: String) {
+    fun handleCallAction(
+        context: Context,
+        action: String,
+    ) {
         Log.d(TAG, "Handling call action from watch: $action")
         when (action.uppercase()) {
             "ANSWER" -> CallControlUtil.acceptCall(context)
@@ -70,15 +79,20 @@ object WatchCallSyncManager {
         }
     }
 
-    private fun sendMessageToWatch(context: Context, path: String, data: ByteArray) {
+    private fun sendMessageToWatch(
+        context: Context,
+        path: String,
+        data: ByteArray,
+    ) {
         try {
             Wearable.getNodeClient(context).connectedNodes.addOnSuccessListener { nodes ->
                 for (node in nodes) {
-                    Wearable.getMessageClient(context).sendMessage(node.id, path, data)
+                    Wearable
+                        .getMessageClient(context)
+                        .sendMessage(node.id, path, data)
                         .addOnSuccessListener {
                             Log.d(TAG, "Sent message $path to watch node: ${node.displayName}")
-                        }
-                        .addOnFailureListener { e ->
+                        }.addOnFailureListener { e ->
                             Log.e(TAG, "Failed to send message $path to watch node", e)
                         }
                 }
@@ -88,7 +102,10 @@ object WatchCallSyncManager {
         }
     }
 
-    private fun lookupContactName(context: Context, number: String?): String? {
+    private fun lookupContactName(
+        context: Context,
+        number: String?,
+    ): String? {
         if (number.isNullOrBlank()) return null
         return try {
             val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))
@@ -99,7 +116,9 @@ object WatchCallSyncManager {
                 if (cursor != null && cursor.moveToFirst()) {
                     val nameIdx = cursor.getColumnIndex(ContactsContract.PhoneLookup.DISPLAY_NAME)
                     if (nameIdx != -1) cursor.getString(nameIdx) else null
-                } else null
+                } else {
+                    null
+                }
             } finally {
                 cursor?.close()
             }
@@ -109,7 +128,10 @@ object WatchCallSyncManager {
         }
     }
 
-    private fun lookupContactPhotoBase64(context: Context, number: String?): String? {
+    private fun lookupContactPhotoBase64(
+        context: Context,
+        number: String?,
+    ): String? {
         if (number.isNullOrBlank()) return null
         return try {
             val uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(number))

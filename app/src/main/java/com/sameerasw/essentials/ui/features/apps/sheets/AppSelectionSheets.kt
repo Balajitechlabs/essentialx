@@ -69,7 +69,7 @@ fun AppSelectionSheet(
     onSaveApps: suspend (Context, List<AppSelection>) -> Unit,
     onAppToggle: ((Context, String, Boolean) -> Unit)? = null,
     excludePackages: List<String> = emptyList(),
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val view = LocalView.current
@@ -91,10 +91,11 @@ fun AppSelectionSheet(
                 // Load all installed apps (heavy operation on background thread)
                 val allApps = AppUtil.getInstalledApps(context)
 
-                val selectionsToMerge = savedSelections.ifEmpty {
-                    // Default to all disabled if no preferences found
-                    allApps.map { AppSelection(it.packageName, false) }
-                }
+                val selectionsToMerge =
+                    savedSelections.ifEmpty {
+                        // Default to all disabled if no preferences found
+                        allApps.map { AppSelection(it.packageName, false) }
+                    }
 
                 val merged = AppUtil.mergeWithSavedApps(allApps, selectionsToMerge)
 
@@ -106,7 +107,7 @@ fun AppSelectionSheet(
             } catch (e: Exception) {
                 android.util.Log.e(
                     "AppSelectionSheet",
-                    context.getString(R.string.error_loading_apps, e.message ?: "")
+                    context.getString(R.string.error_loading_apps, e.message ?: ""),
                 )
             } finally {
                 withContext(Dispatchers.Main) {
@@ -116,55 +117,65 @@ fun AppSelectionSheet(
         }
     }
 
-    val filteredApps = selectedApps.filter {
-        val matchesSearch =
-            searchQuery.isEmpty() || it.appName.contains(searchQuery, ignoreCase = true)
-        val isVisible =
-            !it.isSystemApp || showSystemApps || it.isEnabled // Always show if enabled, or if system toggle checks out
-        val isExcluded = excludePackages.contains(it.packageName)
-        matchesSearch && isVisible && !isExcluded
-    }
-        .sortedWith(compareByDescending<NotificationApp> { initialEnabledPackageNames.contains(it.packageName) }.thenBy { it.appName.lowercase() })
+    val filteredApps =
+        selectedApps
+            .filter {
+                val matchesSearch =
+                    searchQuery.isEmpty() || it.appName.contains(searchQuery, ignoreCase = true)
+                val isVisible =
+                    !it.isSystemApp || showSystemApps || it.isEnabled // Always show if enabled, or if system toggle checks out
+                val isExcluded = excludePackages.contains(it.packageName)
+                matchesSearch && isVisible && !isExcluded
+            }.sortedWith(
+                compareByDescending<NotificationApp> {
+                    initialEnabledPackageNames.contains(
+                        it.packageName,
+                    )
+                }.thenBy { it.appName.lowercase() },
+            )
 
     EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(R.string.action_select_apps),
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
                 )
 
                 androidx.compose.material3.IconButton(
                     onClick = {
                         HapticUtil.performVirtualKeyHaptic(view)
-                        val updatedList = selectedApps.map { app ->
-                            val isVisible = !app.isSystemApp || showSystemApps || app.isEnabled
-                            if (isVisible) app.copy(isEnabled = !app.isEnabled) else app
-                        }
+                        val updatedList =
+                            selectedApps.map { app ->
+                                val isVisible = !app.isSystemApp || showSystemApps || app.isEnabled
+                                if (isVisible) app.copy(isEnabled = !app.isEnabled) else app
+                            }
                         selectedApps = updatedList
                         scope.launch(Dispatchers.IO) {
                             onSaveApps(
                                 context,
-                                updatedList.map { AppSelection(it.packageName, it.isEnabled) })
+                                updatedList.map { AppSelection(it.packageName, it.isEnabled) },
+                            )
                         }
-                    }
+                    },
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_invert_colors_24),
                         contentDescription = stringResource(R.string.action_invert_selection),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
@@ -178,62 +189,64 @@ fun AppSelectionSheet(
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_search_24),
-                        contentDescription = stringResource(R.string.action_search)
+                        contentDescription = stringResource(R.string.action_search),
                     )
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             )
 
             // System Apps Toggle
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .clickable {
-                        HapticUtil.performVirtualKeyHaptic(view)
-                        showSystemApps = !showSystemApps
-                    }
-                    .padding(8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            showSystemApps = !showSystemApps
+                        }.padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_settings_24),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
                     text = stringResource(R.string.toggle_show_system_apps),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.weight(1f),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Switch(
                     checked = showSystemApps,
                     onCheckedChange = {
                         HapticUtil.performVirtualKeyHaptic(view)
                         showSystemApps = it
-                    }
+                    },
                 )
             }
 
             if (isLoadingApps) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    horizontalArrangement = Arrangement.Center
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp),
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     LoadingIndicator()
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(24.dp)),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(24.dp)),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     items(filteredApps, key = { it.packageName }) { app ->
                         AppToggleItem(
@@ -243,9 +256,10 @@ fun AppSelectionSheet(
                             isSystemApp = app.isSystemApp,
                             isChecked = app.isEnabled,
                             onCheckedChange = { isChecked ->
-                                val updatedList = selectedApps.map {
-                                    if (it.packageName == app.packageName) it.copy(isEnabled = isChecked) else it
-                                }
+                                val updatedList =
+                                    selectedApps.map {
+                                        if (it.packageName == app.packageName) it.copy(isEnabled = isChecked) else it
+                                    }
 
                                 // If toggled via switch, update specific app then save all
                                 updatedList.find { it.packageName == app.packageName }?.let {
@@ -260,11 +274,12 @@ fun AppSelectionSheet(
                                         updatedList.map {
                                             AppSelection(
                                                 it.packageName,
-                                                it.isEnabled
+                                                it.isEnabled,
                                             )
-                                        })
+                                        },
+                                    )
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -278,7 +293,7 @@ fun AppSelectionSheet(
 fun SingleAppSelectionSheet(
     onDismissRequest: () -> Unit,
     onAppSelected: (NotificationApp) -> Unit,
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val view = LocalView.current
@@ -303,23 +318,26 @@ fun SingleAppSelectionSheet(
         }
     }
 
-    val filteredApps = apps.filter {
-        searchQuery.isEmpty() || it.appName.contains(searchQuery, ignoreCase = true)
-    }.sortedBy { it.appName.lowercase() }
+    val filteredApps =
+        apps
+            .filter {
+                searchQuery.isEmpty() || it.appName.contains(searchQuery, ignoreCase = true)
+            }.sortedBy { it.appName.lowercase() }
 
     EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.action_select_app),
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
 
             OutlinedTextField(
@@ -330,28 +348,30 @@ fun SingleAppSelectionSheet(
                 leadingIcon = {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_search_24),
-                        contentDescription = stringResource(R.string.action_search)
+                        contentDescription = stringResource(R.string.action_search),
                     )
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             )
 
             if (isLoading) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    horizontalArrangement = Arrangement.Center
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp),
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     LoadingIndicator()
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(24.dp)),
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .clip(RoundedCornerShape(24.dp)),
+                    verticalArrangement = Arrangement.spacedBy(2.dp),
                 ) {
                     items(filteredApps, key = { it.packageName }) { app ->
                         Surface(
@@ -361,34 +381,36 @@ fun SingleAppSelectionSheet(
                                 onDismissRequest()
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            color = MaterialTheme.colorScheme.surfaceContainer
+                            color = MaterialTheme.colorScheme.surfaceContainer,
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                                horizontalArrangement = Arrangement.spacedBy(16.dp),
                             ) {
                                 Image(
                                     bitmap = app.icon,
                                     contentDescription = null,
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .clip(RoundedCornerShape(8.dp)),
-                                    contentScale = ContentScale.Crop
+                                    modifier =
+                                        Modifier
+                                            .size(40.dp)
+                                            .clip(RoundedCornerShape(8.dp)),
+                                    contentScale = ContentScale.Crop,
                                 )
                                 Column {
                                     Text(
                                         text = app.appName,
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onSurface,
                                     )
                                     Text(
                                         text = app.packageName,
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
                             }

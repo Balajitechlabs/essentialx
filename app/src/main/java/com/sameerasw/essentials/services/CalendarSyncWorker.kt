@@ -16,9 +16,8 @@ import androidx.work.WorkerParameters
 
 class CalendarSyncWorker(
     appContext: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
-
     override suspend fun doWork(): Result {
         Log.d("CalendarSyncWorker", "Executing periodic calendar sync")
         return try {

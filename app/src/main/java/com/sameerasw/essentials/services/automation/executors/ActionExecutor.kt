@@ -13,5 +13,8 @@ import android.content.Context
 import com.sameerasw.essentials.domain.diy.Action
 
 interface ActionExecutor {
-    suspend fun execute(context: Context, action: Action)
+    suspend fun execute(
+        context: Context,
+        action: Action,
+    )
 }
