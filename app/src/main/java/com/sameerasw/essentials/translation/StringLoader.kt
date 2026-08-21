@@ -92,6 +92,7 @@ object StringLoader {
                 "values-it", "values-it-rIT",
                 "values-iw-rIL",
                 "values-ja", "values-ja-rJP",
+                "values-kk", "values-kk-rKZ",
                 "values-ko", "values-ko-rKR",
                 "values-ml-rIN",
                 "values-ne-rNP",
