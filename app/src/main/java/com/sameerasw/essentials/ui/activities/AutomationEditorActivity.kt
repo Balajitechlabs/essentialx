@@ -269,7 +269,6 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showBluetoothSettings by remember { mutableStateOf(false) }
                 var showWifiSettings by remember { mutableStateOf(false) }
                 var showSetKeyboardSheet by remember { mutableStateOf(false) }
-                var selectedIme by remember { mutableStateOf<String?>(null) }
                 var showCustomSettingsSettings by remember { mutableStateOf(false) }
                 var configAction by remember { mutableStateOf<Action?>(null) } // Generic config action
 
@@ -302,7 +301,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 fun isActionConfigured(action: Action?): Boolean = when (action) {
                     is Action.OpenApp -> action.packageName.isNotBlank()
                     is Action.CustomSettings -> action.entries.isNotEmpty()
-                    is Action.Keyboard -> !action.inputMethodId.isNullOrEmpty()
+                    is Action.Keyboard -> !action.inputMethodId.isNullOrBlank()
                     else -> true
                 }
 
@@ -1015,7 +1014,6 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                 }
                                                                 is Action.Keyboard -> {
                                                                     showSetKeyboardSheet = true
-                                                                    selectedIme = resolvedAction.inputMethodId
                                                                 }
                                                                 is Action.CustomSettings -> showCustomSettingsSettings = true
                                                                 else -> {}

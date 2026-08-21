@@ -658,12 +658,29 @@ object CombinedActionExecutor {
                 is Action.Keyboard -> {
                     try {
                         if (PermissionUtils.canWriteSecureSettings(context)) {
-                            Settings.Secure.putString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD, action.inputMethodId)
+                            if (!action.inputMethodId.isNullOrBlank()) {
+                                Settings.Secure.putString(
+                                    context.contentResolver,
+                                    Settings.Secure.DEFAULT_INPUT_METHOD,
+                                    action.inputMethodId
+                                )
+                            }
                             return@withContext
                         }
-                        Toast.makeText(context, R.string.diy_set_keyboard_permission_required, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            R.string.diy_set_keyboard_permission_required,
+                            Toast.LENGTH_SHORT
+                        ).show()
                     } catch (e: Exception) {
-                        Toast.makeText(context, "Keyboard Switching Failed: ${e.message ?: ""}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            context,
+                            context.getString(
+                                R.string.diy_set_keyboard_switch_failed,
+                                e.message ?: ""
+                            ),
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
