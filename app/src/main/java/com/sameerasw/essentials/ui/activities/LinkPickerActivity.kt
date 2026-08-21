@@ -11,6 +11,7 @@ package com.sameerasw.essentials
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -24,6 +25,13 @@ import com.sameerasw.essentials.ui.theme.EssentialsTheme
 class LinkPickerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
+        } else {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, 0)
+        }
+        window.setBackgroundDrawableResource(android.R.color.transparent)
 
         val locationViewModel =
             com.sameerasw.essentials.viewmodels
@@ -71,6 +79,16 @@ class LinkPickerActivity : AppCompatActivity() {
                     modifier = Modifier.fillMaxSize(),
                 )
             }
+        }
+    }
+
+    override fun finish() {
+        super.finish()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
+        } else {
+            @Suppress("DEPRECATION")
+            overridePendingTransition(0, 0)
         }
     }
 }

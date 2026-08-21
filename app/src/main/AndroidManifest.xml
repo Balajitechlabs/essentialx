@@ -273,9 +273,13 @@
 
         <activity
             android:name=".LinkPickerActivity"
+            android:excludeFromRecents="true"
             android:exported="true"
             android:label="Open Link"
-            android:theme="@style/Theme.Essentials">
+            android:launchMode="singleInstance"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Essentials.Translucent">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
