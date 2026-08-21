@@ -56,6 +56,8 @@ android {
             "it",
             "iw",
             "ja",
+            "kk",
+            "kk-rKZ",
             "ko",
             "ml",
             "ml-rIN",

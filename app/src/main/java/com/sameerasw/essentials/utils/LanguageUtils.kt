@@ -34,6 +34,7 @@ object LanguageUtils {
         Language("id", "Indonesian", "Bahasa Indonesia"),
         Language("it", "Italian", "Italiano"),
         Language("ja", "Japanese", "日本語"),
+        Language("kk", "Kazakh", "Қазақша"),
         Language("ko", "Korean", "한국어"),
         Language("ml-IN", "Malayalam", "മലയാളം"),
         Language("ne-NP", "Nepali", "नेपाली"),
