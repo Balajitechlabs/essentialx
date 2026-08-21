@@ -2871,6 +2871,37 @@ class MainViewModel : ViewModel() {
     }
 
     /**
+     * Executes batch set app standby bucket operation for multiple apps.
+     *
+     * @param packageNames [Set<String>] Target package names.
+     * @param targetBucket [Int] Target standby bucket code.
+     * @param context [Context] Context for shell execution.
+     */
+    fun setAppsStandbyBucket(packageNames: Set<String>, targetBucket: Int, context: Context) {
+        val currentList = standbyAppsList.value
+        val updatedList = currentList.map { app ->
+            if (packageNames.contains(app.packageName)) {
+                app.copy(bucket = targetBucket)
+            } else app
+        }
+        standbyAppsList.value = updatedList
+
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val bucketName = when (targetBucket) {
+                10 -> "active"
+                20 -> "working_set"
+                30 -> "frequent"
+                40 -> "rare"
+                45 -> "restricted"
+                else -> "active"
+            }
+            packageNames.forEach { pkg ->
+                ShellUtils.runCommand(context, "am set-standby-bucket $pkg $bucketName")
+            }
+        }
+    }
+
+    /**
      * Executes the set prefer gpu composing enabled operation.
      *
      * @param enabled [Boolean] Target enabled.

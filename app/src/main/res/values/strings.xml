@@ -1982,6 +1982,9 @@
     <string name="standby_bucket_restricted">Restricted</string>
     <string name="standby_apps_empty_bucket">No apps in this bucket</string>
     <string name="standby_apps_loading">Loading standby apps...</string>
+    <string name="standby_apps_selected_count">%1$d Apps</string>
+    <string name="standby_apps_move_sheet_title">Move to Standby Bucket</string>
+    <string name="action_move_bucket">Move to bucket</string>
     <string name="section_graphics">Graphics</string>
     <string name="feat_prefer_gpu_composing_title">Prefer GPU for screen composing</string>
     <string name="feat_prefer_gpu_composing_desc">Disable hardware overlays to force GPU screen compositing. Resets on device reboot.</string>
