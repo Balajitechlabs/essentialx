@@ -385,6 +385,20 @@ object FeatureRegistry {
         },
 
         object : Feature(
+            id = "SIM names",
+            title = R.string.feat_sim_names_title,
+            iconRes = R.drawable.rounded_android_cell_dual_4_bar_24,
+            category = R.string.cat_connectivity,
+            description = R.string.feat_sim_names_desc,
+            permissionKeys = listOf("SHIZUKU", "READ_PHONE_STATE"),
+            parentFeatureId = "Networks",
+            showToggle = false
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = true
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+        },
+
+        object : Feature(
             id = "Watch",
             title = R.string.feat_watch_title,
             iconRes = R.drawable.rounded_watch_24,
@@ -508,6 +522,33 @@ object FeatureRegistry {
         },
 
         object : Feature(
+            id = "Maps power saving mode",
+            title = R.string.feat_maps_power_saving_title,
+            iconRes = R.drawable.rounded_navigation_24,
+            category = R.string.cat_interface,
+            description = R.string.feat_maps_power_saving_desc,
+            aboutDescription = R.string.about_desc_maps_power_saving,
+            permissionKeys = if (ShellUtils.isRootEnabled(EssentialsApp.context)) listOf(
+                "ROOT",
+                "NOTIFICATION_LISTENER"
+            ) else listOf("SHIZUKU", "NOTIFICATION_LISTENER"),
+            parentFeatureId = "Display",
+            isVisibleInMain = false,
+            hasMoreSettings = false
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) =
+                viewModel.isMapsPowerSavingEnabled.value
+
+            override fun isToggleEnabled(viewModel: MainViewModel, context: Context) =
+                ShellUtils.hasPermission(context) && viewModel.isNotificationListenerEnabled.value
+
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
+                viewModel.setMapsPowerSavingEnabled(enabled, context)
+
+            override fun onClick(context: Context, viewModel: MainViewModel) {}
+        },
+
+        object : Feature(
             id = "Caffeinate",
             title = R.string.feat_caffeinate_title,
             iconRes = R.drawable.rounded_coffee_24,
@@ -532,31 +573,6 @@ object FeatureRegistry {
                     context
                 )
             }
-        },
-
-        object : Feature(
-            id = "Maps power saving mode",
-            title = R.string.feat_maps_power_saving_title,
-            iconRes = R.drawable.rounded_navigation_24,
-            category = R.string.cat_tools,
-            description = R.string.feat_maps_power_saving_desc,
-            aboutDescription = R.string.about_desc_maps_power_saving,
-            permissionKeys = if (ShellUtils.isRootEnabled(EssentialsApp.context)) listOf(
-                "ROOT",
-                "NOTIFICATION_LISTENER"
-            ) else listOf("SHIZUKU", "NOTIFICATION_LISTENER"),
-            hasMoreSettings = false
-        ) {
-            override fun isEnabled(viewModel: MainViewModel) =
-                viewModel.isMapsPowerSavingEnabled.value
-
-            override fun isToggleEnabled(viewModel: MainViewModel, context: Context) =
-                ShellUtils.hasPermission(context) && viewModel.isNotificationListenerEnabled.value
-
-            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) =
-                viewModel.setMapsPowerSavingEnabled(enabled, context)
-
-            override fun onClick(context: Context, viewModel: MainViewModel) {}
         },
 
         object : Feature(
@@ -1070,6 +1086,12 @@ object FeatureRegistry {
                     R.string.search_smart_pixels_intensity_title,
                     R.string.search_smart_pixels_intensity_desc,
                     "smart_pixels_intensity_slider"
+                ),
+                SearchSetting(
+                    R.string.smart_pixels_disable_on_cast_title,
+                    R.string.smart_pixels_disable_on_cast_desc,
+                    "smart_pixels_disable_on_cast_toggle",
+                    R.array.keywords_switch_master
                 )
             ),
             showToggle = true,

@@ -20,4 +20,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Essentials"
 include(":app")
+include(":stub")
+
  

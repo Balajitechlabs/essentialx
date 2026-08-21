@@ -83,5 +83,22 @@ fun SmartPixelsSettingsUI(
                 modifier = Modifier.highlight(highlightSetting == "smart_pixels_intensity_slider")
             )
         }
+
+        RoundedCardContainer(
+            spacing = 2.dp,
+            cornerRadius = 24.dp
+        ) {
+            IconToggleItem(
+                iconRes = R.drawable.rounded_cast_24,
+                title = stringResource(R.string.smart_pixels_disable_on_cast_title),
+                description = stringResource(R.string.smart_pixels_disable_on_cast_desc),
+                isChecked = viewModel.isSmartPixelsDisableOnCastEnabled.value,
+                onCheckedChange = { checked ->
+                    HapticUtil.performUIHaptic(view)
+                    viewModel.setSmartPixelsDisableOnCastEnabled(context, checked)
+                },
+                modifier = Modifier.highlight(highlightSetting == "smart_pixels_disable_on_cast_toggle")
+            )
+        }
     }
 }

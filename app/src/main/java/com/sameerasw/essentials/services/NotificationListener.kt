@@ -60,6 +60,53 @@ class NotificationListener : NotificationListenerService() {
         fun clearUnreadNotifications() {
             instance?.unreadNotifications?.clear()
         }
+
+        fun isScreenCaptureActive(): Boolean {
+            val activeNotifs = instance?.activeNotifications ?: return false
+            for (sbn in activeNotifs) {
+                if (isOngoingScreenCaptureNotification(sbn)) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        fun isOngoingScreenCaptureNotification(sbn: StatusBarNotification): Boolean {
+            val notif = sbn.notification
+            val isOngoing = sbn.isOngoing || (notif.flags and Notification.FLAG_ONGOING_EVENT) != 0
+            if (!isOngoing) return false
+
+            val pkg = sbn.packageName.lowercase()
+            val channelId = notif.channelId?.lowercase() ?: ""
+            val tag = (sbn.tag ?: "").lowercase()
+
+            val isCapturePkg = pkg == "com.android.systemui" ||
+                    pkg == "android" ||
+                    pkg.contains("screenrecord") ||
+                    pkg.contains("screencast")
+
+            val isCaptureChannelOrTag = channelId.contains("screen_record") ||
+                    channelId.contains("screenrecord") ||
+                    channelId.contains("screen_cast") ||
+                    channelId.contains("cast") ||
+                    tag.contains("screenrecord") ||
+                    tag.contains("cast")
+
+            if (isCapturePkg && isCaptureChannelOrTag) return true
+
+            val title = notif.extras?.getCharSequence(Notification.EXTRA_TITLE)?.toString()?.lowercase() ?: ""
+            val text = notif.extras?.getCharSequence(Notification.EXTRA_TEXT)?.toString()?.lowercase() ?: ""
+
+            return title.contains("screen record") ||
+                    title.contains("recording screen") ||
+                    title.contains("screen cast") ||
+                    title.contains("casting screen") ||
+                    title.contains("screen share") ||
+                    title.contains("sharing screen") ||
+                    text.contains("screen record") ||
+                    text.contains("recording screen") ||
+                    text.contains("casting screen")
+        }
     }
 
     private val activeGlanceNotifications = mutableSetOf<String>()
@@ -750,6 +797,9 @@ class NotificationListener : NotificationListenerService() {
         if (sbn.packageName == packageName) {
             return
         }
+        if (isOngoingScreenCaptureNotification(sbn)) {
+            ScreenOffAccessibilityService.updateSmartPixelsState()
+        }
         handleRespectNotifications(sbn)
         WatchNotificationSyncManager.onNotificationPosted(applicationContext, sbn, isSilentNotification(sbn, rankingMap))
 
@@ -1070,6 +1120,10 @@ class NotificationListener : NotificationListenerService() {
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         unreadNotifications.remove(sbn.key)
         WatchNotificationSyncManager.onNotificationRemoved(applicationContext, sbn.key)
+
+        if (isOngoingScreenCaptureNotification(sbn) || sbn.packageName.contains("screenrecord") || sbn.packageName == "com.android.systemui") {
+            ScreenOffAccessibilityService.updateSmartPixelsState()
+        }
 
         // Trigger refresh if something is playing
         try {

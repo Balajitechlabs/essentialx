@@ -58,6 +58,7 @@ class SettingsRepository(private val context: Context) {
         const val KEY_GENAI_AUTOMATION_ENABLED = "genai_automation_enabled"
         const val KEY_SMART_PIXELS_ENABLED = "smart_pixels_enabled"
         const val KEY_SMART_PIXELS_INTENSITY = "smart_pixels_intensity"
+        const val KEY_SMART_PIXELS_DISABLE_ON_CAST = "smart_pixels_disable_on_cast"
         const val KEY_DAILY_WALLPAPER_LAST_ID = "daily_wallpaper_last_id"
 
         const val KEY_DAILY_WALLPAPER_LAST_URL_MOBILE = "daily_wallpaper_last_url_mobile"
