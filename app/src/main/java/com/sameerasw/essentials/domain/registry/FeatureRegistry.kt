@@ -385,6 +385,20 @@ object FeatureRegistry {
         },
 
         object : Feature(
+            id = "SIM names",
+            title = R.string.feat_sim_names_title,
+            iconRes = R.drawable.rounded_android_cell_dual_4_bar_24,
+            category = R.string.cat_connectivity,
+            description = R.string.feat_sim_names_desc,
+            permissionKeys = listOf("SHIZUKU", "READ_PHONE_STATE"),
+            parentFeatureId = "Networks",
+            showToggle = false
+        ) {
+            override fun isEnabled(viewModel: MainViewModel) = true
+            override fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean) {}
+        },
+
+        object : Feature(
             id = "Watch",
             title = R.string.feat_watch_title,
             iconRes = R.drawable.rounded_watch_24,

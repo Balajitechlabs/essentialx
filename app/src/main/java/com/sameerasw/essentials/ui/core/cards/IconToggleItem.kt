@@ -70,7 +70,11 @@ fun IconToggleItem(
     val onClickAction = {
         if (enabled) {
             HapticUtil.performVirtualKeyHaptic(view)
-            onCheckedChange(!finalIsChecked)
+            if (onClick != null) {
+                onClick()
+            } else {
+                onCheckedChange(!finalIsChecked)
+            }
         } else if (onDisabledClick != null) {
             HapticUtil.performVirtualKeyHaptic(view)
             onDisabledClick()

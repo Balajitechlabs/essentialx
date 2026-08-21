@@ -20,6 +20,7 @@ import android.widget.Toast
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.utils.ShizukuUtils
 import io.sentry.android.core.SentryAndroid
+import org.lsposed.hiddenapibypass.HiddenApiBypass
 
 class EssentialsApp : Application() {
     companion object {
@@ -37,6 +38,11 @@ class EssentialsApp : Application() {
             resources?.configuration
         } catch (e: Exception) {
 
+        }
+
+        try {
+            HiddenApiBypass.setHiddenApiExemptions("")
+        } catch (_: Throwable) {
         }
 
         ShizukuUtils.initialize()

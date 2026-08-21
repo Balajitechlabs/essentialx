@@ -1949,6 +1949,12 @@
     <string name="feat_mobile_data_always_on_desc">Keep mobile data active even when Wi-Fi is connected</string>
     <string name="feat_wireless_display_certification_title">Wireless display certification</string>
     <string name="feat_wireless_display_certification_desc">Show options for wireless display certification</string>
+    <string name="feat_sim_names_title">SIM names</string>
+    <string name="feat_sim_names_desc">Rename carrier display name for active SIM cards</string>
+    <string name="sim_names_slot_format">SIM %1$d (%2$s)</string>
+    <string name="sim_names_carrier_label">Carrier name</string>
+    <string name="sim_names_reset_tooltip">Reset to default</string>
+    <string name="sim_names_no_sim">No active SIM cards detected</string>
     <string name="feat_transparent_navigation_bar_title">Transparent navigation bar</string>
     <string name="feat_transparent_navigation_bar_desc">Make system navigation bar background transparent</string>
     <string name="cat_navigation">Navigation</string>
@@ -2142,9 +2148,3 @@
     <string name="watch_call_sync_title">Sync calls</string>
     <string name="watch_call_sync_desc">Sync and control calls from your watch</string>
 </resources>
-
-
-
-
-
-
