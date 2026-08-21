@@ -1054,6 +1054,12 @@
     <string name="diy_custom_settings_key_label">Setting Key</string>
     <string name="diy_custom_settings_value_label">Value</string>
 
+    <string name="diy_set_keyboard_title">Set Keyboard</string>
+    <string name="diy_set_keyboard_sheet_title">Select Keyboard</string>
+    <string name="diy_set_keyboard_input_method_disabled">Enable input method in settings</string>
+    <string name="diy_set_keyboard_permission_required">Grant permission to change your keyboard.</string>
+    <string name="diy_set_keyboard_switch_failed">Keyboard switching failed: %1$s</string>
+
     <!-- About Section -->
     <string name="app_developer_name">Sameera Wijerathna</string>
     <string name="app_description">The all-in-one toolbox for your Pixel and Androids</string>
@@ -1353,6 +1359,8 @@
     <string name="about_desc_smart_pixels">Overlay a customizable checkered pattern of blacked-out pixels across the screen using accessibility service to save display power on OLED screens.</string>
     <string name="smart_pixels_enable_title">Enable smart pixels</string>
     <string name="smart_pixels_intensity_title">Intensity</string>
+    <string name="smart_pixels_disable_on_cast_title">Disable during screen casting</string>
+    <string name="smart_pixels_disable_on_cast_desc">Automatically pause pixel grid overlay while casting or recording screen</string>
     <string name="search_smart_pixels_enable_title">Enable smart pixels</string>
     <string name="search_smart_pixels_enable_desc">Black out pixels to save power</string>
     <string name="search_smart_pixels_intensity_title">Smart pixels intensity</string>
@@ -1942,6 +1950,12 @@
     <string name="feat_mobile_data_always_on_desc">Keep mobile data active even when Wi-Fi is connected</string>
     <string name="feat_wireless_display_certification_title">Wireless display certification</string>
     <string name="feat_wireless_display_certification_desc">Show options for wireless display certification</string>
+    <string name="feat_sim_names_title">SIM names</string>
+    <string name="feat_sim_names_desc">Rename carrier display name for active SIM cards</string>
+    <string name="sim_names_slot_format">SIM %1$d (%2$s)</string>
+    <string name="sim_names_carrier_label">Carrier name</string>
+    <string name="sim_names_reset_tooltip">Reset to default</string>
+    <string name="sim_names_no_sim">No active SIM cards detected</string>
     <string name="feat_transparent_navigation_bar_title">Transparent navigation bar</string>
     <string name="feat_transparent_navigation_bar_desc">Make system navigation bar background transparent</string>
     <string name="cat_navigation">Navigation</string>
@@ -2135,9 +2149,3 @@
     <string name="watch_call_sync_title">Sync calls</string>
     <string name="watch_call_sync_desc">Sync and control calls from your watch</string>
 </resources>
-
-
-
-
-
-

@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.DETECT_SCREEN_RECORDING" />
     <uses-permission
         android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
@@ -1276,5 +1277,10 @@
             android:resource="@xml/app_metadata" />
 
     </application>
+
+    <instrumentation
+        android:name=".shizuku.CarrierConfigModifier"
+        android:label="CarrierConfigModifier"
+        android:targetPackage="${applicationId}" />
 
 </manifest>

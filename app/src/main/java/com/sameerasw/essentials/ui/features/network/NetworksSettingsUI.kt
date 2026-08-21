@@ -9,7 +9,10 @@
 
 package com.sameerasw.essentials.ui.features.system
 
+import android.Manifest
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,6 +32,8 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.sameerasw.essentials.R
@@ -37,6 +42,7 @@ import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.PermissionItem
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
+import com.sameerasw.essentials.ui.features.network.sheets.SimNamesBottomSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -46,6 +52,7 @@ private enum class NetworkPermissionModule {
     RATE_LIMIT,
     MOBILE_DATA_ALWAYS_ON,
     WIRELESS_DISPLAY_CERTIFICATION,
+    SIM_NAMES,
     NONE
 }
 
@@ -124,7 +131,23 @@ fun NetworksSettingsUI(
         }
     }
 
+    val hasReadPhoneState = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.READ_PHONE_STATE
+    ) == PackageManager.PERMISSION_GRANTED
+    val hasSimNamesPermission = isShellGranted && hasReadPhoneState
+
+    var showSimNamesSheet by remember { mutableStateOf(false) }
+
+    if (showSimNamesSheet) {
+        SimNamesBottomSheet(
+            onDismissRequest = { showSimNamesSheet = false }
+        )
+    }
+
     if (requestingPermissionFor != NetworkPermissionModule.NONE) {
+        val permissionsList = mutableListOf<PermissionItem>()
+
         val shizukuPermission = PermissionItem(
             iconRes = R.drawable.rounded_adb_24,
             title = if (!isShizukuAvailable) R.string.perm_shizuku_title else R.string.perm_shizuku_grant_title,
@@ -132,7 +155,8 @@ fun NetworksSettingsUI(
             dependentFeatures = listOf(
                 R.string.feat_network_download_rate_limit_title,
                 R.string.feat_mobile_data_always_on_title,
-                R.string.feat_wireless_display_certification_title
+                R.string.feat_wireless_display_certification_title,
+                R.string.feat_sim_names_title
             ),
             actionLabel = if (!isShizukuAvailable) R.string.perm_shizuku_install_action else if (isShellGranted) R.string.perm_action_granted else R.string.perm_action_grant,
             action = {
@@ -149,11 +173,33 @@ fun NetworksSettingsUI(
             },
             isGranted = isShellGranted
         )
+        permissionsList.add(shizukuPermission)
+
+        if (requestingPermissionFor == NetworkPermissionModule.SIM_NAMES) {
+            val phoneStatePermission = PermissionItem(
+                iconRes = R.drawable.rounded_mobile_vibrate_24,
+                title = R.string.permission_read_phone_state_title,
+                description = R.string.permission_read_phone_state_desc_call_vibrations,
+                dependentFeatures = listOf(R.string.feat_sim_names_title),
+                actionLabel = if (hasReadPhoneState) R.string.perm_action_granted else R.string.perm_action_grant,
+                action = {
+                    (context as? Activity)?.let {
+                        ActivityCompat.requestPermissions(
+                            it,
+                            arrayOf(Manifest.permission.READ_PHONE_STATE),
+                            102
+                        )
+                    }
+                },
+                isGranted = hasReadPhoneState
+            )
+            permissionsList.add(phoneStatePermission)
+        }
 
         PermissionsBottomSheet(
             onDismissRequest = { requestingPermissionFor = NetworkPermissionModule.NONE },
-            featureTitle = R.string.feat_networks_title,
-            permissions = listOf(shizukuPermission)
+            featureTitle = if (requestingPermissionFor == NetworkPermissionModule.SIM_NAMES) R.string.feat_sim_names_title else R.string.feat_networks_title,
+            permissions = permissionsList
         )
     }
 
@@ -247,6 +293,21 @@ fun NetworksSettingsUI(
                 },
                 iconRes = R.drawable.rounded_cast_24,
                 modifier = Modifier.highlight(highlightSetting == "wireless_display_certification_toggle")
+            )
+
+            IconToggleItem(
+                title = stringResource(R.string.feat_sim_names_title),
+                description = stringResource(R.string.feat_sim_names_desc),
+                iconRes = R.drawable.rounded_android_cell_dual_4_bar_24,
+                showToggle = false,
+                onClick = {
+                    if (hasSimNamesPermission) {
+                        showSimNamesSheet = true
+                    } else {
+                        requestingPermissionFor = NetworkPermissionModule.SIM_NAMES
+                    }
+                },
+                modifier = Modifier.highlight(highlightSetting == "sim_names_item")
             )
         }
     }

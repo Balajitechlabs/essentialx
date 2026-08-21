@@ -56,6 +56,8 @@ android {
             "it",
             "iw",
             "ja",
+            "kk",
+            "kk-rKZ",
             "ko",
             "ml",
             "ml-rIN",
@@ -128,6 +130,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        aidl = true
     }
     packaging {
         jniLibs {
@@ -137,6 +140,7 @@ android {
 }
 
 dependencies {
+    compileOnly(project(":stub"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
