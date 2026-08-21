@@ -175,8 +175,6 @@ class DIYViewModel(application: Application) : AndroidViewModel(application) {
         val actions = suggestion.actionTypes.mapNotNull { actionName ->
             when (actionName) {
                 "HapticVibration" -> Action.HapticVibration
-                "ShowNotification" -> Action.ShowNotification
-                "RemoveNotification" -> Action.RemoveNotification
                 "TurnOnFlashlight" -> Action.TurnOnFlashlight
                 "TurnOffFlashlight" -> Action.TurnOffFlashlight
                 "ToggleFlashlight" -> Action.ToggleFlashlight

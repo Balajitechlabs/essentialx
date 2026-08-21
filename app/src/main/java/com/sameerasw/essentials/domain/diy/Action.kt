@@ -36,18 +36,6 @@ sealed interface Action {
     }
 
     @Keep
-    data object ShowNotification : Action {
-        override val title: Int = R.string.diy_action_notification
-        override val icon: Int = R.drawable.rounded_notifications_unread_24
-    }
-
-    @Keep
-    data object RemoveNotification : Action {
-        override val title: Int = R.string.diy_action_remove_notification
-        override val icon: Int = R.drawable.rounded_notifications_off_24
-    }
-
-    @Keep
     data object TurnOnFlashlight : Action {
         override val title: Int = R.string.diy_action_flashlight_on
         override val icon: Int = R.drawable.round_flashlight_on_24
@@ -175,6 +163,27 @@ sealed interface Action {
     data object ToggleMediaVolume : Action {
         override val title: Int = R.string.diy_action_toggle_media_volume
         override val icon: Int = R.drawable.rounded_mobile_sound_24
+    }
+
+    @Keep
+    data object CycleSoundModes : Action {
+        override val title: Int = R.string.diy_action_cycle_sound_modes
+        override val icon: Int = R.drawable.rounded_volume_up_24
+        override val permissions: List<String> = listOf("NOTIFICATION_POLICY")
+    }
+
+    @Keep
+    data object ToggleMute : Action {
+        override val title: Int = R.string.diy_action_toggle_mute
+        override val icon: Int = R.drawable.rounded_volume_off_24
+        override val permissions: List<String> = listOf("NOTIFICATION_POLICY")
+    }
+
+    @Keep
+    data object ToggleVibrate : Action {
+        override val title: Int = R.string.diy_action_toggle_vibrate
+        override val icon: Int = R.drawable.rounded_mobile_vibrate_24
+        override val permissions: List<String> = listOf("NOTIFICATION_POLICY")
     }
 
     @Keep

@@ -4,7 +4,7 @@
  *
  * Feature Module: Hardware Features
  * File: ButtonRemapSettingsUI.kt
- * Description: Composable screen for remapping volume and hardware keys.
+ * Description: Composable screen for remapping volume and hardware keys with unified DIY actions.
  */
 
 package com.sameerasw.essentials.ui.features.system
@@ -50,12 +50,23 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.HapticFeedbackType
+import com.sameerasw.essentials.domain.diy.Action
+import com.sameerasw.essentials.domain.diy.ActionRegistry
+import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.shizuku.ShizukuPermissionHelper
 import com.sameerasw.essentials.shizuku.ShizukuStatus
+import com.sameerasw.essentials.ui.components.CategoryExpandableSection
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.HapticFeedbackPicker
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
+import com.sameerasw.essentials.ui.core.sheets.AppSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.CustomSettingsSheet
+import com.sameerasw.essentials.ui.core.sheets.DimWallpaperSettingsSheet
+import com.sameerasw.essentials.ui.core.sheets.ScreenOffSettingsSheet
+import com.sameerasw.essentials.ui.core.sheets.SingleAppSelectionSheet
+import com.sameerasw.essentials.ui.core.sheets.SoundModeSettingsSheet
+import com.sameerasw.essentials.ui.features.apps.sheets.KeyboardSelectionSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -68,20 +79,30 @@ fun ButtonRemapSettingsUI(
     highlightSetting: String? = null
 ) {
     val context = LocalContext.current
-    val showLikeSongOptions = remember { mutableStateOf(false) }
-
-    if (showLikeSongOptions.value) {
-        LikeSongSettingsSheet(
-            onDismiss = { showLikeSongOptions.value = false },
-            viewModel = viewModel,
-            context = context
-        )
-    }
-
     val view = LocalView.current
     var selectedScreenTab by remember { mutableIntStateOf(0) } // 0: Off, 1: On
     var selectedButtonTab by remember { mutableIntStateOf(0) } // 0: Up, 1: Down
     var showFlashlightOptions by remember { mutableStateOf(false) }
+    val showLikeSongOptions = remember { mutableStateOf(false) }
+
+    // Action Config Sheets State
+    var showDimSettings by remember { mutableStateOf(false) }
+    var showScreenOffSettings by remember { mutableStateOf(false) }
+    var showDeviceEffectsSettings by remember { mutableStateOf(false) }
+    var showSoundModeSettings by remember { mutableStateOf(false) }
+    var showSometimesEssentialsSettings by remember { mutableStateOf(false) }
+    var showFreezeTagSettings by remember { mutableStateOf(false) }
+    var showOpenAppSettings by remember { mutableStateOf(false) }
+    var showFreezeAppsSettings by remember { mutableStateOf(false) }
+    var temporarySelectedAppsForAction by remember { mutableStateOf<List<String>>(emptyList()) }
+    var showSetKeyboardSheet by remember { mutableStateOf(false) }
+    var showCustomSettingsSettings by remember { mutableStateOf(false) }
+    var configAction by remember { mutableStateOf<Action?>(null) }
+
+    // Missing permission handling sheet
+    var showPermissionSheet by remember { mutableStateOf(false) }
+    var permissionKeysToShow by remember { mutableStateOf<List<String>>(emptyList()) }
+    var permissionFeatureTitle by remember { mutableStateOf<Any>("") }
 
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
     var shizukuStatus by remember { mutableStateOf(ShizukuStatus.NOT_RUNNING) }
@@ -97,6 +118,44 @@ fun ButtonRemapSettingsUI(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    fun getMissingPermissionsHelper(action: Action?): List<String> {
+        if (action == null) return emptyList()
+        val resolvedPermissions = action.permissions.map { permKey ->
+            if (permKey == "SHIZUKU" || permKey == "ROOT") {
+                if (com.sameerasw.essentials.utils.ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"
+            } else {
+                permKey
+            }
+        }.distinct()
+
+        return resolvedPermissions.filter { permKey ->
+            when (permKey) {
+                "SHIZUKU" -> !viewModel.isShizukuPermissionGranted.value
+                "ROOT" -> !viewModel.isRootPermissionGranted.value
+                "WRITE_SETTINGS" -> !viewModel.isWriteSettingsEnabled.value
+                "NOTIFICATION_POLICY" -> !viewModel.isNotificationPolicyAccessGranted.value
+                "WRITE_SECURE_SETTINGS" -> !viewModel.isWriteSecureSettingsEnabled.value
+                else -> false
+            }
+        }
+    }
+
+    val currentAction: Action? = when (selectedScreenTab) {
+        0 if selectedButtonTab == 0 -> viewModel.volumeUpActionOff.value
+        0 if selectedButtonTab == 1 -> viewModel.volumeDownActionOff.value
+        1 if selectedButtonTab == 0 -> viewModel.volumeUpActionOn.value
+        else -> viewModel.volumeDownActionOn.value
+    }
+
+    val onActionSelected: (Action?) -> Unit = { action ->
+        when (selectedScreenTab) {
+            0 if selectedButtonTab == 0 -> viewModel.setVolumeUpActionOff(action, context)
+            0 if selectedButtonTab == 1 -> viewModel.setVolumeDownActionOff(action, context)
+            1 if selectedButtonTab == 0 -> viewModel.setVolumeUpActionOn(action, context)
+            else -> viewModel.setVolumeDownActionOn(action, context)
         }
     }
 
@@ -139,21 +198,18 @@ fun ButtonRemapSettingsUI(
                                 if (shellHasPermission) {
                                     viewModel.setButtonRemapUseShizuku(true, context)
                                 } else if (shellIsAvailable && !isRootEnabled) {
-                                    // Shizuku logic
                                     shizukuHelper.requestPermission { _, grantResult ->
                                         if (grantResult == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                                             viewModel.setButtonRemapUseShizuku(true, context)
                                         }
                                     }
                                 } else if (isRootEnabled && !shellHasPermission) {
-                                    // Root logic
                                     viewModel.setButtonRemapUseShizuku(true, context)
                                     com.sameerasw.essentials.utils.ShellUtils.runCommand(
                                         context,
                                         "id"
                                     )
                                 } else {
-                                    // Provider not running
                                     viewModel.setButtonRemapUseShizuku(true, context)
                                     val toastRes =
                                         if (isRootEnabled) R.string.root_not_available_toast else R.string.shizuku_not_running_toast
@@ -175,7 +231,6 @@ fun ButtonRemapSettingsUI(
                         enter = expandVertically() + fadeIn(),
                         exit = shrinkVertically() + fadeOut()
                     ) {
-                        // Status indicator
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -250,8 +305,6 @@ fun ButtonRemapSettingsUI(
             exit = shrinkVertically() + fadeOut()
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Flashlight Options
-
                 // Haptic Feedback (Common)
                 Text(
                     text = stringResource(R.string.settings_section_haptic),
@@ -279,7 +332,7 @@ fun ButtonRemapSettingsUI(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                // Button Picker & Actions
+                // Button Picker & Tabs
                 RoundedCardContainer(spacing = 2.dp) {
                     val screenOptions = listOf(
                         stringResource(R.string.screen_off),
@@ -307,119 +360,103 @@ fun ButtonRemapSettingsUI(
                         },
                         labelProvider = { it }
                     )
+                }
 
-                    val currentAction = when (selectedScreenTab) {
-                        0 if selectedButtonTab == 0 -> viewModel.volumeUpActionOff.value
-                        0 if selectedButtonTab == 1 -> viewModel.volumeDownActionOff.value
-                        1 if selectedButtonTab == 0 -> viewModel.volumeUpActionOn.value
-                        else -> viewModel.volumeDownActionOn.value
-                    }
-
-                    val onActionSelected: (String) -> Unit = { action ->
-                        when (selectedScreenTab) {
-                            0 if selectedButtonTab == 0 -> viewModel.setVolumeUpActionOff(
-                                action,
-                                context
-                            )
-
-                            0 if selectedButtonTab == 1 -> viewModel.setVolumeDownActionOff(
-                                action,
-                                context
-                            )
-
-                            1 if selectedButtonTab == 0 -> viewModel.setVolumeUpActionOn(
-                                action,
-                                context
-                            )
-
-                            else -> viewModel.setVolumeDownActionOn(action, context)
-                        }
-                    }
-
+                // None Option
+                RoundedCardContainer(spacing = 2.dp) {
                     RemapActionItem(
                         title = stringResource(R.string.haptic_none),
-                        isSelected = currentAction == "None",
-                        onClick = { onActionSelected("None") },
+                        isSelected = currentAction == null,
+                        onClick = { onActionSelected(null) },
                         iconRes = R.drawable.rounded_do_not_disturb_on_24,
                     )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_toggle_flashlight),
-                        isSelected = currentAction == "Toggle flashlight",
-                        onClick = { onActionSelected("Toggle flashlight") },
-                        hasSettings = true,
-                        onSettingsClick = { showFlashlightOptions = true },
-                        iconRes = R.drawable.rounded_flashlight_on_24,
-                        modifier = Modifier.highlight(highlightSetting == "flashlight_toggle")
+                }
+
+                // Categorized Actions List
+                val actionCategories = remember(selectedScreenTab) {
+                    ActionRegistry.getCategories(screenOnOnly = selectedScreenTab == 1)
+                }
+
+                var expandedActionCategory by remember(selectedScreenTab, selectedButtonTab) {
+                    mutableStateOf<Int?>(
+                        actionCategories.firstOrNull { category ->
+                            category.actions.any { currentAction != null && it::class == currentAction::class }
+                        }?.titleRes ?: actionCategories.firstOrNull()?.titleRes
                     )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_media_play_pause),
-                        isSelected = currentAction == "Media play/pause",
-                        onClick = { onActionSelected("Media play/pause") },
-                        iconRes = R.drawable.rounded_play_pause_24,
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_media_next),
-                        isSelected = currentAction == "Media next",
-                        onClick = { onActionSelected("Media next") },
-                        iconRes = R.drawable.rounded_skip_next_24,
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_media_previous),
-                        isSelected = currentAction == "Media previous",
-                        onClick = { onActionSelected("Media previous") },
-                        iconRes = R.drawable.rounded_skip_previous_24,
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_toggle_vibrate),
-                        isSelected = currentAction == "Toggle vibrate",
-                        onClick = { onActionSelected("Toggle vibrate") },
-                        iconRes = R.drawable.rounded_mobile_vibrate_24,
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_toggle_mute),
-                        isSelected = currentAction == "Toggle mute",
-                        onClick = { onActionSelected("Toggle mute") },
-                        iconRes = R.drawable.rounded_volume_off_24,
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_ai_assistant),
-                        isSelected = currentAction == "AI assistant",
-                        onClick = { onActionSelected("AI assistant") },
-                        iconRes = R.drawable.rounded_bubble_chart_24,
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_toggle_media_volume),
-                        isSelected = currentAction == "Toggle media volume",
-                        onClick = { onActionSelected("Toggle media volume") },
-                        iconRes = R.drawable.rounded_volume_off_24,
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_cycle_sound_modes),
-                        isSelected = currentAction == "Cycle sound modes",
-                        onClick = { onActionSelected("Cycle sound modes") },
-                        iconRes = R.drawable.rounded_volume_up_24,
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_like_song),
-                        isSelected = currentAction == "Like current song",
-                        onClick = { onActionSelected("Like current song") },
-                        iconRes = R.drawable.rounded_favorite_24,
-                        hasSettings = true,
-                        onSettingsClick = { showLikeSongOptions.value = true }
-                    )
-                    RemapActionItem(
-                        title = stringResource(R.string.action_circle_to_search),
-                        isSelected = currentAction == "Circle to Search",
-                        onClick = { onActionSelected("Circle to Search") },
-                        iconRes = R.drawable.frame_inspect_24px,
-                    )
-                    if (selectedScreenTab == 1) {
-                        RemapActionItem(
-                            title = stringResource(R.string.action_take_screenshot),
-                            isSelected = currentAction == "Take screenshot",
-                            onClick = { onActionSelected("Take screenshot") },
-                            iconRes = R.drawable.rounded_screenshot_region_24,
-                        )
+                }
+
+                actionCategories.forEach { category ->
+                    CategoryExpandableSection(
+                        title = stringResource(category.titleRes),
+                        itemCount = category.actions.size,
+                        isExpanded = expandedActionCategory == category.titleRes,
+                        onToggleExpand = {
+                            expandedActionCategory =
+                                if (expandedActionCategory == category.titleRes) null else category.titleRes
+                        }
+                    ) {
+                        category.actions.forEach { action ->
+                            val resolvedAction =
+                                if (currentAction != null && currentAction::class == action::class) currentAction else action
+                            val isSelected =
+                                currentAction != null && currentAction::class == resolvedAction::class
+                            val missing = getMissingPermissionsHelper(resolvedAction)
+
+                            fun showMissingPermissionSheet() {
+                                permissionKeysToShow = missing
+                                permissionFeatureTitle = resolvedAction.title
+                                showPermissionSheet = true
+                            }
+
+                            RemapActionItem(
+                                title = stringResource(resolvedAction.title),
+                                iconRes = resolvedAction.icon,
+                                isSelected = isSelected,
+                                hasSettings = resolvedAction.isConfigurable || resolvedAction is Action.ToggleFlashlight || resolvedAction is Action.LikeCurrentSong,
+                                onClick = {
+                                    onActionSelected(resolvedAction)
+                                    if (missing.isNotEmpty()) {
+                                        showMissingPermissionSheet()
+                                    }
+                                },
+                                onSettingsClick = {
+                                    if (resolvedAction is Action.ToggleFlashlight) {
+                                        showFlashlightOptions = true
+                                        return@RemapActionItem
+                                    }
+                                    if (resolvedAction is Action.LikeCurrentSong) {
+                                        showLikeSongOptions.value = true
+                                        return@RemapActionItem
+                                    }
+                                    if (missing.isNotEmpty()) {
+                                        showMissingPermissionSheet()
+                                        return@RemapActionItem
+                                    }
+
+                                    configAction = resolvedAction
+                                    when (resolvedAction) {
+                                        is Action.DimWallpaper -> showDimSettings = true
+                                        is Action.ScreenOff -> showScreenOffSettings = true
+                                        is Action.DeviceEffects -> showDeviceEffectsSettings = true
+                                        is Action.SoundMode -> showSoundModeSettings = true
+                                        is Action.SometimesEssentials -> showSometimesEssentialsSettings = true
+                                        is Action.FreezeTag -> showFreezeTagSettings = true
+                                        is Action.OpenApp -> showOpenAppSettings = true
+                                        is Action.FreezeApps -> {
+                                            temporarySelectedAppsForAction = resolvedAction.packageNames
+                                            showFreezeAppsSettings = true
+                                        }
+                                        is Action.UnfreezeApps -> {
+                                            temporarySelectedAppsForAction = resolvedAction.packageNames
+                                            showFreezeAppsSettings = true
+                                        }
+                                        is Action.Keyboard -> showSetKeyboardSheet = true
+                                        is Action.CustomSettings -> showCustomSettingsSettings = true
+                                        else -> {}
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -438,7 +475,15 @@ fun ButtonRemapSettingsUI(
         }
     }
 
-    // Flashlight Options Bottom Sheet
+    // Config Bottom Sheets
+    if (showLikeSongOptions.value) {
+        LikeSongSettingsSheet(
+            onDismiss = { showLikeSongOptions.value = false },
+            viewModel = viewModel,
+            context = context
+        )
+    }
+
     if (showFlashlightOptions) {
         ModalBottomSheet(
             onDismissRequest = { showFlashlightOptions = false },
@@ -472,13 +517,9 @@ fun ButtonRemapSettingsUI(
                         description = stringResource(R.string.flashlight_always_off_desc),
                         isChecked = viewModel.isFlashlightAlwaysTurnOffEnabled.value,
                         onCheckedChange = {
-                            viewModel.setFlashlightAlwaysTurnOffEnabled(
-                                it,
-                                context
-                            )
+                            viewModel.setFlashlightAlwaysTurnOffEnabled(it, context)
                         }
                     )
-
                 }
 
                 Button(
@@ -497,7 +538,157 @@ fun ButtonRemapSettingsUI(
         }
     }
 
+    if (showDimSettings && configAction is Action.DimWallpaper) {
+        DimWallpaperSettingsSheet(
+            initialAction = configAction as Action.DimWallpaper,
+            onDismiss = { showDimSettings = false },
+            onSave = { newAction ->
+                showDimSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
 
+    if (showScreenOffSettings && configAction is Action.ScreenOff) {
+        ScreenOffSettingsSheet(
+            initialAction = configAction as Action.ScreenOff,
+            onDismiss = { showScreenOffSettings = false },
+            onSave = { newAction ->
+                showScreenOffSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
+
+    if (showDeviceEffectsSettings && configAction is Action.DeviceEffects) {
+        com.sameerasw.essentials.ui.core.sheets.DeviceEffectsSettingsSheet(
+            initialAction = configAction as Action.DeviceEffects,
+            onDismiss = { showDeviceEffectsSettings = false },
+            onSave = { newAction ->
+                showDeviceEffectsSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
+
+    if (showSoundModeSettings && configAction is Action.SoundMode) {
+        SoundModeSettingsSheet(
+            initialAction = configAction as Action.SoundMode,
+            onDismiss = { showSoundModeSettings = false },
+            onSave = { newAction ->
+                showSoundModeSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
+
+    if (showSometimesEssentialsSettings && configAction is Action.SometimesEssentials) {
+        com.sameerasw.essentials.ui.core.sheets.SometimesEssentialsSettingsSheet(
+            initialAction = configAction as Action.SometimesEssentials,
+            onDismiss = { showSometimesEssentialsSettings = false },
+            onSave = { newAction ->
+                showSometimesEssentialsSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
+
+    if (showFreezeTagSettings && configAction is Action.FreezeTag) {
+        val availableTags = remember {
+            com.sameerasw.essentials.data.repository.SettingsRepository(context).getFreezeTags()
+        }
+        com.sameerasw.essentials.ui.core.sheets.FreezeTagSettingsSheet(
+            initialAction = configAction as Action.FreezeTag,
+            availableTags = availableTags,
+            onDismiss = { showFreezeTagSettings = false },
+            onSave = { newAction ->
+                showFreezeTagSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
+
+    if (showOpenAppSettings) {
+        SingleAppSelectionSheet(
+            onDismissRequest = { showOpenAppSettings = false },
+            onAppSelected = { app ->
+                val newAction = Action.OpenApp(packageName = app.packageName)
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
+
+    if (showFreezeAppsSettings && (configAction is Action.FreezeApps || configAction is Action.UnfreezeApps)) {
+        AppSelectionSheet(
+            onDismissRequest = {
+                val finalAction = when (val action = configAction) {
+                    is Action.FreezeApps -> action.copy(packageNames = temporarySelectedAppsForAction)
+                    is Action.UnfreezeApps -> action.copy(packageNames = temporarySelectedAppsForAction)
+                    else -> configAction
+                }
+                if (finalAction != null) {
+                    onActionSelected(finalAction)
+                }
+                showFreezeAppsSettings = false
+                configAction = null
+            },
+            onLoadApps = {
+                temporarySelectedAppsForAction.map { AppSelection(it, true) }
+            },
+            onSaveApps = { _, selections ->
+                temporarySelectedAppsForAction =
+                    selections.filter { it.isEnabled }.map { it.packageName }
+            }
+        )
+    }
+
+    if (showSetKeyboardSheet && configAction is Action.Keyboard) {
+        KeyboardSelectionSheet(
+            onDismissRequest = { newIme ->
+                showSetKeyboardSheet = false
+                onActionSelected(Action.Keyboard(newIme))
+                configAction = null
+            },
+            selectedIme = (configAction as? Action.Keyboard)?.inputMethodId
+        )
+    }
+
+    if (showCustomSettingsSettings && configAction is Action.CustomSettings) {
+        CustomSettingsSheet(
+            initialAction = configAction as Action.CustomSettings,
+            onDismiss = { showCustomSettingsSettings = false },
+            onSave = { newAction ->
+                showCustomSettingsSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
+
+    if (showPermissionSheet) {
+        val permissionItems = com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItems(
+            permissionKeysToShow,
+            context,
+            viewModel
+        )
+        if (permissionItems.isNotEmpty()) {
+            com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet(
+                onDismissRequest = {
+                    showPermissionSheet = false
+                    permissionKeysToShow = emptyList()
+                },
+                featureTitle = permissionFeatureTitle,
+                permissions = permissionItems
+            )
+        }
+    }
 }
 
 @Composable

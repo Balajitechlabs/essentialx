@@ -73,6 +73,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.diy.Action
+import com.sameerasw.essentials.domain.diy.ActionRegistry
 import com.sameerasw.essentials.domain.diy.Automation
 import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.Trigger
@@ -884,67 +885,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                         }
 
                                         val actionCategories = remember(currentSelection) {
-                                            val connectivityActions = listOf(
-                                                Action.TurnOnWifi,
-                                                Action.TurnOffWifi,
-                                                Action.TurnOnCellularData,
-                                                Action.TurnOffCellularData,
-                                                Action.TurnOnHotspot,
-                                                Action.TurnOffHotspot,
-                                                Action.ToggleHotspot
-                                            )
-                                            val displayActions = mutableListOf<Action>(
-                                                Action.TurnOnAutoBrightness,
-                                                Action.TurnOffAutoBrightness,
-                                                Action.DimWallpaper(),
-                                                Action.ScreenOff()
-                                            ).apply {
-                                                if (android.os.Build.VERSION.SDK_INT >= 35) {
-                                                    add(Action.DeviceEffects())
-                                                }
-                                            }
-                                            val appsActions = listOf(
-                                                Action.OpenApp(),
-                                                Action.AIAssistant,
-                                                Action.FreezeApps(),
-                                                Action.UnfreezeApps(),
-                                                Action.FreezeTag(),
-                                                Action.PinApp,
-                                                Action.Keyboard()
-                                            )
-                                            val systemActions = listOf(
-                                                Action.TurnOnFlashlight,
-                                                Action.TurnOffFlashlight,
-                                                Action.ToggleFlashlight,
-                                                Action.TurnOnLowPower,
-                                                Action.TurnOffLowPower,
-                                                Action.CustomSettings(),
-                                                Action.CircleToSearch,
-                                                Action.TakeScreenshot,
-                                                Action.ShowNotification,
-                                                Action.RemoveNotification
-                                            )
-                                            val soundMediaActions = listOf(
-                                                Action.SoundMode(),
-                                                Action.HapticVibration,
-                                                Action.ToggleMediaVolume,
-                                                Action.MediaPlayPause,
-                                                Action.MediaNext,
-                                                Action.MediaPrevious,
-                                                Action.LikeCurrentSong
-                                            )
-                                            val essentialsActions = listOf(
-                                                Action.SometimesEssentials()
-                                            )
-
-                                            listOf(
-                                                R.string.diy_category_connectivity to connectivityActions,
-                                                R.string.diy_category_display to displayActions,
-                                                R.string.diy_category_apps to appsActions,
-                                                R.string.diy_category_system to systemActions,
-                                                R.string.diy_category_sound_media to soundMediaActions,
-                                                R.string.diy_category_essentials to essentialsActions
-                                            )
+                                            ActionRegistry.getCategories().map { it.titleRes to it.actions }
                                         }
 
                                         var expandedActionCategory by remember {

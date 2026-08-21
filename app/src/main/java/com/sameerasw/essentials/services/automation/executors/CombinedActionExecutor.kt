@@ -84,14 +84,6 @@ object CombinedActionExecutor {
                     }
                 }
 
-                is Action.ShowNotification -> {
-                    // Placeholder
-                }
-
-                is Action.RemoveNotification -> {
-                    // Placeholder
-                }
-
                 is Action.DimWallpaper -> {
                     com.sameerasw.essentials.utils.ShellUtils.runCommand(
                         context,
@@ -329,6 +321,40 @@ object CombinedActionExecutor {
                             lastVolume,
                             AudioManager.FLAG_SHOW_UI
                         )
+                    }
+                }
+
+                is Action.CycleSoundModes -> {
+                    com.sameerasw.essentials.services.handlers.SoundModeHandler(context).cycleNextMode()
+                }
+
+                is Action.ToggleMute -> {
+                    val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                    if (nm.isNotificationPolicyAccessGranted) {
+                        try {
+                            am.ringerMode = if (am.ringerMode == AudioManager.RINGER_MODE_SILENT)
+                                AudioManager.RINGER_MODE_NORMAL
+                            else
+                                AudioManager.RINGER_MODE_SILENT
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+
+                is Action.ToggleVibrate -> {
+                    val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                    if (nm.isNotificationPolicyAccessGranted) {
+                        try {
+                            am.ringerMode = if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE)
+                                AudioManager.RINGER_MODE_NORMAL
+                            else
+                                AudioManager.RINGER_MODE_VIBRATE
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
 
