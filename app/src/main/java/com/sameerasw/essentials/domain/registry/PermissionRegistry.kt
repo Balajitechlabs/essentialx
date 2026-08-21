@@ -62,6 +62,7 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("SHIZUKU", R.string.tile_refresh_rate)
     PermissionRegistry.register("SHIZUKU", R.string.feat_prefer_gpu_composing_title)
     PermissionRegistry.register("SHIZUKU", R.string.feat_networks_title)
+    PermissionRegistry.register("SHIZUKU", R.string.feat_sim_names_title)
     PermissionRegistry.register("SHIZUKU", R.string.feat_transparent_navigation_bar_title)
     PermissionRegistry.register("SHIZUKU", R.string.feat_standby_apps_title)
     PermissionRegistry.register("USAGE_STATS", R.string.feat_freeze_title)
@@ -101,6 +102,7 @@ fun initPermissionRegistry() {
     // Read phone state permission
     PermissionRegistry.register("READ_PHONE_STATE", R.string.search_smart_data_title)
     PermissionRegistry.register("READ_PHONE_STATE", R.string.feat_call_vibrations_title)
+    PermissionRegistry.register("READ_PHONE_STATE", R.string.feat_sim_names_title)
 
     // Device Admin permission
 

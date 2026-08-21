@@ -211,7 +211,10 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
                 updatePocketModeSensors()
             } else if (key == "pocket_mode_excluded_apps") {
                 updatePocketModeExcludedAppsSet()
-            } else if (key == SettingsRepository.KEY_SMART_PIXELS_ENABLED || key == SettingsRepository.KEY_SMART_PIXELS_INTENSITY) {
+            } else if (key == SettingsRepository.KEY_SMART_PIXELS_ENABLED ||
+                key == SettingsRepository.KEY_SMART_PIXELS_INTENSITY ||
+                key == SettingsRepository.KEY_SMART_PIXELS_DISABLE_ON_CAST
+            ) {
                 smartPixelsHandler.updateState()
             }
         }
@@ -267,6 +270,7 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
                         if (prefs.getBoolean("pocket_mode_lock_screen_only", false)) {
                             pocketModeHandler.onScreenOff() // cancel pending timer + remove overlay
                         }
+                        updateOmniOverlay()
                     }
 
                     InputEventListenerService.ACTION_VOLUME_LONG_PRESSED -> {
@@ -362,7 +366,8 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
             240f
         }
         val isPreview = prefs.getBoolean("circle_to_search_preview_enabled", false)
-        omniGestureOverlayHandler.updateOverlay(isGestureEnabled, height, width, isPreview)
+        val shouldShow = isGestureEnabled && isScreenOn && !keyguardManager.isKeyguardLocked
+        omniGestureOverlayHandler.updateOverlay(shouldShow, height, width, isPreview)
     }
 
     override fun onDestroy() {
@@ -667,5 +672,9 @@ class ScreenOffAccessibilityService : AccessibilityService(), SensorEventListene
 
     companion object {
         var instance: ScreenOffAccessibilityService? = null
+
+        fun updateSmartPixelsState() {
+            instance?.smartPixelsHandler?.updateState()
+        }
     }
 }

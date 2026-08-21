@@ -18,16 +18,20 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PixelFormat
+import android.hardware.display.DisplayManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Display
 import android.view.View
 import android.view.WindowManager
 import com.sameerasw.essentials.data.repository.SettingsRepository
+import com.sameerasw.essentials.services.NotificationListener
 
 class SmartPixelsHandler(private val service: AccessibilityService) {
 
     private var windowManager: WindowManager? = null
+    private var displayManager: DisplayManager? = null
     private var overlayView: SmartPixelsOverlayView? = null
     private var isOverlayAdded = false
 
@@ -36,6 +40,23 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
         override fun run() {
             overlayView?.shiftPattern()
             handler.postDelayed(this, 30 * 60 * 1000L) // Shift pattern every 30 minutes to prevent burn-in
+        }
+    }
+
+    private var isScreenRecordingActive = false
+    private var screenRecordingCallback: java.util.function.Consumer<Int>? = null
+
+    private val displayListener = object : DisplayManager.DisplayListener {
+        override fun onDisplayAdded(displayId: Int) {
+            updateState()
+        }
+
+        override fun onDisplayRemoved(displayId: Int) {
+            updateState()
+        }
+
+        override fun onDisplayChanged(displayId: Int) {
+            updateState()
         }
     }
 
@@ -49,14 +70,52 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
     fun init() {
         windowManager =
             service.getSystemService(AccessibilityService.WINDOW_SERVICE) as? WindowManager
+        displayManager =
+            service.getSystemService(AccessibilityService.DISPLAY_SERVICE) as? DisplayManager
+        displayManager?.registerDisplayListener(displayListener, handler)
+
+        if (android.os.Build.VERSION.SDK_INT >= 35 && windowManager != null) {
+            try {
+                val callback = java.util.function.Consumer<Int> { state ->
+                    isScreenRecordingActive = (state == WindowManager.SCREEN_RECORDING_STATE_VISIBLE)
+                    updateState()
+                }
+                screenRecordingCallback = callback
+                windowManager?.addScreenRecordingCallback(
+                    { command -> handler.post(command) },
+                    callback
+                )
+            } catch (e: Exception) {
+                Log.e("SmartPixelsHandler", "Failed to register screen recording callback", e)
+            }
+        }
+
         updateState()
+    }
+
+    private fun isScreenCastingOrMirroring(): Boolean {
+        if (isScreenRecordingActive) return true
+        if (NotificationListener.isScreenCaptureActive()) return true
+        val displays = displayManager?.displays ?: return false
+        for (display in displays) {
+            if (display.displayId == Display.DEFAULT_DISPLAY) continue
+            val flags = display.flags
+            val isPresentation = (flags and Display.FLAG_PRESENTATION) != 0
+            val isPrivate = (flags and Display.FLAG_PRIVATE) != 0
+            // Secondary display, presentation display, virtual or wireless mirroring display
+            if (isPresentation || isPrivate || display.displayId != Display.DEFAULT_DISPLAY) {
+                return true
+            }
+        }
+        return false
     }
 
     fun updateState() {
         val enabled = prefs.getBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED, false)
+        val disableOnCast = prefs.getBoolean(SettingsRepository.KEY_SMART_PIXELS_DISABLE_ON_CAST, true)
         val intensity = prefs.getFloat(SettingsRepository.KEY_SMART_PIXELS_INTENSITY, 50f)
 
-        if (enabled) {
+        if (enabled && !(disableOnCast && isScreenCastingOrMirroring())) {
             showOverlay(intensity)
         } else {
             hideOverlay()
@@ -91,13 +150,14 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
             }
 
             try {
+                overlayView?.visibility = View.VISIBLE
                 overlayView?.alpha = 0f
                 windowManager?.addView(overlayView, params)
                 isOverlayAdded = true
 
                 // Fade in animation
                 ObjectAnimator.ofFloat(overlayView, "alpha", 0f, 1f).apply {
-                    duration = 300
+                    duration = 200
                     start()
                 }
 
@@ -107,39 +167,41 @@ class SmartPixelsHandler(private val service: AccessibilityService) {
             } catch (e: Exception) {
                 Log.e("SmartPixelsHandler", "Failed to add Smart Pixels accessibility overlay", e)
             }
-        } else if (isOverlayAdded) {
+        } else if (isOverlayAdded && overlayView != null) {
+            overlayView?.visibility = View.VISIBLE
+            overlayView?.alpha = 1f
             overlayView?.invalidate()
         }
     }
 
     private fun hideOverlay() {
-        if (isOverlayAdded && windowManager != null && overlayView != null) {
+        if (isOverlayAdded && overlayView != null) {
             handler.removeCallbacks(shiftPatternRunnable)
-            val currentView = overlayView
-            // Fade out animation before removing
-            ObjectAnimator.ofFloat(currentView, "alpha", currentView?.alpha ?: 1f, 0f).apply {
-                duration = 300
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        try {
-                            if (isOverlayAdded && currentView != null) {
-                                windowManager?.removeView(currentView)
-                            }
-                        } catch (e: Exception) {
-                            Log.e("SmartPixelsHandler", "Failed to remove Smart Pixels accessibility overlay", e)
-                        }
-                        isOverlayAdded = false
-                    }
-                })
-                start()
+            val currentView = overlayView ?: return
+            currentView.visibility = View.GONE
+            try {
+                if (windowManager != null) {
+                    windowManager?.removeView(currentView)
+                }
+            } catch (_: Exception) {
             }
+            isOverlayAdded = false
         }
     }
 
     fun destroy() {
+        if (android.os.Build.VERSION.SDK_INT >= 35 && screenRecordingCallback != null) {
+            try {
+                windowManager?.removeScreenRecordingCallback(screenRecordingCallback!!)
+            } catch (_: Exception) {
+            }
+            screenRecordingCallback = null
+        }
+        displayManager?.unregisterDisplayListener(displayListener)
         handler.removeCallbacks(shiftPatternRunnable)
         hideOverlay()
         overlayView = null
+        displayManager = null
     }
 
     private class SmartPixelsOverlayView(context: AccessibilityService) : View(context) {

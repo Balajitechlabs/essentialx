@@ -96,7 +96,7 @@ This is a new restriction on Android with sideloaded apps that can receive sensi
 # Shell Providers (Shizuku & Root)
 
 - Essentials supports both **Shizuku** and **Root** as shell providers for executing advanced system-level commands.
-- **Shizuku**: Make sure to get the latest version of Shizuku preferably from a fork such as [yangFenTuoZi/Shizuku](https://github.com/yangFenTuoZi/Shizuku) or other not from the Google Play as it is no longer well supported especially with Android 16 QPR1 up.
+- **Shizuku**: Make sure to get the latest version of Shizuku preferably from a fork such as [thedjchi/Shizuku](https://github.com/thedjchi/Shizuku) or other not from the Google Play as it is no longer well supported.
 - **Root**: If your device is rooted, Essentials can bypass Shizuku and use root privileges directly for features like Button Remap and App Freezing.
 
 # How to grant accessibility permissions
@@ -138,7 +138,6 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
 - [xav-ie/generate-kaomoji](https://github.com/xav-ie/generate-kaomoji) - Keyboard kaomojis
 - [TebbeUbben/ChargeQuickTile](https://github.com/TebbeUbben/ChargeQuickTile) - Pixel charging QS
 
-<!-- 
 # Stars <3
 
 <a href="https://star-history.dera.page/#sameerasw/essentials&Date">
@@ -149,7 +148,6 @@ Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of co
  </picture>
 </a>
 
--->
 
 ---
 

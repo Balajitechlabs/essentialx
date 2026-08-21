@@ -94,7 +94,8 @@ class FlashlightHandler(
                 primaryCameraId = cameraId
 
                 if (isGlobalEnabled && !isInternalToggle) {
-                    // External trigger - smoothly fade in to last known intensity
+                    currentIntensityLevel = lastIntensity
+                    updateFlashlightNotification(lastIntensity)
                     Log.d(
                         "Flashlight",
                         "Global control detected external ON. Fading in to $lastIntensity"
@@ -106,10 +107,9 @@ class FlashlightHandler(
                             cameraId,
                             fromLevel = 1,
                             toLevel = lastIntensity,
-                            durationMs = 400L,
-                            steps = 20
+                            durationMs = 250L,
+                            steps = 8
                         )
-                        updateFlashlightNotification(lastIntensity)
                     }
                 } else if (isInternalToggle) {
                     // Internal trigger - reset only if no special mode is running
@@ -206,9 +206,9 @@ class FlashlightHandler(
         }
     }
 
-    private fun updateFlashlightNotification(intensity: Int) {
+    private fun updateFlashlightNotification(intensity: Int, forceShow: Boolean = false) {
         val prefs = service.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-        if (!prefs.getBoolean("flashlight_live_update_enabled", true) || !isTorchOn) {
+        if (!prefs.getBoolean("flashlight_live_update_enabled", true) || (!isTorchOn && !forceShow)) {
             cancelFlashlightNotification()
             return
         }
@@ -604,6 +604,9 @@ class FlashlightHandler(
                             defaultLevel
                         }
                     }
+                    if (targetState) {
+                        updateFlashlightNotification(currentIntensityLevel, forceShow = true)
+                    }
                     isInternalToggle = true
                     flashlightJob?.cancel()
                     flashlightJob = scope.launch {
@@ -613,15 +616,12 @@ class FlashlightHandler(
                             targetState,
                             maxLevel = currentIntensityLevel
                         )
-                        if (success) {
-                            if (targetState) {
-                                updateFlashlightNotification(currentIntensityLevel)
-                            } else {
-                                cancelFlashlightNotification()
-                            }
-                        } else {
+                        if (!success) {
                             // Hardware failed (camera in use), reset toggle
                             isInternalToggle = false
+                            cancelFlashlightNotification()
+                        } else if (!targetState) {
+                            cancelFlashlightNotification()
                         }
                     }
                 } else {
