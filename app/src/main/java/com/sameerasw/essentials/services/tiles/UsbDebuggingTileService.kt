@@ -56,18 +56,37 @@ class UsbDebuggingTileService : BaseTileService() {
     }
 
     override fun getTileState(): Int {
+        val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
+        val tapAction = prefs.getString("debugging_tile_tap_action", "both") ?: "both"
         val usbOn = isUsbDebuggingEnabled()
         val wifiOn = isWifiDebuggingEnabled()
-        return if (usbOn && wifiOn) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+
+        return when (tapAction) {
+            "usb" -> if (usbOn) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+            "wireless" -> if (wifiOn) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+            else -> if (usbOn && wifiOn) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+        }
     }
 
     override fun onTileClick() {
+        val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
+        val tapAction = prefs.getString("debugging_tile_tap_action", "both") ?: "both"
         val usbOn = isUsbDebuggingEnabled()
         val wifiOn = isWifiDebuggingEnabled()
 
-        val newState = if (usbOn && wifiOn) 0 else 1
-        setUsbDebuggingEnabled(newState == 1)
-        setWifiDebuggingEnabled(newState == 1)
+        when (tapAction) {
+            "usb" -> {
+                setUsbDebuggingEnabled(!usbOn)
+            }
+            "wireless" -> {
+                setWifiDebuggingEnabled(!wifiOn)
+            }
+            else -> {
+                val newState = if (usbOn && wifiOn) 0 else 1
+                setUsbDebuggingEnabled(newState == 1)
+                setWifiDebuggingEnabled(newState == 1)
+            }
+        }
     }
 
     private fun isUsbDebuggingEnabled(): Boolean {

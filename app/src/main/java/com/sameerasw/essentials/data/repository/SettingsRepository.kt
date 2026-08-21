@@ -14,6 +14,8 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.sameerasw.essentials.domain.HapticFeedbackType
+import com.sameerasw.essentials.domain.diy.Action
+import com.sameerasw.essentials.domain.diy.ActionGsonAdapter
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.AppTag
 import com.sameerasw.essentials.domain.model.DnsPreset
@@ -38,6 +40,7 @@ class SettingsRepository(private val context: Context) {
 
     init {
         migrateUsageAccessKey()
+        migrateRemapStringToAction()
     }
 
     private fun migrateUsageAccessKey() {
@@ -51,10 +54,63 @@ class SettingsRepository(private val context: Context) {
         }
     }
 
+    private fun migrateRemapStringToAction() {
+        if (getBoolean(KEY_BUTTON_REMAP_MIGRATION_DONE)) return
+
+        val remapKeys = listOf(
+            KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF,
+            KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF,
+            KEY_BUTTON_REMAP_VOL_UP_ACTION_ON,
+            KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON
+        )
+        for (key in remapKeys) {
+            val raw = prefs.getString(key, null) ?: continue
+            // Skip if already JSON (starts with '{') — already migrated or set by new code
+            if (raw.startsWith("{")) continue
+            val action: Action? = when (raw) {
+                "Toggle flashlight" -> Action.ToggleFlashlight
+                "Media play/pause" -> Action.MediaPlayPause
+                "Media next" -> Action.MediaNext
+                "Media previous" -> Action.MediaPrevious
+                "Toggle vibrate" -> Action.ToggleVibrate
+                "Toggle mute" -> Action.ToggleMute
+                "AI assistant" -> Action.AIAssistant
+                "Take screenshot" -> Action.TakeScreenshot
+                "Cycle sound modes" -> Action.CycleSoundModes
+                "Toggle media volume" -> Action.ToggleMediaVolume
+                "Like current song" -> Action.LikeCurrentSong
+                "Circle to Search" -> Action.CircleToSearch
+                else -> null
+            }
+            setRemapAction(key, action)
+        }
+
+        putBoolean(KEY_BUTTON_REMAP_MIGRATION_DONE, true)
+    }
+
+    fun getRemapAction(key: String): Action? {
+        val json = prefs.getString(key, null) ?: return null
+        return try {
+            ActionGsonAdapter.fromJson(json)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun setRemapAction(key: String, action: Action?) {
+        if (action == null) {
+            prefs.edit().remove(key).apply()
+        } else {
+            prefs.edit().putString(key, ActionGsonAdapter.toJson(action)).apply()
+        }
+    }
+
+
     companion object {
         const val PREFS_NAME = "essentials_prefs"
 
         // Keys
+        const val KEY_DEBUGGING_TILE_TAP_ACTION = "debugging_tile_tap_action"
         const val KEY_GENAI_AUTOMATION_ENABLED = "genai_automation_enabled"
         const val KEY_SMART_PIXELS_ENABLED = "smart_pixels_enabled"
         const val KEY_SMART_PIXELS_INTENSITY = "smart_pixels_intensity"
@@ -122,6 +178,7 @@ class SettingsRepository(private val context: Context) {
         const val KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON = "button_remap_vol_down_action_on"
         const val KEY_BUTTON_REMAP_HAPTIC_TYPE = "button_remap_haptic_type"
         const val KEY_FLASHLIGHT_HAPTIC_TYPE = "flashlight_haptic_type" // Legacy
+        const val KEY_BUTTON_REMAP_MIGRATION_DONE = "button_remap_action_migration_done"
 
         const val KEY_DYNAMIC_NIGHT_LIGHT_ENABLED = "dynamic_night_light_enabled"
         const val KEY_DYNAMIC_NIGHT_LIGHT_SELECTED_APPS = "dynamic_night_light_selected_apps"
@@ -228,6 +285,8 @@ class SettingsRepository(private val context: Context) {
         const val KEY_CALENDAR_SYNC_SELECTED_CALENDARS = "calendar_sync_selected_calendars"
         const val KEY_CALENDAR_SYNC_PERIODIC_ENABLED = "calendar_sync_periodic_enabled"
         const val KEY_REMOTE_LOCK_MODE = "remote_lock_mode" // 0: Screen off, 1: Lock
+        const val KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED =
+            "location_reached_full_screen_alarm_enabled"
 
         const val KEY_GITHUB_ACCESS_TOKEN = "github_access_token"
         const val KEY_GITHUB_WORKFLOW_TOKEN = "github_workflow_token"
@@ -2821,5 +2880,11 @@ class SettingsRepository(private val context: Context) {
      * @param value [Int] Target value.
      */
     fun setLockScreenClockSeedColor(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_SEED_COLOR, value)
+
+    fun getLocationReachedFullScreenAlarmEnabled(): Boolean =
+        getBoolean(KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED, true)
+
+    fun setLocationReachedFullScreenAlarmEnabled(value: Boolean) =
+        putBoolean(KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED, value)
 }
 

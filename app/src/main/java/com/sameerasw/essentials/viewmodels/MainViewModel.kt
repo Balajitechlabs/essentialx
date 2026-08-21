@@ -46,6 +46,7 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.data.repository.UpdateRepository
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.MapsState
+import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.AppStandbyInfo
 import com.sameerasw.essentials.domain.model.DnsPreset
@@ -109,10 +110,10 @@ class MainViewModel : ViewModel() {
     val isButtonRemapEnabled = mutableStateOf(false)
     val isButtonRemapUseShizuku = mutableStateOf(false)
     val shizukuDetectedDevicePath = mutableStateOf<String?>(null)
-    val volumeUpActionOff = mutableStateOf("None")
-    val volumeDownActionOff = mutableStateOf("None")
-    val volumeUpActionOn = mutableStateOf("None")
-    val volumeDownActionOn = mutableStateOf("None")
+    val volumeUpActionOff = mutableStateOf<Action?>(null)
+    val volumeDownActionOff = mutableStateOf<Action?>(null)
+    val volumeUpActionOn = mutableStateOf<Action?>(null)
+    val volumeDownActionOn = mutableStateOf<Action?>(null)
     val remapHapticType = mutableStateOf(HapticFeedbackType.DOUBLE)
     val isDynamicNightLightEnabled = mutableStateOf(false)
     val isSmartPixelsEnabled = mutableStateOf(false)
@@ -286,6 +287,7 @@ class MainViewModel : ViewModel() {
 
     val isPitchBlackThemeEnabled = mutableStateOf(false)
     val isGenAIAutomationEnabled = mutableStateOf(false)
+    val isLocationReachedFullScreenAlarmEnabled = mutableStateOf(true)
 
     val isEnableUnsupportedFeatures = mutableStateOf(false)
     val isBlurEnabled = mutableStateOf(true)
@@ -546,6 +548,10 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_PITCH_BLACK_THEME_ENABLED -> isPitchBlackThemeEnabled.value =
                         settingsRepository.getBoolean(key)
+
+                    SettingsRepository.KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED ->
+                        isLocationReachedFullScreenAlarmEnabled.value =
+                            settingsRepository.getLocationReachedFullScreenAlarmEnabled()
 
                     SettingsRepository.KEY_ENABLE_UNSUPPORTED_FEATURES -> {
                         isEnableUnsupportedFeatures.value =
@@ -1523,30 +1529,10 @@ class MainViewModel : ViewModel() {
             false
         ) // Default false here as key check logic
 
-        volumeUpActionOff.value = settingsRepository.getString(
-            SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF,
-            settingsRepository.getString(
-                SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION,
-                if (oldTrigger == "Volume Up" && hasLegacyToggle) "Toggle flashlight" else "None"
-            )
-        ) ?: "None"
-
-        volumeDownActionOff.value = settingsRepository.getString(
-            SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF,
-            settingsRepository.getString(
-                SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION,
-                if (oldTrigger == "Volume Down" && hasLegacyToggle) "Toggle flashlight" else "None"
-            )
-        ) ?: "None"
-
-        volumeUpActionOn.value = settingsRepository.getString(
-            SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON,
-            "None"
-        ) ?: "None"
-        volumeDownActionOn.value = settingsRepository.getString(
-            SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON,
-            "None"
-        ) ?: "None"
+        volumeUpActionOff.value = settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF)
+        volumeDownActionOff.value = settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF)
+        volumeUpActionOn.value = settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON)
+        volumeDownActionOn.value = settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON)
 
         val hapticName = settingsRepository.getString(
             SettingsRepository.KEY_BUTTON_REMAP_HAPTIC_TYPE,
@@ -1616,6 +1602,8 @@ class MainViewModel : ViewModel() {
             )
         isPitchBlackThemeEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_PITCH_BLACK_THEME_ENABLED)
+        isLocationReachedFullScreenAlarmEnabled.value =
+            settingsRepository.getLocationReachedFullScreenAlarmEnabled()
         isEnableUnsupportedFeatures.value = settingsRepository.isEnableUnsupportedFeatures()
 
         keyboardHeight.floatValue =
@@ -2253,6 +2241,11 @@ class MainViewModel : ViewModel() {
         settingsRepository.putBoolean(SettingsRepository.KEY_PITCH_BLACK_THEME_ENABLED, enabled)
     }
 
+    fun setLocationReachedFullScreenAlarmEnabled(enabled: Boolean) {
+        isLocationReachedFullScreenAlarmEnabled.value = enabled
+        settingsRepository.setLocationReachedFullScreenAlarmEnabled(enabled)
+    }
+
     /**
      * Executes the set blur enabled operation.
      *
@@ -2886,6 +2879,37 @@ class MainViewModel : ViewModel() {
                 else -> "active"
             }
             ShellUtils.runCommand(context, "am set-standby-bucket $packageName $bucketName")
+        }
+    }
+
+    /**
+     * Executes batch set app standby bucket operation for multiple apps.
+     *
+     * @param packageNames [Set<String>] Target package names.
+     * @param targetBucket [Int] Target standby bucket code.
+     * @param context [Context] Context for shell execution.
+     */
+    fun setAppsStandbyBucket(packageNames: Set<String>, targetBucket: Int, context: Context) {
+        val currentList = standbyAppsList.value
+        val updatedList = currentList.map { app ->
+            if (packageNames.contains(app.packageName)) {
+                app.copy(bucket = targetBucket)
+            } else app
+        }
+        standbyAppsList.value = updatedList
+
+        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            val bucketName = when (targetBucket) {
+                10 -> "active"
+                20 -> "working_set"
+                30 -> "frequent"
+                40 -> "rare"
+                45 -> "restricted"
+                else -> "active"
+            }
+            packageNames.forEach { pkg ->
+                ShellUtils.runCommand(context, "am set-standby-bucket $pkg $bucketName")
+            }
         }
     }
 
@@ -3535,23 +3559,23 @@ class MainViewModel : ViewModel() {
     /**
      * Executes the set volume up action off operation.
      *
-     * @param action [String] Target action.
+     * @param action [Action?] Target action.
      * @param context [Context] Target context.
      */
-    fun setVolumeUpActionOff(action: String, context: Context) {
+    fun setVolumeUpActionOff(action: Action?, context: Context) {
         volumeUpActionOff.value = action
-        settingsRepository.putString(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF, action)
+        settingsRepository.setRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF, action)
     }
 
     /**
      * Executes the set volume down action off operation.
      *
-     * @param action [String] Target action.
+     * @param action [Action?] Target action.
      * @param context [Context] Target context.
      */
-    fun setVolumeDownActionOff(action: String, context: Context) {
+    fun setVolumeDownActionOff(action: Action?, context: Context) {
         volumeDownActionOff.value = action
-        settingsRepository.putString(
+        settingsRepository.setRemapAction(
             SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF,
             action
         )
@@ -3560,23 +3584,23 @@ class MainViewModel : ViewModel() {
     /**
      * Executes the set volume up action on operation.
      *
-     * @param action [String] Target action.
+     * @param action [Action?] Target action.
      * @param context [Context] Target context.
      */
-    fun setVolumeUpActionOn(action: String, context: Context) {
+    fun setVolumeUpActionOn(action: Action?, context: Context) {
         volumeUpActionOn.value = action
-        settingsRepository.putString(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON, action)
+        settingsRepository.setRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON, action)
     }
 
     /**
      * Executes the set volume down action on operation.
      *
-     * @param action [String] Target action.
+     * @param action [Action?] Target action.
      * @param context [Context] Target context.
      */
-    fun setVolumeDownActionOn(action: String, context: Context) {
+    fun setVolumeDownActionOn(action: Action?, context: Context) {
         volumeDownActionOn.value = action
-        settingsRepository.putString(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON, action)
+        settingsRepository.setRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON, action)
     }
 
     /**

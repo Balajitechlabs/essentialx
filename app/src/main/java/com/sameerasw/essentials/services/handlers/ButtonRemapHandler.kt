@@ -21,19 +21,27 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
 import android.view.KeyEvent
+import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.HapticFeedbackType
+import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.services.InputEventListenerService
+import com.sameerasw.essentials.services.automation.executors.CombinedActionExecutor
 import com.sameerasw.essentials.utils.performHapticFeedback
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class ButtonRemapHandler(
     private val service: AccessibilityService,
     private val flashlightHandler: FlashlightHandler
 ) {
-    private val soundModeHandler = SoundModeHandler(service)
+    private val settingsRepository = SettingsRepository(service)
     private val handler = Handler(Looper.getMainLooper())
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var isLongPressTriggered: Boolean = false
     private var lastPressedKeyCode: Int = -1
-    private var lastPendingAction: String? = null
+    private var lastPendingAction: Action? = null
     private val longPressTimeout = 500L
 
     private val longPressRunnable = Runnable {
@@ -82,8 +90,8 @@ class ButtonRemapHandler(
             val suffix = "_off"
             val actionKey =
                 if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) "button_remap_vol_up_action$suffix" else "button_remap_vol_down_action$suffix"
-            val action = prefs.getString(actionKey, "None")
-            val isMapped = action != null && action != "None"
+            val action = settingsRepository.getRemapAction(actionKey)
+            val isMapped = action != null
 
             if (isMapped || isTorchControl) {
                 return true
@@ -95,38 +103,26 @@ class ButtonRemapHandler(
             val isAlwaysTurnOffEnabled =
                 prefs.getBoolean("flashlight_always_turn_off_enabled", false)
             val isVolUpFlashlight =
-                prefs.getString("button_remap_vol_up_action_off", "None") == "Toggle flashlight" ||
-                        prefs.getString(
-                            "button_remap_vol_up_action_on",
-                            "None"
-                        ) == "Toggle flashlight"
+                settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF) is Action.ToggleFlashlight ||
+                        settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON) is Action.ToggleFlashlight
             val isVolDownFlashlight =
-                prefs.getString(
-                    "button_remap_vol_down_action_off",
-                    "None"
-                ) == "Toggle flashlight" ||
-                        prefs.getString(
-                            "button_remap_vol_down_action_on",
-                            "None"
-                        ) == "Toggle flashlight"
+                settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF) is Action.ToggleFlashlight ||
+                        settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON) is Action.ToggleFlashlight
             val isFlashlightCapableButton =
                 (keyCode == KeyEvent.KEYCODE_VOLUME_UP && isVolUpFlashlight) ||
                         (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && isVolDownFlashlight)
 
-            val actionKeySuffix = if (isScreenInteractive) "_on" else "_off"
             val actionKey = if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                "button_remap_vol_up_action$actionKeySuffix"
+                if (isScreenInteractive) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
             } else {
-                "button_remap_vol_down_action$actionKeySuffix"
+                if (isScreenInteractive) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
             }
-            val mappedAction = prefs.getString(actionKey, "None") ?: "None"
+            val mappedAction = settingsRepository.getRemapAction(actionKey)
 
-            val targetLongPressAction = if (isAlwaysTurnOffEnabled && isFlashlightCapableButton) {
-                "Toggle flashlight"
-            } else if (mappedAction != "None") {
-                mappedAction
+            val targetLongPressAction: Action = if (isAlwaysTurnOffEnabled && isFlashlightCapableButton) {
+                Action.ToggleFlashlight
             } else {
-                "Toggle flashlight"
+                mappedAction ?: Action.ToggleFlashlight
             }
 
             if (event.action == KeyEvent.ACTION_DOWN) {
@@ -150,25 +146,21 @@ class ButtonRemapHandler(
 
         val isScreenOn = isScreenInteractive
 
-        val actionKeySuffix = if (isScreenOn) "_on" else "_off"
         val actionKey = if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            "button_remap_vol_up_action$actionKeySuffix"
+            if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
         } else {
-            "button_remap_vol_down_action$actionKeySuffix"
+            if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
         }
 
-        val action = prefs.getString(actionKey, "None") ?: "None"
+        val action = settingsRepository.getRemapAction(actionKey)
         val isAlwaysTurnOffEnabled = prefs.getBoolean("flashlight_always_turn_off_enabled", false)
 
         val isVolUpFlashlight =
-            prefs.getString("button_remap_vol_up_action_off", "None") == "Toggle flashlight" ||
-                    prefs.getString("button_remap_vol_up_action_on", "None") == "Toggle flashlight"
+            settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF) is Action.ToggleFlashlight ||
+                    settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON) is Action.ToggleFlashlight
         val isVolDownFlashlight =
-            prefs.getString("button_remap_vol_down_action_off", "None") == "Toggle flashlight" ||
-                    prefs.getString(
-                        "button_remap_vol_down_action_on",
-                        "None"
-                    ) == "Toggle flashlight"
+            settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF) is Action.ToggleFlashlight ||
+                    settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON) is Action.ToggleFlashlight
 
         val isFlashlightCapableButton =
             (keyCode == KeyEvent.KEYCODE_VOLUME_UP && isVolUpFlashlight) ||
@@ -176,10 +168,10 @@ class ButtonRemapHandler(
 
         var finalAction = action
         if (flashlightHandler.isTorchOn && isAlwaysTurnOffEnabled && isFlashlightCapableButton) {
-            finalAction = "Toggle flashlight"
+            finalAction = Action.ToggleFlashlight
         }
 
-        if (finalAction == "None") return false
+        if (finalAction == null) return false
 
         if (event.action == KeyEvent.ACTION_DOWN) {
             if (event.repeatCount == 0) {
@@ -212,127 +204,36 @@ class ButtonRemapHandler(
         if (intent.action == InputEventListenerService.ACTION_VOLUME_LONG_PRESSED) {
             val direction = intent.getStringExtra(InputEventListenerService.EXTRA_DIRECTION)
             if (direction != null) {
-                val prefs = service.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
                 val isScreenOn = try {
                     (service.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
                 } catch (e: Exception) {
                     false
                 }
 
-                val actionKeySuffix = if (isScreenOn) "_on" else "_off"
                 val actionKey = if (direction == "UP") {
-                    "button_remap_vol_up_action$actionKeySuffix"
+                    if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
                 } else {
-                    "button_remap_vol_down_action$actionKeySuffix"
+                    if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
                 }
-                val action = prefs.getString(actionKey, "None") ?: "None"
-                handleLongPress(action)
+                val action = settingsRepository.getRemapAction(actionKey)
+                if (action != null) {
+                    handleLongPress(action)
+                }
             }
         }
     }
 
-    private fun handleLongPress(action: String) {
-        when (action) {
-            "Toggle flashlight" -> flashlightHandler.toggleFlashlight()
-            "Media play/pause" -> sendMediaKey(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE)
-            "Media next" -> sendMediaKey(KeyEvent.KEYCODE_MEDIA_NEXT)
-            "Media previous" -> sendMediaKey(KeyEvent.KEYCODE_MEDIA_PREVIOUS)
-            "Toggle vibrate" -> toggleRingerMode(AudioManager.RINGER_MODE_VIBRATE)
-            "Toggle mute" -> toggleRingerMode(AudioManager.RINGER_MODE_SILENT)
-            "AI assistant" -> launchAssistant()
-            "Take screenshot" -> takeScreenshot()
-            "Cycle sound modes" -> cycleSoundModes()
-            "Toggle media volume" -> toggleMediaVolume()
-            "Like current song" -> {
-                service.sendBroadcast(
-                    Intent("com.sameerasw.essentials.ACTION_LIKE_CURRENT_SONG").setPackage(
-                        service.packageName
-                    )
-                )
-                triggerHapticFeedback()
-            }
-
-            "Circle to Search" -> {
-                com.sameerasw.essentials.utils.OmniTriggerUtil.trigger(service)
-                triggerHapticFeedback()
-            }
-        }
-    }
-
-    private fun cycleSoundModes() {
-        soundModeHandler.cycleNextMode()
-        triggerHapticFeedback()
-    }
-
-    private fun takeScreenshot() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            service.performGlobalAction(AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
-            triggerHapticFeedback()
+    private fun handleLongPress(action: Action) {
+        if (action is Action.ToggleFlashlight) {
+            flashlightHandler.toggleFlashlight()
         } else {
-            Log.w("ButtonRemap", "Take screenshot is only supported on Android 9+")
-        }
-    }
-
-    private fun sendMediaKey(keyCode: Int) {
-        val am = service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        am.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
-        am.dispatchMediaKeyEvent(KeyEvent(KeyEvent.ACTION_UP, keyCode))
-        triggerHapticFeedback()
-    }
-
-    private fun toggleMediaVolume() {
-        val am = service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val currentVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC)
-        val prefs = service.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-
-        if (currentVolume > 0) {
-            // Mute and save current volume
-            prefs.edit().putInt("last_media_volume", currentVolume).apply()
-            am.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_SHOW_UI)
-        } else {
-            // Restore last known volume or default to mid-range
-            val lastVolume = prefs.getInt(
-                "last_media_volume",
-                am.getStreamMaxVolume(AudioManager.STREAM_MUSIC) / 2
-            )
-            am.setStreamVolume(AudioManager.STREAM_MUSIC, lastVolume, AudioManager.FLAG_SHOW_UI)
-        }
-        triggerHapticFeedback()
-    }
-
-    private fun toggleRingerMode(targetMode: Int) {
-        val notificationManager =
-            service.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-        if (!notificationManager.isNotificationPolicyAccessGranted) {
-            return
-        }
-
-        val am = service.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val currentMode = am.ringerMode
-
-        try {
-            if (currentMode == targetMode) {
-                am.ringerMode = AudioManager.RINGER_MODE_NORMAL
-            } else {
-                am.ringerMode = targetMode
+            scope.launch {
+                CombinedActionExecutor.execute(service, action)
             }
             triggerHapticFeedback()
-        } catch (e: Exception) {
-            Log.e("ButtonRemap", "Error toggling ringer mode", e)
         }
     }
 
-    private fun launchAssistant() {
-        try {
-            val intent = Intent(Intent.ACTION_VOICE_COMMAND).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-            service.startActivity(intent)
-            triggerHapticFeedback()
-        } catch (e: Exception) {
-            Log.e("ButtonRemap", "Failed to launch assistant", e)
-        }
-    }
 
     private fun triggerHapticFeedback() {
         try {

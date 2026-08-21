@@ -73,6 +73,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.diy.Action
+import com.sameerasw.essentials.domain.diy.ActionRegistry
 import com.sameerasw.essentials.domain.diy.Automation
 import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.diy.Trigger
@@ -103,6 +104,7 @@ import com.sameerasw.essentials.ui.core.sheets.ScreenOffSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.SingleAppSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.SoundModeSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.WifiNetworkSelectionSheet
+import com.sameerasw.essentials.ui.features.audio.sheets.SetVolumeSettingsSheet
 import com.sameerasw.essentials.ui.features.apps.sheets.KeyboardSelectionSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.AppUtil
@@ -270,6 +272,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showWifiSettings by remember { mutableStateOf(false) }
                 var showSetKeyboardSheet by remember { mutableStateOf(false) }
                 var showCustomSettingsSettings by remember { mutableStateOf(false) }
+                var showSetVolumeSettings by remember { mutableStateOf(false) }
                 var configAction by remember { mutableStateOf<Action?>(null) } // Generic config action
 
                 val isTriggerConfigured = when (val trigger = selectedTrigger) {
@@ -884,67 +887,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                         }
 
                                         val actionCategories = remember(currentSelection) {
-                                            val connectivityActions = listOf(
-                                                Action.TurnOnWifi,
-                                                Action.TurnOffWifi,
-                                                Action.TurnOnCellularData,
-                                                Action.TurnOffCellularData,
-                                                Action.TurnOnHotspot,
-                                                Action.TurnOffHotspot,
-                                                Action.ToggleHotspot
-                                            )
-                                            val displayActions = mutableListOf<Action>(
-                                                Action.TurnOnAutoBrightness,
-                                                Action.TurnOffAutoBrightness,
-                                                Action.DimWallpaper(),
-                                                Action.ScreenOff()
-                                            ).apply {
-                                                if (android.os.Build.VERSION.SDK_INT >= 35) {
-                                                    add(Action.DeviceEffects())
-                                                }
-                                            }
-                                            val appsActions = listOf(
-                                                Action.OpenApp(),
-                                                Action.AIAssistant,
-                                                Action.FreezeApps(),
-                                                Action.UnfreezeApps(),
-                                                Action.FreezeTag(),
-                                                Action.PinApp,
-                                                Action.Keyboard()
-                                            )
-                                            val systemActions = listOf(
-                                                Action.TurnOnFlashlight,
-                                                Action.TurnOffFlashlight,
-                                                Action.ToggleFlashlight,
-                                                Action.TurnOnLowPower,
-                                                Action.TurnOffLowPower,
-                                                Action.CustomSettings(),
-                                                Action.CircleToSearch,
-                                                Action.TakeScreenshot,
-                                                Action.ShowNotification,
-                                                Action.RemoveNotification
-                                            )
-                                            val soundMediaActions = listOf(
-                                                Action.SoundMode(),
-                                                Action.HapticVibration,
-                                                Action.ToggleMediaVolume,
-                                                Action.MediaPlayPause,
-                                                Action.MediaNext,
-                                                Action.MediaPrevious,
-                                                Action.LikeCurrentSong
-                                            )
-                                            val essentialsActions = listOf(
-                                                Action.SometimesEssentials()
-                                            )
-
-                                            listOf(
-                                                R.string.diy_category_connectivity to connectivityActions,
-                                                R.string.diy_category_display to displayActions,
-                                                R.string.diy_category_apps to appsActions,
-                                                R.string.diy_category_system to systemActions,
-                                                R.string.diy_category_sound_media to soundMediaActions,
-                                                R.string.diy_category_essentials to essentialsActions
-                                            )
+                                            ActionRegistry.getCategories().map { it.titleRes to it.actions }
                                         }
 
                                         var expandedActionCategory by remember {
@@ -1015,6 +958,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                 is Action.Keyboard -> {
                                                                     showSetKeyboardSheet = true
                                                                 }
+                                                                is Action.SetVolume -> showSetVolumeSettings = true
                                                                 is Action.CustomSettings -> showCustomSettingsSettings = true
                                                                 else -> {}
                                                             }
@@ -1202,6 +1146,27 @@ class AutomationEditorActivity : ComponentActivity() {
                                 }
                             )
                         }
+                        if (showSetVolumeSettings && configAction is Action.SetVolume) {
+                            SetVolumeSettingsSheet(
+                                initialAction = configAction as Action.SetVolume,
+                                onDismiss = { showSetVolumeSettings = false },
+                                onSave = { newAction ->
+                                    showSetVolumeSettings = false
+                                    when (automationType) {
+                                        Automation.Type.TRIGGER -> selectedAction = newAction
+                                        Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction =
+                                            newAction
+
+                                        Automation.Type.STATE, Automation.Type.APP -> {
+                                            if (selectedActionTab == 0) selectedInAction = newAction
+                                            else selectedOutAction = newAction
+                                        }
+                                    }
+                                    configAction = null
+                                }
+                            )
+                        }
+
                         if (showSometimesEssentialsSettings && configAction is Action.SometimesEssentials) {
                             com.sameerasw.essentials.ui.core.sheets.SometimesEssentialsSettingsSheet(
                                 initialAction = configAction as Action.SometimesEssentials,

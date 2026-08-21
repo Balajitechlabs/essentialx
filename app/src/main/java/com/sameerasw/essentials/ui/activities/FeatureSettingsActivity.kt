@@ -226,6 +226,8 @@ class FeatureSettingsActivity : AppCompatActivity() {
                     // Permission sheet state
                     var showPermissionSheet by remember { mutableStateOf(false) }
                     var childFeatureForPermissions by remember { mutableStateOf<String?>(null) }
+                    var standbyAppsSelectedPackages by remember { mutableStateOf(setOf<String>()) }
+                    var isStandbyMoveSheetVisible by remember { mutableStateOf(false) }
 
                     val isAccessibilityEnabled by viewModel.isAccessibilityEnabled
                     val isWriteSecureSettingsEnabled by viewModel.isWriteSecureSettingsEnabled
@@ -1072,7 +1074,11 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                     "Standby apps" -> {
                                         StandbyAppsSettingsUI(
                                             viewModel = viewModel,
-                                            modifier = Modifier.padding(top = 16.dp)
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            selectedPackages = standbyAppsSelectedPackages,
+                                            onSelectionChange = { standbyAppsSelectedPackages = it },
+                                            showMoveSheet = isStandbyMoveSheetVisible,
+                                            onShowMoveSheetChange = { isStandbyMoveSheetVisible = it }
                                         )
                                     }
                                 }
@@ -1088,21 +1094,40 @@ class FeatureSettingsActivity : AppCompatActivity() {
                             }
                         }
 
+                        val isStandbyMultiSelecting = featureId == "Standby apps" && standbyAppsSelectedPackages.isNotEmpty()
+
                         EssentialsFloatingToolbar(
-                            title = pageTitle,
-                            isBeta = featureObj?.isBeta ?: false,
-                            onBackClick = { finish() },
+                            title = if (isStandbyMultiSelecting) {
+                                stringResource(R.string.standby_apps_selected_count, standbyAppsSelectedPackages.size)
+                            } else {
+                                pageTitle
+                            },
+                            isBeta = if (isStandbyMultiSelecting) false else (featureObj?.isBeta ?: false),
+                            onBackClick = {
+                                if (isStandbyMultiSelecting) {
+                                    standbyAppsSelectedPackages = emptySet()
+                                } else {
+                                    finish()
+                                }
+                            },
+                            fabIconRes = if (isStandbyMultiSelecting) R.drawable.rounded_mobiledata_arrows_24 else null,
+                            fabAction = if (isStandbyMultiSelecting) {
+                                { isStandbyMoveSheetVisible = true }
+                            } else null,
+                            fabContentDescription = if (isStandbyMultiSelecting) stringResource(R.string.action_move_bucket) else null,
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
                                 .zIndex(1f),
-                            onHelpClick = {
-                                if (featureId == "Watch") {
-                                    showWatchInstallHelpSheet = true
-                                } else if (hasMenu) {
-                                    selectedHelpFeature = featureObj
-                                    showHelpSheet = true
-                                } else {
-                                    showInstructionsSheet = true
+                            onHelpClick = if (isStandbyMultiSelecting) null else {
+                                {
+                                    if (featureId == "Watch") {
+                                        showWatchInstallHelpSheet = true
+                                    } else if (hasMenu) {
+                                        selectedHelpFeature = featureObj
+                                        showHelpSheet = true
+                                    } else {
+                                        showInstructionsSheet = true
+                                    }
                                 }
                             }
                         )
