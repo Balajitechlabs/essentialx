@@ -285,6 +285,8 @@ class SettingsRepository(private val context: Context) {
         const val KEY_CALENDAR_SYNC_SELECTED_CALENDARS = "calendar_sync_selected_calendars"
         const val KEY_CALENDAR_SYNC_PERIODIC_ENABLED = "calendar_sync_periodic_enabled"
         const val KEY_REMOTE_LOCK_MODE = "remote_lock_mode" // 0: Screen off, 1: Lock
+        const val KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED =
+            "location_reached_full_screen_alarm_enabled"
 
         const val KEY_GITHUB_ACCESS_TOKEN = "github_access_token"
         const val KEY_GITHUB_WORKFLOW_TOKEN = "github_workflow_token"
@@ -2878,5 +2880,11 @@ class SettingsRepository(private val context: Context) {
      * @param value [Int] Target value.
      */
     fun setLockScreenClockSeedColor(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_SEED_COLOR, value)
+
+    fun getLocationReachedFullScreenAlarmEnabled(): Boolean =
+        getBoolean(KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED, true)
+
+    fun setLocationReachedFullScreenAlarmEnabled(value: Boolean) =
+        putBoolean(KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED, value)
 }
 

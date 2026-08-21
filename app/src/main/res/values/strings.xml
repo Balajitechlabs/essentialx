@@ -1465,6 +1465,8 @@
     <string name="location_reached_alarm_subtitle">Prepare to get off</string>
     <string name="location_reached_dismiss">Dismiss</string>
     <string name="location_reached_toast_set">Destination set: %1$.4f, %2$.4f</string>
+    <string name="setting_location_reached_full_screen_alarm_title">Full-screen alarm</string>
+    <string name="setting_location_reached_full_screen_alarm_desc">Play alarm ringtone and show full-screen alert upon arrival</string>
     <string name="setting_use_root_title">Use Root</string>
     <string name="setting_use_root_desc">Instead of Shizuku</string>
     <string name="root_not_available_toast">Root access not available. Please check your root manager.</string>

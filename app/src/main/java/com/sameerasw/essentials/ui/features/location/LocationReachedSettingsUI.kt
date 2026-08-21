@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.cards.LocationAlarmCard
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.LocationReachedBottomSheet
@@ -208,6 +209,25 @@ fun LocationReachedSettingsUI(
                 )
             }
 
+            // Settings Card
+            item {
+                val isFullScreenAlarmEnabled by mainViewModel.isLocationReachedFullScreenAlarmEnabled
+                RoundedCardContainer(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    IconToggleItem(
+                        title = stringResource(R.string.setting_location_reached_full_screen_alarm_title),
+                        description = stringResource(R.string.setting_location_reached_full_screen_alarm_desc),
+                        isChecked = isFullScreenAlarmEnabled,
+                        onCheckedChange = { enabled ->
+                            HapticUtil.performUIHaptic(view)
+                            mainViewModel.setLocationReachedFullScreenAlarmEnabled(enabled)
+                        },
+                        iconRes = R.drawable.rounded_alarm_24
+                    )
+                }
+            }
+
             // Permission Warning
             item {
                 val isFSIGranted by mainViewModel.isFullScreenIntentPermissionGranted
@@ -216,7 +236,7 @@ fun LocationReachedSettingsUI(
                         modifier = Modifier.fillMaxWidth(),
                         containerColor = MaterialTheme.colorScheme.errorContainer
                     ) {
-                        com.sameerasw.essentials.ui.core.cards.IconToggleItem(
+                        IconToggleItem(
                             title = stringResource(R.string.location_reached_fsi_title),
                             description = stringResource(R.string.location_reached_fsi_desc),
                             isChecked = false,

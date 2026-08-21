@@ -287,6 +287,7 @@ class MainViewModel : ViewModel() {
 
     val isPitchBlackThemeEnabled = mutableStateOf(false)
     val isGenAIAutomationEnabled = mutableStateOf(false)
+    val isLocationReachedFullScreenAlarmEnabled = mutableStateOf(true)
 
     val isEnableUnsupportedFeatures = mutableStateOf(false)
     val isBlurEnabled = mutableStateOf(true)
@@ -547,6 +548,10 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_PITCH_BLACK_THEME_ENABLED -> isPitchBlackThemeEnabled.value =
                         settingsRepository.getBoolean(key)
+
+                    SettingsRepository.KEY_LOCATION_REACHED_FULL_SCREEN_ALARM_ENABLED ->
+                        isLocationReachedFullScreenAlarmEnabled.value =
+                            settingsRepository.getLocationReachedFullScreenAlarmEnabled()
 
                     SettingsRepository.KEY_ENABLE_UNSUPPORTED_FEATURES -> {
                         isEnableUnsupportedFeatures.value =
@@ -1597,6 +1602,8 @@ class MainViewModel : ViewModel() {
             )
         isPitchBlackThemeEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_PITCH_BLACK_THEME_ENABLED)
+        isLocationReachedFullScreenAlarmEnabled.value =
+            settingsRepository.getLocationReachedFullScreenAlarmEnabled()
         isEnableUnsupportedFeatures.value = settingsRepository.isEnableUnsupportedFeatures()
 
         keyboardHeight.floatValue =
@@ -2232,6 +2239,11 @@ class MainViewModel : ViewModel() {
     fun setPitchBlackThemeEnabled(enabled: Boolean, context: Context) {
         isPitchBlackThemeEnabled.value = enabled
         settingsRepository.putBoolean(SettingsRepository.KEY_PITCH_BLACK_THEME_ENABLED, enabled)
+    }
+
+    fun setLocationReachedFullScreenAlarmEnabled(enabled: Boolean) {
+        isLocationReachedFullScreenAlarmEnabled.value = enabled
+        settingsRepository.setLocationReachedFullScreenAlarmEnabled(enabled)
     }
 
     /**

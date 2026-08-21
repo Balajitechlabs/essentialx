@@ -10,6 +10,11 @@
 package com.sameerasw.essentials.ui.activities
 
 import android.app.KeyguardManager
+import android.app.NotificationManager
+import android.media.AudioAttributes
+import android.media.Ringtone
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -45,6 +50,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,8 +60,11 @@ import androidx.core.view.WindowCompat
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.LocationReachedRepository
 import com.sameerasw.essentials.services.LocationReachedService
+import com.sameerasw.essentials.utils.HapticUtil
 
 class LocationAlarmActivity : ComponentActivity() {
+
+    private var ringtone: Ringtone? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -78,17 +87,13 @@ class LocationAlarmActivity : ComponentActivity() {
             }
         }
 
+        startAlarmRingtone()
         startUrgentVibration()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onDestroy() {
         stopAlarmAndFinish()
-    }
-
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        stopAlarmAndFinish()
+        super.onDestroy()
     }
 
     private fun showWhenLockedAndTurnScreenOn() {
@@ -116,6 +121,30 @@ class LocationAlarmActivity : ComponentActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
+    private fun startAlarmRingtone() {
+        try {
+            val alarmUri: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
+            if (alarmUri != null) {
+                ringtone = RingtoneManager.getRingtone(applicationContext, alarmUri)?.apply {
+                    val attributes = AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build()
+                    audioAttributes = attributes
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        isLooping = true
+                    }
+                    play()
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
     private fun startUrgentVibration() {
         val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager =
@@ -137,6 +166,17 @@ class LocationAlarmActivity : ComponentActivity() {
     }
 
     private fun stopAlarmAndFinish() {
+        try {
+            ringtone?.let {
+                if (it.isPlaying) {
+                    it.stop()
+                }
+            }
+            ringtone = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager =
                 getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -147,6 +187,15 @@ class LocationAlarmActivity : ComponentActivity() {
         }
         try {
             vibrator.cancel()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Cancel all notifications
+        try {
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.cancel(1001) // ALARM_NOTIFICATION_ID
+            notificationManager.cancel(2001) // NOTIFICATION_ID
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -235,8 +284,12 @@ fun LocationAlarmScreen(onFinish: () -> Unit) {
 
             Spacer(modifier = Modifier.height(80.dp))
 
+            val view = LocalView.current
             Button(
-                onClick = onFinish,
+                onClick = {
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    onFinish()
+                },
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
                     .height(64.dp),

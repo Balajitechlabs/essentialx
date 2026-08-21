@@ -46,6 +46,7 @@ class LocationReachedService : Service() {
     private var isInitialCalculationDone = false
 
     private val repository by lazy { LocationReachedRepository(this) }
+    private val settingsRepository by lazy { com.sameerasw.essentials.data.repository.SettingsRepository(this) }
     private val fusedLocationClient by lazy { LocationServices.getFusedLocationProviderClient(this) }
     private val notificationManager by lazy { getSystemService(NOTIFICATION_SERVICE) as NotificationManager }
 
@@ -262,7 +263,9 @@ class LocationReachedService : Service() {
         val alarm = repository.getAlarms().find { it.id == activeId }
         saveTravelProgress(alarm != null, alarm, 100, "Arrived", "0 m")
 
-        val channelId = "location_reached_channel"
+        val isFullScreenAlarmEnabled = settingsRepository.getLocationReachedFullScreenAlarmEnabled()
+        val channelId = if (isFullScreenAlarmEnabled) "location_reached_channel_alarm" else "location_reached_channel"
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
@@ -271,6 +274,16 @@ class LocationReachedService : Service() {
             ).apply {
                 enableLights(true)
                 enableVibration(true)
+                if (isFullScreenAlarmEnabled) {
+                    val audioAttributes = android.media.AudioAttributes.Builder()
+                        .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .setUsage(android.media.AudioAttributes.USAGE_ALARM)
+                        .build()
+                    val alarmUri = android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_ALARM)
+                        ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_RINGTONE)
+                        ?: android.media.RingtoneManager.getDefaultUri(android.media.RingtoneManager.TYPE_NOTIFICATION)
+                    setSound(alarmUri, audioAttributes)
+                }
             }
             notificationManager.createNotificationChannel(channel)
         }
@@ -279,26 +292,40 @@ class LocationReachedService : Service() {
             this,
             com.sameerasw.essentials.ui.activities.LocationAlarmActivity::class.java
         ).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_NO_USER_ACTION
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_SINGLE_TOP
         }
         val fullScreenPendingIntent = PendingIntent.getActivity(
             this, 0, fullScreenIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification = NotificationCompat.Builder(this, channelId)
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.rounded_navigation_24)
             .setContentTitle(getString(R.string.location_reached_notification_title))
             .setContentText(getString(R.string.location_reached_notification_desc))
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setDefaults(NotificationCompat.DEFAULT_ALL)
-            .setFullScreenIntent(fullScreenPendingIntent, true)
             .setAutoCancel(true)
-            .build()
 
-        notificationManager.notify(ALARM_NOTIFICATION_ID, notification)
+        if (isFullScreenAlarmEnabled) {
+            notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
+        } else {
+            notificationBuilder.setContentIntent(fullScreenPendingIntent)
+            notificationBuilder.setDefaults(NotificationCompat.DEFAULT_ALL)
+        }
+
+        notificationManager.notify(ALARM_NOTIFICATION_ID, notificationBuilder.build())
+
+        if (isFullScreenAlarmEnabled) {
+            try {
+                startActivity(fullScreenIntent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private fun updateNotification(distanceKm: Float?) {
@@ -568,6 +595,7 @@ class LocationReachedService : Service() {
                 stopForeground(true)
             }
             notificationManager.cancel(NOTIFICATION_ID)
+            notificationManager.cancel(ALARM_NOTIFICATION_ID)
         } catch (e: Exception) {
             e.printStackTrace()
         }
