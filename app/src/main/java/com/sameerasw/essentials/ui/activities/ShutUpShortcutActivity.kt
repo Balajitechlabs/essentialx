@@ -37,7 +37,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ShutUpShortcutActivity : ComponentActivity() {
-
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +50,8 @@ class ShutUpShortcutActivity : ComponentActivity() {
 
         setContent {
             val viewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val context = androidx.compose.ui.platform.LocalContext.current
             androidx.compose.runtime.LaunchedEffect(Unit) {
                 viewModel.check(context)
@@ -60,7 +60,7 @@ class ShutUpShortcutActivity : ComponentActivity() {
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     LoadingIndicator(modifier = Modifier.scale(5f))
                 }
@@ -74,12 +74,12 @@ class ShutUpShortcutActivity : ComponentActivity() {
             // Unfreeze first while Shizuku/Root is still  functional
             if (com.sameerasw.essentials.utils.FreezeManager.isAppFrozen(
                     this@ShutUpShortcutActivity,
-                    packageName
+                    packageName,
                 )
             ) {
                 com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(
                     this@ShutUpShortcutActivity,
-                    packageName
+                    packageName,
                 )
                 delay(200) // Small extra delay for system to register unfreeze
             }
@@ -88,11 +88,12 @@ class ShutUpShortcutActivity : ComponentActivity() {
                 if (PermissionUtils.canWriteSecureSettings(this@ShutUpShortcutActivity)) {
                     applyShutUpSettings(config, settingsRepository)
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            this@ShutUpShortcutActivity,
-                            getString(R.string.shut_up_toast_active),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast
+                            .makeText(
+                                this@ShutUpShortcutActivity,
+                                getString(R.string.shut_up_toast_active),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     }
                 }
             }
@@ -107,47 +108,49 @@ class ShutUpShortcutActivity : ComponentActivity() {
 
     private suspend fun applyShutUpSettings(
         config: ShutUpAppConfig,
-        repository: SettingsRepository
+        repository: SettingsRepository,
     ) {
         withContext(Dispatchers.IO) {
             val originalSettings = mutableMapOf<String, String>()
 
             if (config.disableDevOptions) {
                 // Backup all relevant dev settings because disabling the main toggle might reset them
-                val secureSettings = listOf(
-                    "anr_show_background",
-                    "bugreport_in_power_menu",
-                    "display_density_forced",
-                    "mock_location",
-                    "secure_overlay_settings",
-                    "usb_audio_automatic_routing_disabled"
-                )
+                val secureSettings =
+                    listOf(
+                        "anr_show_background",
+                        "bugreport_in_power_menu",
+                        "display_density_forced",
+                        "mock_location",
+                        "secure_overlay_settings",
+                        "usb_audio_automatic_routing_disabled",
+                    )
                 val systemSettings = listOf("show_touches", "show_key_presses")
-                val globalSettings = listOf(
-                    "adb_allowed_connection_time",
-                    "adb_enabled",
-                    "adb_wifi_enabled",
-                    "always_finish_activities",
-                    "animator_duration_scale",
-                    "app_standby_enabled",
-                    "cached_apps_freezer",
-                    "default_install_location",
-                    "development_settings_enabled",
-                    "disable_window_blurs",
-                    "enable_freeform_support",
-                    "enable_non_resizable_multi_window",
-                    "force_allow_on_external",
-                    "force_desktop_mode_on_external_displays",
-                    "force_resizable_activities",
-                    "mobile_data_always_on",
-                    "stay_on_while_plugged_in",
-                    "usb_mass_storage_enabled",
-                    "wait_for_debugger",
-                    "wifi_display_certification_on",
-                    "wifi_display_on",
-                    "wifi_scan_always_enabled",
-                    "window_animation_scale"
-                )
+                val globalSettings =
+                    listOf(
+                        "adb_allowed_connection_time",
+                        "adb_enabled",
+                        "adb_wifi_enabled",
+                        "always_finish_activities",
+                        "animator_duration_scale",
+                        "app_standby_enabled",
+                        "cached_apps_freezer",
+                        "default_install_location",
+                        "development_settings_enabled",
+                        "disable_window_blurs",
+                        "enable_freeform_support",
+                        "enable_non_resizable_multi_window",
+                        "force_allow_on_external",
+                        "force_desktop_mode_on_external_displays",
+                        "force_resizable_activities",
+                        "mobile_data_always_on",
+                        "stay_on_while_plugged_in",
+                        "usb_mass_storage_enabled",
+                        "wait_for_debugger",
+                        "wifi_display_certification_on",
+                        "wifi_display_on",
+                        "wifi_scan_always_enabled",
+                        "window_animation_scale",
+                    )
 
                 secureSettings.forEach { key ->
                     safeReadSetting(contentResolver, SettingsTable.SECURE, key)
@@ -166,12 +169,13 @@ class ShutUpShortcutActivity : ComponentActivity() {
                 Settings.Global.putString(
                     contentResolver,
                     Settings.Global.DEVELOPMENT_SETTINGS_ENABLED,
-                    "0"
+                    "0",
                 )
             }
 
             if (config.disableUsbDebugging || config.disableWirelessDebugging) {
-                com.sameerasw.essentials.utils.ShizukuUtils.stopShizuku(this@ShutUpShortcutActivity)
+                com.sameerasw.essentials.utils.ShizukuUtils
+                    .stopShizuku(this@ShutUpShortcutActivity)
             }
 
             // Always explicitly disable USB debugging if requested, even if dev options were already disabled
@@ -181,7 +185,7 @@ class ShutUpShortcutActivity : ComponentActivity() {
                     safeReadSetting(
                         contentResolver,
                         SettingsTable.GLOBAL,
-                        Settings.Global.ADB_ENABLED
+                        Settings.Global.ADB_ENABLED,
                     )
                         ?: "0"
                 if (current == "1") {
@@ -205,18 +209,19 @@ class ShutUpShortcutActivity : ComponentActivity() {
             }
 
             if (config.disableAccessibility) {
-                val current = safeReadSetting(
-                    contentResolver,
-                    SettingsTable.SECURE,
-                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-                )
+                val current =
+                    safeReadSetting(
+                        contentResolver,
+                        SettingsTable.SECURE,
+                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                    )
                 if (!current.isNullOrEmpty()) {
                     originalSettings["secure:${Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES}"] =
                         current
                     Settings.Secure.putString(
                         contentResolver,
                         Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-                        ""
+                        "",
                     )
                 }
             }
@@ -234,17 +239,18 @@ class ShutUpShortcutActivity : ComponentActivity() {
     private fun safeReadSetting(
         resolver: ContentResolver,
         table: SettingsTable,
-        key: String
-    ): String? = try {
-        when (table) {
-            SettingsTable.SYSTEM -> Settings.System.getString(resolver, key)
-            SettingsTable.SECURE -> Settings.Secure.getString(resolver, key)
-            SettingsTable.GLOBAL -> Settings.Global.getString(resolver, key)
+        key: String,
+    ): String? =
+        try {
+            when (table) {
+                SettingsTable.SYSTEM -> Settings.System.getString(resolver, key)
+                SettingsTable.SECURE -> Settings.Secure.getString(resolver, key)
+                SettingsTable.GLOBAL -> Settings.Global.getString(resolver, key)
+            }
+        } catch (e: SecurityException) {
+            Log.w("ShutUpShortcut", "Skipping unreadable setting $table:$key", e)
+            null
         }
-    } catch (e: SecurityException) {
-        Log.w("ShutUpShortcut", "Skipping unreadable setting $table:$key", e)
-        null
-    }
 
     private fun launchApp(packageName: String) {
         val intent = packageManager.getLaunchIntentForPackage(packageName)

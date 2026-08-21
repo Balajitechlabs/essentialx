@@ -17,16 +17,22 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.utils.BatteryStatsUtil
 
 class BatteryAutomationReceiver : BroadcastReceiver() {
-
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val action = intent.action ?: return
         val bm = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
         val level = bm?.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) ?: -1
         val isPlugged =
-            action == Intent.ACTION_POWER_CONNECTED || (action == Intent.ACTION_BATTERY_CHANGED && intent.getIntExtra(
-                BatteryManager.EXTRA_PLUGGED,
-                0
-            ) > 0)
+            action == Intent.ACTION_POWER_CONNECTED ||
+                (
+                    action == Intent.ACTION_BATTERY_CHANGED &&
+                        intent.getIntExtra(
+                            BatteryManager.EXTRA_PLUGGED,
+                            0,
+                        ) > 0
+                )
 
         if (level >= 0) {
             val force =
@@ -35,7 +41,7 @@ class BatteryAutomationReceiver : BroadcastReceiver() {
                 context,
                 level,
                 isPlugged,
-                forceRecord = force
+                forceRecord = force,
             )
         }
 

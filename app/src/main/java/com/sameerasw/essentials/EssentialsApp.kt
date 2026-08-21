@@ -28,7 +28,9 @@ class EssentialsApp : Application() {
             private set
     }
 
-    private val securityReceiver = com.sameerasw.essentials.services.receivers.SecurityReceiver()
+    private val securityReceiver =
+        com.sameerasw.essentials.services.receivers
+            .SecurityReceiver()
 
     override fun onCreate() {
         super.onCreate()
@@ -37,7 +39,6 @@ class EssentialsApp : Application() {
         try {
             resources?.configuration
         } catch (e: Exception) {
-
         }
 
         try {
@@ -46,23 +47,31 @@ class EssentialsApp : Application() {
         }
 
         ShizukuUtils.initialize()
-        com.sameerasw.essentials.utils.LogManager.init(this)
+        com.sameerasw.essentials.utils.LogManager
+            .init(this)
 
         // Init Automation
-        com.sameerasw.essentials.domain.diy.DIYRepository.init(this)
-        com.sameerasw.essentials.services.automation.AutomationManager.init(this)
-        com.sameerasw.essentials.services.CalendarSyncManager.init(this)
-        com.sameerasw.essentials.services.DeviceInfoSyncManager.init(this)
-        com.sameerasw.essentials.utils.ServiceUtils.startRequiredServices(this)
+        com.sameerasw.essentials.domain.diy.DIYRepository
+            .init(this)
+        com.sameerasw.essentials.services.automation.AutomationManager
+            .init(this)
+        com.sameerasw.essentials.services.CalendarSyncManager
+            .init(this)
+        com.sameerasw.essentials.services.DeviceInfoSyncManager
+            .init(this)
+        com.sameerasw.essentials.utils.ServiceUtils
+            .startRequiredServices(this)
 
-        com.sameerasw.essentials.appfunctions.AppFunctionAvailabilityManager.updateAvailability(this)
+        com.sameerasw.essentials.appfunctions.AppFunctionAvailabilityManager
+            .updateAvailability(this)
 
         initSentry()
 
-        val intentFilter = IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Intent.ACTION_USER_PRESENT)
-        }
+        val intentFilter =
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_USER_PRESENT)
+            }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             registerReceiver(securityReceiver, intentFilter, RECEIVER_EXPORTED)
@@ -89,16 +98,15 @@ class EssentialsApp : Application() {
 
             options.setBeforeSend { event, _ ->
                 Handler(Looper.getMainLooper()).post {
-                    Toast.makeText(
-                        this@EssentialsApp,
-                        R.string.sentry_crash_toast,
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast
+                        .makeText(
+                            this@EssentialsApp,
+                            R.string.sentry_crash_toast,
+                            Toast.LENGTH_LONG,
+                        ).show()
                 }
                 event
             }
         }
     }
-
 }
-

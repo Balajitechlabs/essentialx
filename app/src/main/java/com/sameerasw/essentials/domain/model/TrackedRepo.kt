@@ -33,5 +33,5 @@ data class TrackedRepo(
     @SerializedName("allowPreReleases") val allowPreReleases: Boolean = false,
     @SerializedName("notificationsEnabled") val notificationsEnabled: Boolean = true,
     @SerializedName("lastETag") val lastETag: String? = null,
-    @SerializedName("addedAt") val addedAt: Long = System.currentTimeMillis()
+    @SerializedName("addedAt") val addedAt: Long = System.currentTimeMillis(),
 )

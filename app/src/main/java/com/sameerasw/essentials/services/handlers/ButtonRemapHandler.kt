@@ -19,7 +19,6 @@ import android.os.Looper
 import android.os.PowerManager
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.util.Log
 import android.view.KeyEvent
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.HapticFeedbackType
@@ -34,7 +33,7 @@ import kotlinx.coroutines.launch
 
 class ButtonRemapHandler(
     private val service: AccessibilityService,
-    private val flashlightHandler: FlashlightHandler
+    private val flashlightHandler: FlashlightHandler,
 ) {
     private val settingsRepository = SettingsRepository(service)
     private val handler = Handler(Looper.getMainLooper())
@@ -44,10 +43,11 @@ class ButtonRemapHandler(
     private var lastPendingAction: Action? = null
     private val longPressTimeout = 500L
 
-    private val longPressRunnable = Runnable {
-        isLongPressTriggered = true
-        lastPendingAction?.let { handleLongPress(it) }
-    }
+    private val longPressRunnable =
+        Runnable {
+            isLongPressTriggered = true
+            lastPendingAction?.let { handleLongPress(it) }
+        }
 
     fun onKeyEvent(event: KeyEvent): Boolean {
         val keyCode = event.keyCode
@@ -62,26 +62,29 @@ class ButtonRemapHandler(
         val isGlobalEnabled = prefs.getBoolean("flashlight_global_enabled", false)
 
         val powerManager = service.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val isScreenInteractive = try {
-            powerManager.isInteractive
-        } catch (e: Exception) {
-            false
-        }
+        val isScreenInteractive =
+            try {
+                powerManager.isInteractive
+            } catch (e: Exception) {
+                false
+            }
 
         val isAod = isAodShowing()
 
         val shellReady =
-            com.sameerasw.essentials.utils.ShellUtils.isAvailable(service) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                service
-            )
+            com.sameerasw.essentials.utils.ShellUtils
+                .isAvailable(service) &&
+                com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                    service,
+                )
         val devicePathDetected =
             !prefs.getString("shizuku_detected_device_path", null).isNullOrEmpty()
 
-
         val useShell =
-            isButtonRemapUseShizuku || com.sameerasw.essentials.utils.ShellUtils.isRootEnabled(
-                service
-            )
+            isButtonRemapUseShizuku ||
+                com.sameerasw.essentials.utils.ShellUtils.isRootEnabled(
+                    service,
+                )
 
         if (useShell && isButtonRemapEnabled && shellReady && devicePathDetected && !isScreenInteractive && !isAod) {
             val isTorchControl =
@@ -104,26 +107,28 @@ class ButtonRemapHandler(
                 prefs.getBoolean("flashlight_always_turn_off_enabled", false)
             val isVolUpFlashlight =
                 settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF) is Action.ToggleFlashlight ||
-                        settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON) is Action.ToggleFlashlight
+                    settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON) is Action.ToggleFlashlight
             val isVolDownFlashlight =
                 settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF) is Action.ToggleFlashlight ||
-                        settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON) is Action.ToggleFlashlight
+                    settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON) is Action.ToggleFlashlight
             val isFlashlightCapableButton =
                 (keyCode == KeyEvent.KEYCODE_VOLUME_UP && isVolUpFlashlight) ||
-                        (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && isVolDownFlashlight)
+                    (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && isVolDownFlashlight)
 
-            val actionKey = if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-                if (isScreenInteractive) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
-            } else {
-                if (isScreenInteractive) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
-            }
+            val actionKey =
+                if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                    if (isScreenInteractive) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
+                } else {
+                    if (isScreenInteractive) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
+                }
             val mappedAction = settingsRepository.getRemapAction(actionKey)
 
-            val targetLongPressAction: Action = if (isAlwaysTurnOffEnabled && isFlashlightCapableButton) {
-                Action.ToggleFlashlight
-            } else {
-                mappedAction ?: Action.ToggleFlashlight
-            }
+            val targetLongPressAction: Action =
+                if (isAlwaysTurnOffEnabled && isFlashlightCapableButton) {
+                    Action.ToggleFlashlight
+                } else {
+                    mappedAction ?: Action.ToggleFlashlight
+                }
 
             if (event.action == KeyEvent.ACTION_DOWN) {
                 if (event.repeatCount == 0) {
@@ -146,25 +151,26 @@ class ButtonRemapHandler(
 
         val isScreenOn = isScreenInteractive
 
-        val actionKey = if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
-        } else {
-            if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
-        }
+        val actionKey =
+            if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
+                if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
+            } else {
+                if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
+            }
 
         val action = settingsRepository.getRemapAction(actionKey)
         val isAlwaysTurnOffEnabled = prefs.getBoolean("flashlight_always_turn_off_enabled", false)
 
         val isVolUpFlashlight =
             settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF) is Action.ToggleFlashlight ||
-                    settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON) is Action.ToggleFlashlight
+                settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON) is Action.ToggleFlashlight
         val isVolDownFlashlight =
             settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF) is Action.ToggleFlashlight ||
-                    settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON) is Action.ToggleFlashlight
+                settingsRepository.getRemapAction(SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON) is Action.ToggleFlashlight
 
         val isFlashlightCapableButton =
             (keyCode == KeyEvent.KEYCODE_VOLUME_UP && isVolUpFlashlight) ||
-                    (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && isVolDownFlashlight)
+                (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN && isVolDownFlashlight)
 
         var finalAction = action
         if (flashlightHandler.isTorchOn && isAlwaysTurnOffEnabled && isFlashlightCapableButton) {
@@ -191,7 +197,7 @@ class ButtonRemapHandler(
                 am.adjustSuggestedStreamVolume(
                     direction,
                     AudioManager.USE_DEFAULT_STREAM_TYPE,
-                    AudioManager.FLAG_SHOW_UI
+                    AudioManager.FLAG_SHOW_UI,
                 )
             }
             return true
@@ -204,17 +210,19 @@ class ButtonRemapHandler(
         if (intent.action == InputEventListenerService.ACTION_VOLUME_LONG_PRESSED) {
             val direction = intent.getStringExtra(InputEventListenerService.EXTRA_DIRECTION)
             if (direction != null) {
-                val isScreenOn = try {
-                    (service.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
-                } catch (e: Exception) {
-                    false
-                }
+                val isScreenOn =
+                    try {
+                        (service.getSystemService(Context.POWER_SERVICE) as PowerManager).isInteractive
+                    } catch (e: Exception) {
+                        false
+                    }
 
-                val actionKey = if (direction == "UP") {
-                    if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
-                } else {
-                    if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
-                }
+                val actionKey =
+                    if (direction == "UP") {
+                        if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_UP_ACTION_OFF
+                    } else {
+                        if (isScreenOn) SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_ON else SettingsRepository.KEY_BUTTON_REMAP_VOL_DOWN_ACTION_OFF
+                    }
                 val action = settingsRepository.getRemapAction(actionKey)
                 if (action != null) {
                     handleLongPress(action)
@@ -234,42 +242,42 @@ class ButtonRemapHandler(
         }
     }
 
-
     private fun triggerHapticFeedback() {
         try {
-            val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                service.getSystemService(VibratorManager::class.java)?.defaultVibrator
-            } else {
-                @Suppress("DEPRECATION")
-                service.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-            }
+            val vibrator =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    service.getSystemService(VibratorManager::class.java)?.defaultVibrator
+                } else {
+                    @Suppress("DEPRECATION")
+                    service.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+                }
 
             if (vibrator != null) {
                 // Use default from Button Remap preference
                 val prefs = service.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
                 val typeName =
                     prefs.getString("button_remap_haptic_type", HapticFeedbackType.DOUBLE.name)
-                val type = try {
-                    HapticFeedbackType.valueOf(typeName ?: HapticFeedbackType.DOUBLE.name)
-                } catch (_: Exception) {
-                    HapticFeedbackType.DOUBLE
-                }
+                val type =
+                    try {
+                        HapticFeedbackType.valueOf(typeName ?: HapticFeedbackType.DOUBLE.name)
+                    } catch (_: Exception) {
+                        HapticFeedbackType.DOUBLE
+                    }
                 performHapticFeedback(
                     vibrator,
-                    if (type.name == "LONG") HapticFeedbackType.DOUBLE else type
+                    if (type.name == "LONG") HapticFeedbackType.DOUBLE else type,
                 )
             }
         } catch (_: Exception) {
         }
     }
 
-    private fun isAodShowing(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+    private fun isAodShowing(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             val display =
                 (service.getSystemService(Context.WINDOW_SERVICE) as android.view.WindowManager).defaultDisplay
             display.state == android.view.Display.STATE_DOZE || display.state == android.view.Display.STATE_DOZE_SUSPEND
         } else {
             false
         }
-    }
 }

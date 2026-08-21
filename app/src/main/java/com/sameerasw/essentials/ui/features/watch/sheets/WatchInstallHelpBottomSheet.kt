@@ -49,64 +49,67 @@ import com.sameerasw.essentials.viewmodels.WatchViewModel
 @Composable
 fun WatchInstallHelpBottomSheet(
     onDismissRequest: () -> Unit,
-    viewModel: WatchViewModel = viewModel()
+    viewModel: WatchViewModel = viewModel(),
 ) {
     LocalContext.current
     val uriHandler = LocalUriHandler.current
     val view = LocalView.current
 
     EssentialsBottomSheet(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp)
-                .verticalScroll(rememberScrollState()),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 32.dp)
+                    .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Header
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(40.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = CircleShape,
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_watch_24),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
 
                 Text(
                     text = stringResource(R.string.watch_help_title),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
             }
 
             // Description
             RoundedCardContainer(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = stringResource(R.string.watch_help_description),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -117,24 +120,26 @@ fun WatchInstallHelpBottomSheet(
                     HapticUtil.performUIHaptic(view)
                     uriHandler.openUri("http://github.com/sameerasw/essentials-wear/releases/latest")
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
                 shape = MaterialTheme.shapes.extraLarge,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_download_24),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.action_download_from_github),
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
 
@@ -143,9 +148,10 @@ fun WatchInstallHelpBottomSheet(
             Text(
                 text = "Watch ADB Permissions",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier
-                    .align(Alignment.Start)
-                    .padding(start = 8.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 8.dp),
             )
 
             val context = LocalContext.current
@@ -156,7 +162,7 @@ fun WatchInstallHelpBottomSheet(
                 description = "Required on the watch to toggle Wireless Debugging remotely.",
                 command = "adb shell pm grant com.sameerasw.essentials android.permission.WRITE_SECURE_SETTINGS",
                 context = context,
-                view = view
+                view = view,
             )
 
             // DND Access Command Card
@@ -165,7 +171,7 @@ fun WatchInstallHelpBottomSheet(
                 description = "Required on the watch for DND / Silent sync modes.",
                 command = "adb shell cmd notification allow_dnd com.sameerasw.essentials",
                 context = context,
-                view = view
+                view = view,
             )
         }
     }
@@ -177,38 +183,38 @@ private fun AdbCommandCard(
     description: String,
     command: String,
     context: android.content.Context,
-    view: android.view.View
+    view: android.view.View,
 ) {
     RoundedCardContainer(
-        containerColor = MaterialTheme.colorScheme.surfaceBright
+        containerColor = MaterialTheme.colorScheme.surfaceBright,
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(text = title, style = MaterialTheme.typography.titleSmall)
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(start = 12.dp, top = 4.dp, bottom = 4.dp, end = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceContainer,
+                            shape = MaterialTheme.shapes.small,
+                        ).padding(start = 12.dp, top = 4.dp, bottom = 4.dp, end = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = command,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 androidx.compose.material3.IconButton(
@@ -218,18 +224,19 @@ private fun AdbCommandCard(
                             context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                         val clip = android.content.ClipData.newPlainText("adb_command", command)
                         clipboard.setPrimaryClip(clip)
-                        android.widget.Toast.makeText(
-                            context,
-                            "Command copied",
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                        android.widget.Toast
+                            .makeText(
+                                context,
+                                "Command copied",
+                                android.widget.Toast.LENGTH_SHORT,
+                            ).show()
+                    },
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_content_copy_24),
                         contentDescription = "Copy command",
                         modifier = Modifier.size(20.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }

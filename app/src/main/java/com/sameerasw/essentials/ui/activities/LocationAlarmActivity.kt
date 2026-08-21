@@ -63,7 +63,6 @@ import com.sameerasw.essentials.services.LocationReachedService
 import com.sameerasw.essentials.utils.HapticUtil
 
 class LocationAlarmActivity : ComponentActivity() {
-
     private var ringtone: Ringtone? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +73,8 @@ class LocationAlarmActivity : ComponentActivity() {
 
         setContent {
             val viewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val context = androidx.compose.ui.platform.LocalContext.current
             androidx.compose.runtime.LaunchedEffect(Unit) {
                 viewModel.check(context)
@@ -104,7 +104,7 @@ class LocationAlarmActivity : ComponentActivity() {
             @Suppress("DEPRECATION")
             window.addFlags(
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON,
             )
         }
 
@@ -123,22 +123,26 @@ class LocationAlarmActivity : ComponentActivity() {
 
     private fun startAlarmRingtone() {
         try {
-            val alarmUri: Uri? = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            val alarmUri: Uri? =
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
             if (alarmUri != null) {
-                ringtone = RingtoneManager.getRingtone(applicationContext, alarmUri)?.apply {
-                    val attributes = AudioAttributes.Builder()
-                        .setUsage(AudioAttributes.USAGE_ALARM)
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                        .build()
-                    audioAttributes = attributes
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        isLooping = true
+                ringtone =
+                    RingtoneManager.getRingtone(applicationContext, alarmUri)?.apply {
+                        val attributes =
+                            AudioAttributes
+                                .Builder()
+                                .setUsage(AudioAttributes.USAGE_ALARM)
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                                .build()
+                        audioAttributes = attributes
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            isLooping = true
+                        }
+                        play()
                     }
-                    play()
-                }
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -146,14 +150,15 @@ class LocationAlarmActivity : ComponentActivity() {
     }
 
     private fun startUrgentVibration() {
-        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vibratorManager =
-                getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            vibratorManager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            getSystemService(VIBRATOR_SERVICE) as Vibrator
-        }
+        val vibrator =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager =
+                    getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                vibratorManager.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                getSystemService(VIBRATOR_SERVICE) as Vibrator
+            }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val pattern = longArrayOf(0, 500, 200, 500, 200, 1000)
@@ -177,14 +182,15 @@ class LocationAlarmActivity : ComponentActivity() {
             e.printStackTrace()
         }
 
-        val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vibratorManager =
-                getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            vibratorManager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            getSystemService(VIBRATOR_SERVICE) as Vibrator
-        }
+        val vibrator =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val vibratorManager =
+                    getSystemService(VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                vibratorManager.defaultVibrator
+            } else {
+                @Suppress("DEPRECATION")
+                getSystemService(VIBRATOR_SERVICE) as Vibrator
+            }
         try {
             vibrator.cancel()
         } catch (e: Exception) {
@@ -233,35 +239,38 @@ fun LocationAlarmScreen(onFinish: () -> Unit) {
     val scale by infiniteTransition.animateFloat(
         initialValue = 1f,
         targetValue = 1.15f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(800, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "scale"
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(800, easing = FastOutSlowInEasing),
+                repeatMode = RepeatMode.Reverse,
+            ),
+        label = "scale",
     )
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surface),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface),
+        contentAlignment = Alignment.Center,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Box(
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .size(200.dp)
-                    .scale(scale)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape)
+                modifier =
+                    Modifier
+                        .size(200.dp)
+                        .scale(scale)
+                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f), CircleShape),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_location_on_24),
                     contentDescription = null,
                     modifier = Modifier.size(100.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
 
@@ -269,17 +278,18 @@ fun LocationAlarmScreen(onFinish: () -> Unit) {
 
             Text(
                 text = stringResource(R.string.location_reached_alarm_title),
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Black,
-                    letterSpacing = 2.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurface
+                style =
+                    MaterialTheme.typography.headlineLarge.copy(
+                        fontWeight = FontWeight.Black,
+                        letterSpacing = 2.sp,
+                    ),
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Text(
                 text = stringResource(R.string.location_reached_alarm_subtitle),
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Spacer(modifier = Modifier.height(80.dp))
@@ -290,18 +300,19 @@ fun LocationAlarmScreen(onFinish: () -> Unit) {
                     HapticUtil.performVirtualKeyHaptic(view)
                     onFinish()
                 },
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(64.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(64.dp),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_mobile_check_24),
-                    contentDescription = null
+                    contentDescription = null,
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = stringResource(R.string.location_reached_dismiss),
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 )
             }
         }

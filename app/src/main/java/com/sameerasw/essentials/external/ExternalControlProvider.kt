@@ -16,40 +16,38 @@ import android.net.Uri
 import android.os.Bundle
 
 class ExternalControlProvider : ContentProvider() {
-
-    override fun onCreate(): Boolean {
-        return true
-    }
+    override fun onCreate(): Boolean = true
 
     override fun query(
         uri: Uri,
         projection: Array<out String>?,
         selection: String?,
         selectionArgs: Array<out String>?,
-        sortOrder: String?
+        sortOrder: String?,
     ): Cursor? {
         val context = context ?: return null
         val path = uri.path ?: return null
         return ExternalRouter.query(context, path, null)
     }
 
-    override fun getType(uri: Uri): String? {
-        return "vnd.android.cursor.item/vnd.com.sameerasw.essentials.external"
-    }
+    override fun getType(uri: Uri): String? = "vnd.android.cursor.item/vnd.com.sameerasw.essentials.external"
 
-    override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        return null
-    }
+    override fun insert(
+        uri: Uri,
+        values: ContentValues?,
+    ): Uri? = null
 
-    override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
-        return 0
-    }
+    override fun delete(
+        uri: Uri,
+        selection: String?,
+        selectionArgs: Array<out String>?,
+    ): Int = 0
 
     override fun update(
         uri: Uri,
         values: ContentValues?,
         selection: String?,
-        selectionArgs: Array<out String>?
+        selectionArgs: Array<out String>?,
     ): Int {
         val context = context ?: return 0
         val path = uri.path ?: return 0
@@ -58,7 +56,11 @@ class ExternalControlProvider : ContentProvider() {
         return if (success) 1 else 0
     }
 
-    override fun call(method: String, arg: String?, extras: Bundle?): Bundle? {
+    override fun call(
+        method: String,
+        arg: String?,
+        extras: Bundle?,
+    ): Bundle? {
         val context = context ?: return null
         if (method == "action") {
             val path = arg ?: return null

@@ -16,7 +16,6 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.model.ScaleAnimationsProfile
 
 class ScaleAnimationsTileService : BaseTileService() {
-
     private val settingsRepository: SettingsRepository by lazy { SettingsRepository(this) }
 
     override fun getTileLabel(): String = getString(R.string.tile_scale_animations)
@@ -26,9 +25,7 @@ class ScaleAnimationsTileService : BaseTileService() {
         return if (mode == "glove") getString(R.string.label_enabled) else getString(R.string.label_disabled)
     }
 
-    override fun hasFeaturePermission(): Boolean {
-        return true
-    }
+    override fun hasFeaturePermission(): Boolean = true
 
     override fun getTileIcon(): Icon {
         val mode = settingsRepository.getScaleAnimationsMode()
@@ -48,17 +45,21 @@ class ScaleAnimationsTileService : BaseTileService() {
         val newMode = if (currentMode == "glove") "default" else "glove"
 
         // 1. Save current active values to old profile
-        val currentProfile = ScaleAnimationsProfile(
-            fontScale = settingsRepository.getFontScale(),
-            fontWeight = settingsRepository.getFontWeight(),
-            animatorDurationScale = settingsRepository.getAnimationScale(android.provider.Settings.Global.ANIMATOR_DURATION_SCALE),
-            transitionAnimationScale = settingsRepository.getAnimationScale(android.provider.Settings.Global.TRANSITION_ANIMATION_SCALE),
-            windowAnimationScale = settingsRepository.getAnimationScale(android.provider.Settings.Global.WINDOW_ANIMATION_SCALE),
-            smallestWidth = settingsRepository.getSmallestWidth(),
-            touchSensitivityEnabled = settingsRepository.getTouchSensitivityEnabled(),
-            autoRotateEnabled = settingsRepository.getAutoRotateEnabled(),
-            screenTimeout = settingsRepository.getScreenTimeout()
-        )
+        val currentProfile =
+            ScaleAnimationsProfile(
+                fontScale = settingsRepository.getFontScale(),
+                fontWeight = settingsRepository.getFontWeight(),
+                animatorDurationScale = settingsRepository.getAnimationScale(android.provider.Settings.Global.ANIMATOR_DURATION_SCALE),
+                transitionAnimationScale =
+                    settingsRepository.getAnimationScale(
+                        android.provider.Settings.Global.TRANSITION_ANIMATION_SCALE,
+                    ),
+                windowAnimationScale = settingsRepository.getAnimationScale(android.provider.Settings.Global.WINDOW_ANIMATION_SCALE),
+                smallestWidth = settingsRepository.getSmallestWidth(),
+                touchSensitivityEnabled = settingsRepository.getTouchSensitivityEnabled(),
+                autoRotateEnabled = settingsRepository.getAutoRotateEnabled(),
+                screenTimeout = settingsRepository.getScreenTimeout(),
+            )
         settingsRepository.saveScaleAnimationsProfile(oldMode, currentProfile)
 
         // 2. Load and Apply new profile
@@ -66,7 +67,6 @@ class ScaleAnimationsTileService : BaseTileService() {
         settingsRepository.setScaleAnimationsMode(newMode)
 
         applyProfile(newProfile)
-
     }
 
     private fun applyProfile(profile: ScaleAnimationsProfile) {
@@ -74,15 +74,15 @@ class ScaleAnimationsTileService : BaseTileService() {
         settingsRepository.setFontWeight(profile.fontWeight)
         settingsRepository.setAnimationScale(
             android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
-            profile.animatorDurationScale
+            profile.animatorDurationScale,
         )
         settingsRepository.setAnimationScale(
             android.provider.Settings.Global.TRANSITION_ANIMATION_SCALE,
-            profile.transitionAnimationScale
+            profile.transitionAnimationScale,
         )
         settingsRepository.setAnimationScale(
             android.provider.Settings.Global.WINDOW_ANIMATION_SCALE,
-            profile.windowAnimationScale
+            profile.windowAnimationScale,
         )
         settingsRepository.setSmallestWidth(profile.smallestWidth)
         settingsRepository.setTouchSensitivityEnabled(profile.touchSensitivityEnabled)

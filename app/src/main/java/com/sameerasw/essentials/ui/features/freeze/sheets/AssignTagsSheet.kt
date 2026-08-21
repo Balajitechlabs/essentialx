@@ -58,7 +58,7 @@ fun AssignTagsSheet(
     availableTags: List<AppTag>,
     assignedTagIds: List<String>,
     onDismissRequest: () -> Unit,
-    onSave: (List<String>) -> Unit
+    onSave: (List<String>) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val view = LocalView.current
@@ -69,20 +69,21 @@ fun AssignTagsSheet(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.freeze_tag_assign_title) + " ($appName)",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             if (availableTags.isEmpty()) {
@@ -90,42 +91,48 @@ fun AssignTagsSheet(
                     text = stringResource(R.string.freeze_tags_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 16.dp)
+                    modifier = Modifier.padding(vertical = 16.dp),
                 )
             } else {
                 RoundedCardContainer(spacing = 2.dp) {
                     availableTags.forEach { tag ->
                         val isChecked = selectedIds.contains(tag.id)
-                        val color = try {
-                            Color(android.graphics.Color.parseColor(tag.colorHex))
-                        } catch (e: Exception) {
-                            MaterialTheme.colorScheme.primary
-                        }
-                        val iconResId = context.resources.getIdentifier(
-                            tag.iconName,
-                            "drawable",
-                            context.packageName
-                        )
+                        val color =
+                            try {
+                                Color(android.graphics.Color.parseColor(tag.colorHex))
+                            } catch (e: Exception) {
+                                MaterialTheme.colorScheme.primary
+                            }
+                        val iconResId =
+                            context.resources.getIdentifier(
+                                tag.iconName,
+                                "drawable",
+                                context.packageName,
+                            )
 
                         androidx.compose.material3.ListItem(
                             leadingContent = {
-                                val richColor = remember(color) {
-                                    com.sameerasw.essentials.utils.ColorUtil.toRichColor(color)
-                                }
+                                val richColor =
+                                    remember(color) {
+                                        com.sameerasw.essentials.utils.ColorUtil
+                                            .toRichColor(color)
+                                    }
                                 Box(
-                                    modifier = Modifier
-                                        .size(32.dp)
-                                        .clip(CircleShape)
-                                        .background(richColor.copy(alpha = 0.2f)),
-                                    contentAlignment = Alignment.Center
+                                    modifier =
+                                        Modifier
+                                            .size(32.dp)
+                                            .clip(CircleShape)
+                                            .background(richColor.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(
-                                        painter = painterResource(
-                                            id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
-                                        ),
+                                        painter =
+                                            painterResource(
+                                                id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24,
+                                            ),
                                         contentDescription = null,
                                         tint = richColor,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(18.dp),
                                     )
                                 }
                             },
@@ -134,32 +141,36 @@ fun AssignTagsSheet(
                                     checked = isChecked,
                                     onCheckedChange = { checked ->
                                         HapticUtil.performVirtualKeyHaptic(view)
-                                        selectedIds = if (checked) {
-                                            selectedIds + tag.id
-                                        } else {
-                                            selectedIds - tag.id
-                                        }
-                                    }
+                                        selectedIds =
+                                            if (checked) {
+                                                selectedIds + tag.id
+                                            } else {
+                                                selectedIds - tag.id
+                                            }
+                                    },
                                 )
                             },
-                            colors = ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.surfaceBright
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(MaterialTheme.shapes.extraSmall)
-                                .clickable {
-                                    HapticUtil.performVirtualKeyHaptic(view)
-                                    selectedIds = if (isChecked) {
-                                        selectedIds - tag.id
-                                    } else {
-                                        selectedIds + tag.id
-                                    }
-                                }
+                            colors =
+                                ListItemDefaults.colors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                ),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.extraSmall)
+                                    .clickable {
+                                        HapticUtil.performVirtualKeyHaptic(view)
+                                        selectedIds =
+                                            if (isChecked) {
+                                                selectedIds - tag.id
+                                            } else {
+                                                selectedIds + tag.id
+                                            }
+                                    },
                         ) {
                             Text(
                                 text = tag.name,
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -169,13 +180,13 @@ fun AssignTagsSheet(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 TextButton(
                     onClick = {
                         HapticUtil.performVirtualKeyHaptic(view)
                         onDismissRequest()
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.action_cancel))
                 }
@@ -185,7 +196,7 @@ fun AssignTagsSheet(
                         HapticUtil.performVirtualKeyHaptic(view)
                         onSave(selectedIds.toList())
                         onDismissRequest()
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.action_save))
                 }

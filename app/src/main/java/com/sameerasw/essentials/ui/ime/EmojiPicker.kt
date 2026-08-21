@@ -70,7 +70,7 @@ fun EmojiPicker(
     hapticStrength: Float = 0.5f,
     onEmojiSelected: (String) -> Unit,
     onSwipeDownToExit: () -> Unit = {},
-    bottomContentPadding: Dp = 0.dp
+    bottomContentPadding: Dp = 0.dp,
 ) {
     val scope = rememberCoroutineScope()
     val view = LocalView.current
@@ -99,42 +99,46 @@ fun EmojiPicker(
     }
 
     // Nested Scroll for swipe-down exit gesture
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                if (pagerState.currentPage == 0 && available.y > 50f) {
-                    val gridState = gridStates[0]
-                    if (gridState?.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0) {
-                        onSwipeDownToExit()
-                        return available
+    val nestedScrollConnection =
+        remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(
+                    available: Offset,
+                    source: NestedScrollSource,
+                ): Offset {
+                    if (pagerState.currentPage == 0 && available.y > 50f) {
+                        val gridState = gridStates[0]
+                        if (gridState?.firstVisibleItemIndex == 0 && gridState.firstVisibleItemScrollOffset == 0) {
+                            onSwipeDownToExit()
+                            return available
+                        }
                     }
+                    return Offset.Zero
                 }
-                return Offset.Zero
             }
         }
-    }
 
     Row(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.Transparent)
-            .nestedScroll(nestedScrollConnection)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(Color.Transparent)
+                .nestedScroll(nestedScrollConnection),
     ) {
         // Emoji Grid Area (Left side)
         VerticalPager(
             state = pagerState,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
             beyondViewportPageCount = 1,
             userScrollEnabled = true,
-            flingBehavior = PagerDefaults.flingBehavior(
-                state = pagerState,
-                snapPositionalThreshold = 0.15f
-            )
+            flingBehavior =
+                PagerDefaults.flingBehavior(
+                    state = pagerState,
+                    snapPositionalThreshold = 0.15f,
+                ),
         ) { pageIndex ->
             val category = EmojiData.categories.getOrNull(pageIndex)
             if (category != null) {
@@ -146,51 +150,56 @@ fun EmojiPicker(
                         text = category.name,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 12.dp, bottom = 4.dp, start = 12.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp, bottom = 4.dp, start = 12.dp),
                     )
 
                     LazyVerticalGrid(
                         state = gridState,
                         columns = GridCells.Adaptive(minSize = 48.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 4.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 4.dp),
                         contentPadding = PaddingValues(bottom = bottomContentPadding + 32.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         items(
                             items = category.emojis,
                             key = { "${category.name}_${it.name}_${it.emoji}" },
-                            contentType = { "emoji" }
+                            contentType = { "emoji" },
                         ) { emojiObj ->
                             val interactionSource = remember { MutableInteractionSource() }
                             val isPressed by interactionSource.collectIsPressedAsState()
 
                             Box(
-                                modifier = Modifier
-                                    .aspectRatio(1f)
-                                    .clip(RoundedCornerShape(keyRoundness))
-                                    .background(
-                                        if (isPressed) MaterialTheme.colorScheme.surfaceContainerHighest
-                                        else Color.Transparent
-                                    )
-                                    .clickable(
-                                        interactionSource = interactionSource,
-                                        indication = null,
-                                        onClick = {
-                                            onEmojiSelected(emojiObj.emoji)
-                                            performHaptic(hapticStrength)
-                                        }
-                                    ),
-                                contentAlignment = Alignment.Center
+                                modifier =
+                                    Modifier
+                                        .aspectRatio(1f)
+                                        .clip(RoundedCornerShape(keyRoundness))
+                                        .background(
+                                            if (isPressed) {
+                                                MaterialTheme.colorScheme.surfaceContainerHighest
+                                            } else {
+                                                Color.Transparent
+                                            },
+                                        ).clickable(
+                                            interactionSource = interactionSource,
+                                            indication = null,
+                                            onClick = {
+                                                onEmojiSelected(emojiObj.emoji)
+                                                performHaptic(hapticStrength)
+                                            },
+                                        ),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = emojiObj.emoji,
                                     fontSize = 28.sp,
-                                    style = MaterialTheme.typography.headlineMedium
+                                    style = MaterialTheme.typography.headlineMedium,
                                 )
                             }
                         }
@@ -201,12 +210,13 @@ fun EmojiPicker(
 
         // Vertical Category Rail (Right side)
         Column(
-            modifier = Modifier
-                .width(52.dp)
-                .fillMaxHeight()
-                .padding(vertical = 4.dp),
+            modifier =
+                Modifier
+                    .width(52.dp)
+                    .fillMaxHeight()
+                    .padding(vertical = 4.dp),
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             EmojiData.categories.forEachIndexed { index, category ->
                 val isSelected = index == pagerState.currentPage
@@ -222,21 +232,29 @@ fun EmojiPicker(
                         performHaptic(hapticStrength * 0.8f)
                     },
                     interactionSource = interactionSource,
-                    modifier = Modifier
-                        .size(44.dp)
-                        .padding(vertical = 2.dp)
-                        .clip(RoundedCornerShape(keyRoundness / 2))
-                        .background(
-                            if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                            else Color.Transparent
-                        )
+                    modifier =
+                        Modifier
+                            .size(44.dp)
+                            .padding(vertical = 2.dp)
+                            .clip(RoundedCornerShape(keyRoundness / 2))
+                            .background(
+                                if (isSelected) {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else {
+                                    Color.Transparent
+                                },
+                            ),
                 ) {
                     Icon(
                         painter = painterResource(id = category.iconRes),
                         contentDescription = category.name,
-                        tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                        else MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(24.dp)
+                        tint =
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }

@@ -47,7 +47,7 @@ sealed interface State {
         @SerializedName("startMinute") val startMinute: Int = 0,
         @SerializedName("endHour") val endHour: Int = 0,
         @SerializedName("endMinute") val endMinute: Int = 0,
-        @SerializedName("days") val days: Set<Int> = emptySet()
+        @SerializedName("days") val days: Set<Int> = emptySet(),
     ) : State {
         override val title: Int get() = R.string.diy_state_time_period
         override val icon: Int get() = R.drawable.rounded_timelapse_24

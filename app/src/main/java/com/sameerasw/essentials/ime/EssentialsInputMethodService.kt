@@ -47,8 +47,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewModelStoreOwner,
-    SavedStateRegistryOwner, ClipboardManager.OnPrimaryClipChangedListener {
+class EssentialsInputMethodService :
+    InputMethodService(),
+    LifecycleOwner,
+    ViewModelStoreOwner,
+    SavedStateRegistryOwner,
+    ClipboardManager.OnPrimaryClipChangedListener {
     private val lifecycleRegistry by lazy { LifecycleRegistry(this) }
     private val store by lazy { ViewModelStore() }
     private val savedStateRegistryController by lazy { SavedStateRegistryController.create(this) }
@@ -140,7 +144,7 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
         view.setViewTreeSavedStateRegistryOwner(this)
 
         view.setViewCompositionStrategy(
-            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed,
         )
 
         view.setContent {
@@ -154,8 +158,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                     mutableFloatStateOf(
                         prefs.getFloat(
                             SettingsRepository.KEY_KEYBOARD_HEIGHT,
-                            400f
-                        )
+                            400f,
+                        ),
                     )
                 }
                 // Migration check
@@ -168,24 +172,24 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                     mutableFloatStateOf(
                         prefs.getFloat(
                             SettingsRepository.KEY_KEYBOARD_BOTTOM_PADDING,
-                            0f
-                        )
+                            0f,
+                        ),
                     )
                 }
                 var keyboardRoundness by remember {
                     mutableFloatStateOf(
                         prefs.getFloat(
                             SettingsRepository.KEY_KEYBOARD_ROUNDNESS,
-                            24f
-                        )
+                            24f,
+                        ),
                     )
                 }
                 var keyboardShape by remember {
                     mutableIntStateOf(
                         prefs.getInt(
                             SettingsRepository.KEY_KEYBOARD_SHAPE,
-                            0
-                        )
+                            0,
+                        ),
                     )
                 }
 
@@ -203,48 +207,48 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                     mutableStateOf(
                         prefs.getBoolean(
                             SettingsRepository.KEY_KEYBOARD_FUNCTIONS_BOTTOM,
-                            false
-                        )
+                            false,
+                        ),
                     )
                 }
                 var functionsPadding by remember {
                     mutableFloatStateOf(
                         prefs.getFloat(
                             SettingsRepository.KEY_KEYBOARD_FUNCTIONS_PADDING,
-                            0f
-                        )
+                            0f,
+                        ),
                     )
                 }
                 var isHapticsEnabled by remember {
                     mutableStateOf(
                         prefs.getBoolean(
                             SettingsRepository.KEY_KEYBOARD_HAPTICS_ENABLED,
-                            true
-                        )
+                            true,
+                        ),
                     )
                 }
                 var hapticStrength by remember {
                     mutableFloatStateOf(
                         prefs.getFloat(
                             SettingsRepository.KEY_KEYBOARD_HAPTIC_STRENGTH,
-                            0.5f
-                        )
+                            0.5f,
+                        ),
                     )
                 }
                 var isAlwaysDark by remember {
                     mutableStateOf(
                         prefs.getBoolean(
                             SettingsRepository.KEY_KEYBOARD_ALWAYS_DARK,
-                            false
-                        )
+                            false,
+                        ),
                     )
                 }
                 var isPitchBlack by remember {
                     mutableStateOf(
                         prefs.getBoolean(
                             SettingsRepository.KEY_KEYBOARD_PITCH_BLACK,
-                            false
-                        )
+                            false,
+                        ),
                     )
                 }
 
@@ -252,8 +256,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                     mutableStateOf(
                         prefs.getBoolean(
                             SettingsRepository.KEY_KEYBOARD_CLIPBOARD_ENABLED,
-                            true
-                        )
+                            true,
+                        ),
                     )
                 }
 
@@ -261,8 +265,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                     mutableStateOf(
                         prefs.getBoolean(
                             SettingsRepository.KEY_USER_DICTIONARY_ENABLED,
-                            false
-                        )
+                            false,
+                        ),
                     )
                 }
 
@@ -270,8 +274,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                     mutableStateOf(
                         prefs.getBoolean(
                             SettingsRepository.KEY_KEYBOARD_LONG_PRESS_SYMBOLS,
-                            false
-                        )
+                            false,
+                        ),
                     )
                 }
 
@@ -279,8 +283,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                     mutableStateOf(
                         prefs.getBoolean(
                             SettingsRepository.KEY_KEYBOARD_ACCENTED_CHARACTERS,
-                            false
-                        )
+                            false,
+                        ),
                     )
                 }
 
@@ -290,81 +294,92 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                         android.content.SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
                             when (key) {
                                 SettingsRepository.KEY_KEYBOARD_HEIGHT -> {
-                                    val height = sharedPreferences.getFloat(
-                                        SettingsRepository.KEY_KEYBOARD_HEIGHT,
-                                        280f
-                                    )
+                                    val height =
+                                        sharedPreferences.getFloat(
+                                            SettingsRepository.KEY_KEYBOARD_HEIGHT,
+                                            280f,
+                                        )
                                     keyboardHeight = if (height < 100f) 280f else height
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_BOTTOM_PADDING -> {
-                                    bottomPadding = sharedPreferences.getFloat(
-                                        SettingsRepository.KEY_KEYBOARD_BOTTOM_PADDING,
-                                        0f
-                                    )
+                                    bottomPadding =
+                                        sharedPreferences.getFloat(
+                                            SettingsRepository.KEY_KEYBOARD_BOTTOM_PADDING,
+                                            0f,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_ROUNDNESS -> {
-                                    keyboardRoundness = sharedPreferences.getFloat(
-                                        SettingsRepository.KEY_KEYBOARD_ROUNDNESS,
-                                        24f
-                                    )
+                                    keyboardRoundness =
+                                        sharedPreferences.getFloat(
+                                            SettingsRepository.KEY_KEYBOARD_ROUNDNESS,
+                                            24f,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_SHAPE -> {
-                                    keyboardShape = sharedPreferences.getInt(
-                                        SettingsRepository.KEY_KEYBOARD_SHAPE,
-                                        0
-                                    )
+                                    keyboardShape =
+                                        sharedPreferences.getInt(
+                                            SettingsRepository.KEY_KEYBOARD_SHAPE,
+                                            0,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_FUNCTIONS_BOTTOM -> {
-                                    isFunctionsBottom = sharedPreferences.getBoolean(
-                                        SettingsRepository.KEY_KEYBOARD_FUNCTIONS_BOTTOM,
-                                        false
-                                    )
+                                    isFunctionsBottom =
+                                        sharedPreferences.getBoolean(
+                                            SettingsRepository.KEY_KEYBOARD_FUNCTIONS_BOTTOM,
+                                            false,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_FUNCTIONS_PADDING -> {
-                                    functionsPadding = sharedPreferences.getFloat(
-                                        SettingsRepository.KEY_KEYBOARD_FUNCTIONS_PADDING,
-                                        0f
-                                    )
+                                    functionsPadding =
+                                        sharedPreferences.getFloat(
+                                            SettingsRepository.KEY_KEYBOARD_FUNCTIONS_PADDING,
+                                            0f,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_HAPTICS_ENABLED -> {
-                                    isHapticsEnabled = sharedPreferences.getBoolean(
-                                        SettingsRepository.KEY_KEYBOARD_HAPTICS_ENABLED,
-                                        true
-                                    )
+                                    isHapticsEnabled =
+                                        sharedPreferences.getBoolean(
+                                            SettingsRepository.KEY_KEYBOARD_HAPTICS_ENABLED,
+                                            true,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_HAPTIC_STRENGTH -> {
-                                    hapticStrength = sharedPreferences.getFloat(
-                                        SettingsRepository.KEY_KEYBOARD_HAPTIC_STRENGTH,
-                                        0.5f
-                                    )
+                                    hapticStrength =
+                                        sharedPreferences.getFloat(
+                                            SettingsRepository.KEY_KEYBOARD_HAPTIC_STRENGTH,
+                                            0.5f,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_ALWAYS_DARK -> {
-                                    isAlwaysDark = sharedPreferences.getBoolean(
-                                        SettingsRepository.KEY_KEYBOARD_ALWAYS_DARK,
-                                        false
-                                    )
+                                    isAlwaysDark =
+                                        sharedPreferences.getBoolean(
+                                            SettingsRepository.KEY_KEYBOARD_ALWAYS_DARK,
+                                            false,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_PITCH_BLACK -> {
-                                    isPitchBlack = sharedPreferences.getBoolean(
-                                        SettingsRepository.KEY_KEYBOARD_PITCH_BLACK,
-                                        false
-                                    )
+                                    isPitchBlack =
+                                        sharedPreferences.getBoolean(
+                                            SettingsRepository.KEY_KEYBOARD_PITCH_BLACK,
+                                            false,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_CLIPBOARD_ENABLED -> {
-                                    isKeyboardClipboardEnabled = sharedPreferences.getBoolean(
-                                        SettingsRepository.KEY_KEYBOARD_CLIPBOARD_ENABLED,
-                                        true
-                                    )
+                                    isKeyboardClipboardEnabled =
+                                        sharedPreferences.getBoolean(
+                                            SettingsRepository.KEY_KEYBOARD_CLIPBOARD_ENABLED,
+                                            true,
+                                        )
                                     if (isKeyboardClipboardEnabled) {
                                         if (::clipboardManager.isInitialized) {
                                             clipboardManager.addPrimaryClipChangedListener(this@EssentialsInputMethodService)
@@ -378,10 +393,11 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                                 }
 
                                 SettingsRepository.KEY_USER_DICTIONARY_ENABLED -> {
-                                    isUserDictionaryEnabled = sharedPreferences.getBoolean(
-                                        SettingsRepository.KEY_USER_DICTIONARY_ENABLED,
-                                        false
-                                    )
+                                    isUserDictionaryEnabled =
+                                        sharedPreferences.getBoolean(
+                                            SettingsRepository.KEY_USER_DICTIONARY_ENABLED,
+                                            false,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_USER_DICT_LAST_UPDATE -> {
@@ -391,17 +407,19 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_LONG_PRESS_SYMBOLS -> {
-                                    isLongPressSymbolsEnabled = sharedPreferences.getBoolean(
-                                        SettingsRepository.KEY_KEYBOARD_LONG_PRESS_SYMBOLS,
-                                        false
-                                    )
+                                    isLongPressSymbolsEnabled =
+                                        sharedPreferences.getBoolean(
+                                            SettingsRepository.KEY_KEYBOARD_LONG_PRESS_SYMBOLS,
+                                            false,
+                                        )
                                 }
 
                                 SettingsRepository.KEY_KEYBOARD_ACCENTED_CHARACTERS -> {
-                                    isAccentedCharactersEnabled = sharedPreferences.getBoolean(
-                                        SettingsRepository.KEY_KEYBOARD_ACCENTED_CHARACTERS,
-                                        false
-                                    )
+                                    isAccentedCharactersEnabled =
+                                        sharedPreferences.getBoolean(
+                                            SettingsRepository.KEY_KEYBOARD_ACCENTED_CHARACTERS,
+                                            false,
+                                        )
                                 }
                             }
                         }
@@ -417,7 +435,7 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
 
                 EssentialsTheme(
                     darkTheme = useDarkTheme,
-                    pitchBlackTheme = isPitchBlack
+                    pitchBlackTheme = isPitchBlack,
                 ) {
                     KeyboardInputView(
                         keyboardHeight = keyboardHeight.dp,
@@ -502,8 +520,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                                                 KeyEvent.ACTION_DOWN,
                                                 KeyEvent.KEYCODE_SHIFT_LEFT,
                                                 0,
-                                                0
-                                            )
+                                                0,
+                                            ),
                                         )
                                         metaState =
                                             metaState or KeyEvent.META_SHIFT_ON or KeyEvent.META_SHIFT_LEFT_ON
@@ -516,8 +534,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                                                 KeyEvent.ACTION_DOWN,
                                                 KeyEvent.KEYCODE_CTRL_LEFT,
                                                 0,
-                                                0
-                                            )
+                                                0,
+                                            ),
                                         )
                                         metaState =
                                             metaState or KeyEvent.META_CTRL_ON or KeyEvent.META_CTRL_LEFT_ON
@@ -531,8 +549,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                                             KeyEvent.ACTION_DOWN,
                                             keyCode,
                                             0,
-                                            metaState
-                                        )
+                                            metaState,
+                                        ),
                                     )
                                     ic.sendKeyEvent(
                                         KeyEvent(
@@ -541,8 +559,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                                             KeyEvent.ACTION_UP,
                                             keyCode,
                                             0,
-                                            metaState
-                                        )
+                                            metaState,
+                                        ),
                                     )
 
                                     if (isWordJump) {
@@ -553,8 +571,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                                                 KeyEvent.ACTION_UP,
                                                 KeyEvent.KEYCODE_CTRL_LEFT,
                                                 0,
-                                                0
-                                            )
+                                                0,
+                                            ),
                                         )
                                     }
                                     if (isSelection) {
@@ -565,8 +583,8 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                                                 KeyEvent.ACTION_UP,
                                                 KeyEvent.KEYCODE_SHIFT_LEFT,
                                                 0,
-                                                0
-                                            )
+                                                0,
+                                            ),
                                         )
                                     }
                                 } else {
@@ -576,7 +594,7 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                         },
                         onCursorDrag = { isDragging ->
                             onCursorDrag(isDragging)
-                        }
+                        },
                     )
                 }
             }
@@ -595,7 +613,10 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
         }
     }
 
-    override fun onStartInputView(info: android.view.inputmethod.EditorInfo?, restarting: Boolean) {
+    override fun onStartInputView(
+        info: android.view.inputmethod.EditorInfo?,
+        restarting: Boolean,
+    ) {
         super.onStartInputView(info, restarting)
         // Ensure lifecycle is in RESUMED state when view becomes visible
         if (lifecycleRegistry.currentState != Lifecycle.State.RESUMED) {
@@ -635,9 +656,10 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
                     if (!before.isNullOrEmpty()) {
                         var deleteCount = 1
                         val len = before.length
-                        if (len >= 2 && Character.isSurrogatePair(
+                        if (len >= 2 &&
+                            Character.isSurrogatePair(
                                 before[len - 2],
-                                before[len - 1]
+                                before[len - 1],
                             )
                         ) {
                             deleteCount = 2
@@ -706,9 +728,12 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
     }
 
     override fun onUpdateSelection(
-        oldSelStart: Int, oldSelEnd: Int,
-        newSelStart: Int, newSelEnd: Int,
-        candidatesStart: Int, candidatesEnd: Int
+        oldSelStart: Int,
+        oldSelEnd: Int,
+        newSelStart: Int,
+        newSelEnd: Int,
+        candidatesStart: Int,
+        candidatesEnd: Int,
     ) {
         super.onUpdateSelection(
             oldSelStart,
@@ -716,7 +741,7 @@ class EssentialsInputMethodService : InputMethodService(), LifecycleOwner, ViewM
             newSelStart,
             newSelEnd,
             candidatesStart,
-            candidatesEnd
+            candidatesEnd,
         )
 
         if (isCursorDragging) return

@@ -43,42 +43,43 @@ import com.sameerasw.essentials.translation.ui.TranslationBottomSheet
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.utils.HapticUtil
 
-private val GOOGLE_SYSTEM_USER_APPS = setOf(
-    "com.google.android.apps.scone",
-    "com.google.android.marvin.talkback",
-    "com.google.android.projection.gearhead",
-    "com.google.android.as",
-    "com.google.android.contactkeys",
-    "com.google.android.safetycore",
-    "com.google.android.webview",
-    "com.google.android.captiveportallogin",
-    "com.google.ambient.streaming",
-    "com.google.android.apps.pixel.dcservice",
-    "com.google.android.apps.turbo",
-    "com.google.android.apps.work.clouddpc",
-    "com.google.android.apps.diagnosticstool",
-    "com.google.android.apps.wellbeing",
-    "com.google.android.documentsui",
-    "com.google.android.odad",
-    "com.google.android.gms",
-    "com.google.ar.core",
-    "com.google.vending",
-    "com.google.android.apps.carrier.carrierwifi",
-    "com.google.android.modulemetadata",
-    "com.google.android.networkstack",
-    "com.google.android.apps.safetyhub",
-    "com.google.intelligence.sense",
-    "com.google.android.apps.camera.services",
-    "com.google.android.apps.nexuslauncher",
-    "com.google.android.apps.pixel.support",
-    "com.google.android.as.oss",
-    "com.android.settings",
-    "com.google.android.settings.intelligence",
-    "com.android.stk",
-    "com.google.android.soundpicker",
-    "com.google.mainline.telemetry",
-    "com.google.android.apps.messaging"
-)
+private val GOOGLE_SYSTEM_USER_APPS =
+    setOf(
+        "com.google.android.apps.scone",
+        "com.google.android.marvin.talkback",
+        "com.google.android.projection.gearhead",
+        "com.google.android.as",
+        "com.google.android.contactkeys",
+        "com.google.android.safetycore",
+        "com.google.android.webview",
+        "com.google.android.captiveportallogin",
+        "com.google.ambient.streaming",
+        "com.google.android.apps.pixel.dcservice",
+        "com.google.android.apps.turbo",
+        "com.google.android.apps.work.clouddpc",
+        "com.google.android.apps.diagnosticstool",
+        "com.google.android.apps.wellbeing",
+        "com.google.android.documentsui",
+        "com.google.android.odad",
+        "com.google.android.gms",
+        "com.google.ar.core",
+        "com.google.vending",
+        "com.google.android.apps.carrier.carrierwifi",
+        "com.google.android.modulemetadata",
+        "com.google.android.networkstack",
+        "com.google.android.apps.safetyhub",
+        "com.google.intelligence.sense",
+        "com.google.android.apps.camera.services",
+        "com.google.android.apps.nexuslauncher",
+        "com.google.android.apps.pixel.support",
+        "com.google.android.as.oss",
+        "com.android.settings",
+        "com.google.android.settings.intelligence",
+        "com.android.stk",
+        "com.google.android.soundpicker",
+        "com.google.mainline.telemetry",
+        "com.google.android.apps.messaging",
+    )
 
 @Composable
 fun AppToggleItem(
@@ -93,7 +94,7 @@ fun AppToggleItem(
     onClick: (() -> Unit)? = null,
     icon: ImageBitmap? = null,
     packageName: String? = null,
-    isSystemApp: Boolean = false
+    isSystemApp: Boolean = false,
 ) {
     val view = LocalView.current
     val context = LocalContext.current
@@ -102,9 +103,10 @@ fun AppToggleItem(
     var showMenu by remember { mutableStateOf(false) }
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
-    val shouldShowSystemTag = remember(packageName) {
-        packageName != null && GOOGLE_SYSTEM_USER_APPS.contains(packageName)
-    }
+    val shouldShowSystemTag =
+        remember(packageName) {
+            packageName != null && GOOGLE_SYSTEM_USER_APPS.contains(packageName)
+        }
 
     val onClickAction = {
         if (enabled) {
@@ -116,17 +118,20 @@ fun AppToggleItem(
         }
     }
 
-    val onLongClickAction: (() -> Unit)? = if (isTranslationModeActive) {
-        {
-            HapticUtil.performVirtualKeyHaptic(view)
-            showMenu = true
+    val onLongClickAction: (() -> Unit)? =
+        if (isTranslationModeActive) {
+            {
+                HapticUtil.performVirtualKeyHaptic(view)
+                showMenu = true
+            }
+        } else {
+            null
         }
-    } else null
 
     val renderMenu: @Composable () -> Unit = {
         SegmentedDropdownMenu(
             expanded = showMenu,
-            onDismissRequest = { showMenu = false }
+            onDismissRequest = { showMenu = false },
         ) {
             com.sameerasw.essentials.translation.ui.TranslationMenuItems(
                 title = title,
@@ -134,11 +139,10 @@ fun AppToggleItem(
                 onSelectKey = { key ->
                     showMenu = false
                     translationSheetKey = key
-                }
+                },
             )
         }
     }
-
 
     if (showToggle) {
         ListItem(
@@ -162,66 +166,72 @@ fun AppToggleItem(
                         bitmap = icon,
                         contentDescription = title,
                         modifier = Modifier.size(24.dp),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.Fit,
                     )
                 } else {
                     Spacer(modifier = Modifier.size(24.dp))
                 }
             },
-            supportingContent = if (description != null) {
-                {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            } else null,
+            supportingContent =
+                if (description != null) {
+                    {
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                } else {
+                    null
+                },
             trailingContent = {
                 Switch(
                     checked = if (enabled) isChecked else false,
                     onCheckedChange = null,
-                    enabled = enabled
+                    enabled = enabled,
                 )
             },
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
-            ),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                horizontal = 16.dp,
-                vertical = 16.dp
-            ),
+            colors =
+                ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                ),
+            contentPadding =
+                androidx.compose.foundation.layout.PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 16.dp,
+                ),
             content = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     if (shouldShowSystemTag) {
                         Box(
-                            modifier = Modifier
-                                .size(18.dp)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .size(18.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = CircleShape,
+                                    ),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.round_android_24),
                                 contentDescription = null,
                                 modifier = Modifier.size(12.dp),
-                                tint = MaterialTheme.colorScheme.surfaceBright
+                                tint = MaterialTheme.colorScheme.surfaceBright,
                             )
                         }
                     }
                 }
                 renderMenu()
-            }
+            },
         )
     } else {
         ListItem(
@@ -236,66 +246,72 @@ fun AppToggleItem(
                         bitmap = icon,
                         contentDescription = title,
                         modifier = Modifier.size(24.dp),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.Fit,
                     )
                 } else {
                     Spacer(modifier = Modifier.size(24.dp))
                 }
             },
-            supportingContent = if (description != null) {
-                {
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            } else null,
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
-            ),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                horizontal = 16.dp,
-                vertical = 16.dp
-            ),
+            supportingContent =
+                if (description != null) {
+                    {
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                } else {
+                    null
+                },
+            colors =
+                ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                ),
+            contentPadding =
+                androidx.compose.foundation.layout.PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 16.dp,
+                ),
             content = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Text(
                         text = title,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     if (shouldShowSystemTag) {
                         Box(
-                            modifier = Modifier
-                                .size(18.dp)
-                                .background(
-                                    color = MaterialTheme.colorScheme.primary,
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .size(18.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = CircleShape,
+                                    ),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.round_android_24),
                                 contentDescription = null,
                                 modifier = Modifier.size(12.dp),
-                                tint = MaterialTheme.colorScheme.surfaceBright
+                                tint = MaterialTheme.colorScheme.surfaceBright,
                             )
                         }
                     }
                 }
                 renderMenu()
-            }
+            },
         )
     }
 
     if (translationSheetKey != null) {
         TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

@@ -14,7 +14,10 @@ import com.google.gson.annotations.SerializedName
 
 @Keep
 data class LocationAlarm(
-    @SerializedName("id") val id: String = java.util.UUID.randomUUID().toString(),
+    @SerializedName("id") val id: String =
+        java.util.UUID
+            .randomUUID()
+            .toString(),
     @SerializedName("name") val name: String = "",
     @SerializedName("latitude") val latitude: Double = 0.0,
     @SerializedName("longitude") val longitude: Double = 0.0,
@@ -23,5 +26,5 @@ data class LocationAlarm(
     @SerializedName("lastTravelled") val lastTravelled: Long? = null,
     @SerializedName("isPaused") val isPaused: Boolean = false,
     @SerializedName("iconResName") val iconResName: String = "round_navigation_24",
-    @SerializedName("createdAt") val createdAt: Long = System.currentTimeMillis()
+    @SerializedName("createdAt") val createdAt: Long = System.currentTimeMillis(),
 )

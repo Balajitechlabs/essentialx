@@ -68,7 +68,7 @@ fun WatermarkPreviewArea(
     onPickImage: () -> Unit,
     onRotate: (left: Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     val density = LocalDensity.current
     val configuration = LocalConfiguration.current
@@ -85,73 +85,77 @@ fun WatermarkPreviewArea(
     var previewHeightPx by previewHeightPxState
     var showRotationMenu by remember { mutableStateOf(false) }
 
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(
-                available: androidx.compose.ui.geometry.Offset,
-                source: NestedScrollSource
-            ): androidx.compose.ui.geometry.Offset {
-                val delta = available.y
-                if (delta < 0) {
-                    val newHeight = (previewHeightPx + delta).coerceIn(minPx, maxPx)
-                    val consumed = newHeight - previewHeightPx
-                    if (kotlin.math.abs(consumed) > 0.5f) {
-                        performSliderHaptic(view)
+    val nestedScrollConnection =
+        remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(
+                    available: androidx.compose.ui.geometry.Offset,
+                    source: NestedScrollSource,
+                ): androidx.compose.ui.geometry.Offset {
+                    val delta = available.y
+                    if (delta < 0) {
+                        val newHeight = (previewHeightPx + delta).coerceIn(minPx, maxPx)
+                        val consumed = newHeight - previewHeightPx
+                        if (kotlin.math.abs(consumed) > 0.5f) {
+                            performSliderHaptic(view)
+                        }
+                        previewHeightPx = newHeight
+                        return androidx.compose.ui.geometry
+                            .Offset(0f, consumed)
                     }
-                    previewHeightPx = newHeight
-                    return androidx.compose.ui.geometry.Offset(0f, consumed)
+                    return androidx.compose.ui.geometry.Offset.Zero
                 }
-                return androidx.compose.ui.geometry.Offset.Zero
-            }
 
-            override fun onPostScroll(
-                consumed: androidx.compose.ui.geometry.Offset,
-                available: androidx.compose.ui.geometry.Offset,
-                source: NestedScrollSource
-            ): androidx.compose.ui.geometry.Offset {
-                val delta = available.y
-                if (delta > 0) {
-                    val newHeight = (previewHeightPx + delta).coerceIn(minPx, maxPx)
-                    val consumedY = newHeight - previewHeightPx
-                    if (kotlin.math.abs(consumedY) > 0.5f) {
-                        performSliderHaptic(view)
+                override fun onPostScroll(
+                    consumed: androidx.compose.ui.geometry.Offset,
+                    available: androidx.compose.ui.geometry.Offset,
+                    source: NestedScrollSource,
+                ): androidx.compose.ui.geometry.Offset {
+                    val delta = available.y
+                    if (delta > 0) {
+                        val newHeight = (previewHeightPx + delta).coerceIn(minPx, maxPx)
+                        val consumedY = newHeight - previewHeightPx
+                        if (kotlin.math.abs(consumedY) > 0.5f) {
+                            performSliderHaptic(view)
+                        }
+                        previewHeightPx = newHeight
+                        return androidx.compose.ui.geometry
+                            .Offset(0f, consumedY)
                     }
-                    previewHeightPx = newHeight
-                    return androidx.compose.ui.geometry.Offset(0f, consumedY)
+                    return androidx.compose.ui.geometry.Offset.Zero
                 }
-                return androidx.compose.ui.geometry.Offset.Zero
             }
         }
-    }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(nestedScrollConnection)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .nestedScroll(nestedScrollConnection),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(with(density) { previewHeightPx.toDp() })
-                .padding(16.dp)
-                .clip(if (initialUri == null) RoundedCornerShape(24.dp) else RectangleShape)
-                .background(if (initialUri == null) MaterialTheme.colorScheme.surfaceContainerHigh else Color.Transparent)
-                .combinedClickable(
-                    onClick = {
-                        performUIHaptic(view)
-                        if (initialUri == null) {
-                            onPickImage()
-                        }
-                    },
-                    onLongClick = {
-                        if (initialUri != null) {
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(with(density) { previewHeightPx.toDp() })
+                    .padding(16.dp)
+                    .clip(if (initialUri == null) RoundedCornerShape(24.dp) else RectangleShape)
+                    .background(if (initialUri == null) MaterialTheme.colorScheme.surfaceContainerHigh else Color.Transparent)
+                    .combinedClickable(
+                        onClick = {
                             performUIHaptic(view)
-                            showRotationMenu = true
-                        }
-                    }
-                )
-                .padding(if (initialUri == null) 32.dp else 0.dp),
-            contentAlignment = Alignment.Center
+                            if (initialUri == null) {
+                                onPickImage()
+                            }
+                        },
+                        onLongClick = {
+                            if (initialUri != null) {
+                                performUIHaptic(view)
+                                showRotationMenu = true
+                            }
+                        },
+                    ).padding(if (initialUri == null) 32.dp else 0.dp),
+            contentAlignment = Alignment.Center,
         ) {
             if (initialUri == null) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -159,13 +163,13 @@ fun WatermarkPreviewArea(
                         painter = painterResource(R.drawable.rounded_add_photo_alternate_24),
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(Modifier.size(8.dp))
                     Text(
                         stringResource(R.string.watermark_pick_image),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             } else {
@@ -180,20 +184,21 @@ fun WatermarkPreviewArea(
 
                 val blurRadius by animateDpAsState(
                     targetValue = if (showBlur) 16.dp else 0.dp,
-                    label = "blur"
+                    label = "blur",
                 )
 
                 val alpha by animateFloatAsState(
                     targetValue = if (showBlur) 0.6f else 1f,
-                    label = "alpha"
+                    label = "alpha",
                 )
 
                 Box(contentAlignment = Alignment.Center) {
                     if (lastSuccess != null) {
                         Box(
-                            modifier = Modifier
-                                .blur(blurRadius)
-                                .alpha(alpha)
+                            modifier =
+                                Modifier
+                                    .blur(blurRadius)
+                                    .alpha(alpha),
                         ) {
                             WatermarkPreview(uiState = lastSuccess!!)
                         }
@@ -204,7 +209,7 @@ fun WatermarkPreviewArea(
                     androidx.compose.animation.AnimatedVisibility(
                         visible = showBlur,
                         enter = fadeIn(),
-                        exit = fadeOut()
+                        exit = fadeOut(),
                     ) {
                         LoadingIndicator()
                     }
@@ -213,7 +218,7 @@ fun WatermarkPreviewArea(
                 Box(Modifier.align(Alignment.Center)) {
                     SegmentedDropdownMenu(
                         expanded = showRotationMenu,
-                        onDismissRequest = { showRotationMenu = false }
+                        onDismissRequest = { showRotationMenu = false },
                     ) {
                         SegmentedDropdownMenuItem(
                             text = { Text(stringResource(R.string.watermark_rotate_left)) },
@@ -221,13 +226,13 @@ fun WatermarkPreviewArea(
                                 Icon(
                                     painter = painterResource(R.drawable.rounded_rotate_left_24),
                                     contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(20.dp),
                                 )
                             },
                             onClick = {
                                 showRotationMenu = false
                                 onRotate(true)
-                            }
+                            },
                         )
                         SegmentedDropdownMenuItem(
                             text = { Text(stringResource(R.string.watermark_rotate_right)) },
@@ -235,13 +240,13 @@ fun WatermarkPreviewArea(
                                 Icon(
                                     painter = painterResource(R.drawable.rounded_rotate_right_24),
                                     contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(20.dp),
                                 )
                             },
                             onClick = {
                                 showRotationMenu = false
                                 onRotate(false)
-                            }
+                            },
                         )
                     }
                 }

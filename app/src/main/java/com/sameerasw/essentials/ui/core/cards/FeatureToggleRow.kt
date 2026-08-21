@@ -42,7 +42,7 @@ fun FeatureToggleRow(
     onCheckedChange: (Boolean) -> Unit,
     switchValue: Boolean,
     onSwitchChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     ListItem(
         onClick = { onCheckedChange(!isChecked) },
@@ -51,24 +51,25 @@ fun FeatureToggleRow(
         leadingContent = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Checkbox(
                     checked = isChecked,
-                    onCheckedChange = onCheckedChange
+                    onCheckedChange = onCheckedChange,
                 )
                 Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(ColorUtil.getPastelColorFor(title)),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(ColorUtil.getPastelColorFor(title)),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(iconRes),
                         contentDescription = null,
                         tint = ColorUtil.getVibrantColorFor(title),
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                 }
             }
@@ -77,19 +78,20 @@ fun FeatureToggleRow(
             Switch(
                 checked = switchValue,
                 onCheckedChange = onSwitchChange,
-                enabled = isChecked
+                enabled = isChecked,
             )
         },
-        colors = ListItemDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        ),
+        colors =
+            ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         content = {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-        }
+        },
     )
 }

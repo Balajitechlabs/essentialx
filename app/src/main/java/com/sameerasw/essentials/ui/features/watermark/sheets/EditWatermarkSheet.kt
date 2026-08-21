@@ -64,7 +64,7 @@ fun EditWatermarkSheet(
     currentDate: String?,
     formatDate: (String) -> String,
     onDismissRequest: () -> Unit,
-    onSaveClick: (showBrand: Boolean, brand: String, custom: String, date: String?) -> Unit
+    onSaveClick: (showBrand: Boolean, brand: String, custom: String, date: String?) -> Unit,
 ) {
     val view = LocalView.current
     var draftBrand by remember { mutableStateOf(currentBrand ?: "") }
@@ -79,28 +79,30 @@ fun EditWatermarkSheet(
         draftDate?.let { formatDate(it) } ?: stringResource(R.string.watermark_no_date)
 
     EssentialsBottomSheet(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 32.dp)
+                    .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.watermark_edit_texts),
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp),
             )
 
             RoundedCardContainer {
                 Column(
-                    modifier = Modifier.background(
-                        color = MaterialTheme.colorScheme.surfaceBright,
-                        shape = RoundedCornerShape(4.dp)
-                    )
+                    modifier =
+                        Modifier.background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = RoundedCornerShape(4.dp),
+                        ),
                 ) {
                     IconToggleItem(
                         iconRes = R.drawable.rounded_mobile_text_2_24,
@@ -109,7 +111,7 @@ fun EditWatermarkSheet(
                         onCheckedChange = {
                             performUIHaptic(view)
                             showBrandToggle = it
-                        }
+                        },
                     )
 
                     androidx.compose.animation.AnimatedVisibility(visible = showBrandToggle) {
@@ -118,74 +120,75 @@ fun EditWatermarkSheet(
                                 value = draftBrand,
                                 onValueChange = { draftBrand = it },
                                 label = { Text(stringResource(R.string.watermark_device_brand)) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 12.dp),
-                                singleLine = true
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 12.dp),
+                                singleLine = true,
                             )
                         }
                     }
                 }
 
                 Column(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .padding(vertical = 12.dp)
+                    modifier =
+                        Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = RoundedCornerShape(4.dp),
+                            ).padding(vertical = 12.dp),
                 ) {
                     OutlinedTextField(
                         value = draftCustom,
                         onValueChange = { draftCustom = it },
                         label = { Text(stringResource(R.string.watermark_custom_text)) },
                         placeholder = { Text(stringResource(R.string.watermark_custom_text_hint)) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp),
-                        singleLine = true
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp),
+                        singleLine = true,
                     )
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = RoundedCornerShape(4.dp)
-                        )
-                        .clickable {
-                            performUIHaptic(view)
-                            showDatePicker = true
-                        }
-                        .padding(12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = RoundedCornerShape(4.dp),
+                            ).clickable {
+                                performUIHaptic(view)
+                                showDatePicker = true
+                            }.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Spacer(modifier = Modifier.size(2.dp))
                     Icon(
                         painter = painterResource(R.drawable.rounded_date_range_24),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.size(2.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.watermark_date_time),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                         Text(
                             text = displayDate,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Icon(
                         painter = painterResource(R.drawable.rounded_chevron_right_24),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -193,14 +196,14 @@ fun EditWatermarkSheet(
             // Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 OutlinedButton(
                     onClick = {
                         performUIHaptic(view)
                         onDismissRequest()
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Text(stringResource(R.string.action_cancel))
                 }
@@ -210,7 +213,7 @@ fun EditWatermarkSheet(
                         performUIHaptic(view)
                         onSaveClick(showBrandToggle, draftBrand, draftCustom, draftDate)
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Text(stringResource(R.string.action_save_changes))
                 }
@@ -219,14 +222,15 @@ fun EditWatermarkSheet(
     }
 
     if (showDatePicker) {
-        val initialDateMillis = remember(draftDate) {
-            try {
-                val sdf = SimpleDateFormat("yyyy:MM:dd", Locale.US)
-                sdf.parse(draftDate?.split(" ")?.getOrNull(0) ?: "")?.time
-            } catch (e: Exception) {
-                null
+        val initialDateMillis =
+            remember(draftDate) {
+                try {
+                    val sdf = SimpleDateFormat("yyyy:MM:dd", Locale.US)
+                    sdf.parse(draftDate?.split(" ")?.getOrNull(0) ?: "")?.time
+                } catch (e: Exception) {
+                    null
+                }
             }
-        }
         val datePickerState = rememberDatePickerState(initialSelectedDateMillis = initialDateMillis)
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
@@ -242,22 +246,23 @@ fun EditWatermarkSheet(
                     showDatePicker = false
                     showTimePicker = true
                 }) { Text(stringResource(R.string.action_next)) }
-            }
+            },
         ) {
             DatePicker(state = datePickerState)
         }
     }
 
     if (showTimePicker) {
-        val (initialHour, initialMinute) = remember(draftDate) {
-            try {
-                val timePart = draftDate?.split(" ")?.getOrNull(1) ?: "00:00:00"
-                val parts = timePart.split(":")
-                parts.getOrNull(0)?.toInt()!! to parts.getOrNull(1)?.toInt()!!
-            } catch (e: Exception) {
-                0 to 0
+        val (initialHour, initialMinute) =
+            remember(draftDate) {
+                try {
+                    val timePart = draftDate?.split(" ")?.getOrNull(1) ?: "00:00:00"
+                    val parts = timePart.split(":")
+                    parts.getOrNull(0)?.toInt()!! to parts.getOrNull(1)?.toInt()!!
+                } catch (e: Exception) {
+                    0 to 0
+                }
             }
-        }
         val timePickerState =
             rememberTimePickerState(initialHour = initialHour, initialMinute = initialMinute)
         AlertDialog(
@@ -271,7 +276,7 @@ fun EditWatermarkSheet(
                     showTimePicker = false
                 }) { Text(stringResource(R.string.action_ok)) }
             },
-            text = { TimePicker(state = timePickerState) }
+            text = { TimePicker(state = timePickerState) },
         )
     }
 }

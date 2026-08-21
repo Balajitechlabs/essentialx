@@ -76,7 +76,7 @@ fun ReusableTopAppBar(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     onSignOutClick: (() -> Unit)? = null,
     hasHelpBadge: Boolean = false,
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     val collapsedFraction = scrollBehavior?.state?.collapsedFraction ?: 0f
     collapsedFraction > 0.5f
@@ -84,80 +84,84 @@ fun ReusableTopAppBar(
     // Internal state for profile menu
     var showProfileMenu by androidx.compose.runtime.remember {
         androidx.compose.runtime.mutableStateOf(
-            false
+            false,
         )
     }
 
     val titleContent: @Composable () -> Unit = {
-        val resolvedTitle = when (title) {
-            is Int -> stringResource(id = title)
-            is String -> title
-            else -> ""
-        }
+        val resolvedTitle =
+            when (title) {
+                is Int -> stringResource(id = title)
+                is String -> title
+                else -> ""
+            }
         if (subtitle != null) {
             // Show title and subtitle
             Column {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
                         resolvedTitle,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                     if (isBeta) {
                         androidx.compose.material3.Card(
-                            colors = androidx.compose.material3.CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primary
-                            ),
-                            shape = MaterialTheme.shapes.extraSmall
+                            colors =
+                                androidx.compose.material3.CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                ),
+                            shape = MaterialTheme.shapes.extraSmall,
                         ) {
                             Text(
                                 text = stringResource(R.string.label_beta),
                                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                                 style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.onPrimary,
                             )
                         }
                     }
                 }
-                val resolvedSubtitle = when (subtitle) {
-                    is Int -> stringResource(id = subtitle)
-                    is String -> subtitle
-                    else -> ""
-                }
+                val resolvedSubtitle =
+                    when (subtitle) {
+                        is Int -> stringResource(id = subtitle)
+                        is String -> subtitle
+                        else -> ""
+                    }
                 Text(
                     resolvedSubtitle,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         } else {
             // Show only title
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     resolvedTitle,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 if (isBeta) {
                     androidx.compose.material3.Card(
-                        colors = androidx.compose.material3.CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.background
-                        ),
-                        shape = MaterialTheme.shapes.extraSmall
+                        colors =
+                            androidx.compose.material3.CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.background,
+                            ),
+                        shape = MaterialTheme.shapes.extraSmall,
                     ) {
                         Text(
                             text = stringResource(R.string.label_beta),
                             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
                 }
@@ -173,14 +177,15 @@ fun ReusableTopAppBar(
                     HapticUtil.performVirtualKeyHaptic(view)
                     onBackClick?.invoke()
                 },
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                )
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
             ) {
                 Icon(
                     painter = painterResource(id = backIconRes),
                     contentDescription = stringResource(R.string.action_back),
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
@@ -196,22 +201,24 @@ fun ReusableTopAppBar(
                     HapticUtil.performVirtualKeyHaptic(view)
                     onHelpClick?.invoke()
                 },
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                )
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
             ) {
                 Box {
                     Icon(
                         painter = painterResource(id = helpIconRes),
                         contentDescription = stringResource(helpContentDescription),
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     if (hasHelpBadge) {
                         Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .align(Alignment.TopEnd)
-                                .background(Color.Red, CircleShape)
+                            modifier =
+                                Modifier
+                                    .size(10.dp)
+                                    .align(Alignment.TopEnd)
+                                    .background(Color.Red, CircleShape),
                         )
                     }
                 }
@@ -229,22 +236,24 @@ fun ReusableTopAppBar(
                     HapticUtil.performVirtualKeyHaptic(view)
                     onUpdateClick?.invoke()
                 },
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                )
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
             ) {
                 Box {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_mobile_arrow_down_24),
                         contentDescription = stringResource(R.string.update_available_title),
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     // Red dot
                     Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .align(Alignment.TopEnd)
-                            .background(Color.Red, CircleShape)
+                        modifier =
+                            Modifier
+                                .size(10.dp)
+                                .align(Alignment.TopEnd)
+                                .background(Color.Red, CircleShape),
                     )
                 }
             }
@@ -272,25 +281,27 @@ fun ReusableTopAppBar(
                             onGitHubClick?.invoke()
                         }
                     },
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceBright
-                    ),
-                    modifier = Modifier.size(40.dp)
+                    colors =
+                        IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                        ),
+                    modifier = Modifier.size(40.dp),
                 ) {
                     if (gitHubUser != null) {
                         AsyncImage(
                             model = gitHubUser.avatarUrl,
                             contentDescription = stringResource(R.string.action_profile),
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(CircleShape)
+                            modifier =
+                                Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape),
                         )
                     } else {
                         Icon(
                             painter = painterResource(id = R.drawable.brand_github),
                             contentDescription = stringResource(R.string.action_sign_in_github),
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         )
                     }
                 }
@@ -298,7 +309,7 @@ fun ReusableTopAppBar(
                 if (gitHubUser != null) {
                     androidx.compose.material3.DropdownMenu(
                         expanded = showProfileMenu,
-                        onDismissRequest = { showProfileMenu = false }
+                        onDismissRequest = { showProfileMenu = false },
                     ) {
                         androidx.compose.material3.DropdownMenuItem(
                             text = { Text(stringResource(R.string.action_sign_out)) },
@@ -309,9 +320,9 @@ fun ReusableTopAppBar(
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_logout_24),
-                                    contentDescription = null
+                                    contentDescription = null,
                                 )
-                            }
+                            },
                         )
                     }
                 }
@@ -329,14 +340,15 @@ fun ReusableTopAppBar(
                     HapticUtil.performVirtualKeyHaptic(view)
                     onSettingsClick?.invoke()
                 },
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                )
+                colors =
+                    IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_settings_heart_24),
                     contentDescription = stringResource(R.string.content_desc_settings),
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }
@@ -344,27 +356,29 @@ fun ReusableTopAppBar(
 
     if (isSmall) {
         TopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = containerColor
-            ),
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = containerColor,
+                ),
             modifier = Modifier.padding(horizontal = 8.dp),
             title = titleContent,
             navigationIcon = navigationIconContent,
             actions = actionsContent,
-            scrollBehavior = scrollBehavior
+            scrollBehavior = scrollBehavior,
         )
     } else {
         LargeFlexibleTopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = containerColor
-            ),
+            colors =
+                TopAppBarDefaults.topAppBarColors(
+                    containerColor = containerColor,
+                ),
             modifier = Modifier.padding(horizontal = 8.dp),
             expandedHeight = if (subtitle != null) 152.dp else 120.dp,
             collapsedHeight = TopAppBarDefaults.LargeAppBarCollapsedHeight,
             title = titleContent,
             navigationIcon = navigationIconContent,
             actions = actionsContent,
-            scrollBehavior = scrollBehavior
+            scrollBehavior = scrollBehavior,
         )
     }
 }

@@ -62,83 +62,102 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun LockScreenClockSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
     val currentClockId by viewModel.lockScreenClockId
     val isDark = isSystemInDarkTheme()
 
-    val inversionMatrix = remember {
-        ColorMatrix(
-            floatArrayOf(
-                -1f, 0f, 0f, 0f, 255f,
-                0f, -1f, 0f, 0f, 255f,
-                0f, 0f, -1f, 0f, 255f,
-                0f, 0f, 0f, 1f, 0f
+    val inversionMatrix =
+        remember {
+            ColorMatrix(
+                floatArrayOf(
+                    -1f,
+                    0f,
+                    0f,
+                    0f,
+                    255f,
+                    0f,
+                    -1f,
+                    0f,
+                    0f,
+                    255f,
+                    0f,
+                    0f,
+                    -1f,
+                    0f,
+                    255f,
+                    0f,
+                    0f,
+                    0f,
+                    1f,
+                    0f,
+                ),
             )
-        )
-    }
+        }
 
-    val clockOptions = remember {
-        listOf(
-            ClockOption("DEFAULT", R.string.lock_screen_clock_default, R.drawable.clock_flex),
-            ClockOption(
-                "ANALOG_CLOCK_BIGNUM",
-                R.string.lock_screen_clock_bignum,
-                R.drawable.clock_bignum
-            ),
-            ClockOption(
-                "DIGITAL_CLOCK_CALLIGRAPHY",
-                R.string.lock_screen_clock_calligraphy,
-                R.drawable.clock_calligraphy
-            ),
-            ClockOption(
-                "DIGITAL_CLOCK_GROWTH",
-                R.string.lock_screen_clock_growth,
-                R.drawable.clock_growth
-            ),
-            ClockOption(
-                "DIGITAL_CLOCK_HANDWRITTEN",
-                R.string.lock_screen_clock_handwritten,
-                R.drawable.clock_handwritten
-            ),
-            ClockOption(
-                "DIGITAL_CLOCK_INFLATE",
-                R.string.lock_screen_clock_inflate,
-                R.drawable.clock_inflate
-            ),
-            ClockOption(
-                "DIGITAL_CLOCK_METRO",
-                R.string.lock_screen_clock_metro,
-                R.drawable.clock_metro
-            ),
-            ClockOption(
-                "DIGITAL_CLOCK_NUMBEROVERLAP",
-                R.string.lock_screen_clock_numoverlap,
-                R.drawable.clock_overlap
-            ),
-            ClockOption(
-                "DIGITAL_CLOCK_WEATHER",
-                R.string.lock_screen_clock_weather,
-                R.drawable.clock_weather
+    val clockOptions =
+        remember {
+            listOf(
+                ClockOption("DEFAULT", R.string.lock_screen_clock_default, R.drawable.clock_flex),
+                ClockOption(
+                    "ANALOG_CLOCK_BIGNUM",
+                    R.string.lock_screen_clock_bignum,
+                    R.drawable.clock_bignum,
+                ),
+                ClockOption(
+                    "DIGITAL_CLOCK_CALLIGRAPHY",
+                    R.string.lock_screen_clock_calligraphy,
+                    R.drawable.clock_calligraphy,
+                ),
+                ClockOption(
+                    "DIGITAL_CLOCK_GROWTH",
+                    R.string.lock_screen_clock_growth,
+                    R.drawable.clock_growth,
+                ),
+                ClockOption(
+                    "DIGITAL_CLOCK_HANDWRITTEN",
+                    R.string.lock_screen_clock_handwritten,
+                    R.drawable.clock_handwritten,
+                ),
+                ClockOption(
+                    "DIGITAL_CLOCK_INFLATE",
+                    R.string.lock_screen_clock_inflate,
+                    R.drawable.clock_inflate,
+                ),
+                ClockOption(
+                    "DIGITAL_CLOCK_METRO",
+                    R.string.lock_screen_clock_metro,
+                    R.drawable.clock_metro,
+                ),
+                ClockOption(
+                    "DIGITAL_CLOCK_NUMBEROVERLAP",
+                    R.string.lock_screen_clock_numoverlap,
+                    R.drawable.clock_overlap,
+                ),
+                ClockOption(
+                    "DIGITAL_CLOCK_WEATHER",
+                    R.string.lock_screen_clock_weather,
+                    R.drawable.clock_weather,
+                ),
             )
-        )
-    }
+        }
 
-    val colorOptions = remember {
-        listOf(
-            ClockColorOption("DEFAULT", Color.Transparent, 0, R.string.color_default),
-            ClockColorOption("RED", Color(0xFFE57373), -23641, R.string.color_red),
-            ClockColorOption("GREEN", Color(0xFF81C784), -14057967, R.string.color_green),
-            ClockColorOption("BLUE", Color(0xFF64B5F6), -14575885, R.string.color_blue),
-            ClockColorOption("YELLOW", Color(0xFFFFF176), -5317, R.string.color_yellow),
-            ClockColorOption("ORANGE", Color(0xFFFFB74D), -18611, R.string.color_orange),
-            ClockColorOption("PURPLE", Color(0xFFBA68C8), -4560702, R.string.color_purple),
-            ClockColorOption("PINK", Color(0xFFF06292), -1023342, R.string.color_pink),
-            ClockColorOption("TEAL", Color(0xFF4DB6AC), -11684180, R.string.color_teal)
-        )
-    }
+    val colorOptions =
+        remember {
+            listOf(
+                ClockColorOption("DEFAULT", Color.Transparent, 0, R.string.color_default),
+                ClockColorOption("RED", Color(0xFFE57373), -23641, R.string.color_red),
+                ClockColorOption("GREEN", Color(0xFF81C784), -14057967, R.string.color_green),
+                ClockColorOption("BLUE", Color(0xFF64B5F6), -14575885, R.string.color_blue),
+                ClockColorOption("YELLOW", Color(0xFFFFF176), -5317, R.string.color_yellow),
+                ClockColorOption("ORANGE", Color(0xFFFFB74D), -18611, R.string.color_orange),
+                ClockColorOption("PURPLE", Color(0xFFBA68C8), -4560702, R.string.color_purple),
+                ClockColorOption("PINK", Color(0xFFF06292), -1023342, R.string.color_pink),
+                ClockColorOption("TEAL", Color(0xFF4DB6AC), -11684180, R.string.color_teal),
+            )
+        }
 
     val isDefaultStyleSelected =
         currentClockId == "DEFAULT" || currentClockId == "DIGITAL_CLOCK_FLEX"
@@ -158,62 +177,66 @@ fun LockScreenClockSettingsUI(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
             text = stringResource(R.string.lock_screen_clock_select_label),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         HorizontalMultiBrowseCarousel(
             state = carouselState,
             preferredItemWidth = 180.dp,
             itemSpacing = 2.dp,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(200.dp),
         ) { index ->
             val option = clockOptions[index]
             val isSelected =
                 if (option.id == "DEFAULT") isDefaultStyleSelected else currentClockId == option.id
 
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 4.dp)
-                    .maskClip(MaterialTheme.shapes.large)
-                    .background(if (isDark) Color.White else MaterialTheme.colorScheme.surfaceBright)
-                    .pointerInput(option) {
-                        detectTapGestures {
-                            HapticUtil.performUIHaptic(view)
-                            if (option.id == "DEFAULT") {
-                                if (!isDefaultStyleSelected) {
-                                    viewModel.setLockScreenClockId("DEFAULT", context)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(vertical = 4.dp)
+                        .maskClip(MaterialTheme.shapes.large)
+                        .background(if (isDark) Color.White else MaterialTheme.colorScheme.surfaceBright)
+                        .pointerInput(option) {
+                            detectTapGestures {
+                                HapticUtil.performUIHaptic(view)
+                                if (option.id == "DEFAULT") {
+                                    if (!isDefaultStyleSelected) {
+                                        viewModel.setLockScreenClockId("DEFAULT", context)
+                                    }
+                                } else {
+                                    viewModel.setLockScreenClockId(option.id, context)
                                 }
-                            } else {
-                                viewModel.setLockScreenClockId(option.id, context)
                             }
-                        }
-                    }
+                        },
             ) {
                 androidx.compose.foundation.Image(
                     painter = painterResource(id = option.imageRes),
                     contentDescription = stringResource(option.nameRes),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                    colorFilter = if (isDark) ColorFilter.colorMatrix(inversionMatrix) else null
+                    colorFilter = if (isDark) ColorFilter.colorMatrix(inversionMatrix) else null,
                 )
 
                 if (isSelected) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
                     )
                 }
             }
@@ -224,26 +247,26 @@ fun LockScreenClockSettingsUI(
             text = stringResource(R.string.label_color),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceBright,
-                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                    )
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                        ).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // Multi-row Color Picker
                 val rows = colorOptions.chunked(5)
                 rows.forEach { rowOptions ->
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         rowOptions.forEach { colorOption ->
                             ColorCircle(
@@ -254,9 +277,9 @@ fun LockScreenClockSettingsUI(
                                     viewModel.setLockScreenClockColor(
                                         colorOption.id,
                                         colorOption.seedColor,
-                                        context
+                                        context,
                                     )
-                                }
+                                },
                             )
                         }
                     }
@@ -270,7 +293,7 @@ fun LockScreenClockSettingsUI(
                 valueRange = 0f..100f,
                 valueFormatter = { "${it.toInt()}%" },
                 iconRes = R.drawable.rounded_palette_24,
-                enabled = viewModel.lockScreenClockSelectedColorId.value != "DEFAULT"
+                enabled = viewModel.lockScreenClockSelectedColorId.value != "DEFAULT",
             )
         }
 
@@ -279,7 +302,7 @@ fun LockScreenClockSettingsUI(
                 text = stringResource(R.string.label_style_font),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer {
@@ -287,7 +310,7 @@ fun LockScreenClockSettingsUI(
                     items = listOf("DEFAULT", "DIGITAL_CLOCK_FLEX"),
                     selectedItem = currentClockId ?: "DEFAULT",
                     onItemSelected = { viewModel.setLockScreenClockId(it, context) },
-                    labelProvider = { if (it == "DEFAULT") "Default" else "Flex" }
+                    labelProvider = { if (it == "DEFAULT") "Default" else "Flex" },
                 )
 
                 ConfigSliderItem(
@@ -297,7 +320,7 @@ fun LockScreenClockSettingsUI(
                     valueRange = 100f..1000f,
                     increment = 10f,
                     valueFormatter = { it.toInt().toString() },
-                    iconRes = R.drawable.rounded_line_weight_24
+                    iconRes = R.drawable.rounded_line_weight_24,
                 )
 
                 ConfigSliderItem(
@@ -307,7 +330,7 @@ fun LockScreenClockSettingsUI(
                     valueRange = 25f..200f,
                     increment = 5f,
                     valueFormatter = { it.toInt().toString() },
-                    iconRes = R.drawable.rounded_arrows_outward_24
+                    iconRes = R.drawable.rounded_arrows_outward_24,
                 )
 
                 ConfigSliderItem(
@@ -317,7 +340,7 @@ fun LockScreenClockSettingsUI(
                     valueRange = 0f..100f,
                     increment = 5f,
                     valueFormatter = { it.toInt().toString() },
-                    iconRes = R.drawable.rounded_rounded_corner_24
+                    iconRes = R.drawable.rounded_rounded_corner_24,
                 )
             }
         }
@@ -330,7 +353,7 @@ fun LockScreenClockSettingsUI(
                 description = stringResource(R.string.about_desc_lock_screen_clock),
                 isChecked = false,
                 onCheckedChange = {},
-                showToggle = false
+                showToggle = false,
             )
         }
 
@@ -342,44 +365,49 @@ fun LockScreenClockSettingsUI(
 fun ColorCircle(
     colorOption: ClockColorOption,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .size(44.dp)
-            .clip(CircleShape)
-            .background(
-                if (colorOption.id == "DEFAULT") MaterialTheme.colorScheme.surfaceVariant else colorOption.color
-            )
-            .border(
-                width = if (isSelected) 3.dp else 1.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(
-                    alpha = 0.2f
-                ),
-                shape = CircleShape
-            )
-            .pointerInput(colorOption.id) {
-                detectTapGestures {
-                    onClick()
-                }
-            },
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .size(44.dp)
+                .clip(CircleShape)
+                .background(
+                    if (colorOption.id == "DEFAULT") MaterialTheme.colorScheme.surfaceVariant else colorOption.color,
+                ).border(
+                    width = if (isSelected) 3.dp else 1.dp,
+                    color =
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline.copy(
+                                alpha = 0.2f,
+                            )
+                        },
+                    shape = CircleShape,
+                ).pointerInput(colorOption.id) {
+                    detectTapGestures {
+                        onClick()
+                    }
+                },
+        contentAlignment = Alignment.Center,
     ) {
         if (colorOption.id == "DEFAULT") {
             Icon(
                 painter = painterResource(id = R.drawable.rounded_palette_24),
                 contentDescription = null,
                 modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
         if (isSelected) {
             Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(if (colorOption.id == "DEFAULT") MaterialTheme.colorScheme.primary else Color.White)
+                modifier =
+                    Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(if (colorOption.id == "DEFAULT") MaterialTheme.colorScheme.primary else Color.White),
             )
         }
     }
@@ -388,13 +416,12 @@ fun ColorCircle(
 data class ClockOption(
     val id: String,
     val nameRes: Int,
-    val imageRes: Int
+    val imageRes: Int,
 )
 
 data class ClockColorOption(
     val id: String,
     val color: Color,
     val seedColor: Int,
-    val nameRes: Int
+    val nameRes: Int,
 )
-

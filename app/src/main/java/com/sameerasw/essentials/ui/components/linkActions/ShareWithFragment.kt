@@ -41,15 +41,16 @@ fun ShareWithContent(
     togglePin: (String) -> Unit,
     pinnedPackages: Set<String>,
     demo: Boolean = false,
-    topPadding: Dp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    topPadding: Dp = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
 ) {
     Log.d("LinkPicker", "ShareWithContent: ${resolveInfos.size} apps found")
     val context = LocalContext.current
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
     ) {
         Spacer(modifier = Modifier.height(topPadding))
 
@@ -58,13 +59,14 @@ fun ShareWithContent(
                 text = "No apps found to share with",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             )
         } else {
             RoundedCardContainer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
             ) {
                 resolveInfos.forEach { info ->
                     AppPickerItem(
@@ -73,17 +75,18 @@ fun ShareWithContent(
                         pinnedPackages = pinnedPackages,
                         demo = demo,
                         onTapAction = {
-                            val intent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, uri.toString())
-                            }
+                            val intent =
+                                Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, uri.toString())
+                                }
                             intent.setClassName(
                                 info.resolveInfo.activityInfo.packageName,
-                                info.resolveInfo.activityInfo.name
+                                info.resolveInfo.activityInfo.name,
                             )
                             context.startActivity(intent)
                             onFinish()
-                        }
+                        },
                     )
                 }
             }

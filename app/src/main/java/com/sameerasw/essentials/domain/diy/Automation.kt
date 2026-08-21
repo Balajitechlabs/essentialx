@@ -22,7 +22,7 @@ data class Automation(
     @SerializedName("entryAction") val entryAction: Action? = null,
     @SerializedName("exitAction") val exitAction: Action? = null,
     @SerializedName("isEnabled") val isEnabled: Boolean = true,
-    @SerializedName("selectedApps") val selectedApps: List<String> = emptyList()
+    @SerializedName("selectedApps") val selectedApps: List<String> = emptyList(),
 ) {
     @Keep
     enum class Type {
@@ -39,6 +39,6 @@ data class Automation(
         ACTION_SHORTCUT,
 
         @SerializedName("PIXEL_SEARCHBAR")
-        PIXEL_SEARCHBAR
+        PIXEL_SEARCHBAR,
     }
 }

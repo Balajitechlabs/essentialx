@@ -26,24 +26,29 @@ import androidx.compose.ui.unit.dp
 fun TranslationFocusOutline(
     visible: Boolean,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val borderWidth by animateDpAsState(
         targetValue = if (visible) 2.dp else 0.dp,
         animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing),
-        label = "TranslationFocusBorderWidth"
+        label = "TranslationFocusBorderWidth",
     )
 
     Box(
-        modifier = modifier
-            .border(
-                width = borderWidth,
-                color = if (visible) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.surface.copy(
-                    alpha = 0f
-                ),
-                shape = RoundedCornerShape(8.dp)
-            )
-            .padding(if (visible) 4.dp else 0.dp)
+        modifier =
+            modifier
+                .border(
+                    width = borderWidth,
+                    color =
+                        if (visible) {
+                            MaterialTheme.colorScheme.tertiary
+                        } else {
+                            MaterialTheme.colorScheme.surface.copy(
+                                alpha = 0f,
+                            )
+                        },
+                    shape = RoundedCornerShape(8.dp),
+                ).padding(if (visible) 4.dp else 0.dp),
     ) {
         content()
     }

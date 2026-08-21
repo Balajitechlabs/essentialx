@@ -31,16 +31,12 @@ object RefreshRateUtils {
         val min: Float,
         val peak: Float,
         val isSystemManaged: Boolean,
-        val usesInfinityDefaultPeak: Boolean
+        val usesInfinityDefaultPeak: Boolean,
     )
 
-    fun getPeakRefreshRate(context: Context): Float {
-        return getCurrentState(context).peak
-    }
+    fun getPeakRefreshRate(context: Context): Float = getCurrentState(context).peak
 
-    fun getMinRefreshRate(context: Context): Float {
-        return getCurrentState(context).min
-    }
+    fun getMinRefreshRate(context: Context): Float = getCurrentState(context).min
 
     fun hasCustomRefreshRate(context: Context): Boolean {
         val state = getCurrentState(context)
@@ -76,11 +72,12 @@ object RefreshRateUtils {
         }
     }
 
-    fun hasPermission(context: Context): Boolean {
-        return ShellUtils.hasPermission(context)
-    }
+    fun hasPermission(context: Context): Boolean = ShellUtils.hasPermission(context)
 
-    fun applyFixedRefreshRate(context: Context, value: Float): Boolean {
+    fun applyFixedRefreshRate(
+        context: Context,
+        value: Float,
+    ): Boolean {
         if (!ShellUtils.hasPermission(context)) return false
 
         val clamped = normalizeRate(value)
@@ -90,23 +87,30 @@ object RefreshRateUtils {
         return true
     }
 
-    fun applyRangeRefreshRate(context: Context, minValue: Float, peakValue: Float): Boolean {
+    fun applyRangeRefreshRate(
+        context: Context,
+        minValue: Float,
+        peakValue: Float,
+    ): Boolean {
         if (!ShellUtils.hasPermission(context)) return false
 
         val safeMin = normalizeRate(minValue)
         val safePeak = normalizeRate(maxOf(minValue, peakValue))
         ShellUtils.runCommand(
             context,
-            "settings put system $KEY_MIN_REFRESH_RATE ${formatRate(safeMin)}"
+            "settings put system $KEY_MIN_REFRESH_RATE ${formatRate(safeMin)}",
         )
         ShellUtils.runCommand(
             context,
-            "settings put system $KEY_PEAK_REFRESH_RATE ${formatRate(safePeak)}"
+            "settings put system $KEY_PEAK_REFRESH_RATE ${formatRate(safePeak)}",
         )
         return true
     }
 
-    fun resetRefreshRate(context: Context, restoreInfinityPeak: Boolean = false): Boolean {
+    fun resetRefreshRate(
+        context: Context,
+        restoreInfinityPeak: Boolean = false,
+    ): Boolean {
         if (!ShellUtils.hasPermission(context)) return false
 
         // Clear both namespaces first, then restore the original system-managed peak behavior.
@@ -149,27 +153,32 @@ object RefreshRateUtils {
                 min = 0f,
                 peak = 0f,
                 isSystemManaged = true,
-                usesInfinityDefaultPeak = isInfinityValue(rawPeak)
+                usesInfinityDefaultPeak = isInfinityValue(rawPeak),
             )
         } else {
             RefreshRateState(
                 min = min,
                 peak = peak,
                 isSystemManaged = false,
-                usesInfinityDefaultPeak = false
+                usesInfinityDefaultPeak = false,
             )
         }
     }
 
-    private fun getSystemString(context: Context, key: String): String? {
-        return try {
+    private fun getSystemString(
+        context: Context,
+        key: String,
+    ): String? =
+        try {
             Settings.System.getString(context.contentResolver, key)
         } catch (_: Exception) {
             null
         }
-    }
 
-    private fun parseRefreshRate(rawValue: String?, fallbackForInfinity: Float): Float {
+    private fun parseRefreshRate(
+        rawValue: String?,
+        fallbackForInfinity: Float,
+    ): Float {
         val trimmed = rawValue?.trim().orEmpty()
         if (trimmed.isEmpty()) return 0f
         if (trimmed.equals("Infinity", ignoreCase = true)) return fallbackForInfinity
@@ -186,15 +195,15 @@ object RefreshRateUtils {
         rawMin: String?,
         min: Float,
         rawPeak: String?,
-        peak: Float
+        peak: Float,
     ): Boolean {
         val isMinUnset = min <= 0f && isUnsetValue(rawMin)
         if (!isMinUnset) return false
 
         return isUnsetValue(rawPeak) ||
-                isInfinityValue(rawPeak) ||
-                peak <= 0f ||
-                peak.roundToInt() == DEFAULT_SYSTEM_REFRESH_RATE.roundToInt()
+            isInfinityValue(rawPeak) ||
+            peak <= 0f ||
+            peak.roundToInt() == DEFAULT_SYSTEM_REFRESH_RATE.roundToInt()
     }
 
     private fun isUnsetValue(rawValue: String?): Boolean {
@@ -205,23 +214,21 @@ object RefreshRateUtils {
     private fun isInfinityValue(rawValue: String?): Boolean {
         val trimmed = rawValue?.trim().orEmpty()
         return trimmed.equals("Infinity", ignoreCase = true) ||
-                trimmed.equals("inf", ignoreCase = true)
+            trimmed.equals("inf", ignoreCase = true)
     }
 
-    private fun getHighestSupportedRefreshRate(context: Context): Float {
-        return try {
+    private fun getHighestSupportedRefreshRate(context: Context): Float =
+        try {
             val displayManager = context.getSystemService(DisplayManager::class.java)
             val display = displayManager?.getDisplay(Display.DEFAULT_DISPLAY)
-            display?.supportedModes
+            display
+                ?.supportedModes
                 ?.maxOfOrNull { it.refreshRate }
                 ?.takeIf { it.isFinite() && it > 0f }
                 ?: DEFAULT_SYSTEM_REFRESH_RATE
         } catch (_: Exception) {
             DEFAULT_SYSTEM_REFRESH_RATE
         }
-    }
 
-    private fun formatRate(value: Float): String {
-        return String.format(Locale.US, "%.0f", value)
-    }
+    private fun formatRate(value: Float): String = String.format(Locale.US, "%.0f", value)
 }

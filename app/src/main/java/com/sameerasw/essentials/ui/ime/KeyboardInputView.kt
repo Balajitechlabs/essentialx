@@ -104,66 +104,68 @@ import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private val KeyAccentMap = mapOf(
-    "a" to listOf("à", "á", "â", "ä", "æ", "ã", "å", "ā"),
-    "e" to listOf("è", "é", "ê", "ë", "ē", "ė", "ę"),
-    "i" to listOf("ì", "í", "î", "ï", "ī", "į"),
-    "o" to listOf("ò", "ó", "ô", "ö", "ø", "õ", "œ", "ō"),
-    "u" to listOf("ù", "ú", "û", "ü", "ū"),
-    "n" to listOf("ñ", "ń"),
-    "s" to listOf("ś", "š", "ß"),
-    "z" to listOf("ź", "ż", "ž"),
-    "c" to listOf("ç", "ć", "č"),
-    "l" to listOf("ł"),
-    "y" to listOf("ÿ"),
-    "A" to listOf("À", "Á", "Â", "Ä", "Æ", "Ã", "Å", "Ā"),
-    "E" to listOf("È", "É", "Ê", "Ë", "Ē", "Ė", "Ę"),
-    "I" to listOf("Ì", "Í", "Î", "Ï", "Ī", "Į"),
-    "O" to listOf("Ò", "Ó", "Ô", "Ö", "Ø", "Õ", "Œ", "Ō"),
-    "U" to listOf("Ù", "Ú", "Û", "Ü", "Ū"),
-    "S" to listOf("Ś", "Š"),
-    "N" to listOf("Ñ", "Ń"),
-    "Z" to listOf("Ž", "Ź", "Ż"),
-    "C" to listOf("Ç", "Ć", "Č"),
-    "L" to listOf("Ł"),
-    "Y" to listOf("Ÿ")
-)
+private val KeyAccentMap =
+    mapOf(
+        "a" to listOf("à", "á", "â", "ä", "æ", "ã", "å", "ā"),
+        "e" to listOf("è", "é", "ê", "ë", "ē", "ė", "ę"),
+        "i" to listOf("ì", "í", "î", "ï", "ī", "į"),
+        "o" to listOf("ò", "ó", "ô", "ö", "ø", "õ", "œ", "ō"),
+        "u" to listOf("ù", "ú", "û", "ü", "ū"),
+        "n" to listOf("ñ", "ń"),
+        "s" to listOf("ś", "š", "ß"),
+        "z" to listOf("ź", "ż", "ž"),
+        "c" to listOf("ç", "ć", "č"),
+        "l" to listOf("ł"),
+        "y" to listOf("ÿ"),
+        "A" to listOf("À", "Á", "Â", "Ä", "Æ", "Ã", "Å", "Ā"),
+        "E" to listOf("È", "É", "Ê", "Ë", "Ē", "Ė", "Ę"),
+        "I" to listOf("Ì", "Í", "Î", "Ï", "Ī", "Į"),
+        "O" to listOf("Ò", "Ó", "Ô", "Ö", "Ø", "Õ", "Œ", "Ō"),
+        "U" to listOf("Ù", "Ú", "Û", "Ü", "Ū"),
+        "S" to listOf("Ś", "Š"),
+        "N" to listOf("Ñ", "Ń"),
+        "Z" to listOf("Ž", "Ź", "Ż"),
+        "C" to listOf("Ç", "Ć", "Č"),
+        "L" to listOf("Ł"),
+        "Y" to listOf("Ÿ"),
+    )
 
 @Composable
 fun AccentedKeysPopup(
     variants: List<String>,
     selectedIndex: Int,
     keyRoundness: Dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     androidx.compose.material3.Surface(
         modifier = modifier.zIndex(100f),
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
         shape = RoundedCornerShape(keyRoundness),
         shadowElevation = 8.dp,
-        tonalElevation = 4.dp
+        tonalElevation = 4.dp,
     ) {
         Row(
             modifier = Modifier.padding(4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             variants.forEachIndexed { index, char ->
                 val isSelected = index == selectedIndex
                 Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .background(
-                            color = if (isSelected) MaterialTheme.colorScheme.primary else androidx.compose.ui.graphics.Color.Transparent,
-                            shape = RoundedCornerShape(keyRoundness / 2)
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(44.dp)
+                            .background(
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else androidx.compose.ui.graphics.Color.Transparent,
+                                shape = RoundedCornerShape(keyRoundness / 2),
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
                         text = char,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                     )
                 }
             }
@@ -171,50 +173,54 @@ fun AccentedKeysPopup(
     }
 }
 
-
 enum class ShiftState {
     OFF,
     ON,
-    LOCKED
+    LOCKED,
 }
 
-class LiquidShape(private val curveHeight: Float) : androidx.compose.ui.graphics.Shape {
+class LiquidShape(
+    private val curveHeight: Float,
+) : androidx.compose.ui.graphics.Shape {
     override fun createOutline(
         size: androidx.compose.ui.geometry.Size,
         layoutDirection: androidx.compose.ui.unit.LayoutDirection,
-        density: androidx.compose.ui.unit.Density
+        density: androidx.compose.ui.unit.Density,
     ): androidx.compose.ui.graphics.Outline {
-        val path = androidx.compose.ui.graphics.Path().apply {
-            // Left Horn
-            moveTo(0f, 0f)
-            // Curve down from (0,0) to (R, R) with control point at (0, R)
-            // This creates a vertical tangent at the wall and horizontal at the bottom
-            quadraticTo(0f, curveHeight, curveHeight, curveHeight)
+        val path =
+            androidx.compose.ui.graphics.Path().apply {
+                // Left Horn
+                moveTo(0f, 0f)
+                // Curve down from (0,0) to (R, R) with control point at (0, R)
+                // This creates a vertical tangent at the wall and horizontal at the bottom
+                quadraticTo(0f, curveHeight, curveHeight, curveHeight)
 
-            // Flat bottom of the meniscus
-            lineTo(size.width - curveHeight, curveHeight)
+                // Flat bottom of the meniscus
+                lineTo(size.width - curveHeight, curveHeight)
 
-            // Right Horn
-            // Curve up from (W-R, R) to (W, 0) with control point at (W, R)
-            quadraticTo(size.width, curveHeight, size.width, 0f)
+                // Right Horn
+                // Curve up from (W-R, R) to (W, 0) with control point at (W, R)
+                quadraticTo(size.width, curveHeight, size.width, 0f)
 
-            // Rest of the box
-            lineTo(size.width, size.height)
-            lineTo(0f, size.height)
-            close()
+                // Rest of the box
+                lineTo(size.width, size.height)
+                lineTo(0f, size.height)
+                close()
+            }
+        return androidx.compose.ui.graphics.Outline
+            .Generic(path)
+    }
+}
+
+private fun Modifier.bounceClick(interactionSource: MutableInteractionSource): Modifier =
+    composed {
+        val isPressed by interactionSource.collectIsPressedAsState()
+        val scale by animateFloatAsState(targetValue = if (isPressed) 0.9f else 1f, label = "scale")
+        this.graphicsLayer {
+            scaleX = scale
+            scaleY = scale
         }
-        return androidx.compose.ui.graphics.Outline.Generic(path)
     }
-}
-
-private fun Modifier.bounceClick(interactionSource: MutableInteractionSource): Modifier = composed {
-    val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(targetValue = if (isPressed) 0.9f else 1f, label = "scale")
-    this.graphicsLayer {
-        scaleX = scale
-        scaleY = scale
-    }
-}
 
 @Composable
 fun KeyButton(
@@ -229,16 +235,16 @@ fun KeyButton(
     contentColor: androidx.compose.ui.graphics.Color,
     onRepeat: (() -> Unit)? = null,
     canRepeat: (() -> Boolean)? = null,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val isPressed by interactionSource.collectIsPressedAsState()
     val animatedContainerColor by animateColorAsState(
         targetValue = if (isPressed) MaterialTheme.colorScheme.primaryContainer else containerColor,
-        label = "ButtonContainerColor"
+        label = "ButtonContainerColor",
     )
     val animatedContentColor by animateColorAsState(
         targetValue = if (isPressed) MaterialTheme.colorScheme.onPrimaryContainer else contentColor,
-        label = "ButtonContentColor"
+        label = "ButtonContentColor",
     )
 
     val scope = rememberCoroutineScope()
@@ -246,63 +252,67 @@ fun KeyButton(
     LocalViewConfiguration.current
 
     Box(
-        modifier = modifier
-            .bounceClick(interactionSource)
-            .clip(shape)
-            .background(animatedContainerColor)
-            .pointerInput(onClick, onLongClick, onPress) {
-                detectTapGestures(
-                    onPress = { offset ->
-                        val press = PressInteraction.Press(offset)
-                        scope.launch { interactionSource.emit(press) }
-                        onPress()
+        modifier =
+            modifier
+                .bounceClick(interactionSource)
+                .clip(shape)
+                .background(animatedContainerColor)
+                .pointerInput(onClick, onLongClick, onPress) {
+                    detectTapGestures(
+                        onPress = { offset ->
+                            val press = PressInteraction.Press(offset)
+                            scope.launch { interactionSource.emit(press) }
+                            onPress()
 
-                        var isReleased = false
-                        val repeatJob = if (onRepeat != null) {
-                            scope.launch {
-                                delay(500)
-                                while (!isReleased) {
-                                    if (canRepeat?.invoke() != false) {
-                                        onRepeat()
-                                        delay(50)
-                                    } else {
-                                        break
+                            var isReleased = false
+                            val repeatJob =
+                                if (onRepeat != null) {
+                                    scope.launch {
+                                        delay(500)
+                                        while (!isReleased) {
+                                            if (canRepeat?.invoke() != false) {
+                                                onRepeat()
+                                                delay(50)
+                                            } else {
+                                                break
+                                            }
+                                        }
                                     }
+                                } else {
+                                    null
                                 }
-                            }
-                        } else null
 
-                        try {
-                            if (tryAwaitRelease()) {
+                            try {
+                                if (tryAwaitRelease()) {
+                                    isReleased = true
+                                    repeatJob?.cancel()
+                                    scope.launch { interactionSource.emit(PressInteraction.Release(press)) }
+                                } else {
+                                    isReleased = true
+                                    repeatJob?.cancel()
+                                    scope.launch { interactionSource.emit(PressInteraction.Cancel(press)) }
+                                }
+                            } catch (e: Exception) {
                                 isReleased = true
                                 repeatJob?.cancel()
-                                scope.launch { interactionSource.emit(PressInteraction.Release(press)) }
-                            } else {
-                                isReleased = true
-                                repeatJob?.cancel()
-                                scope.launch { interactionSource.emit(PressInteraction.Cancel(press)) }
                             }
-                        } catch (e: Exception) {
-                            isReleased = true
-                            repeatJob?.cancel()
-                        }
-                    },
-                    onLongPress = {
-                        if (onLongClick != null) {
-                            onLongClick()
-                            HapticUtil.performHeavyHaptic(view)
-                        }
-                    },
-                    onTap = {
-                        onClick()
-                    }
-                )
-            },
-        contentAlignment = Alignment.Center
+                        },
+                        onLongPress = {
+                            if (onLongClick != null) {
+                                onLongClick()
+                                HapticUtil.performHeavyHaptic(view)
+                            }
+                        },
+                        onTap = {
+                            onClick()
+                        },
+                    )
+                },
+        contentAlignment = Alignment.Center,
     ) {
         androidx.compose.runtime.CompositionLocalProvider(
             androidx.compose.material3.LocalContentColor provides animatedContentColor,
-            content = content
+            content = content,
         )
 
         // Secondary Text (Top Center)
@@ -311,9 +321,10 @@ fun KeyButton(
                 text = secondaryText,
                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
                 color = animatedContentColor.copy(alpha = 0.6f),
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(top = 2.dp, end = 4.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(top = 2.dp, end = 4.dp),
             )
         }
     }
@@ -324,32 +335,32 @@ fun ClipboardItem(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp)
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(8.dp),
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val animatedColor by animateColorAsState(
         targetValue = if (isPressed) MaterialTheme.colorScheme.surfaceContainerHighest else MaterialTheme.colorScheme.surfaceContainerHigh,
-        label = "ClipboardItemColor"
+        label = "ClipboardItemColor",
     )
 
     Box(
-        modifier = modifier
-            .clip(shape)
-            .background(animatedColor)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = onClick
-            )
-            .padding(12.dp)
+        modifier =
+            modifier
+                .clip(shape)
+                .background(animatedColor)
+                .clickable(
+                    interactionSource = interactionSource,
+                    indication = null,
+                    onClick = onClick,
+                ).padding(12.dp),
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
-            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
         )
     }
 }
@@ -379,7 +390,7 @@ fun KeyboardInputView(
     isLongPressSymbolsEnabled: Boolean = false,
     isAccentedCharactersEnabled: Boolean = false,
     onOpened: Int = 0,
-    canDelete: () -> Boolean = { true }
+    canDelete: () -> Boolean = { true },
 ) {
     val view = LocalView.current
     val viewConfiguration = LocalViewConfiguration.current
@@ -406,32 +417,35 @@ fun KeyboardInputView(
     var longPressXRatio by remember { mutableFloatStateOf(0.5f) }
     var longPressYRatio by remember { mutableFloatStateOf(0.5f) }
 
-    val emojiCandidates = remember(currentWord) {
-        if (currentWord.length >= 3) {
-            EmojiData.allEmojis
-                .filter { it.name.contains(currentWord, ignoreCase = true) }
-                .take(5)
-                .map {
-                    Suggestion(
-                        it.emoji,
-                        SuggestionType.Prediction
-                    )
-                } // Wrap emojis as Suggestions
-        } else {
-            emptyList()
+    val emojiCandidates =
+        remember(currentWord) {
+            if (currentWord.length >= 3) {
+                EmojiData.allEmojis
+                    .filter { it.name.contains(currentWord, ignoreCase = true) }
+                    .take(5)
+                    .map {
+                        Suggestion(
+                            it.emoji,
+                            SuggestionType.Prediction,
+                        )
+                    } // Wrap emojis as Suggestions
+            } else {
+                emptyList()
+            }
         }
-    }
 
-    val mergedSuggestions = remember(suggestions, emojiCandidates) {
-        if (emojiCandidates.isNotEmpty() && suggestions.isNotEmpty()) {
-            // Priority: Text 1 -> Emoji 1 -> Remaining Text -> Remaining Emojis
-            listOf(suggestions[0]) + emojiCandidates.take(1) + suggestions.drop(1) + emojiCandidates.drop(
-                1
-            )
-        } else {
-            emojiCandidates + suggestions
+    val mergedSuggestions =
+        remember(suggestions, emojiCandidates) {
+            if (emojiCandidates.isNotEmpty() && suggestions.isNotEmpty()) {
+                // Priority: Text 1 -> Emoji 1 -> Remaining Text -> Remaining Emojis
+                listOf(suggestions[0]) + emojiCandidates.take(1) + suggestions.drop(1) +
+                    emojiCandidates.drop(
+                        1,
+                    )
+            } else {
+                emojiCandidates + suggestions
+            }
         }
-    }
 
     fun handleType(text: String) {
         onType(text)
@@ -456,17 +470,18 @@ fun KeyboardInputView(
     // Total Height animation
     val animatedTotalHeight by animateDpAsState(
         targetValue = if (isEmojiMode || isKaomojiMode) keyboardHeight + 120.dp else keyboardHeight,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
-        label = "TotalHeightAnimation"
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessMedium,
+            ),
+        label = "TotalHeightAnimation",
     )
     val totalHeight = animatedTotalHeight
 
     val animatedBlurRadius by animateDpAsState(
         targetValue = if (longPressKey != null) 8.dp else 0.dp,
-        label = "blur"
+        label = "blur",
     )
 
     // Pre-load Emoji & Kaomoji data on startup (Background thread)
@@ -528,83 +543,87 @@ fun KeyboardInputView(
     val currentRow3 = if (isSymbols) row3Symbols else row3Letters
 
     val density = LocalDensity.current
-    val containerShape = remember(keyboardShape, keyRoundness) {
-        when (keyboardShape) {
-            1 -> androidx.compose.ui.graphics.RectangleShape
-            2 -> LiquidShape(with(density) { keyRoundness.toPx() }) // Inverse/Liquid
-            else -> RoundedCornerShape(28.dp)
+    val containerShape =
+        remember(keyboardShape, keyRoundness) {
+            when (keyboardShape) {
+                1 -> androidx.compose.ui.graphics.RectangleShape
+                2 -> LiquidShape(with(density) { keyRoundness.toPx() }) // Inverse/Liquid
+                else -> RoundedCornerShape(28.dp)
+            }
         }
-    }
 
-    val extraTopPadding = remember(keyboardShape, keyRoundness) {
-        if (keyboardShape == 2) keyRoundness else 0.dp
-    }
+    val extraTopPadding =
+        remember(keyboardShape, keyRoundness) {
+            if (keyboardShape == 2) keyRoundness else 0.dp
+        }
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(totalHeight)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .height(totalHeight),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(containerShape)
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-                .pointerInput(Unit) {
-                    detectVerticalDragGestures { change, dragAmount ->
-                        if (!isEmojiMode && dragAmount < -20f) { // Swipe up
-                            isEmojiMode = true
-                            isClipboardMode = false
-                            performHeavyHaptic()
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .clip(containerShape)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .pointerInput(Unit) {
+                        detectVerticalDragGestures { change, dragAmount ->
+                            if (!isEmojiMode && dragAmount < -20f) { // Swipe up
+                                isEmojiMode = true
+                                isClipboardMode = false
+                                performHeavyHaptic()
+                            }
                         }
-                    }
-                }
-                .padding(
-                    bottom = if (isEmojiMode) 0.dp else bottomPadding,
-                    start = 6.dp,
-                    end = 6.dp,
-                    top = 6.dp + extraTopPadding
-                )
-                .pointerInput(longPressKey) {
-                    if (longPressKey == null) return@pointerInput
-                    awaitPointerEventScope {
-                        var baselineX: Float? = null
-                        while (longPressKey != null) {
-                            val event = awaitPointerEvent(PointerEventPass.Initial)
-                            val change = event.changes.firstOrNull()
+                    }.padding(
+                        bottom = if (isEmojiMode) 0.dp else bottomPadding,
+                        start = 6.dp,
+                        end = 6.dp,
+                        top = 6.dp + extraTopPadding,
+                    ).pointerInput(longPressKey) {
+                        if (longPressKey == null) return@pointerInput
+                        awaitPointerEventScope {
+                            var baselineX: Float? = null
+                            while (longPressKey != null) {
+                                val event = awaitPointerEvent(PointerEventPass.Initial)
+                                val change = event.changes.firstOrNull()
 
-                            if (change == null || change.changedToUp() || !change.pressed) {
-                                // Commit selection and dismiss
-                                val selectedChar =
-                                    longPressVariants.getOrNull(selectedAccentIndex)
-                                if (selectedChar != null) {
-                                    handleType(selectedChar)
-                                    performHeavyHaptic()
-                                }
-                                longPressKey = null
-                                break
-                            } else {
-                                if (baselineX == null) {
-                                    baselineX = change.position.x
-                                }
+                                if (change == null || change.changedToUp() || !change.pressed) {
+                                    // Commit selection and dismiss
+                                    val selectedChar =
+                                        longPressVariants.getOrNull(selectedAccentIndex)
+                                    if (selectedChar != null) {
+                                        handleType(selectedChar)
+                                        performHeavyHaptic()
+                                    }
+                                    longPressKey = null
+                                    break
+                                } else {
+                                    if (baselineX == null) {
+                                        baselineX = change.position.x
+                                    }
 
-                                // Slide selection - relative movement from start
-                                val deltaX = change.position.x - baselineX
-                                val stepWidthPx = with(density) { 40.dp.toPx() }
+                                    // Slide selection - relative movement from start
+                                    val deltaX = change.position.x - baselineX
+                                    val stepWidthPx = with(density) { 40.dp.toPx() }
 
-                                val index = ((deltaX / stepWidthPx) + initialAccentIndex).toInt()
-                                    .coerceIn(0, longPressVariants.size - 1)
+                                    val index =
+                                        ((deltaX / stepWidthPx) + initialAccentIndex)
+                                            .toInt()
+                                            .coerceIn(0, longPressVariants.size - 1)
 
-                                if (index != selectedAccentIndex) {
-                                    selectedAccentIndex = index
-                                    performLightHaptic()
+                                    if (index != selectedAccentIndex) {
+                                        selectedAccentIndex = index
+                                        performLightHaptic()
+                                    }
                                 }
                             }
                         }
-                    }
-                },
+                    },
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             val FunctionRow: @Composable (Modifier) -> Unit = { modifier ->
                 val hasSuggestions = mergedSuggestions.isNotEmpty()
@@ -612,20 +631,22 @@ fun KeyboardInputView(
 
                 val rotation by animateFloatAsState(
                     targetValue = if (showSuggestions) 45f else 0f,
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioLowBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    ),
-                    label = "controlIconRotation"
+                    animationSpec =
+                        spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessMedium,
+                        ),
+                    label = "controlIconRotation",
                 )
 
                 AnimatedContent(
                     targetState = showSuggestions,
                     transitionSpec = {
-                        val springSpec = spring<IntOffset>(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessMedium
-                        )
+                        val springSpec =
+                            spring<IntOffset>(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessMedium,
+                            )
                         if (targetState) {
                             // Expand
                             (fadeIn() + slideInHorizontally(animationSpec = springSpec) { it })
@@ -637,7 +658,7 @@ fun KeyboardInputView(
                         }
                     },
                     label = "FunctionRowTransition",
-                    modifier = modifier
+                    modifier = modifier,
                 ) { targetShowSuggestions ->
                     if (targetShowSuggestions) {
                         val collapseInteraction = remember { MutableInteractionSource() }
@@ -646,47 +667,49 @@ fun KeyboardInputView(
                         Row(
                             modifier = Modifier.fillMaxSize(),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
-                            val nestedScrollConnection = remember {
-                                object : NestedScrollConnection {
-                                    var accumulatedScroll = 0f
-                                    val threshold = 70f
+                            val nestedScrollConnection =
+                                remember {
+                                    object : NestedScrollConnection {
+                                        var accumulatedScroll = 0f
+                                        val threshold = 70f
 
-                                    override fun onPreScroll(
-                                        available: Offset,
-                                        source: NestedScrollSource
-                                    ): Offset {
-                                        if (source == NestedScrollSource.UserInput) {
-                                            accumulatedScroll += available.x
-                                            if (kotlin.math.abs(accumulatedScroll) >= threshold) {
-                                                performScrollHaptic()
-                                                accumulatedScroll = 0f
+                                        override fun onPreScroll(
+                                            available: Offset,
+                                            source: NestedScrollSource,
+                                        ): Offset {
+                                            if (source == NestedScrollSource.UserInput) {
+                                                accumulatedScroll += available.x
+                                                if (kotlin.math.abs(accumulatedScroll) >= threshold) {
+                                                    performScrollHaptic()
+                                                    accumulatedScroll = 0f
+                                                }
                                             }
+                                            return Offset.Zero
                                         }
-                                        return Offset.Zero
                                     }
                                 }
-                            }
 
                             HorizontalMultiBrowseCarousel(
                                 state = carouselState,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight()
-                                    .nestedScroll(nestedScrollConnection),
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .nestedScroll(nestedScrollConnection),
                                 preferredItemWidth = 150.dp,
                                 itemSpacing = 4.dp,
                                 minSmallItemWidth = 10.dp,
                                 maxSmallItemWidth = 20.dp,
-                                contentPadding = PaddingValues(start = functionsPadding)
+                                contentPadding = PaddingValues(start = functionsPadding),
                             ) { i ->
                                 val suggestion = mergedSuggestions[i]
                                 val isLearned = suggestion.type == SuggestionType.Learned
                                 val suggInteraction = remember { MutableInteractionSource() }
                                 val animatedRadius by animateDpAsState(
                                     targetValue = keyRoundness,
-                                    label = "cornerRadius"
+                                    label = "cornerRadius",
                                 )
 
                                 KeyButton(
@@ -698,22 +721,28 @@ fun KeyboardInputView(
                                     },
                                     onPress = { performLightHaptic() },
                                     interactionSource = suggInteraction,
-                                    containerColor = if (isLearned) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.secondaryContainer.copy(
-                                        alpha = 0.7f
-                                    ),
+                                    containerColor =
+                                        if (isLearned) {
+                                            MaterialTheme.colorScheme.secondaryContainer
+                                        } else {
+                                            MaterialTheme.colorScheme.secondaryContainer.copy(
+                                                alpha = 0.7f,
+                                            )
+                                        },
                                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                                     shape = RoundedCornerShape(animatedRadius),
-                                    modifier = Modifier
-                                        .fillMaxHeight()
-                                        .fillMaxWidth()
-                                        .maskClip(RoundedCornerShape(animatedRadius))
+                                    modifier =
+                                        Modifier
+                                            .fillMaxHeight()
+                                            .fillMaxWidth()
+                                            .maskClip(RoundedCornerShape(animatedRadius)),
                                 ) {
                                     Text(
                                         text = suggestion.text,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily = CustomFontFamily,
-                                        maxLines = 1
+                                        maxLines = 1,
                                     )
                                 }
                             }
@@ -722,7 +751,7 @@ fun KeyboardInputView(
                             val isCollapsePressed by collapseInteraction.collectIsPressedAsState()
                             val collapseRadius by animateDpAsState(
                                 targetValue = if (isCollapsePressed) 4.dp else keyRoundness,
-                                label = "collapseRadius"
+                                label = "collapseRadius",
                             )
 
                             KeyButton(
@@ -735,48 +764,56 @@ fun KeyboardInputView(
                                 containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                 contentColor = MaterialTheme.colorScheme.onSurface,
                                 shape = RoundedCornerShape(collapseRadius),
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .width(50.dp)
-                                    .padding(end = functionsPadding)
+                                modifier =
+                                    Modifier
+                                        .fillMaxHeight()
+                                        .width(50.dp)
+                                        .padding(end = functionsPadding),
                             ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_add_24),
                                     contentDescription = "Collapse Suggestions",
-                                    modifier = Modifier
-                                        .size(18.dp)
-                                        .graphicsLayer { rotationZ = rotation }
+                                    modifier =
+                                        Modifier
+                                            .size(18.dp)
+                                            .graphicsLayer { rotationZ = rotation },
                                 )
                             }
                         }
                     } else {
-                        val functions = remember(
-                            isClipboardEnabled,
-                            isEmojiMode,
-                            isSuggestionsCollapsed,
-                            hasSuggestions
-                        ) {
-                            val list = mutableListOf(
-                                R.drawable.ic_emoji to "Emoji",
-                                if (isEmojiMode) R.drawable.rounded_backspace_24 to "Backspace"
-                                else R.drawable.ic_undo to "Undo"
-                            )
-                            if (isClipboardEnabled) {
-                                list.add(1, R.drawable.ic_clipboard to "Clipboard")
+                        val functions =
+                            remember(
+                                isClipboardEnabled,
+                                isEmojiMode,
+                                isSuggestionsCollapsed,
+                                hasSuggestions,
+                            ) {
+                                val list =
+                                    mutableListOf(
+                                        R.drawable.ic_emoji to "Emoji",
+                                        if (isEmojiMode) {
+                                            R.drawable.rounded_backspace_24 to "Backspace"
+                                        } else {
+                                            R.drawable.ic_undo to "Undo"
+                                        },
+                                    )
+                                if (isClipboardEnabled) {
+                                    list.add(1, R.drawable.ic_clipboard to "Clipboard")
+                                }
+                                // Add Expand button if collapsed and suggestions exist
+                                if (isSuggestionsCollapsed && hasSuggestions && !isEmojiMode) {
+                                    list.add(R.drawable.rounded_add_24 to "Expand")
+                                }
+                                list
                             }
-                            // Add Expand button if collapsed and suggestions exist
-                            if (isSuggestionsCollapsed && hasSuggestions && !isEmojiMode) {
-                                list.add(R.drawable.rounded_add_24 to "Expand")
-                            }
-                            list
-                        }
 
                         ButtonGroup(
                             overflowIndicator = { ButtonGroupDefaults.OverflowIndicator(it) },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                                .padding(horizontal = functionsPadding),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                                    .padding(horizontal = functionsPadding),
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                             content = {
                                 functions.forEach { (iconRes, desc) ->
@@ -787,7 +824,7 @@ fun KeyboardInputView(
                                             val isPressed by fnInteraction.collectIsPressedAsState()
                                             val animatedRadius by animateDpAsState(
                                                 targetValue = if (isPressed) 4.dp else keyRoundness,
-                                                label = "cornerRadius"
+                                                label = "cornerRadius",
                                             )
 
                                             KeyButton(
@@ -819,49 +856,68 @@ fun KeyboardInputView(
                                                     if (desc == "Backspace") canDelete() else true
                                                 },
                                                 onPress = { performLightHaptic() },
-                                                onLongClick = if (desc == "Emoji") {
-                                                    {
-                                                        isKaomojiMode = true
-                                                        isEmojiMode = false
-                                                        isClipboardMode = false
-                                                        performHeavyHaptic()
-                                                    }
-                                                } else null,
+                                                onLongClick =
+                                                    if (desc == "Emoji") {
+                                                        {
+                                                            isKaomojiMode = true
+                                                            isEmojiMode = false
+                                                            isClipboardMode = false
+                                                            performHeavyHaptic()
+                                                        }
+                                                    } else {
+                                                        null
+                                                    },
                                                 interactionSource = fnInteraction,
-                                                containerColor = if ((desc == "Clipboard" && isClipboardMode) || (desc == "Emoji" && (isEmojiMode || isKaomojiMode))) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
-                                                contentColor = if ((desc == "Clipboard" && isClipboardMode) || (desc == "Emoji" && (isEmojiMode || isKaomojiMode))) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                                                containerColor =
+                                                    if ((desc == "Clipboard" && isClipboardMode) ||
+                                                        (desc == "Emoji" && (isEmojiMode || isKaomojiMode))
+                                                    ) {
+                                                        MaterialTheme.colorScheme.primaryContainer
+                                                    } else {
+                                                        MaterialTheme.colorScheme.surfaceContainerHighest
+                                                    },
+                                                contentColor =
+                                                    if ((desc == "Clipboard" && isClipboardMode) ||
+                                                        (desc == "Emoji" && (isEmojiMode || isKaomojiMode))
+                                                    ) {
+                                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                                    } else {
+                                                        MaterialTheme.colorScheme.onSurface
+                                                    },
                                                 shape = RoundedCornerShape(animatedRadius),
-                                                modifier = if (desc == "Expand") {
-                                                    Modifier
-                                                        .width(50.dp)
-                                                        .fillMaxHeight()
-                                                } else {
-                                                    Modifier
-                                                        .weight(1.3f)
-                                                        .fillMaxHeight()
-                                                }
+                                                modifier =
+                                                    if (desc == "Expand") {
+                                                        Modifier
+                                                            .width(50.dp)
+                                                            .fillMaxHeight()
+                                                    } else {
+                                                        Modifier
+                                                            .weight(1.3f)
+                                                            .fillMaxHeight()
+                                                    },
                                             ) {
                                                 Icon(
                                                     painter = painterResource(id = iconRes),
                                                     contentDescription = desc,
-                                                    modifier = Modifier
-                                                        .size(if (desc == "Expand") 18.dp else 20.dp)
-                                                        .then(
-                                                            if (desc == "Expand") {
-                                                                Modifier.graphicsLayer {
-                                                                    rotationZ = rotation
-                                                                }
-                                                            } else {
-                                                                Modifier
-                                                            }
-                                                        )
+                                                    modifier =
+                                                        Modifier
+                                                            .size(if (desc == "Expand") 18.dp else 20.dp)
+                                                            .then(
+                                                                if (desc == "Expand") {
+                                                                    Modifier.graphicsLayer {
+                                                                        rotationZ = rotation
+                                                                    }
+                                                                } else {
+                                                                    Modifier
+                                                                },
+                                                            ),
                                                 )
                                             }
                                         },
-                                        menuContent = {}
+                                        menuContent = {},
                                     )
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -871,48 +927,53 @@ fun KeyboardInputView(
                 FunctionRow(
                     Modifier
                         .height(48.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 )
             }
 
-            val currentMode = when {
-                isEmojiMode -> 1
-                isClipboardMode && isClipboardEnabled -> 2
-                isKaomojiMode -> 3
-                else -> 0
-            }
+            val currentMode =
+                when {
+                    isEmojiMode -> 1
+                    isClipboardMode && isClipboardEnabled -> 2
+                    isKaomojiMode -> 3
+                    else -> 0
+                }
 
             AnimatedContent(
                 targetState = currentMode,
                 transitionSpec = {
-                    (fadeIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) togetherWith
-                            fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium)))
+                    (
+                        fadeIn(animationSpec = spring(stiffness = Spring.StiffnessMedium)) togetherWith
+                            fadeOut(animationSpec = spring(stiffness = Spring.StiffnessMedium))
+                    )
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(5f),
-                label = "KeyboardModeAnimation"
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(5f),
+                label = "KeyboardModeAnimation",
             ) { mode ->
                 when (mode) {
                     2 -> {
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clip(RoundedCornerShape(keyRoundness))
-                                .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                                .padding(8.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(keyRoundness))
+                                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                                    .padding(8.dp),
                         ) {
                             if (clipboardHistory.isEmpty()) {
                                 Text(
                                     text = "Clipboard is empty",
                                     modifier = Modifier.align(Alignment.Center),
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             } else {
                                 LazyColumn(
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                                    modifier = Modifier.fillMaxSize()
+                                    modifier = Modifier.fillMaxSize(),
                                 ) {
                                     items(clipboardHistory, key = { it }) { clipText ->
                                         val dismissState =
@@ -924,8 +985,10 @@ fun KeyboardInputView(
                                                         onDeleteClipboardItem(clipText)
                                                         performHeavyHaptic()
                                                         true
-                                                    } else false
-                                                }
+                                                    } else {
+                                                        false
+                                                    }
+                                                },
                                             )
 
                                         androidx.compose.material3.SwipeToDismissBox(
@@ -935,7 +998,8 @@ fun KeyboardInputView(
                                                     when (dismissState.targetValue) {
                                                         androidx.compose.material3.SwipeToDismissBoxValue.Settled -> MaterialTheme.colorScheme.surfaceContainerLow
                                                         else -> MaterialTheme.colorScheme.errorContainer
-                                                    }, label = "dismissBackground"
+                                                    },
+                                                    label = "dismissBackground",
                                                 )
                                                 Box(
                                                     Modifier
@@ -943,13 +1007,19 @@ fun KeyboardInputView(
                                                         .clip(RoundedCornerShape(keyRoundness))
                                                         .background(color)
                                                         .padding(horizontal = 16.dp),
-                                                    contentAlignment = if (dismissState.dismissDirection == androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd)
-                                                        Alignment.CenterStart else Alignment.CenterEnd
+                                                    contentAlignment =
+                                                        if (dismissState.dismissDirection ==
+                                                            androidx.compose.material3.SwipeToDismissBoxValue.StartToEnd
+                                                        ) {
+                                                            Alignment.CenterStart
+                                                        } else {
+                                                            Alignment.CenterEnd
+                                                        },
                                                 ) {
                                                     Icon(
                                                         painter = painterResource(R.drawable.rounded_delete_24),
                                                         contentDescription = "Delete",
-                                                        tint = MaterialTheme.colorScheme.onErrorContainer
+                                                        tint = MaterialTheme.colorScheme.onErrorContainer,
                                                     )
                                                 }
                                             },
@@ -961,9 +1031,9 @@ fun KeyboardInputView(
                                                         onPasteClick(clipText)
                                                         isClipboardMode = false
                                                     },
-                                                    modifier = Modifier.fillMaxWidth()
+                                                    modifier = Modifier.fillMaxWidth(),
                                                 )
-                                            }
+                                            },
                                         )
                                     }
                                 }
@@ -986,7 +1056,7 @@ fun KeyboardInputView(
                                     performHeavyHaptic()
                                 }
                             },
-                            bottomContentPadding = bottomPadding
+                            bottomContentPadding = bottomPadding,
                         )
                     }
 
@@ -1005,23 +1075,25 @@ fun KeyboardInputView(
                                     performHeavyHaptic()
                                 }
                             },
-                            bottomContentPadding = bottomPadding
+                            bottomContentPadding = bottomPadding,
                         )
                     }
 
                     else -> {
                         Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .blur(animatedBlurRadius),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .blur(animatedBlurRadius),
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
                             // Dedicated Number Row
                             ButtonGroup(
                                 overflowIndicator = { ButtonGroupDefaults.OverflowIndicator(it) },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 content = {
                                     numberRow.forEach { char ->
@@ -1037,31 +1109,33 @@ fun KeyboardInputView(
                                                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                                         contentColor = MaterialTheme.colorScheme.onSurface,
                                                         shape = RoundedCornerShape(keyRoundness),
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .fillMaxHeight()
+                                                        modifier =
+                                                            Modifier
+                                                                .weight(1f)
+                                                                .fillMaxHeight(),
                                                     ) {
                                                         Text(
                                                             text = char,
                                                             style = MaterialTheme.typography.titleLarge,
                                                             fontWeight = FontWeight.Medium,
-                                                            fontFamily = CustomFontFamily
+                                                            fontFamily = CustomFontFamily,
                                                         )
                                                     }
                                                 }
                                             },
-                                            menuContent = {}
+                                            menuContent = {},
                                         )
                                     }
-                                }
+                                },
                             )
 
                             // Row 1
                             ButtonGroup(
                                 overflowIndicator = { ButtonGroupDefaults.OverflowIndicator(it) },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 content = {
                                     currentRow1.forEachIndexed { index, char ->
@@ -1075,59 +1149,77 @@ fun KeyboardInputView(
                                                     val isPressed by row1Interaction.collectIsPressedAsState()
                                                     val animatedRadius by animateDpAsState(
                                                         targetValue = if (isPressed) 4.dp else keyRoundness,
-                                                        label = "cornerRadius"
+                                                        label = "cornerRadius",
                                                     )
 
                                                     val secondary =
-                                                        if (!isSymbols && isLongPressSymbolsEnabled && index < row1LongPress.size) row1LongPress[index] else null
+                                                        if (!isSymbols &&
+                                                            isLongPressSymbolsEnabled &&
+                                                            index < row1LongPress.size
+                                                        ) {
+                                                            row1LongPress[index]
+                                                        } else {
+                                                            null
+                                                        }
 
                                                     KeyButton(
                                                         onClick = {
                                                             handleType(displayLabel)
-                                                            if (shiftState == ShiftState.ON) shiftState =
-                                                                ShiftState.OFF
+                                                            if (shiftState == ShiftState.ON) {
+                                                                shiftState =
+                                                                    ShiftState.OFF
+                                                            }
                                                         },
                                                         onPress = { performLightHaptic() },
                                                         onLongClick = {
                                                             if (isLongPressSymbolsEnabled) {
                                                                 val accents =
-                                                                    if (isAccentedCharactersEnabled) KeyAccentMap[char]
-                                                                        ?: emptyList() else emptyList()
+                                                                    if (isAccentedCharactersEnabled) {
+                                                                        KeyAccentMap[char]
+                                                                            ?: emptyList()
+                                                                    } else {
+                                                                        emptyList()
+                                                                    }
                                                                 val variants =
                                                                     mutableListOf<String>()
                                                                 val xRatio = (index + 0.5f) / 10f
                                                                 var startIndex = 0
 
                                                                 if (xRatio < 0.35f) {
-                                                                    if (secondary != null) variants.add(
-                                                                        secondary
-                                                                    )
+                                                                    if (secondary != null) {
+                                                                        variants.add(
+                                                                            secondary,
+                                                                        )
+                                                                    }
                                                                     variants.addAll(accents)
                                                                     startIndex = 0
                                                                 } else if (xRatio > 0.65f) {
                                                                     variants.addAll(accents)
-                                                                    if (secondary != null) variants.add(
-                                                                        secondary
-                                                                    )
+                                                                    if (secondary != null) {
+                                                                        variants.add(
+                                                                            secondary,
+                                                                        )
+                                                                    }
                                                                     startIndex = variants.size - 1
                                                                 } else {
                                                                     val half = accents.size / 2
                                                                     variants.addAll(
                                                                         accents.take(
-                                                                            half
+                                                                            half,
+                                                                        ),
+                                                                    )
+                                                                    if (secondary != null) {
+                                                                        variants.add(
+                                                                            secondary,
                                                                         )
-                                                                    )
-                                                                    if (secondary != null) variants.add(
-                                                                        secondary
-                                                                    )
+                                                                    }
                                                                     startIndex = variants.size - 1
                                                                     variants.addAll(
                                                                         accents.drop(
-                                                                            half
-                                                                        )
+                                                                            half,
+                                                                        ),
                                                                     )
                                                                 }
-
 
                                                                 if (variants.isNotEmpty()) {
                                                                     longPressKey = char
@@ -1144,32 +1236,34 @@ fun KeyboardInputView(
                                                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                                         contentColor = MaterialTheme.colorScheme.onSurface,
                                                         shape = RoundedCornerShape(animatedRadius),
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .fillMaxHeight()
+                                                        modifier =
+                                                            Modifier
+                                                                .weight(1f)
+                                                                .fillMaxHeight(),
                                                     ) {
                                                         Text(
                                                             text = displayLabel,
                                                             style = MaterialTheme.typography.titleLarge,
                                                             fontWeight = FontWeight.Medium,
                                                             color = MaterialTheme.colorScheme.onSurface,
-                                                            fontFamily = CustomFontFamily
+                                                            fontFamily = CustomFontFamily,
                                                         )
                                                     }
                                                 }
                                             },
-                                            menuContent = {}
+                                            menuContent = {},
                                         )
                                     }
-                                }
+                                },
                             )
 
                             // Row 2
                             Row(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
                             ) {
                                 if (!isSymbols) Spacer(modifier = Modifier.weight(0.5f))
 
@@ -1189,24 +1283,37 @@ fun KeyboardInputView(
                                                         val isPressed by row2Interaction.collectIsPressedAsState()
                                                         val animatedRadius by animateDpAsState(
                                                             targetValue = if (isPressed) 4.dp else keyRoundness,
-                                                            label = "cornerRadius"
+                                                            label = "cornerRadius",
                                                         )
 
                                                         val secondary =
-                                                            if (!isSymbols && isLongPressSymbolsEnabled && index < row2LongPress.size) row2LongPress[index] else null
+                                                            if (!isSymbols &&
+                                                                isLongPressSymbolsEnabled &&
+                                                                index < row2LongPress.size
+                                                            ) {
+                                                                row2LongPress[index]
+                                                            } else {
+                                                                null
+                                                            }
 
                                                         KeyButton(
                                                             onClick = {
                                                                 handleType(displayLabel)
-                                                                if (shiftState == ShiftState.ON) shiftState =
-                                                                    ShiftState.OFF
+                                                                if (shiftState == ShiftState.ON) {
+                                                                    shiftState =
+                                                                        ShiftState.OFF
+                                                                }
                                                             },
                                                             onPress = { performLightHaptic() },
                                                             onLongClick = {
                                                                 if (isLongPressSymbolsEnabled) {
                                                                     val accents =
-                                                                        if (isAccentedCharactersEnabled) KeyAccentMap[char]
-                                                                            ?: emptyList() else emptyList()
+                                                                        if (isAccentedCharactersEnabled) {
+                                                                            KeyAccentMap[char]
+                                                                                ?: emptyList()
+                                                                        } else {
+                                                                            emptyList()
+                                                                        }
                                                                     val variants =
                                                                         mutableListOf<String>()
                                                                     val xRatio =
@@ -1214,34 +1321,40 @@ fun KeyboardInputView(
                                                                     var startIndex = 0
 
                                                                     if (xRatio < 0.35f) {
-                                                                        if (secondary != null) variants.add(
-                                                                            secondary
-                                                                        )
+                                                                        if (secondary != null) {
+                                                                            variants.add(
+                                                                                secondary,
+                                                                            )
+                                                                        }
                                                                         variants.addAll(accents)
                                                                         startIndex = 0
                                                                     } else if (xRatio > 0.65f) {
                                                                         variants.addAll(accents)
-                                                                        if (secondary != null) variants.add(
-                                                                            secondary
-                                                                        )
+                                                                        if (secondary != null) {
+                                                                            variants.add(
+                                                                                secondary,
+                                                                            )
+                                                                        }
                                                                         startIndex =
                                                                             variants.size - 1
                                                                     } else {
                                                                         val half = accents.size / 2
                                                                         variants.addAll(
                                                                             accents.take(
-                                                                                half
+                                                                                half,
+                                                                            ),
+                                                                        )
+                                                                        if (secondary != null) {
+                                                                            variants.add(
+                                                                                secondary,
                                                                             )
-                                                                        )
-                                                                        if (secondary != null) variants.add(
-                                                                            secondary
-                                                                        )
+                                                                        }
                                                                         startIndex =
                                                                             variants.size - 1
                                                                         variants.addAll(
                                                                             accents.drop(
-                                                                                half
-                                                                            )
+                                                                                half,
+                                                                            ),
                                                                         )
                                                                     }
 
@@ -1262,27 +1375,29 @@ fun KeyboardInputView(
                                                             interactionSource = row2Interaction,
                                                             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                                             contentColor = MaterialTheme.colorScheme.onSurface,
-                                                            shape = RoundedCornerShape(
-                                                                animatedRadius
-                                                            ),
-                                                            modifier = Modifier
-                                                                .weight(1f)
-                                                                .fillMaxHeight()
+                                                            shape =
+                                                                RoundedCornerShape(
+                                                                    animatedRadius,
+                                                                ),
+                                                            modifier =
+                                                                Modifier
+                                                                    .weight(1f)
+                                                                    .fillMaxHeight(),
                                                         ) {
                                                             Text(
                                                                 text = displayLabel,
                                                                 style = MaterialTheme.typography.titleLarge,
                                                                 fontWeight = FontWeight.Medium,
                                                                 color = MaterialTheme.colorScheme.onSurface,
-                                                                fontFamily = CustomFontFamily
+                                                                fontFamily = CustomFontFamily,
                                                             )
                                                         }
                                                     }
                                                 },
-                                                menuContent = {}
+                                                menuContent = {},
                                             )
                                         }
-                                    }
+                                    },
                                 )
 
                                 if (!isSymbols) Spacer(modifier = Modifier.weight(0.5f))
@@ -1291,9 +1406,10 @@ fun KeyboardInputView(
                             // Row 3 (with Shift/Backspace logic)
                             ButtonGroup(
                                 overflowIndicator = { ButtonGroupDefaults.OverflowIndicator(it) },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 content = {
                                     // Shift Key
@@ -1305,7 +1421,7 @@ fun KeyboardInputView(
 
                                             var shiftPressTime by remember {
                                                 androidx.compose.runtime.mutableLongStateOf(
-                                                    0L
+                                                    0L,
                                                 )
                                             }
                                             var wasShiftOffAtDown by remember { mutableStateOf(false) }
@@ -1321,7 +1437,7 @@ fun KeyboardInputView(
 
                                             val animatedRadius by animateDpAsState(
                                                 targetValue = if (isPressed) 4.dp else keyRoundness,
-                                                label = "cornerRadius"
+                                                label = "cornerRadius",
                                             )
 
                                             KeyButton(
@@ -1362,44 +1478,48 @@ fun KeyboardInputView(
                                                     }
                                                 },
                                                 interactionSource = shiftInteraction,
-                                                containerColor = if (isSymbols) {
-                                                    MaterialTheme.colorScheme.surfaceContainerHighest.copy(
-                                                        alpha = 0.5f
-                                                    )
-                                                } else if (shiftState != ShiftState.OFF) {
-                                                    MaterialTheme.colorScheme.primary
-                                                } else {
-                                                    MaterialTheme.colorScheme.primaryContainer
-                                                },
-                                                contentColor = if (isSymbols) {
-                                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                                                } else if (shiftState != ShiftState.OFF) {
-                                                    MaterialTheme.colorScheme.onPrimary
-                                                } else {
-                                                    MaterialTheme.colorScheme.onPrimaryContainer
-                                                },
+                                                containerColor =
+                                                    if (isSymbols) {
+                                                        MaterialTheme.colorScheme.surfaceContainerHighest.copy(
+                                                            alpha = 0.5f,
+                                                        )
+                                                    } else if (shiftState != ShiftState.OFF) {
+                                                        MaterialTheme.colorScheme.primary
+                                                    } else {
+                                                        MaterialTheme.colorScheme.primaryContainer
+                                                    },
+                                                contentColor =
+                                                    if (isSymbols) {
+                                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                                                    } else if (shiftState != ShiftState.OFF) {
+                                                        MaterialTheme.colorScheme.onPrimary
+                                                    } else {
+                                                        MaterialTheme.colorScheme.onPrimaryContainer
+                                                    },
                                                 shape = RoundedCornerShape(animatedRadius),
-                                                modifier = Modifier
-                                                    .weight(1.5f)
-                                                    .fillMaxHeight()
+                                                modifier =
+                                                    Modifier
+                                                        .weight(1.5f)
+                                                        .fillMaxHeight(),
                                             ) {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.key_shift),
                                                     contentDescription = "Shift",
                                                     modifier = Modifier.size(24.dp),
-                                                    tint = if (isSymbols) {
-                                                        MaterialTheme.colorScheme.onSurface.copy(
-                                                            alpha = 0.3f
-                                                        )
-                                                    } else if (shiftState != ShiftState.OFF) {
-                                                        MaterialTheme.colorScheme.onPrimary
-                                                    } else {
-                                                        MaterialTheme.colorScheme.onPrimaryContainer
-                                                    }
+                                                    tint =
+                                                        if (isSymbols) {
+                                                            MaterialTheme.colorScheme.onSurface.copy(
+                                                                alpha = 0.3f,
+                                                            )
+                                                        } else if (shiftState != ShiftState.OFF) {
+                                                            MaterialTheme.colorScheme.onPrimary
+                                                        } else {
+                                                            MaterialTheme.colorScheme.onPrimaryContainer
+                                                        },
                                                 )
                                             }
                                         },
-                                        menuContent = {}
+                                        menuContent = {},
                                     )
 
                                     currentRow3.forEachIndexed { index, char ->
@@ -1413,56 +1533,75 @@ fun KeyboardInputView(
                                                     val isPressed by row3Interaction.collectIsPressedAsState()
                                                     val animatedRadius by animateDpAsState(
                                                         targetValue = if (isPressed) 4.dp else keyRoundness,
-                                                        label = "cornerRadius"
+                                                        label = "cornerRadius",
                                                     )
 
                                                     val secondary =
-                                                        if (!isSymbols && isLongPressSymbolsEnabled && index < row3LongPress.size) row3LongPress[index] else null
+                                                        if (!isSymbols &&
+                                                            isLongPressSymbolsEnabled &&
+                                                            index < row3LongPress.size
+                                                        ) {
+                                                            row3LongPress[index]
+                                                        } else {
+                                                            null
+                                                        }
 
                                                     KeyButton(
                                                         onClick = {
                                                             handleType(displayLabel)
-                                                            if (shiftState == ShiftState.ON) shiftState =
-                                                                ShiftState.OFF
+                                                            if (shiftState == ShiftState.ON) {
+                                                                shiftState =
+                                                                    ShiftState.OFF
+                                                            }
                                                         },
                                                         onPress = { performLightHaptic() },
                                                         onLongClick = {
                                                             if (isLongPressSymbolsEnabled) {
                                                                 val accents =
-                                                                    if (isAccentedCharactersEnabled) KeyAccentMap[char]
-                                                                        ?: emptyList() else emptyList()
+                                                                    if (isAccentedCharactersEnabled) {
+                                                                        KeyAccentMap[char]
+                                                                            ?: emptyList()
+                                                                    } else {
+                                                                        emptyList()
+                                                                    }
                                                                 val variants =
                                                                     mutableListOf<String>()
                                                                 val xRatio = (index + 2.0f) / 10.5f
                                                                 var startIndex = 0
 
                                                                 if (xRatio < 0.35f) {
-                                                                    if (secondary != null) variants.add(
-                                                                        secondary
-                                                                    )
+                                                                    if (secondary != null) {
+                                                                        variants.add(
+                                                                            secondary,
+                                                                        )
+                                                                    }
                                                                     variants.addAll(accents)
                                                                     startIndex = 0
                                                                 } else if (xRatio > 0.65f) {
                                                                     variants.addAll(accents)
-                                                                    if (secondary != null) variants.add(
-                                                                        secondary
-                                                                    )
+                                                                    if (secondary != null) {
+                                                                        variants.add(
+                                                                            secondary,
+                                                                        )
+                                                                    }
                                                                     startIndex = variants.size - 1
                                                                 } else {
                                                                     val half = accents.size / 2
                                                                     variants.addAll(
                                                                         accents.take(
-                                                                            half
+                                                                            half,
+                                                                        ),
+                                                                    )
+                                                                    if (secondary != null) {
+                                                                        variants.add(
+                                                                            secondary,
                                                                         )
-                                                                    )
-                                                                    if (secondary != null) variants.add(
-                                                                        secondary
-                                                                    )
+                                                                    }
                                                                     startIndex = variants.size - 1
                                                                     variants.addAll(
                                                                         accents.drop(
-                                                                            half
-                                                                        )
+                                                                            half,
+                                                                        ),
                                                                     )
                                                                 }
 
@@ -1481,21 +1620,22 @@ fun KeyboardInputView(
                                                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
                                                         contentColor = MaterialTheme.colorScheme.onSurface,
                                                         shape = RoundedCornerShape(animatedRadius),
-                                                        modifier = Modifier
-                                                            .weight(1f)
-                                                            .fillMaxHeight()
+                                                        modifier =
+                                                            Modifier
+                                                                .weight(1f)
+                                                                .fillMaxHeight(),
                                                     ) {
                                                         Text(
                                                             text = displayLabel,
                                                             style = MaterialTheme.typography.titleLarge,
                                                             fontWeight = FontWeight.Medium,
                                                             color = MaterialTheme.colorScheme.onSurface,
-                                                            fontFamily = CustomFontFamily
+                                                            fontFamily = CustomFontFamily,
                                                         )
                                                     }
                                                 }
                                             },
-                                            menuContent = {}
+                                            menuContent = {},
                                         )
                                     }
 
@@ -1507,7 +1647,7 @@ fun KeyboardInputView(
                                             val isPressedDel by backspaceInteraction.collectIsPressedAsState()
                                             val animatedRadiusDel by animateDpAsState(
                                                 targetValue = if (isPressedDel) 4.dp else keyRoundness,
-                                                label = "cornerRadius"
+                                                label = "cornerRadius",
                                             )
                                             var delAccumulatedDx by remember { mutableStateOf(0f) }
                                             var isDraggingDel by remember { mutableStateOf(false) }
@@ -1515,119 +1655,121 @@ fun KeyboardInputView(
 
                                             val animatedColorDel by animateColorAsState(
                                                 targetValue = if (isPressedDel) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.primaryContainer,
-                                                label = "DelColor"
+                                                label = "DelColor",
                                             )
                                             val animatedContentColorDel by animateColorAsState(
                                                 targetValue = if (isPressedDel) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onPrimaryContainer,
-                                                label = "DelContentColor"
+                                                label = "DelContentColor",
                                             )
 
                                             Box(
-                                                modifier = Modifier
-                                                    .weight(1.5f)
-                                                    .fillMaxHeight()
-                                                    .bounceClick(backspaceInteraction)
-                                                    .clip(RoundedCornerShape(animatedRadiusDel))
-                                                    .pointerInput(Unit) {
-                                                        detectHorizontalDragGestures(
-                                                            onDragStart = {
-                                                                delAccumulatedDx = 0f
-                                                                isDraggingDel = true
-                                                            },
-                                                            onDragEnd = { isDraggingDel = false },
-                                                            onDragCancel = {
-                                                                isDraggingDel = false
-                                                            },
-                                                            onHorizontalDrag = { change, dragAmount ->
-                                                                change.consume()
-                                                                delAccumulatedDx += dragAmount
-                                                                // Moving left (negative dx) for delete
-                                                                if (delAccumulatedDx <= -delSweepThreshold) {
-                                                                    val steps =
-                                                                        (kotlin.math.abs(
-                                                                            delAccumulatedDx
-                                                                        ) / delSweepThreshold).toInt()
-                                                                    repeat(steps) {
-                                                                        performLightHaptic()
-                                                                        handleKeyPress(KeyEvent.KEYCODE_DEL)
-                                                                    }
-                                                                    delAccumulatedDx %= delSweepThreshold
-                                                                }
-                                                            }
-                                                        )
-                                                    }
-                                                    .pointerInput(Unit) {
-                                                        detectTapGestures(
-                                                            onPress = { offset ->
-                                                                val press =
-                                                                    PressInteraction.Press(offset)
-                                                                performLightHaptic()
-                                                                scope.launch {
-                                                                    backspaceInteraction.emit(
-                                                                        press
-                                                                    )
-                                                                }
-
-                                                                var isReleased = false
-                                                                val repeatJob = scope.launch {
-                                                                    delay(500)
-                                                                    while (!isReleased && !isDraggingDel) {
-                                                                        if (canDelete()) {
-                                                                            handleKeyPress(KeyEvent.KEYCODE_DEL)
+                                                modifier =
+                                                    Modifier
+                                                        .weight(1.5f)
+                                                        .fillMaxHeight()
+                                                        .bounceClick(backspaceInteraction)
+                                                        .clip(RoundedCornerShape(animatedRadiusDel))
+                                                        .pointerInput(Unit) {
+                                                            detectHorizontalDragGestures(
+                                                                onDragStart = {
+                                                                    delAccumulatedDx = 0f
+                                                                    isDraggingDel = true
+                                                                },
+                                                                onDragEnd = { isDraggingDel = false },
+                                                                onDragCancel = {
+                                                                    isDraggingDel = false
+                                                                },
+                                                                onHorizontalDrag = { change, dragAmount ->
+                                                                    change.consume()
+                                                                    delAccumulatedDx += dragAmount
+                                                                    // Moving left (negative dx) for delete
+                                                                    if (delAccumulatedDx <= -delSweepThreshold) {
+                                                                        val steps =
+                                                                            (
+                                                                                kotlin.math.abs(
+                                                                                    delAccumulatedDx,
+                                                                                ) / delSweepThreshold
+                                                                            ).toInt()
+                                                                        repeat(steps) {
                                                                             performLightHaptic()
-                                                                            delay(50)
-                                                                        } else {
-                                                                            break
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                                try {
-                                                                    if (tryAwaitRelease()) {
-                                                                        isReleased = true
-                                                                        repeatJob.cancel()
-                                                                        scope.launch {
-                                                                            backspaceInteraction.emit(
-                                                                                PressInteraction.Release(
-                                                                                    press
-                                                                                )
-                                                                            )
-                                                                        }
-                                                                        if (!isDraggingDel) {
                                                                             handleKeyPress(KeyEvent.KEYCODE_DEL)
                                                                         }
-                                                                    } else {
+                                                                        delAccumulatedDx %= delSweepThreshold
+                                                                    }
+                                                                },
+                                                            )
+                                                        }.pointerInput(Unit) {
+                                                            detectTapGestures(
+                                                                onPress = { offset ->
+                                                                    val press =
+                                                                        PressInteraction.Press(offset)
+                                                                    performLightHaptic()
+                                                                    scope.launch {
+                                                                        backspaceInteraction.emit(
+                                                                            press,
+                                                                        )
+                                                                    }
+
+                                                                    var isReleased = false
+                                                                    val repeatJob =
+                                                                        scope.launch {
+                                                                            delay(500)
+                                                                            while (!isReleased && !isDraggingDel) {
+                                                                                if (canDelete()) {
+                                                                                    handleKeyPress(KeyEvent.KEYCODE_DEL)
+                                                                                    performLightHaptic()
+                                                                                    delay(50)
+                                                                                } else {
+                                                                                    break
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                    try {
+                                                                        if (tryAwaitRelease()) {
+                                                                            isReleased = true
+                                                                            repeatJob.cancel()
+                                                                            scope.launch {
+                                                                                backspaceInteraction.emit(
+                                                                                    PressInteraction.Release(
+                                                                                        press,
+                                                                                    ),
+                                                                                )
+                                                                            }
+                                                                            if (!isDraggingDel) {
+                                                                                handleKeyPress(KeyEvent.KEYCODE_DEL)
+                                                                            }
+                                                                        } else {
+                                                                            isReleased = true
+                                                                            repeatJob.cancel()
+                                                                            scope.launch {
+                                                                                backspaceInteraction.emit(
+                                                                                    PressInteraction.Cancel(
+                                                                                        press,
+                                                                                    ),
+                                                                                )
+                                                                            }
+                                                                        }
+                                                                    } catch (e: Exception) {
                                                                         isReleased = true
                                                                         repeatJob.cancel()
-                                                                        scope.launch {
-                                                                            backspaceInteraction.emit(
-                                                                                PressInteraction.Cancel(
-                                                                                    press
-                                                                                )
-                                                                            )
-                                                                        }
                                                                     }
-                                                                } catch (e: Exception) {
-                                                                    isReleased = true
-                                                                    repeatJob.cancel()
-                                                                }
-                                                            }
-                                                        )
-                                                    }
-                                                    .background(animatedColorDel),
-                                                contentAlignment = Alignment.Center
+                                                                },
+                                                            )
+                                                        }.background(animatedColorDel),
+                                                contentAlignment = Alignment.Center,
                                             ) {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.rounded_backspace_24),
                                                     contentDescription = "Backspace",
                                                     modifier = Modifier.size(24.dp),
-                                                    tint = animatedContentColorDel
+                                                    tint = animatedContentColorDel,
                                                 )
                                             }
                                         },
-                                        menuContent = {}
+                                        menuContent = {},
                                     )
-                                }
+                                },
                             )
 
                             // Row 4 (Sym, Space, Return)
@@ -1636,9 +1778,10 @@ fun KeyboardInputView(
 
                             ButtonGroup(
                                 overflowIndicator = { ButtonGroupDefaults.OverflowIndicator(it) },
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxWidth(),
+                                modifier =
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                                 content = {
                                     // Symbols Toggle
@@ -1646,7 +1789,7 @@ fun KeyboardInputView(
                                         buttonGroupContent = {
                                             var symPressTime by remember {
                                                 androidx.compose.runtime.mutableLongStateOf(
-                                                    0L
+                                                    0L,
                                                 )
                                             }
                                             var wasSymOffAtDown by remember { mutableStateOf(false) }
@@ -1662,7 +1805,7 @@ fun KeyboardInputView(
 
                                             val animatedRadiusSym by animateDpAsState(
                                                 targetValue = if (isPressedSym) 4.dp else keyRoundness,
-                                                label = "cornerRadius"
+                                                label = "cornerRadius",
                                             )
                                             KeyButton(
                                                 onClick = {
@@ -1695,19 +1838,23 @@ fun KeyboardInputView(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                                 shape = RoundedCornerShape(animatedRadiusSym),
-                                                modifier = Modifier
-                                                    .weight(1.2f)
-                                                    .fillMaxHeight()
+                                                modifier =
+                                                    Modifier
+                                                        .weight(1.2f)
+                                                        .fillMaxHeight(),
                                             ) {
                                                 Text(
-                                                    text = stringResource(if (isSymbols) R.string.label_kbd_abc else R.string.label_kbd_symbols),
+                                                    text =
+                                                        stringResource(
+                                                            if (isSymbols) R.string.label_kbd_abc else R.string.label_kbd_symbols,
+                                                        ),
                                                     style = MaterialTheme.typography.titleLarge,
                                                     fontWeight = FontWeight.Medium,
-                                                    fontFamily = CustomFontFamily
+                                                    fontFamily = CustomFontFamily,
                                                 )
                                             }
                                         },
-                                        menuContent = {}
+                                        menuContent = {},
                                     )
 
                                     // Comma Key
@@ -1718,7 +1865,7 @@ fun KeyboardInputView(
                                             val isPressedComma by commaInteraction.collectIsPressedAsState()
                                             val animatedRadiusComma by animateDpAsState(
                                                 targetValue = if (isPressedComma) 4.dp else keyRoundness,
-                                                label = "cornerRadius"
+                                                label = "cornerRadius",
                                             )
                                             KeyButton(
                                                 onClick = { handleType(",") },
@@ -1727,19 +1874,20 @@ fun KeyboardInputView(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                                 shape = RoundedCornerShape(animatedRadiusComma),
-                                                modifier = Modifier
-                                                    .weight(0.7f)
-                                                    .fillMaxHeight()
+                                                modifier =
+                                                    Modifier
+                                                        .weight(0.7f)
+                                                        .fillMaxHeight(),
                                             ) {
                                                 Text(
                                                     text = ",",
                                                     style = MaterialTheme.typography.titleLarge,
                                                     fontWeight = FontWeight.Medium,
-                                                    fontFamily = CustomFontFamily
+                                                    fontFamily = CustomFontFamily,
                                                 )
                                             }
                                         },
-                                        menuContent = {}
+                                        menuContent = {},
                                     )
 
                                     // Space
@@ -1750,145 +1898,153 @@ fun KeyboardInputView(
                                             val isPressedSpace by spaceInteraction.collectIsPressedAsState()
                                             val animatedRadiusSpace by animateDpAsState(
                                                 targetValue = if (isPressedSpace) 4.dp else keyRoundness,
-                                                label = "cornerRadius"
+                                                label = "cornerRadius",
                                             )
                                             val sweepThreshold = 25f // pixels per cursor move
 
                                             val animatedColorSpace by animateColorAsState(
                                                 targetValue = if (isPressedSpace) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHighest,
-                                                label = "SpaceColor"
+                                                label = "SpaceColor",
                                             )
 
                                             Box(
-                                                modifier = Modifier
-                                                    .weight(3f)
-                                                    .fillMaxHeight()
-                                                    .bounceClick(spaceInteraction)
-                                                    .clip(RoundedCornerShape(animatedRadiusSpace))
-                                                    .pointerInput(Unit) {
-                                                        val viewConfig = viewConfiguration
-                                                        awaitEachGesture {
-                                                            val down =
-                                                                awaitFirstDown(requireUnconsumed = false)
-                                                            val press =
-                                                                PressInteraction.Press(down.position)
-                                                            scope.launch {
-                                                                spaceInteraction.emit(
-                                                                    press
-                                                                )
-                                                            }
-                                                            performLightHaptic()
-
-                                                            var isDragStarted = false
-                                                            var totalDx = 0f
-                                                            var cursorAccumulator = 0f
-
-                                                            // Increased slop for spacebar to prevent accidental cursor moves
-                                                            val customSlop =
-                                                                viewConfig.touchSlop * 2.5f
-
-                                                            var upOrCancel: PointerInputChange? =
-                                                                null
-
-                                                            while (true) {
-                                                                val event = awaitPointerEvent()
-                                                                val change =
-                                                                    event.changes.find { it.id == down.id }
-
-                                                                if (change == null || change.isConsumed) {
-                                                                    break
+                                                modifier =
+                                                    Modifier
+                                                        .weight(3f)
+                                                        .fillMaxHeight()
+                                                        .bounceClick(spaceInteraction)
+                                                        .clip(RoundedCornerShape(animatedRadiusSpace))
+                                                        .pointerInput(Unit) {
+                                                            val viewConfig = viewConfiguration
+                                                            awaitEachGesture {
+                                                                val down =
+                                                                    awaitFirstDown(requireUnconsumed = false)
+                                                                val press =
+                                                                    PressInteraction.Press(down.position)
+                                                                scope.launch {
+                                                                    spaceInteraction.emit(
+                                                                        press,
+                                                                    )
                                                                 }
+                                                                performLightHaptic()
 
-                                                                if (change.changedToUp()) {
-                                                                    upOrCancel = change
-                                                                    break
-                                                                }
+                                                                var isDragStarted = false
+                                                                var totalDx = 0f
+                                                                var cursorAccumulator = 0f
 
-                                                                if (change.positionChange() != Offset.Zero) {
-                                                                    totalDx += (change.position.x - change.previousPosition.x)
-                                                                    val dxFromOrigin = totalDx
+                                                                // Increased slop for spacebar to prevent accidental cursor moves
+                                                                val customSlop =
+                                                                    viewConfig.touchSlop * 2.5f
 
-                                                                    if (!isDragStarted) {
-                                                                        if (kotlin.math.abs(
-                                                                                dxFromOrigin
-                                                                            ) > customSlop
-                                                                        ) {
-                                                                            isDragStarted = true
-                                                                            onCursorDrag(true)
-                                                                            cursorAccumulator = 0f
-                                                                        }
+                                                                var upOrCancel: PointerInputChange? =
+                                                                    null
+
+                                                                while (true) {
+                                                                    val event = awaitPointerEvent()
+                                                                    val change =
+                                                                        event.changes.find { it.id == down.id }
+
+                                                                    if (change == null || change.isConsumed) {
+                                                                        break
                                                                     }
 
-                                                                    if (isDragStarted) {
-                                                                        change.consume()
-                                                                        cursorAccumulator += (change.position.x - change.previousPosition.x)
+                                                                    if (change.changedToUp()) {
+                                                                        upOrCancel = change
+                                                                        break
+                                                                    }
 
-                                                                        val absDx = kotlin.math.abs(
-                                                                            cursorAccumulator
-                                                                        )
-                                                                        if (absDx >= sweepThreshold) {
-                                                                            val steps =
-                                                                                (absDx / sweepThreshold).toInt()
-                                                                            val keycode =
-                                                                                if (cursorAccumulator > 0) KeyEvent.KEYCODE_DPAD_RIGHT else KeyEvent.KEYCODE_DPAD_LEFT
-                                                                            repeat(steps) {
-                                                                                performLightHaptic()
-                                                                                // Use Shift state to decide if we are selecting text
-                                                                                val isSelection =
-                                                                                    shiftState != ShiftState.OFF
-                                                                                if (isSelection) {
-                                                                                    isSelectionPerformed =
-                                                                                        true
-                                                                                }
-                                                                                // Use Symbols press state to decide if we are jumping words
-                                                                                val isWordJump =
-                                                                                    isPressedSym
-                                                                                if (isWordJump) {
-                                                                                    isWordJumpPerformed =
-                                                                                        true
-                                                                                }
-                                                                                onCursorMove(
-                                                                                    keycode,
-                                                                                    isSelection,
-                                                                                    isWordJump
-                                                                                )
+                                                                    if (change.positionChange() != Offset.Zero) {
+                                                                        totalDx += (change.position.x - change.previousPosition.x)
+                                                                        val dxFromOrigin = totalDx
+
+                                                                        if (!isDragStarted) {
+                                                                            if (kotlin.math.abs(
+                                                                                    dxFromOrigin,
+                                                                                ) > customSlop
+                                                                            ) {
+                                                                                isDragStarted = true
+                                                                                onCursorDrag(true)
+                                                                                cursorAccumulator = 0f
                                                                             }
-                                                                            cursorAccumulator %= sweepThreshold
+                                                                        }
+
+                                                                        if (isDragStarted) {
+                                                                            change.consume()
+                                                                            cursorAccumulator +=
+                                                                                (change.position.x - change.previousPosition.x)
+
+                                                                            val absDx =
+                                                                                kotlin.math.abs(
+                                                                                    cursorAccumulator,
+                                                                                )
+                                                                            if (absDx >= sweepThreshold) {
+                                                                                val steps =
+                                                                                    (absDx / sweepThreshold).toInt()
+                                                                                val keycode =
+                                                                                    if (cursorAccumulator >
+                                                                                        0
+                                                                                    ) {
+                                                                                        KeyEvent.KEYCODE_DPAD_RIGHT
+                                                                                    } else {
+                                                                                        KeyEvent.KEYCODE_DPAD_LEFT
+                                                                                    }
+                                                                                repeat(steps) {
+                                                                                    performLightHaptic()
+                                                                                    // Use Shift state to decide if we are selecting text
+                                                                                    val isSelection =
+                                                                                        shiftState != ShiftState.OFF
+                                                                                    if (isSelection) {
+                                                                                        isSelectionPerformed =
+                                                                                            true
+                                                                                    }
+                                                                                    // Use Symbols press state to decide if we are jumping words
+                                                                                    val isWordJump =
+                                                                                        isPressedSym
+                                                                                    if (isWordJump) {
+                                                                                        isWordJumpPerformed =
+                                                                                            true
+                                                                                    }
+                                                                                    onCursorMove(
+                                                                                        keycode,
+                                                                                        isSelection,
+                                                                                        isWordJump,
+                                                                                    )
+                                                                                }
+                                                                                cursorAccumulator %= sweepThreshold
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
-                                                            }
 
-                                                            if (upOrCancel != null && !isDragStarted) {
-                                                                handleType(" ")
-                                                                scope.launch {
-                                                                    spaceInteraction.emit(
-                                                                        PressInteraction.Release(
-                                                                            press
+                                                                if (upOrCancel != null && !isDragStarted) {
+                                                                    handleType(" ")
+                                                                    scope.launch {
+                                                                        spaceInteraction.emit(
+                                                                            PressInteraction.Release(
+                                                                                press,
+                                                                            ),
                                                                         )
-                                                                    )
-                                                                }
-                                                            } else {
-                                                                if (isDragStarted) {
-                                                                    onCursorDrag(false)
-                                                                }
-                                                                scope.launch {
-                                                                    spaceInteraction.emit(
-                                                                        PressInteraction.Cancel(
-                                                                            press
+                                                                    }
+                                                                } else {
+                                                                    if (isDragStarted) {
+                                                                        onCursorDrag(false)
+                                                                    }
+                                                                    scope.launch {
+                                                                        spaceInteraction.emit(
+                                                                            PressInteraction.Cancel(
+                                                                                press,
+                                                                            ),
                                                                         )
-                                                                    )
+                                                                    }
                                                                 }
                                                             }
-                                                        }
-                                                    }
-                                                    .background(animatedColorSpace),
-                                                contentAlignment = Alignment.Center
+                                                        }.background(animatedColorSpace),
+                                                contentAlignment = Alignment.Center,
                                             ) {
                                                 // Empty space
                                             }
                                         },
-                                        menuContent = {}
+                                        menuContent = {},
                                     )
 
                                     // Dot Key
@@ -1899,7 +2055,7 @@ fun KeyboardInputView(
                                             val isPressedDot by dotInteraction.collectIsPressedAsState()
                                             val animatedRadiusDot by animateDpAsState(
                                                 targetValue = if (isPressedDot) 4.dp else keyRoundness,
-                                                label = "cornerRadius"
+                                                label = "cornerRadius",
                                             )
                                             KeyButton(
                                                 onClick = { handleType(".") },
@@ -1908,19 +2064,20 @@ fun KeyboardInputView(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                                 shape = RoundedCornerShape(animatedRadiusDot),
-                                                modifier = Modifier
-                                                    .weight(0.7f)
-                                                    .fillMaxHeight()
+                                                modifier =
+                                                    Modifier
+                                                        .weight(0.7f)
+                                                        .fillMaxHeight(),
                                             ) {
                                                 Text(
                                                     text = ".",
                                                     style = MaterialTheme.typography.titleLarge,
                                                     fontWeight = FontWeight.Medium,
-                                                    fontFamily = CustomFontFamily
+                                                    fontFamily = CustomFontFamily,
                                                 )
                                             }
                                         },
-                                        menuContent = {}
+                                        menuContent = {},
                                     )
 
                                     // Return
@@ -1931,7 +2088,7 @@ fun KeyboardInputView(
                                             val isPressedReturn by returnInteraction.collectIsPressedAsState()
                                             val animatedRadiusReturn by animateDpAsState(
                                                 targetValue = if (isPressedReturn) 4.dp else keyRoundness,
-                                                label = "cornerRadius"
+                                                label = "cornerRadius",
                                             )
                                             KeyButton(
                                                 onClick = { handleKeyPress(KeyEvent.KEYCODE_ENTER) },
@@ -1940,20 +2097,21 @@ fun KeyboardInputView(
                                                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                                                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                                                 shape = RoundedCornerShape(animatedRadiusReturn),
-                                                modifier = Modifier
-                                                    .weight(1.5f)
-                                                    .fillMaxHeight()
+                                                modifier =
+                                                    Modifier
+                                                        .weight(1.5f)
+                                                        .fillMaxHeight(),
                                             ) {
                                                 Icon(
                                                     painter = painterResource(id = R.drawable.rounded_keyboard_return_24),
                                                     contentDescription = "Return",
-                                                    modifier = Modifier.size(24.dp)
+                                                    modifier = Modifier.size(24.dp),
                                                 )
                                             }
                                         },
-                                        menuContent = {}
+                                        menuContent = {},
                                     )
-                                }
+                                },
                             )
                         }
                     }
@@ -1964,7 +2122,7 @@ fun KeyboardInputView(
                 FunctionRow(
                     Modifier
                         .height(48.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
                 )
             }
         }
@@ -1975,18 +2133,19 @@ fun KeyboardInputView(
             Popup(
                 alignment = BiasAlignment(-1f + 2f * longPressXRatio, -1f + 2f * longPressYRatio),
                 offset = IntOffset(0, with(density) { (-20).dp.roundToPx() }),
-                properties = PopupProperties(
-                    focusable = false,
-                    dismissOnClickOutside = false,
-                    dismissOnBackPress = true,
-                    clippingEnabled = false,
-                    excludeFromSystemGesture = true
-                )
+                properties =
+                    PopupProperties(
+                        focusable = false,
+                        dismissOnClickOutside = false,
+                        dismissOnBackPress = true,
+                        clippingEnabled = false,
+                        excludeFromSystemGesture = true,
+                    ),
             ) {
                 AccentedKeysPopup(
                     variants = longPressVariants,
                     selectedIndex = selectedAccentIndex,
-                    keyRoundness = keyRoundness
+                    keyRoundness = keyRoundness,
                 )
             }
         }

@@ -14,7 +14,6 @@ import android.app.RemoteInput
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -40,7 +39,7 @@ object WatchNotificationSyncManager {
         if (NotificationListener.instance == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             try {
                 NotificationListenerService.requestRebind(
-                    ComponentName(context, NotificationListener::class.java)
+                    ComponentName(context, NotificationListener::class.java),
                 )
                 Log.d(TAG, "Requested rebind for NotificationListenerService")
             } catch (e: Exception) {
@@ -105,7 +104,11 @@ object WatchNotificationSyncManager {
         return false
     }
 
-    fun onNotificationPosted(context: Context, sbn: StatusBarNotification, isSilent: Boolean) {
+    fun onNotificationPosted(
+        context: Context,
+        sbn: StatusBarNotification,
+        isSilent: Boolean,
+    ) {
         ensureListenerServiceRunning(context)
         val enabled = isSyncEnabled(context)
         Log.d(TAG, "onNotificationPosted: pkg=${sbn.packageName}, isSyncEnabled=$enabled, isOngoing=${sbn.isOngoing}, isSilent=$isSilent")
@@ -137,17 +140,19 @@ object WatchNotificationSyncManager {
         }
 
         val extras = sbn.notification.extras ?: return
-        var title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
-            ?: extras.getCharSequence("android.media.title")?.toString()
-            ?: ""
+        var title =
+            extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
+                ?: extras.getCharSequence("android.media.title")?.toString()
+                ?: ""
 
-        var text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
-            ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
-            ?: extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
-            ?: extras.getCharSequence("android.artist")?.toString()
-            ?: extras.getCharSequence("android.album")?.toString()
-            ?: sbn.notification.tickerText?.toString()
-            ?: ""
+        var text =
+            extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+                ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
+                ?: extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
+                ?: extras.getCharSequence("android.artist")?.toString()
+                ?: extras.getCharSequence("android.album")?.toString()
+                ?: sbn.notification.tickerText?.toString()
+                ?: ""
 
         if (title.isBlank() && text.isBlank()) {
             val lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
@@ -156,13 +161,14 @@ object WatchNotificationSyncManager {
             }
         }
 
-        val appName = try {
-            val pm = context.packageManager
-            val appInfo = pm.getApplicationInfo(sbn.packageName, 0)
-            pm.getApplicationLabel(appInfo).toString()
-        } catch (e: Exception) {
-            sbn.packageName
-        }
+        val appName =
+            try {
+                val pm = context.packageManager
+                val appInfo = pm.getApplicationInfo(sbn.packageName, 0)
+                pm.getApplicationLabel(appInfo).toString()
+            } catch (e: Exception) {
+                sbn.packageName
+            }
 
         if (title.isBlank() && text.isNotBlank()) {
             title = appName
@@ -176,16 +182,17 @@ object WatchNotificationSyncManager {
         }
 
         val postTime = if (sbn.postTime > 0) sbn.postTime else System.currentTimeMillis()
-        val jsonObj = JSONObject().apply {
-            put("key", sbn.key)
-            put("packageName", sbn.packageName)
-            put("appName", appName)
-            put("title", title)
-            put("text", text)
-            put("postTime", postTime)
-            put("isMedia", isMedia)
-            put("canReply", canReplyToNotification(sbn))
-        }
+        val jsonObj =
+            JSONObject().apply {
+                put("key", sbn.key)
+                put("packageName", sbn.packageName)
+                put("appName", appName)
+                put("title", title)
+                put("text", text)
+                put("postTime", postTime)
+                put("isMedia", isMedia)
+                put("canReply", canReplyToNotification(sbn))
+            }
 
         Log.d(TAG, "Sending notification to watch: $jsonObj")
         sendMessageToWatch(context, PATH_WATCH_NOTIFICATION, jsonObj.toString().toByteArray())
@@ -194,7 +201,10 @@ object WatchNotificationSyncManager {
         syncAppIcons(context, setOf(sbn.packageName))
     }
 
-    fun syncActiveNotifications(context: Context, activeNotifs: Array<StatusBarNotification>?): Int {
+    fun syncActiveNotifications(
+        context: Context,
+        activeNotifs: Array<StatusBarNotification>?,
+    ): Int {
         if (!isSyncEnabled(context) || activeNotifs == null) return 0
         val allowedApps = getAllowedApps(context)
         val silentSyncEnabled = isSilentSyncEnabled(context)
@@ -228,16 +238,18 @@ object WatchNotificationSyncManager {
             }
 
             val extras = sbn.notification.extras ?: continue
-            var title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
-                ?: extras.getCharSequence("android.media.title")?.toString()
-                ?: ""
-            var text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
-                ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
-                ?: extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
-                ?: extras.getCharSequence("android.artist")?.toString()
-                ?: extras.getCharSequence("android.album")?.toString()
-                ?: sbn.notification.tickerText?.toString()
-                ?: ""
+            var title =
+                extras.getCharSequence(Notification.EXTRA_TITLE)?.toString()
+                    ?: extras.getCharSequence("android.media.title")?.toString()
+                    ?: ""
+            var text =
+                extras.getCharSequence(Notification.EXTRA_TEXT)?.toString()
+                    ?: extras.getCharSequence(Notification.EXTRA_BIG_TEXT)?.toString()
+                    ?: extras.getCharSequence(Notification.EXTRA_SUB_TEXT)?.toString()
+                    ?: extras.getCharSequence("android.artist")?.toString()
+                    ?: extras.getCharSequence("android.album")?.toString()
+                    ?: sbn.notification.tickerText?.toString()
+                    ?: ""
 
             if (title.isBlank() && text.isBlank()) {
                 val lines = extras.getCharSequenceArray(Notification.EXTRA_TEXT_LINES)
@@ -246,30 +258,35 @@ object WatchNotificationSyncManager {
                 }
             }
 
-            val appName = try {
-                val pm = context.packageManager
-                val appInfo = pm.getApplicationInfo(sbn.packageName, 0)
-                pm.getApplicationLabel(appInfo).toString()
-            } catch (e: Exception) {
-                sbn.packageName
-            }
+            val appName =
+                try {
+                    val pm = context.packageManager
+                    val appInfo = pm.getApplicationInfo(sbn.packageName, 0)
+                    pm.getApplicationLabel(appInfo).toString()
+                } catch (e: Exception) {
+                    sbn.packageName
+                }
 
-            if (title.isBlank() && text.isNotBlank()) title = appName
-            else if (title.isNotBlank() && text.isBlank()) text = appName
+            if (title.isBlank() && text.isNotBlank()) {
+                title = appName
+            } else if (title.isNotBlank() && text.isBlank()) {
+                text = appName
+            }
 
             if (title.isBlank() && text.isBlank()) continue
 
             val postTime = if (sbn.postTime > 0) sbn.postTime else System.currentTimeMillis()
-            val jsonObj = JSONObject().apply {
-                put("key", sbn.key)
-                put("packageName", sbn.packageName)
-                put("appName", appName)
-                put("title", title)
-                put("text", text)
-                put("postTime", postTime)
-                put("isMedia", isMedia)
-                put("canReply", canReplyToNotification(sbn))
-            }
+            val jsonObj =
+                JSONObject().apply {
+                    put("key", sbn.key)
+                    put("packageName", sbn.packageName)
+                    put("appName", appName)
+                    put("title", title)
+                    put("text", text)
+                    put("postTime", postTime)
+                    put("isMedia", isMedia)
+                    put("canReply", canReplyToNotification(sbn))
+                }
             jsonArray.put(jsonObj)
             pkgsToSync.add(sbn.packageName)
         }
@@ -282,7 +299,10 @@ object WatchNotificationSyncManager {
         return jsonArray.length()
     }
 
-    fun handleReplyFromWatch(context: Context, jsonStr: String) {
+    fun handleReplyFromWatch(
+        context: Context,
+        jsonStr: String,
+    ) {
         try {
             val jsonObj = JSONObject(jsonStr)
             val key = jsonObj.optString("key")
@@ -312,7 +332,10 @@ object WatchNotificationSyncManager {
         }
     }
 
-    fun onNotificationRemoved(context: Context, key: String) {
+    fun onNotificationRemoved(
+        context: Context,
+        key: String,
+    ) {
         if (!isSyncEnabled(context)) return
         Log.d(TAG, "Sending notification removed to watch: key=$key")
         sendMessageToWatch(context, PATH_WATCH_NOTIFICATION_REMOVED, key.toByteArray())
@@ -320,7 +343,10 @@ object WatchNotificationSyncManager {
 
     const val PATH_WATCH_APP_ICONS = "/watch_app_icons"
 
-    fun syncAppIcons(context: Context, packageNames: Set<String>): Int {
+    fun syncAppIcons(
+        context: Context,
+        packageNames: Set<String>,
+    ): Int {
         if (!isSyncEnabled(context)) return 0
         val pm = context.packageManager
         val iconsObj = JSONObject()
@@ -330,19 +356,21 @@ object WatchNotificationSyncManager {
             try {
                 val appInfo = pm.getApplicationInfo(pkg, 0)
                 val drawable = pm.getApplicationIcon(appInfo)
-                val bitmap = if (drawable is android.graphics.drawable.BitmapDrawable) {
-                    drawable.bitmap
-                } else {
-                    val bmp = android.graphics.Bitmap.createBitmap(
-                        drawable.intrinsicWidth.coerceAtLeast(1),
-                        drawable.intrinsicHeight.coerceAtLeast(1),
-                        android.graphics.Bitmap.Config.ARGB_8888
-                    )
-                    val canvas = android.graphics.Canvas(bmp)
-                    drawable.setBounds(0, 0, canvas.width, canvas.height)
-                    drawable.draw(canvas)
-                    bmp
-                }
+                val bitmap =
+                    if (drawable is android.graphics.drawable.BitmapDrawable) {
+                        drawable.bitmap
+                    } else {
+                        val bmp =
+                            android.graphics.Bitmap.createBitmap(
+                                drawable.intrinsicWidth.coerceAtLeast(1),
+                                drawable.intrinsicHeight.coerceAtLeast(1),
+                                android.graphics.Bitmap.Config.ARGB_8888,
+                            )
+                        val canvas = android.graphics.Canvas(bmp)
+                        drawable.setBounds(0, 0, canvas.width, canvas.height)
+                        drawable.draw(canvas)
+                        bmp
+                    }
                 val stream = java.io.ByteArrayOutputStream()
                 val scaledBmp = android.graphics.Bitmap.createScaledBitmap(bitmap, 48, 48, true)
                 scaledBmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 100, stream)
@@ -361,26 +389,36 @@ object WatchNotificationSyncManager {
         return count
     }
 
-    fun setWatchNotificationSound(context: Context, soundName: String) {
+    fun setWatchNotificationSound(
+        context: Context,
+        soundName: String,
+    ) {
         Log.d(TAG, "setWatchNotificationSound: $soundName")
         sendMessageToWatch(context, PATH_WATCH_SET_NOTIFICATION_SOUND, soundName.toByteArray())
     }
 
-    private fun sendMessageToWatch(context: Context, path: String, data: ByteArray) {
+    private fun sendMessageToWatch(
+        context: Context,
+        path: String,
+        data: ByteArray,
+    ) {
         val nodeClient = Wearable.getNodeClient(context)
-        nodeClient.connectedNodes.addOnSuccessListener { nodes ->
-            Log.d(TAG, "sendMessageToWatch: connected nodes count=${nodes.size}")
-            if (nodes.isEmpty()) return@addOnSuccessListener
-            val messageClient = Wearable.getMessageClient(context)
-            for (node in nodes) {
-                messageClient.sendMessage(node.id, path, data).addOnSuccessListener {
-                    Log.d(TAG, "Message sent successfully to node ${node.displayName} path $path")
-                }.addOnFailureListener { e ->
-                    Log.e(TAG, "Failed to send message to node ${node.displayName} path $path", e)
+        nodeClient.connectedNodes
+            .addOnSuccessListener { nodes ->
+                Log.d(TAG, "sendMessageToWatch: connected nodes count=${nodes.size}")
+                if (nodes.isEmpty()) return@addOnSuccessListener
+                val messageClient = Wearable.getMessageClient(context)
+                for (node in nodes) {
+                    messageClient
+                        .sendMessage(node.id, path, data)
+                        .addOnSuccessListener {
+                            Log.d(TAG, "Message sent successfully to node ${node.displayName} path $path")
+                        }.addOnFailureListener { e ->
+                            Log.e(TAG, "Failed to send message to node ${node.displayName} path $path", e)
+                        }
                 }
+            }.addOnFailureListener { e ->
+                Log.e(TAG, "Failed to get connected nodes for watch notification sync", e)
             }
-        }.addOnFailureListener { e ->
-            Log.e(TAG, "Failed to get connected nodes for watch notification sync", e)
-        }
     }
 }

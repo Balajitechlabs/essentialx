@@ -65,7 +65,7 @@ fun <T> SegmentedPicker(
     containerColor: Color = MaterialTheme.colorScheme.surfaceBright,
     contentPadding: PaddingValues = PaddingValues(10.dp),
     title: Any? = null,
-    description: Any? = null
+    description: Any? = null,
 ) {
     val view = LocalView.current
     val isTranslationModeActive by TranslationManager.isTranslationModeEnabled
@@ -74,10 +74,11 @@ fun <T> SegmentedPicker(
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
     Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(cornerShape))
-            .background(color = containerColor)
-            .padding(contentPadding),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(cornerShape))
+                .background(color = containerColor)
+                .padding(contentPadding),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
     ) {
         val modifiers = List(items.size) { Modifier.weight(1f) }
@@ -85,31 +86,32 @@ fun <T> SegmentedPicker(
         items.forEachIndexed { index, item ->
             val label = labelProvider(item)
 
-            val boxModifier = if (isTranslationModeActive) {
-                modifiers[index].pointerInput(Unit) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown(pass = PointerEventPass.Initial)
-                        val downTime = System.currentTimeMillis()
-                        var longPressed = false
-                        while (true) {
-                            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-                            val change = event.changes.firstOrNull() ?: break
-                            if (!change.pressed) break
-                            if (System.currentTimeMillis() - downTime >= 400L && !longPressed) {
-                                longPressed = true
-                                change.consume()
-                                HapticUtil.performHeavyHaptic(view)
-                                activeMenuIndex = index
+            val boxModifier =
+                if (isTranslationModeActive) {
+                    modifiers[index].pointerInput(Unit) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown(pass = PointerEventPass.Initial)
+                            val downTime = System.currentTimeMillis()
+                            var longPressed = false
+                            while (true) {
+                                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                                val change = event.changes.firstOrNull() ?: break
+                                if (!change.pressed) break
+                                if (System.currentTimeMillis() - downTime >= 400L && !longPressed) {
+                                    longPressed = true
+                                    change.consume()
+                                    HapticUtil.performHeavyHaptic(view)
+                                    activeMenuIndex = index
+                                }
+                            }
+                            if (longPressed) {
+                                currentEvent.changes.forEach { it.consume() }
                             }
                         }
-                        if (longPressed) {
-                            currentEvent.changes.forEach { it.consume() }
-                        }
                     }
+                } else {
+                    modifiers[index]
                 }
-            } else {
-                modifiers[index]
-            }
 
             Box(modifier = boxModifier) {
                 ToggleButton(
@@ -118,18 +120,20 @@ fun <T> SegmentedPicker(
                         HapticUtil.performUIHaptic(view)
                         onItemSelected(item)
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .semantics { role = Role.RadioButton },
-                    shapes = when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        items.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .semantics { role = Role.RadioButton },
+                    shapes =
+                        when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            items.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (iconProvider != null) {
                             iconProvider(item)
@@ -142,7 +146,7 @@ fun <T> SegmentedPicker(
                                 label,
                                 fontSize = dimensionResource(R.dimen.font_small).value.sp,
                                 modifier = Modifier.basicMarquee(),
-                                maxLines = 1
+                                maxLines = 1,
                             )
                         }
                     }
@@ -151,7 +155,7 @@ fun <T> SegmentedPicker(
                 if (activeMenuIndex == index) {
                     SegmentedDropdownMenu(
                         expanded = activeMenuIndex == index,
-                        onDismissRequest = { activeMenuIndex = null }
+                        onDismissRequest = { activeMenuIndex = null },
                     ) {
                         TranslationMenuItems(
                             title = title ?: label,
@@ -160,7 +164,7 @@ fun <T> SegmentedPicker(
                             onSelectKey = { key ->
                                 activeMenuIndex = null
                                 translationSheetKey = key
-                            }
+                            },
                         )
                     }
                 }
@@ -171,7 +175,7 @@ fun <T> SegmentedPicker(
     if (translationSheetKey != null) {
         TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

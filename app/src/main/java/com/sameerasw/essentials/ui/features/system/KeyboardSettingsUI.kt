@@ -52,7 +52,7 @@ import kotlinx.coroutines.delay
 fun KeyboardSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -68,10 +68,11 @@ fun KeyboardSettingsUI(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Keyboard Setup Section
         if (!isKeyboardEnabled || !isKeyboardSelected) {
@@ -79,25 +80,26 @@ fun KeyboardSettingsUI(
                 text = stringResource(R.string.label_keyboard_setup),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 12.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 if (!isKeyboardEnabled) {
                     Button(
                         onClick = { viewModel.openImeSettings(context) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.rounded_settings_24),
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(stringResource(R.string.btn_enable_keyboard))
@@ -105,12 +107,12 @@ fun KeyboardSettingsUI(
                 } else if (!isKeyboardSelected) {
                     Button(
                         onClick = { viewModel.showImePicker(context) },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.rounded_keyboard_24),
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(stringResource(R.string.btn_select_keyboard))
@@ -124,10 +126,11 @@ fun KeyboardSettingsUI(
             value = text,
             onValueChange = { text = it },
             label = { Text(stringResource(R.string.test_keyboard_hint)) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            shape = RoundedCornerShape(24.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+            shape = RoundedCornerShape(24.dp),
         )
 
         // Customization
@@ -135,7 +138,7 @@ fun KeyboardSettingsUI(
             text = stringResource(R.string.feat_system_keys),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(spacing = 2.dp) {
@@ -144,11 +147,12 @@ fun KeyboardSettingsUI(
                 value = viewModel.keyboardHeight.floatValue,
                 onValueChange = {
                     viewModel.setKeyboardHeight(it, context)
-                    com.sameerasw.essentials.utils.HapticUtil.performSliderHaptic(view)
+                    com.sameerasw.essentials.utils.HapticUtil
+                        .performSliderHaptic(view)
                 },
                 valueRange = 200f..600f,
                 steps = 0,
-                modifier = Modifier.highlight(highlightSetting == "keyboard_height")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_height"),
             )
 
             ConfigSliderItem(
@@ -156,11 +160,12 @@ fun KeyboardSettingsUI(
                 value = viewModel.keyboardBottomPadding.floatValue,
                 onValueChange = {
                     viewModel.setKeyboardBottomPadding(it, context)
-                    com.sameerasw.essentials.utils.HapticUtil.performSliderHaptic(view)
+                    com.sameerasw.essentials.utils.HapticUtil
+                        .performSliderHaptic(view)
                 },
                 valueRange = 0f..100f,
                 steps = 0,
-                modifier = Modifier.highlight(highlightSetting == "keyboard_bottom_padding")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_bottom_padding"),
             )
 
             ConfigSliderItem(
@@ -168,42 +173,45 @@ fun KeyboardSettingsUI(
                 value = viewModel.keyboardRoundness.floatValue,
                 onValueChange = {
                     viewModel.setKeyboardRoundness(it, context)
-                    com.sameerasw.essentials.utils.HapticUtil.performSliderHaptic(view)
+                    com.sameerasw.essentials.utils.HapticUtil
+                        .performSliderHaptic(view)
                 },
                 valueRange = 4f..30f,
                 steps = 0,
-                modifier = Modifier.highlight(highlightSetting == "keyboard_roundness")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_roundness"),
             )
         }
 
         RoundedCardContainer(spacing = 2.dp) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
                 Text(
                     text = stringResource(R.string.label_keyboard_shape),
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = RoundedCornerShape(24.dp)
-                        )
-                        .padding(4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = RoundedCornerShape(24.dp),
+                            ).padding(4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
-                    val shapes = listOf(
-                        R.string.shape_round to 0,
-                        R.string.shape_flat to 1,
-                        R.string.shape_inverse to 2
-                    )
+                    val shapes =
+                        listOf(
+                            R.string.shape_round to 0,
+                            R.string.shape_flat to 1,
+                            R.string.shape_inverse to 2,
+                        )
 
                     shapes.forEach { (labelRes, value) ->
                         val isSelected = viewModel.keyboardShape.intValue == value
@@ -211,11 +219,18 @@ fun KeyboardSettingsUI(
                             checked = isSelected,
                             onCheckedChange = { viewModel.setKeyboardShape(value, context) },
                             modifier = Modifier.weight(1f),
-                            shapes = when (value) {
-                                0 -> androidx.compose.material3.ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                2 -> androidx.compose.material3.ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                else -> androidx.compose.material3.ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            }
+                            shapes =
+                                when (value) {
+                                    0 ->
+                                        androidx.compose.material3.ButtonGroupDefaults
+                                            .connectedLeadingButtonShapes()
+                                    2 ->
+                                        androidx.compose.material3.ButtonGroupDefaults
+                                            .connectedTrailingButtonShapes()
+                                    else ->
+                                        androidx.compose.material3.ButtonGroupDefaults
+                                            .connectedMiddleButtonShapes()
+                                },
                         ) {
                             Text(stringResource(labelRes))
                         }
@@ -230,7 +245,7 @@ fun KeyboardSettingsUI(
                 title = stringResource(R.string.label_keyboard_functions_bottom),
                 isChecked = viewModel.isKeyboardFunctionsBottom.value,
                 onCheckedChange = { viewModel.setKeyboardFunctionsBottom(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "keyboard_functions_bottom")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_functions_bottom"),
             )
 
             ConfigSliderItem(
@@ -238,11 +253,12 @@ fun KeyboardSettingsUI(
                 value = viewModel.keyboardFunctionsPadding.floatValue,
                 onValueChange = {
                     viewModel.setKeyboardFunctionsPadding(it, context)
-                    com.sameerasw.essentials.utils.HapticUtil.performSliderHaptic(view)
+                    com.sameerasw.essentials.utils.HapticUtil
+                        .performSliderHaptic(view)
                 },
                 valueRange = 0f..100f,
                 steps = 0,
-                modifier = Modifier.highlight(highlightSetting == "keyboard_functions_padding")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_functions_padding"),
             )
         }
 
@@ -252,7 +268,7 @@ fun KeyboardSettingsUI(
                 title = stringResource(R.string.label_keyboard_haptics),
                 isChecked = viewModel.isKeyboardHapticsEnabled.value,
                 onCheckedChange = { viewModel.setKeyboardHapticsEnabled(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "keyboard_haptics")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_haptics"),
             )
 
             if (viewModel.isKeyboardHapticsEnabled.value) {
@@ -262,7 +278,7 @@ fun KeyboardSettingsUI(
                     onValueChange = {
                         viewModel.setKeyboardHapticStrength(it, context)
                     },
-                    modifier = Modifier.highlight(highlightSetting == "keyboard_haptic_strength")
+                    modifier = Modifier.highlight(highlightSetting == "keyboard_haptic_strength"),
                 )
             }
 
@@ -271,7 +287,7 @@ fun KeyboardSettingsUI(
                 title = stringResource(R.string.label_keyboard_always_dark),
                 isChecked = viewModel.isKeyboardAlwaysDark.value,
                 onCheckedChange = { viewModel.setKeyboardAlwaysDark(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "keyboard_always_dark")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_always_dark"),
             )
 
             IconToggleItem(
@@ -279,7 +295,7 @@ fun KeyboardSettingsUI(
                 title = stringResource(R.string.label_keyboard_pitch_black),
                 isChecked = viewModel.isKeyboardPitchBlack.value,
                 onCheckedChange = { viewModel.setKeyboardPitchBlack(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "keyboard_pitch_black")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_pitch_black"),
             )
 
             IconToggleItem(
@@ -287,7 +303,7 @@ fun KeyboardSettingsUI(
                 title = stringResource(R.string.label_keyboard_clipboard_enabled),
                 isChecked = viewModel.isKeyboardClipboardEnabled.value,
                 onCheckedChange = { viewModel.setKeyboardClipboardEnabled(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "keyboard_clipboard_enabled")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_clipboard_enabled"),
             )
 
             IconToggleItem(
@@ -295,7 +311,7 @@ fun KeyboardSettingsUI(
                 title = stringResource(R.string.label_keyboard_long_press_symbols),
                 isChecked = viewModel.isLongPressSymbolsEnabled.value,
                 onCheckedChange = { viewModel.setLongPressSymbolsEnabled(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "keyboard_long_press_symbols")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_long_press_symbols"),
             )
 
             IconToggleItem(
@@ -304,7 +320,7 @@ fun KeyboardSettingsUI(
                 isChecked = viewModel.isAccentedCharactersEnabled.value,
                 onCheckedChange = { viewModel.setAccentedCharactersEnabled(it, context) },
                 enabled = viewModel.isLongPressSymbolsEnabled.value,
-                modifier = Modifier.highlight(highlightSetting == "keyboard_accented_characters")
+                modifier = Modifier.highlight(highlightSetting == "keyboard_accented_characters"),
             )
 
             IconToggleItem(
@@ -312,7 +328,7 @@ fun KeyboardSettingsUI(
                 title = "User Dictionary (Learn words)",
                 isChecked = viewModel.isUserDictionaryEnabled.value,
                 onCheckedChange = { viewModel.setUserDictionaryEnabled(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "user_dictionary_enabled")
+                modifier = Modifier.highlight(highlightSetting == "user_dictionary_enabled"),
             )
 
             if (viewModel.isUserDictionaryEnabled.value) {
@@ -321,7 +337,7 @@ fun KeyboardSettingsUI(
                     title = "Manage Learned Words",
                     isChecked = false,
                     showToggle = false,
-                    onCheckedChange = { viewModel.isUserDictionarySheetVisible.value = true }
+                    onCheckedChange = { viewModel.isUserDictionarySheetVisible.value = true },
                 )
             }
         }
@@ -331,7 +347,7 @@ fun KeyboardSettingsUI(
         if (viewModel.isUserDictionarySheetVisible.value) {
             com.sameerasw.essentials.ui.features.apps.sheets.UserDictionaryBottomSheet(
                 viewModel = viewModel,
-                onDismissRequest = { viewModel.isUserDictionarySheetVisible.value = false }
+                onDismissRequest = { viewModel.isUserDictionarySheetVisible.value = false },
             )
         }
     }

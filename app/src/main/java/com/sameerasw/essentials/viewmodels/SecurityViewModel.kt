@@ -40,7 +40,10 @@ class SecurityViewModel : ViewModel() {
      * @param context [Context] Application context for persistence.
      * @param enabled [Boolean] True to enable AppLock protection.
      */
-    fun setAppLockEnabled(context: Context, enabled: Boolean) {
+    fun setAppLockEnabled(
+        context: Context,
+        enabled: Boolean,
+    ) {
         isAppLockEnabled.value = enabled
         SettingsRepository(context).putBoolean(SettingsRepository.KEY_APP_LOCK_ENABLED, enabled)
     }

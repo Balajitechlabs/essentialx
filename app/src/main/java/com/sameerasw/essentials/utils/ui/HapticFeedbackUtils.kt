@@ -22,7 +22,7 @@ import com.sameerasw.essentials.domain.HapticFeedbackType
 @RequiresPermission(Manifest.permission.VIBRATE)
 fun performHapticFeedback(
     vibrator: Vibrator,
-    feedbackType: HapticFeedbackType
+    feedbackType: HapticFeedbackType,
 ) {
     if (!vibrator.hasVibrator()) return
 
@@ -53,12 +53,10 @@ fun performHapticFeedback(
                 vibrator.vibrate(
                     VibrationEffect.createOneShot(
                         20,
-                        VibrationEffect.DEFAULT_AMPLITUDE
-                    )
+                        VibrationEffect.DEFAULT_AMPLITUDE,
+                    ),
                 )
             }
         }
-
     }
 }
-

@@ -16,16 +16,17 @@ import moe.shizuku.server.IShizukuService
 import rikka.shizuku.Shizuku
 
 object ShizukuUtils {
-
     private var binder: IBinder? = null
 
-    private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
-        binder = Shizuku.getBinder()
-    }
+    private val binderReceivedListener =
+        Shizuku.OnBinderReceivedListener {
+            binder = Shizuku.getBinder()
+        }
 
-    private val binderDeadListener = Shizuku.OnBinderDeadListener {
-        binder = null
-    }
+    private val binderDeadListener =
+        Shizuku.OnBinderDeadListener {
+            binder = null
+        }
 
     private val isBinderAlive: Boolean
         get() {
@@ -37,7 +38,9 @@ object ShizukuUtils {
                 } else {
                     false
                 }
-            } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+            } catch (
+                @Suppress("UNUSED_PARAMETER") e: Exception,
+            ) {
                 false
             }
         }
@@ -51,24 +54,29 @@ object ShizukuUtils {
         if (!isBinderAlive) return false
         return try {
             Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
-        } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: Exception,
+        ) {
             false
         }
     }
 
-    fun isShizukuAvailable(): Boolean {
-        return try {
+    fun isShizukuAvailable(): Boolean =
+        try {
             Shizuku.pingBinder()
             true
-        } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: Exception,
+        ) {
             false
         }
-    }
 
     fun requestPermission() {
         try {
             Shizuku.requestPermission(1003)
-        } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: Exception,
+        ) {
             // Permission request failed
         }
     }
@@ -80,7 +88,9 @@ object ShizukuUtils {
         try {
             val process = service.newProcess(arrayOf("sh", "-c", command), null, "/")
             process?.waitFor()
-        } catch (@Suppress("UNUSED_PARAMETER") e: RemoteException) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: RemoteException,
+        ) {
             // Command execution failed
         }
     }
@@ -91,7 +101,9 @@ object ShizukuUtils {
         return try {
             runCommand("pm grant com.sameerasw.essentials android.permission.WRITE_SECURE_SETTINGS")
             true
-        } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: Exception,
+        ) {
             false
         }
     }
@@ -102,7 +114,9 @@ object ShizukuUtils {
         return try {
             runCommand("pm grant com.sameerasw.essentials android.permission.BATTERY_STATS")
             true
-        } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: Exception,
+        ) {
             false
         }
     }
@@ -133,18 +147,20 @@ object ShizukuUtils {
 
     fun stopShizuku(context: android.content.Context) {
         val settingsRepository =
-            com.sameerasw.essentials.data.repository.SettingsRepository(context)
+            com.sameerasw.essentials.data.repository
+                .SettingsRepository(context)
         val token = settingsRepository.getShizukuAuthToken()
         if (token.isEmpty()) {
             android.util.Log.w("ShizukuUtils", "Shizuku auth token is missing, cannot stop Shizuku")
             return
         }
         try {
-            val intent = android.content.Intent("moe.shizuku.privileged.api.STOP").apply {
-                `package` = "moe.shizuku.privileged.api"
-                putExtra("auth", token)
-                addFlags(android.content.Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-            }
+            val intent =
+                android.content.Intent("moe.shizuku.privileged.api.STOP").apply {
+                    `package` = "moe.shizuku.privileged.api"
+                    putExtra("auth", token)
+                    addFlags(android.content.Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
+                }
             context.sendBroadcast(intent)
         } catch (e: Exception) {
             android.util.Log.e("ShizukuUtils", "Failed to stop Shizuku", e)

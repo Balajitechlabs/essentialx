@@ -46,7 +46,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun CalendarSyncSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightKey: String? = null
+    highlightKey: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -59,16 +59,17 @@ fun CalendarSyncSettingsUI(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
             text = stringResource(R.string.calendar_sync_settings_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
@@ -79,7 +80,7 @@ fun CalendarSyncSettingsUI(
                 isChecked = isPeriodicEnabled,
                 onCheckedChange = { viewModel.setCalendarSyncPeriodicEnabled(it, context) },
                 enabled = isEnabled,
-                modifier = Modifier.highlight(highlightKey == "periodic_sync")
+                modifier = Modifier.highlight(highlightKey == "periodic_sync"),
             )
 
             IconToggleItem(
@@ -90,12 +91,13 @@ fun CalendarSyncSettingsUI(
                 onCheckedChange = {
                     HapticUtil.performVirtualKeyHaptic(view)
                     viewModel.triggerCalendarSyncNow(context)
-                    Toast.makeText(context, R.string.calendar_sync_sync_started, Toast.LENGTH_SHORT)
+                    Toast
+                        .makeText(context, R.string.calendar_sync_sync_started, Toast.LENGTH_SHORT)
                         .show()
                 },
                 enabled = isEnabled,
                 showToggle = false,
-                modifier = Modifier.highlight(highlightKey == "sync_now")
+                modifier = Modifier.highlight(highlightKey == "sync_now"),
             )
         }
 
@@ -105,7 +107,7 @@ fun CalendarSyncSettingsUI(
             text = stringResource(R.string.calendar_sync_select_calendars),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, bottom = 4.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         if (calendars.isEmpty()) {
@@ -113,7 +115,7 @@ fun CalendarSyncSettingsUI(
                 text = stringResource(R.string.calendar_sync_no_calendars),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         } else {
             val groupedCalendars = calendars.groupBy { it.accountName }
@@ -123,7 +125,7 @@ fun CalendarSyncSettingsUI(
                     text = accountName,
                     style = MaterialTheme.typography.labelLarge,
                     modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 4.dp),
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
 
                 RoundedCardContainer {
@@ -131,7 +133,7 @@ fun CalendarSyncSettingsUI(
                         CalendarSelectionItem(
                             calendar = calendar,
                             isEnabled = isEnabled,
-                            onToggle = { viewModel.toggleCalendarSelection(calendar.id) }
+                            onToggle = { viewModel.toggleCalendarSelection(calendar.id) },
                         )
                     }
                 }
@@ -144,19 +146,19 @@ fun CalendarSyncSettingsUI(
 fun CalendarSelectionItem(
     calendar: MainViewModel.CalendarAccount,
     isEnabled: Boolean,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
 ) {
     val view = LocalView.current
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceBright)
-            .clickable(enabled = isEnabled) {
-                HapticUtil.performVirtualKeyHaptic(view)
-                onToggle()
-            }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceBright)
+                .clickable(enabled = isEnabled) {
+                    HapticUtil.performVirtualKeyHaptic(view)
+                    onToggle()
+                }.padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
             checked = calendar.isSelected,
@@ -164,18 +166,22 @@ fun CalendarSelectionItem(
                 HapticUtil.performVirtualKeyHaptic(view)
                 onToggle()
             },
-            enabled = isEnabled
+            enabled = isEnabled,
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column {
             Text(
                 text = calendar.name,
                 style = MaterialTheme.typography.bodyLarge,
-                color = if (isEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                    alpha = 0.38f
-                )
+                color =
+                    if (isEnabled) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = 0.38f,
+                        )
+                    },
             )
-
         }
     }
 }

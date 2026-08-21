@@ -55,26 +55,30 @@ fun TimeSelectionSheet(
     initialState: DIYState.TimePeriod? = null,
     onDismiss: () -> Unit,
     onSaveTrigger: (Trigger.Schedule) -> Unit = {},
-    onSaveState: (DIYState.TimePeriod) -> Unit = {}
+    onSaveState: (DIYState.TimePeriod) -> Unit = {},
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val view = LocalView.current
     val isRange = initialState != null
-    val is24Hour = android.text.format.DateFormat.is24HourFormat(context)
+    val is24Hour =
+        android.text.format.DateFormat
+            .is24HourFormat(context)
 
-    val startPickerState = rememberTimePickerState(
-        initialHour = initialTrigger?.hour ?: initialState?.startHour ?: 0,
-        initialMinute = initialTrigger?.minute ?: initialState?.startMinute ?: 0,
-        is24Hour = is24Hour
-    )
-    val endPickerState = rememberTimePickerState(
-        initialHour = initialState?.endHour ?: 0,
-        initialMinute = initialState?.endMinute ?: 0,
-        is24Hour = is24Hour
-    )
+    val startPickerState =
+        rememberTimePickerState(
+            initialHour = initialTrigger?.hour ?: initialState?.startHour ?: 0,
+            initialMinute = initialTrigger?.minute ?: initialState?.startMinute ?: 0,
+            is24Hour = is24Hour,
+        )
+    val endPickerState =
+        rememberTimePickerState(
+            initialHour = initialState?.endHour ?: 0,
+            initialMinute = initialState?.endMinute ?: 0,
+            is24Hour = is24Hour,
+        )
     var selectedDays by remember {
         mutableStateOf(
-            initialTrigger?.days ?: initialState?.days ?: emptySet<Int>()
+            initialTrigger?.days ?: initialState?.days ?: emptySet<Int>(),
         )
     }
 
@@ -89,28 +93,29 @@ fun TimeSelectionSheet(
 
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
-        dragHandle = null
+        dragHandle = null,
     ) {
         Column(
-            modifier = Modifier
-                .padding(24.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(if (isRange) R.string.diy_time_range_selection_title else R.string.diy_time_selection_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.align(Alignment.Start)
+                modifier = Modifier.align(Alignment.Start),
             )
 
             if (isRange) {
                 // Range display with Start/End tabs
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     TimeDisplayCard(
                         label = stringResource(R.string.diy_start_time_label),
@@ -118,7 +123,7 @@ fun TimeSelectionSheet(
                         minute = startPickerState.minute,
                         isSelected = !showingEndPicker,
                         modifier = Modifier.weight(1f),
-                        onClick = { showingEndPicker = false }
+                        onClick = { showingEndPicker = false },
                     )
                     TimeDisplayCard(
                         label = stringResource(R.string.diy_end_time_label),
@@ -126,65 +131,72 @@ fun TimeSelectionSheet(
                         minute = endPickerState.minute,
                         isSelected = showingEndPicker,
                         modifier = Modifier.weight(1f),
-                        onClick = { showingEndPicker = true }
+                        onClick = { showingEndPicker = true },
                     )
                 }
             }
 
             // Time Picker
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceBright,
-                        shape = RoundedCornerShape(28.dp)
-                    )
-                    .padding(vertical = 16.dp),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = RoundedCornerShape(28.dp),
+                        ).padding(vertical = 16.dp),
+                contentAlignment = Alignment.Center,
             ) {
                 TimePicker(
-                    state = if (showingEndPicker) endPickerState else startPickerState
+                    state = if (showingEndPicker) endPickerState else startPickerState,
                 )
             }
 
             // Days Selection
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
                     text = stringResource(R.string.diy_repeat_days_label),
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                val days = listOf(
-                    Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY,
-                    Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY, Calendar.SUNDAY
-                )
-                val dayLabels = mapOf(
-                    Calendar.SUNDAY to "S",
-                    Calendar.MONDAY to "M",
-                    Calendar.TUESDAY to "T",
-                    Calendar.WEDNESDAY to "W",
-                    Calendar.THURSDAY to "T",
-                    Calendar.FRIDAY to "F",
-                    Calendar.SATURDAY to "S"
-                )
+                val days =
+                    listOf(
+                        Calendar.MONDAY,
+                        Calendar.TUESDAY,
+                        Calendar.WEDNESDAY,
+                        Calendar.THURSDAY,
+                        Calendar.FRIDAY,
+                        Calendar.SATURDAY,
+                        Calendar.SUNDAY,
+                    )
+                val dayLabels =
+                    mapOf(
+                        Calendar.SUNDAY to "S",
+                        Calendar.MONDAY to "M",
+                        Calendar.TUESDAY to "T",
+                        Calendar.WEDNESDAY to "W",
+                        Calendar.THURSDAY to "T",
+                        Calendar.FRIDAY to "F",
+                        Calendar.SATURDAY to "S",
+                    )
 
                 MultiSegmentedPicker(
                     items = days,
                     selectedItems = selectedDays,
                     onItemsSelected = { selectedDays = it },
                     labelProvider = { dayLabels[it]!! },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
             // Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Button(
                     onClick = {
@@ -192,15 +204,16 @@ fun TimeSelectionSheet(
                         onDismiss()
                     },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceBright,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_close_24),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(stringResource(R.string.action_cancel))
@@ -216,25 +229,25 @@ fun TimeSelectionSheet(
                                     startMinute = startPickerState.minute,
                                     endHour = endPickerState.hour,
                                     endMinute = endPickerState.minute,
-                                    days = selectedDays
-                                )
+                                    days = selectedDays,
+                                ),
                             )
                         } else {
                             onSaveTrigger(
                                 Trigger.Schedule(
                                     hour = startPickerState.hour,
                                     minute = startPickerState.minute,
-                                    days = selectedDays
-                                )
+                                    days = selectedDays,
+                                ),
                             )
                         }
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_check_24),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(stringResource(R.string.action_save))
@@ -251,18 +264,22 @@ private fun TimeDisplayCard(
     minute: Int,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val view = LocalView.current
 
-    val formattedTime = remember(hour, minute) {
-        val calendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute)
+    val formattedTime =
+        remember(hour, minute) {
+            val calendar =
+                Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, hour)
+                    set(Calendar.MINUTE, minute)
+                }
+            android.text.format.DateFormat
+                .getTimeFormat(context)
+                .format(calendar.time)
         }
-        android.text.format.DateFormat.getTimeFormat(context).format(calendar.time)
-    }
 
     Surface(
         onClick = {
@@ -271,22 +288,22 @@ private fun TimeDisplayCard(
         },
         modifier = modifier.fillMaxWidth(),
         color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceBright,
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(16.dp),
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
-                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = formattedTime,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
             )
         }
     }

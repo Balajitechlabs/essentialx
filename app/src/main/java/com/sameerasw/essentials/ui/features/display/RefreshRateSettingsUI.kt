@@ -43,7 +43,7 @@ import kotlin.math.roundToInt
 fun RefreshRateSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -53,16 +53,17 @@ fun RefreshRateSettingsUI(
     val systemLabel = stringResource(R.string.refresh_rate_system_default)
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
             text = stringResource(R.string.refresh_rate_section_mode),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(spacing = 2.dp) {
@@ -76,7 +77,7 @@ fun RefreshRateSettingsUI(
                         else -> context.getString(R.string.refresh_rate_mode_fixed)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
 
@@ -84,7 +85,7 @@ fun RefreshRateSettingsUI(
             text = stringResource(R.string.refresh_rate_section_values),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(spacing = 2.dp) {
@@ -105,7 +106,7 @@ fun RefreshRateSettingsUI(
                     increment = 10f,
                     valueFormatter = { formatRefreshRateLabel(it, systemLabel) },
                     icon = R.drawable.rounded_shutter_speed_24,
-                    enabled = isEnabled
+                    enabled = isEnabled,
                 )
             } else {
                 ConfigSliderItem(
@@ -124,7 +125,7 @@ fun RefreshRateSettingsUI(
                     increment = 10f,
                     valueFormatter = { formatRefreshRateLabel(it, systemLabel) },
                     icon = R.drawable.rounded_keyboard_arrow_down_24,
-                    enabled = isEnabled
+                    enabled = isEnabled,
                 )
 
                 ConfigSliderItem(
@@ -143,29 +144,30 @@ fun RefreshRateSettingsUI(
                     increment = 10f,
                     valueFormatter = { formatRefreshRateLabel(it, systemLabel) },
                     icon = R.drawable.rounded_keyboard_arrow_up_24,
-                    enabled = isEnabled
+                    enabled = isEnabled,
                 )
             }
 
             Row(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceBright,
-                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                    )
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier =
+                    Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                            shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                        ).fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = if (isEnabled) Arrangement.SpaceBetween else Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (isEnabled) {
                     Text(
                         text = stringResource(R.string.refresh_rate_reset_desc),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp)
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp),
                     )
                     Button(
                         onClick = {
@@ -173,24 +175,29 @@ fun RefreshRateSettingsUI(
                             HapticUtil.performSliderHaptic(view)
                         },
                         colors = ButtonDefaults.filledTonalButtonColors(),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.label_reset_default),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
                         )
                     }
                 } else {
                     Text(
-                        text = stringResource(
-                            if (viewModel.isRootEnabled.value) R.string.msg_refresh_rate_root_permission_required
-                            else R.string.msg_refresh_rate_permission_required
-                        ),
+                        text =
+                            stringResource(
+                                if (viewModel.isRootEnabled.value) {
+                                    R.string.msg_refresh_rate_root_permission_required
+                                } else {
+                                    R.string.msg_refresh_rate_permission_required
+                                },
+                            ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(end = 8.dp)
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp),
                     )
                     Button(
                         onClick = {
@@ -202,11 +209,11 @@ fun RefreshRateSettingsUI(
                             HapticUtil.performSliderHaptic(view)
                         },
                         colors = ButtonDefaults.filledTonalButtonColors(),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.label_grant_permission),
-                            style = MaterialTheme.typography.labelSmall
+                            style = MaterialTheme.typography.labelSmall,
                         )
                     }
                 }
@@ -215,10 +222,12 @@ fun RefreshRateSettingsUI(
     }
 }
 
-private fun formatRefreshRateLabel(value: Float, systemLabel: String): String {
-    return if (value <= 0f) {
+private fun formatRefreshRateLabel(
+    value: Float,
+    systemLabel: String,
+): String =
+    if (value <= 0f) {
         systemLabel
     } else {
         "${value.roundToInt()} Hz"
     }
-}

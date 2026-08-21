@@ -22,13 +22,16 @@ import androidx.core.content.edit
  */
 fun updateIconBlacklistSetting(
     context: Context,
-    blacklistNames: Set<String>
+    blacklistNames: Set<String>,
 ) {
-    val repository = com.sameerasw.essentials.data.repository.SettingsRepository(context)
-    val isEnabled = repository.getBoolean(
-        com.sameerasw.essentials.data.repository.SettingsRepository.KEY_STATUS_BAR_ICON_CONTROL_ENABLED,
-        false
-    )
+    val repository =
+        com.sameerasw.essentials.data.repository
+            .SettingsRepository(context)
+    val isEnabled =
+        repository.getBoolean(
+            com.sameerasw.essentials.data.repository.SettingsRepository.KEY_STATUS_BAR_ICON_CONTROL_ENABLED,
+            false,
+        )
     if (!isEnabled) return
 
     if (blacklistNames.isEmpty()) {
@@ -41,7 +44,9 @@ fun updateIconBlacklistSetting(
         val blacklistString = blacklistNames.joinToString(",")
         try {
             Settings.Secure.putString(context.contentResolver, "icon_blacklist", blacklistString)
-        } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: Exception,
+        ) {
             e.printStackTrace()
         }
     }
@@ -52,7 +57,7 @@ fun updateIconBlacklistSetting(
  */
 fun saveIconVisibilities(
     context: Context,
-    visibilities: Map<String, Boolean>
+    visibilities: Map<String, Boolean>,
 ) {
     val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
     prefs.edit {
@@ -67,7 +72,7 @@ fun saveIconVisibilities(
  */
 fun loadIconVisibilities(
     context: Context,
-    defaultVisibilities: Map<String, Boolean>
+    defaultVisibilities: Map<String, Boolean>,
 ): Map<String, Boolean> {
     val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
     return defaultVisibilities.mapValues { (iconId, default) ->
@@ -80,7 +85,7 @@ fun loadIconVisibilities(
  */
 fun resetAllIconVisibilities(
     context: Context,
-    defaultVisibilities: Map<String, Boolean>
+    defaultVisibilities: Map<String, Boolean>,
 ) {
     val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
     prefs.edit {
@@ -89,4 +94,3 @@ fun resetAllIconVisibilities(
         }
     }
 }
-

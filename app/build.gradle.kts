@@ -6,9 +6,6 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
-
-
-
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_21)
@@ -19,7 +16,7 @@ kotlin {
             "androidx.compose.foundation.ExperimentalFoundationApi",
             "androidx.compose.ui.text.ExperimentalTextApi",
             "androidx.compose.foundation.ExperimentalFoundationApi",
-            "androidx.compose.foundation.layout.ExperimentalLayoutApi"
+            "androidx.compose.foundation.layout.ExperimentalLayoutApi",
         )
     }
 }
@@ -29,62 +26,63 @@ android {
     compileSdk = 37
 
     androidResources {
-        localeFilters += listOf(
-            "en",
-            "ach",
-            "af",
-            "ar",
-            "bn",
-            "bn-rBD",
-            "ca",
-            "cs",
-            "da",
-            "de",
-            "el",
-            "es",
-            "fi",
-            "fil",
-            "fil-rPH",
-            "fr",
-            "he",
-            "hi",
-            "hi-rIN",
-            "hu",
-            "id",
-            "in",
-            "in-rID",
-            "it",
-            "iw",
-            "ja",
-            "kk",
-            "kk-rKZ",
-            "ko",
-            "ml",
-            "ml-rIN",
-            "ne",
-            "ne-rNP",
-            "nl",
-            "no",
-            "pl",
-            "pt",
-            "pt-rBR",
-            "pt-rPT",
-            "ro",
-            "ru",
-            "si",
-            "sk",
-            "sk-rSK",
-            "sr",
-            "sv",
-            "ta",
-            "ta-rIN",
-            "tr",
-            "uk",
-            "vi",
-            "zh",
-            "zh-rCN",
-            "zh-rTW"
-        )
+        localeFilters +=
+            listOf(
+                "en",
+                "ach",
+                "af",
+                "ar",
+                "bn",
+                "bn-rBD",
+                "ca",
+                "cs",
+                "da",
+                "de",
+                "el",
+                "es",
+                "fi",
+                "fil",
+                "fil-rPH",
+                "fr",
+                "he",
+                "hi",
+                "hi-rIN",
+                "hu",
+                "id",
+                "in",
+                "in-rID",
+                "it",
+                "iw",
+                "ja",
+                "kk",
+                "kk-rKZ",
+                "ko",
+                "ml",
+                "ml-rIN",
+                "ne",
+                "ne-rNP",
+                "nl",
+                "no",
+                "pl",
+                "pt",
+                "pt-rBR",
+                "pt-rPT",
+                "ro",
+                "ru",
+                "si",
+                "sk",
+                "sk-rSK",
+                "sr",
+                "sv",
+                "ta",
+                "ta-rIN",
+                "tr",
+                "uk",
+                "vi",
+                "zh",
+                "zh-rCN",
+                "zh-rTW",
+            )
     }
 
     defaultConfig {
@@ -119,7 +117,7 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }

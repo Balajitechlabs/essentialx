@@ -40,22 +40,19 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun DynamicNightLightSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
 
-
     // App selection state
     var showAppSelectionSheet by remember { mutableStateOf(false) }
 
-
     Column(modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-
         RoundedCardContainer(
             modifier = Modifier.padding(top = 8.dp),
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             IconToggleItem(
                 iconRes = R.drawable.rounded_nightlight_24,
@@ -64,7 +61,7 @@ fun DynamicNightLightSettingsUI(
                 onCheckedChange = { checked ->
                     viewModel.setDynamicNightLightEnabled(checked, context)
                 },
-                modifier = Modifier.highlight(highlightSetting == "dynamic_night_light_toggle")
+                modifier = Modifier.highlight(highlightSetting == "dynamic_night_light_toggle"),
             )
 
             IconToggleItem(
@@ -76,7 +73,7 @@ fun DynamicNightLightSettingsUI(
                     HapticUtil.performUIHaptic(view)
                     viewModel.setSmartPixelsEnabled(context, checked)
                 },
-                modifier = Modifier.highlight(highlightSetting == "smart_pixels_enable_toggle")
+                modifier = Modifier.highlight(highlightSetting == "smart_pixels_enable_toggle"),
             )
         }
 
@@ -84,7 +81,7 @@ fun DynamicNightLightSettingsUI(
             text = stringResource(R.string.dynamic_night_light_apps_section),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         // App Selection Sheet Button
@@ -93,7 +90,7 @@ fun DynamicNightLightSettingsUI(
                 HapticUtil.performVirtualKeyHaptic(view)
                 showAppSelectionSheet = true
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Text(stringResource(R.string.action_select_apps))
         }
@@ -105,17 +102,17 @@ fun DynamicNightLightSettingsUI(
                 onSaveApps = { ctx, apps ->
                     viewModel.saveDynamicNightLightSelectedApps(
                         ctx,
-                        apps
+                        apps,
                     )
                 },
                 onAppToggle = { ctx, pkg, enabled ->
                     viewModel.updateDynamicNightLightAppEnabled(
                         ctx,
                         pkg,
-                        enabled
+                        enabled,
                     )
                 },
-                context = context
+                context = context,
             )
         }
     }

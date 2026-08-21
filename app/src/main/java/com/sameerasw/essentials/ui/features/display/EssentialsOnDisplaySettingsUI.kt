@@ -40,7 +40,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun EssentialsOnDisplaySettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     var showPermissionSheet by remember { androidx.compose.runtime.mutableStateOf(false) }
@@ -54,40 +54,41 @@ fun EssentialsOnDisplaySettingsUI(
         PermissionsBottomSheet(
             onDismissRequest = { showPermissionSheet = false },
             featureTitle = R.string.feat_essentials_on_display_title,
-            permissions = listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_settings_accessibility_24,
-                    title = R.string.perm_accessibility_title,
-                    description = R.string.perm_accessibility_desc_essentials_on_display,
-                    dependentFeatures = listOf(R.string.feat_essentials_on_display_title),
-                    actionLabel = R.string.perm_action_enable,
-                    action = {
-                        val intent =
-                            android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    },
-                    isGranted = isAccessibilityEnabled
+            permissions =
+                listOf(
+                    PermissionItem(
+                        iconRes = R.drawable.rounded_settings_accessibility_24,
+                        title = R.string.perm_accessibility_title,
+                        description = R.string.perm_accessibility_desc_essentials_on_display,
+                        dependentFeatures = listOf(R.string.feat_essentials_on_display_title),
+                        actionLabel = R.string.perm_action_enable,
+                        action = {
+                            val intent =
+                                android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+                            context.startActivity(intent)
+                        },
+                        isGranted = isAccessibilityEnabled,
+                    ),
+                    PermissionItem(
+                        iconRes = R.drawable.rounded_notifications_unread_24,
+                        title = R.string.perm_notif_listener_title,
+                        description = R.string.perm_notif_listener_desc_lighting,
+                        dependentFeatures = listOf(R.string.feat_essentials_on_display_title),
+                        actionLabel = R.string.perm_action_grant,
+                        action = { viewModel.requestNotificationListenerPermission(context) },
+                        isGranted = isNotificationListenerEnabled,
+                    ),
                 ),
-                PermissionItem(
-                    iconRes = R.drawable.rounded_notifications_unread_24,
-                    title = R.string.perm_notif_listener_title,
-                    description = R.string.perm_notif_listener_desc_lighting,
-                    dependentFeatures = listOf(R.string.feat_essentials_on_display_title),
-                    actionLabel = R.string.perm_action_grant,
-                    action = { viewModel.requestNotificationListenerPermission(context) },
-                    isGranted = isNotificationListenerEnabled
-                )
-            )
         )
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(16.dp),
     ) {
-
         RoundedCardContainer {
             IconToggleItem(
                 iconRes = R.drawable.rounded_blur_on_24,
@@ -97,7 +98,7 @@ fun EssentialsOnDisplaySettingsUI(
                 onCheckedChange = { viewModel.setAmbientMusicGlanceEnabled(it) },
                 enabled = isPermissionGranted,
                 onDisabledClick = { showPermissionSheet = true },
-                modifier = Modifier.highlight(highlightSetting == "enable_essentials_on_display")
+                modifier = Modifier.highlight(highlightSetting == "enable_essentials_on_display"),
             )
 
             IconToggleItem(
@@ -108,13 +109,13 @@ fun EssentialsOnDisplaySettingsUI(
                 onCheckedChange = { viewModel.setAmbientMusicGlanceDockedModeEnabled(it) },
                 enabled = isPermissionGranted && viewModel.isAmbientMusicGlanceEnabled.value,
                 onDisabledClick = { if (!isPermissionGranted) showPermissionSheet = true },
-                modifier = Modifier.highlight(highlightSetting == "essentials_on_display_docked_mode")
+                modifier = Modifier.highlight(highlightSetting == "essentials_on_display_docked_mode"),
             )
 
             androidx.compose.animation.AnimatedVisibility(
                 visible = viewModel.isAmbientMusicGlanceDockedModeEnabled.value,
                 enter = androidx.compose.animation.expandVertically() + androidx.compose.animation.fadeIn(),
-                exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
+                exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut(),
             ) {
                 IconToggleItem(
                     iconRes = R.drawable.rounded_notification_sound_24,
@@ -123,9 +124,9 @@ fun EssentialsOnDisplaySettingsUI(
                     isChecked = viewModel.isAmbientMusicGlanceRespectNotificationsEnabled.value,
                     onCheckedChange = {
                         viewModel.setAmbientMusicGlanceRespectNotificationsEnabled(
-                            it
+                            it,
                         )
-                    }
+                    },
                 )
             }
         }
@@ -134,26 +135,26 @@ fun EssentialsOnDisplaySettingsUI(
             text = stringResource(R.string.essentials_on_display_album_art_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         AlbumArtModePicker(
             selectedMode = viewModel.ambientMusicGlanceAlbumArtMode.value,
             onModeSelected = { viewModel.setAmbientMusicGlanceAlbumArtMode(it) },
-            modifier = Modifier.highlight(highlightSetting == "essentials_on_display_album_art")
+            modifier = Modifier.highlight(highlightSetting == "essentials_on_display_album_art"),
         )
 
         androidx.compose.animation.AnimatedVisibility(
             visible = viewModel.ambientMusicGlanceAlbumArtMode.value == "default",
             enter = androidx.compose.animation.expandVertically() + androidx.compose.animation.fadeIn(),
-            exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
+            exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut(),
         ) {
             Column {
                 Text(
                     text = stringResource(R.string.label_customization),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 RoundedCardContainer {
@@ -162,7 +163,7 @@ fun EssentialsOnDisplaySettingsUI(
                         title = stringResource(R.string.essentials_on_display_random_shapes_title),
                         description = stringResource(R.string.essentials_on_display_random_shapes_desc),
                         isChecked = viewModel.isAmbientMusicGlanceRandomShapesEnabled.value,
-                        onCheckedChange = { viewModel.setAmbientMusicGlanceRandomShapesEnabled(it) }
+                        onCheckedChange = { viewModel.setAmbientMusicGlanceRandomShapesEnabled(it) },
                     )
                 }
             }
@@ -171,14 +172,14 @@ fun EssentialsOnDisplaySettingsUI(
         androidx.compose.animation.AnimatedVisibility(
             visible = viewModel.ambientMusicGlanceAlbumArtMode.value == "fill",
             enter = androidx.compose.animation.expandVertically() + androidx.compose.animation.fadeIn(),
-            exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut()
+            exit = androidx.compose.animation.shrinkVertically() + androidx.compose.animation.fadeOut(),
         ) {
             Column {
                 Text(
                     text = stringResource(R.string.essentials_on_display_clock_title),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 RoundedCardContainer {
@@ -189,7 +190,7 @@ fun EssentialsOnDisplaySettingsUI(
                         valueRange = 40f..150f,
                         increment = 5f,
                         valueFormatter = { it.toInt().toString() },
-                        iconRes = R.drawable.rounded_mobile_text_2_24
+                        iconRes = R.drawable.rounded_mobile_text_2_24,
                     )
 
                     ConfigSliderItem(
@@ -199,7 +200,7 @@ fun EssentialsOnDisplaySettingsUI(
                         valueRange = 100f..1000f,
                         increment = 10f,
                         valueFormatter = { it.toInt().toString() },
-                        iconRes = R.drawable.rounded_line_weight_24
+                        iconRes = R.drawable.rounded_line_weight_24,
                     )
 
                     ConfigSliderItem(
@@ -209,7 +210,7 @@ fun EssentialsOnDisplaySettingsUI(
                         valueRange = 25f..200f,
                         increment = 5f,
                         valueFormatter = { it.toInt().toString() },
-                        iconRes = R.drawable.rounded_arrows_outward_24
+                        iconRes = R.drawable.rounded_arrows_outward_24,
                     )
 
                     ConfigSliderItem(
@@ -219,7 +220,7 @@ fun EssentialsOnDisplaySettingsUI(
                         valueRange = 0f..100f,
                         increment = 5f,
                         valueFormatter = { it.toInt().toString() },
-                        iconRes = R.drawable.rounded_rounded_corner_24
+                        iconRes = R.drawable.rounded_rounded_corner_24,
                     )
                 }
 
@@ -233,9 +234,9 @@ fun EssentialsOnDisplaySettingsUI(
                         isChecked = viewModel.isAmbientMusicGlanceForceFillWhileChargingEnabled.value,
                         onCheckedChange = {
                             viewModel.setAmbientMusicGlanceForceFillWhileChargingEnabled(
-                                it
+                                it,
                             )
-                        }
+                        },
                     )
                 }
             }

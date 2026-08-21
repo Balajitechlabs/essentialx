@@ -19,8 +19,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DownloadUpdateReceiver : BroadcastReceiver() {
-
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action == "com.sameerasw.essentials.ACTION_DOWNLOAD_UPDATE") {
             val downloadUrl = intent.getStringExtra("download_url") ?: return
             val version = intent.getStringExtra("version") ?: ""
@@ -38,9 +40,9 @@ class DownloadUpdateReceiver : BroadcastReceiver() {
                             UpdateNotificationHelper.showDownloadProgressNotification(
                                 context,
                                 version,
-                                progress
+                                progress,
                             )
-                        }
+                        },
                     )
                 } catch (e: Exception) {
                     e.printStackTrace()

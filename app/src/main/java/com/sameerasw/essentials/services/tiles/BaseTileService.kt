@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 abstract class BaseTileService : TileService() {
-
     private val serviceJob = Job()
     protected val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
     private val secureSettingsCache = mutableMapOf<String, Int>()
@@ -108,25 +107,26 @@ abstract class BaseTileService : TileService() {
         }
     }
 
-    protected fun areUnsupportedFeaturesEnabled(): Boolean =
-        SettingsRepository(this).isEnableUnsupportedFeatures()
+    protected fun areUnsupportedFeaturesEnabled(): Boolean = SettingsRepository(this).isEnableUnsupportedFeatures()
 
     protected fun updateTile() {
         val tile = qsTile ?: return
         val unsupportedDisabled = !isDeviceSupported() && !areUnsupportedFeaturesEnabled()
         val hasPerm = hasFeaturePermission()
-        tile.state = when {
-            unsupportedDisabled || !hasPerm || isProcessing -> Tile.STATE_UNAVAILABLE
-            else -> getTileState()
-        }
+        tile.state =
+            when {
+                unsupportedDisabled || !hasPerm || isProcessing -> Tile.STATE_UNAVAILABLE
+                else -> getTileState()
+            }
         tile.label = getTileLabel()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            tile.subtitle = when {
-                unsupportedDisabled -> getString(R.string.disabled_on_this_device)
-                !hasPerm -> getString(R.string.permission_missing)
-                isProcessing -> "Working..."
-                else -> getTileSubtitle()
-            }
+            tile.subtitle =
+                when {
+                    unsupportedDisabled -> getString(R.string.disabled_on_this_device)
+                    !hasPerm -> getString(R.string.permission_missing)
+                    isProcessing -> "Working..."
+                    else -> getTileSubtitle()
+                }
         }
 
         getTileIcon()?.let { tile.icon = it }
@@ -135,7 +135,10 @@ abstract class BaseTileService : TileService() {
 
     protected abstract fun getTileState(): Int
 
-    protected fun getSecureInt(key: String, def: Int): Int {
+    protected fun getSecureInt(
+        key: String,
+        def: Int,
+    ): Int {
         secureSettingsCache[key]?.let { return it }
 
         try {
@@ -158,7 +161,10 @@ abstract class BaseTileService : TileService() {
         return def
     }
 
-    protected fun putSecureInt(key: String, value: Int) {
+    protected fun putSecureInt(
+        key: String,
+        value: Int,
+    ) {
         secureSettingsCache[key] = value // Update cache immediately
         try {
             Settings.Secure.putInt(contentResolver, key, value)
@@ -168,7 +174,10 @@ abstract class BaseTileService : TileService() {
         }
     }
 
-    protected fun getGlobalInt(key: String, def: Int): Int {
+    protected fun getGlobalInt(
+        key: String,
+        def: Int,
+    ): Int {
         secureSettingsCache[key]?.let { return it }
 
         try {
@@ -191,7 +200,10 @@ abstract class BaseTileService : TileService() {
         return def
     }
 
-    protected fun putGlobalInt(key: String, value: Int) {
+    protected fun putGlobalInt(
+        key: String,
+        value: Int,
+    ) {
         secureSettingsCache[key] = value // Update cache immediately
         try {
             Settings.Global.putInt(contentResolver, key, value)
@@ -201,7 +213,3 @@ abstract class BaseTileService : TileService() {
         }
     }
 }
-
-
-
-

@@ -17,7 +17,6 @@ import com.sameerasw.essentials.utils.DeviceLockUtils
 import com.sameerasw.essentials.utils.HapticUtil
 
 class LockdownTileService : BaseTileService() {
-
     override fun onClick() {
         if (!isDeviceSupported() && !areUnsupportedFeaturesEnabled()) return
         HapticUtil.performHapticForService(this)
@@ -28,9 +27,8 @@ class LockdownTileService : BaseTileService() {
         DeviceLockUtils.performLockdownTileAction(this, isLongPress = false)
     }
 
-    override fun getTileLabel(): String {
-        return if (lockdownModeStatus()) getString(R.string.tile_lockdown_mode) else getString(R.string.tile_lock)
-    }
+    override fun getTileLabel(): String =
+        if (lockdownModeStatus()) getString(R.string.tile_lockdown_mode) else getString(R.string.tile_lock)
 
     override fun getTileSubtitle(): String = getString(R.string.tile_device)
 
@@ -44,7 +42,5 @@ class LockdownTileService : BaseTileService() {
 
     override fun getTileState(): Int = Tile.STATE_INACTIVE
 
-    private fun lockdownModeStatus(): Boolean {
-        return SettingsRepository(this).getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE, false)
-    }
+    private fun lockdownModeStatus(): Boolean = SettingsRepository(this).getBoolean(SettingsRepository.KEY_LOCKDOWN_MODE, false)
 }

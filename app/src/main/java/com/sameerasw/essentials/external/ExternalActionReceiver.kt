@@ -22,7 +22,10 @@ class ExternalActionReceiver : BroadcastReceiver() {
         const val EXTRA_VALUE = "value"
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action != ACTION_EXTERNAL_CONTROL) return
 
         val path = intent.getStringExtra(EXTRA_PATH) ?: return
@@ -31,7 +34,7 @@ class ExternalActionReceiver : BroadcastReceiver() {
 
         Log.d(
             "ExternalActionReceiver",
-            "Received external control request: path=$path, action=$action, value=$value"
+            "Received external control request: path=$path, action=$action, value=$value",
         )
 
         if (action == "update") {

@@ -56,7 +56,7 @@ fun FreezeTagSettingsSheet(
     initialAction: Action.FreezeTag,
     availableTags: List<AppTag>,
     onDismiss: () -> Unit,
-    onSave: (Action.FreezeTag) -> Unit
+    onSave: (Action.FreezeTag) -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -68,21 +68,21 @@ fun FreezeTagSettingsSheet(
 
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.diy_action_freeze_tag),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
-
 
             RoundedCardContainer {
                 SegmentedPicker(
@@ -93,17 +93,20 @@ fun FreezeTagSettingsSheet(
                         selectedMode = mode
                     },
                     labelProvider = { mode ->
-                        if (mode == "Freeze") context.getString(R.string.action_freeze)
-                        else context.getString(R.string.action_unfreeze)
+                        if (mode == "Freeze") {
+                            context.getString(R.string.action_freeze)
+                        } else {
+                            context.getString(R.string.action_unfreeze)
+                        }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
 
             Text(
                 text = stringResource(R.string.freeze_tags_section_title),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             if (availableTags.isEmpty()) {
@@ -111,40 +114,44 @@ fun FreezeTagSettingsSheet(
                     text = stringResource(R.string.freeze_tags_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(vertical = 8.dp),
                 )
             } else {
                 RoundedCardContainer(spacing = 2.dp) {
                     availableTags.forEach { tag ->
                         val isChecked = selectedTagIds.contains(tag.id)
-                        val color = try {
-                            Color(android.graphics.Color.parseColor(tag.colorHex))
-                        } catch (e: Exception) {
-                            MaterialTheme.colorScheme.primary
-                        }
-                        val iconResId = context.resources.getIdentifier(
-                            tag.iconName,
-                            "drawable",
-                            context.packageName
-                        )
+                        val color =
+                            try {
+                                Color(android.graphics.Color.parseColor(tag.colorHex))
+                            } catch (e: Exception) {
+                                MaterialTheme.colorScheme.primary
+                            }
+                        val iconResId =
+                            context.resources.getIdentifier(
+                                tag.iconName,
+                                "drawable",
+                                context.packageName,
+                            )
 
                         androidx.compose.material3.ListItem(
                             leadingContent = {
                                 val richColor = remember(color) { ColorUtil.toRichColor(color) }
                                 Box(
-                                    modifier = Modifier
-                                        .size(32.dp)
-                                        .clip(CircleShape)
-                                        .background(richColor.copy(alpha = 0.2f)),
-                                    contentAlignment = Alignment.Center
+                                    modifier =
+                                        Modifier
+                                            .size(32.dp)
+                                            .clip(CircleShape)
+                                            .background(richColor.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Icon(
-                                        painter = painterResource(
-                                            id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24
-                                        ),
+                                        painter =
+                                            painterResource(
+                                                id = if (iconResId != 0) iconResId else R.drawable.rounded_interests_24,
+                                            ),
                                         contentDescription = null,
                                         tint = richColor,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(18.dp),
                                     )
                                 }
                             },
@@ -153,32 +160,36 @@ fun FreezeTagSettingsSheet(
                                     checked = isChecked,
                                     onCheckedChange = { checked ->
                                         HapticUtil.performUIHaptic(view)
-                                        selectedTagIds = if (checked) {
-                                            selectedTagIds + tag.id
-                                        } else {
-                                            selectedTagIds - tag.id
-                                        }
-                                    }
+                                        selectedTagIds =
+                                            if (checked) {
+                                                selectedTagIds + tag.id
+                                            } else {
+                                                selectedTagIds - tag.id
+                                            }
+                                    },
                                 )
                             },
-                            colors = ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.surfaceBright
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(MaterialTheme.shapes.extraSmall)
-                                .clickable {
-                                    HapticUtil.performUIHaptic(view)
-                                    selectedTagIds = if (isChecked) {
-                                        selectedTagIds - tag.id
-                                    } else {
-                                        selectedTagIds + tag.id
-                                    }
-                                }
+                            colors =
+                                ListItemDefaults.colors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                ),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.extraSmall)
+                                    .clickable {
+                                        HapticUtil.performUIHaptic(view)
+                                        selectedTagIds =
+                                            if (isChecked) {
+                                                selectedTagIds - tag.id
+                                            } else {
+                                                selectedTagIds + tag.id
+                                            }
+                                    },
                         ) {
                             Text(
                                 text = tag.name,
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                         }
                     }
@@ -193,12 +204,12 @@ fun FreezeTagSettingsSheet(
                     onSave(
                         Action.FreezeTag(
                             mode = selectedMode,
-                            tagIds = selectedTagIds.toList()
-                        )
+                            tagIds = selectedTagIds.toList(),
+                        ),
                     )
                     onDismiss()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(text = stringResource(R.string.action_save))
             }

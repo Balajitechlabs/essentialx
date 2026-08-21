@@ -58,7 +58,7 @@ import java.util.Locale
 fun BatteryInfoTabContent(
     batteryDetails: BatteryDetails,
     isLoadingAdvanced: Boolean,
-    onRefresh: () -> Unit = {}
+    onRefresh: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -67,46 +67,46 @@ fun BatteryInfoTabContent(
     batteryDetails.stateOfHealth?.let { soh ->
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.surfaceBright,
-                        shape = Shapes.extraSmall
-                    )
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surfaceBright,
+                            shape = Shapes.extraSmall,
+                        ).padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column {
                     Text(
                         text = stringResource(R.string.label_battery_state_of_health),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
                         text = "$soh%",
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.Bold,
-                        color = if (soh >= 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                        color = if (soh >= 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                     )
                 }
 
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(64.dp),
                 ) {
                     CircularProgressIndicator(
                         progress = { soh / 100f },
                         modifier = Modifier.size(64.dp),
                         color = if (soh >= 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                         trackColor = MaterialTheme.colorScheme.outlineVariant,
-                        strokeWidth = 6.dp
+                        strokeWidth = 6.dp,
                     )
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_ecg_heart_24),
                         contentDescription = null,
                         tint = if (soh >= 80) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
@@ -120,16 +120,17 @@ fun BatteryInfoTabContent(
         InfoDetailRow(
             title = R.string.label_battery_health,
             value = BatteryInfoUtil.formatHealth(batteryDetails.health),
-            iconRes = R.drawable.rounded_ecg_heart_24
+            iconRes = R.drawable.rounded_ecg_heart_24,
         )
         InfoDetailRow(
             title = R.string.label_battery_temperature,
-            value = String.format(
-                LocalLocale.current.platformLocale,
-                "%.1f °C",
-                batteryDetails.temperature / 10.0f
-            ),
-            iconRes = R.drawable.rounded_device_thermostat_24
+            value =
+                String.format(
+                    LocalLocale.current.platformLocale,
+                    "%.1f °C",
+                    batteryDetails.temperature / 10.0f,
+                ),
+            iconRes = R.drawable.rounded_device_thermostat_24,
         )
 
         if (isLoadingAdvanced) {
@@ -145,21 +146,21 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_capacity,
                     value = "$fullMah / $designMah mAh",
-                    iconRes = R.drawable.battery_android_frame_shield_24px
+                    iconRes = R.drawable.battery_android_frame_shield_24px,
                 )
             } else if (design != null && design > 0) {
                 val designMah = if (design > 10000) design / 1000 else design
                 InfoDetailRow(
                     title = R.string.label_battery_capacity,
                     value = "$designMah mAh",
-                    iconRes = R.drawable.battery_android_frame_shield_24px
+                    iconRes = R.drawable.battery_android_frame_shield_24px,
                 )
             } else if (full != null && full > 0) {
                 val fullMah = if (full > 10000) full / 1000 else full
                 InfoDetailRow(
                     title = R.string.label_battery_capacity,
                     value = "$fullMah mAh",
-                    iconRes = R.drawable.battery_android_frame_shield_24px
+                    iconRes = R.drawable.battery_android_frame_shield_24px,
                 )
             }
 
@@ -168,7 +169,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_capacity_health,
                     value = String.format(Locale.getDefault(), "%.1f %%", healthPct),
-                    iconRes = R.drawable.rounded_ecg_heart_24
+                    iconRes = R.drawable.rounded_ecg_heart_24,
                 )
             }
 
@@ -176,7 +177,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_cycle_count,
                     value = "$cycles",
-                    iconRes = R.drawable.rounded_cycle_24
+                    iconRes = R.drawable.rounded_cycle_24,
                 )
             }
         }
@@ -191,17 +192,17 @@ fun BatteryInfoTabContent(
         InfoDetailRow(
             title = R.string.label_battery_mode,
             value = BatteryInfoUtil.formatPlugged(batteryDetails.plugged),
-            iconRes = R.drawable.rounded_cable_24
+            iconRes = R.drawable.rounded_cable_24,
         )
 
         // Dynamically show remaining charging cards only when plugged with expand/collapse animation
         AnimatedVisibility(
             visible = isPlugged,
             enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut()
+            exit = shrinkVertically() + fadeOut(),
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 if (isLoadingAdvanced) {
                     BatteryLoadingIndicatorCard()
@@ -212,7 +213,7 @@ fun BatteryInfoTabContent(
                         InfoDetailRow(
                             title = R.string.label_battery_charging_policy,
                             value = BatteryInfoUtil.formatChargingPolicy(policy),
-                            iconRes = R.drawable.rounded_info_24
+                            iconRes = R.drawable.rounded_info_24,
                         )
                     }
 
@@ -222,7 +223,7 @@ fun BatteryInfoTabContent(
                             InfoDetailRow(
                                 title = R.string.label_battery_max_current,
                                 value = "$curMa mA",
-                                iconRes = R.drawable.rounded_power_input_24
+                                iconRes = R.drawable.rounded_power_input_24,
                             )
                         }
                     }
@@ -233,7 +234,7 @@ fun BatteryInfoTabContent(
                             InfoDetailRow(
                                 title = R.string.label_battery_max_voltage,
                                 value = "$volMv mV",
-                                iconRes = R.drawable.rounded_power_input_24
+                                iconRes = R.drawable.rounded_power_input_24,
                             )
                         }
                     }
@@ -246,13 +247,13 @@ fun BatteryInfoTabContent(
                             iconRes = R.drawable.rounded_charger_24
                         )
                     }
-                    */
+                     */
 
                     batteryDetails.chargeTimeRemainingMs?.let { timeMs ->
                         InfoDetailRow(
                             title = R.string.label_battery_charge_time_remaining,
                             value = BatteryInfoUtil.formatChargeTimeRemaining(timeMs),
-                            iconRes = R.drawable.battery_android_frame_bolt_24px
+                            iconRes = R.drawable.battery_android_frame_bolt_24px,
                         )
                     }
                 }
@@ -267,12 +268,12 @@ fun BatteryInfoTabContent(
         InfoDetailRow(
             title = R.string.label_battery_voltage,
             value = "${batteryDetails.voltage} mV",
-            iconRes = R.drawable.rounded_power_input_24
+            iconRes = R.drawable.rounded_power_input_24,
         )
         InfoDetailRow(
             title = R.string.label_battery_technology,
             value = batteryDetails.technology,
-            iconRes = R.drawable.rounded_memory_alt_24
+            iconRes = R.drawable.rounded_memory_alt_24,
         )
 
         if (!isLoadingAdvanced) {
@@ -282,7 +283,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_charge_counter,
                     value = "$counterMah mAh",
-                    iconRes = R.drawable.battery_android_frame_4_24px
+                    iconRes = R.drawable.battery_android_frame_4_24px,
                 )
             }
 
@@ -292,7 +293,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_current_now,
                     value = "$curNow mA",
-                    iconRes = R.drawable.rounded_power_input_24
+                    iconRes = R.drawable.rounded_power_input_24,
                 )
             }
 
@@ -300,7 +301,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_current_avg,
                     value = "$curAvg mA",
-                    iconRes = R.drawable.rounded_power_input_24
+                    iconRes = R.drawable.rounded_power_input_24,
                 )
             }
 
@@ -308,7 +309,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_remaining_energy,
                     value = "$energy mWh",
-                    iconRes = R.drawable.battery_android_frame_4_24px
+                    iconRes = R.drawable.battery_android_frame_4_24px,
                 )
             }
 
@@ -319,18 +320,19 @@ fun BatteryInfoTabContent(
                 batteryDetails.currentAvgMa?.let { kotlin.math.abs(it) }?.takeIf { it > 0 }
             if (chargeCounterMah != null && chargeCounterMah > 0 && avgCurrentMa != null) {
                 val remainingHours = chargeCounterMah.toDouble() / avgCurrentMa.toDouble()
-                val formattedRemaining = if (remainingHours >= 1.0) {
-                    val h = remainingHours.toInt()
-                    val m = ((remainingHours - h) * 60).toInt()
-                    if (m > 0) "${h}h ${m}m" else "${h}h"
-                } else {
-                    val m = (remainingHours * 60).toInt().coerceAtLeast(1)
-                    "${m}m"
-                }
+                val formattedRemaining =
+                    if (remainingHours >= 1.0) {
+                        val h = remainingHours.toInt()
+                        val m = ((remainingHours - h) * 60).toInt()
+                        if (m > 0) "${h}h ${m}m" else "${h}h"
+                    } else {
+                        val m = (remainingHours * 60).toInt().coerceAtLeast(1)
+                        "${m}m"
+                    }
                 InfoDetailRow(
                     title = R.string.label_battery_avg_remaining,
                     value = formattedRemaining,
-                    iconRes = R.drawable.rounded_av_timer_24
+                    iconRes = R.drawable.rounded_av_timer_24,
                 )
             }
 
@@ -339,7 +341,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_manufacturing_date,
                     value = dateStr,
-                    iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24
+                    iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24,
                 )
             }
 
@@ -348,7 +350,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_first_usage_date,
                     value = dateStr,
-                    iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24
+                    iconRes = if (isSuspicious) R.drawable.rounded_release_alert_24 else R.drawable.rounded_info_24,
                 )
             }
 
@@ -357,7 +359,7 @@ fun BatteryInfoTabContent(
                     InfoDetailRow(
                         title = R.string.label_battery_serial_number,
                         value = serial,
-                        iconRes = R.drawable.rounded_info_24
+                        iconRes = R.drawable.rounded_info_24,
                     )
                 }
             }
@@ -365,7 +367,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_battery_part_status,
                     value = BatteryInfoUtil.formatPartStatus(part),
-                    iconRes = R.drawable.battery_android_frame_shield_24px
+                    iconRes = R.drawable.battery_android_frame_shield_24px,
                 )
             }
         }
@@ -380,7 +382,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_thermal_cpu,
                     value = "${"%.1f".format(Locale.US, cpu)} °C",
-                    iconRes = R.drawable.rounded_memory_alt_24
+                    iconRes = R.drawable.rounded_memory_alt_24,
                 )
             }
 
@@ -388,7 +390,7 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_thermal_gpu,
                     value = "${"%.1f".format(Locale.US, gpu)} °C",
-                    iconRes = R.drawable.rounded_memory_alt_24
+                    iconRes = R.drawable.rounded_memory_alt_24,
                 )
             }
 
@@ -396,25 +398,33 @@ fun BatteryInfoTabContent(
                 InfoDetailRow(
                     title = R.string.label_thermal_skin,
                     value = "${"%.1f".format(Locale.US, skin)} °C",
-                    iconRes = R.drawable.rounded_device_thermostat_24
+                    iconRes = R.drawable.rounded_device_thermostat_24,
                 )
             }
 
-            val statusText = when (thermal.maxThrottlingStatus) {
-                ThermalInfo.THROTTLING_NONE -> stringResource(R.string.label_thermal_status_none)
-                ThermalInfo.THROTTLING_LIGHT -> stringResource(R.string.label_thermal_status_light)
-                ThermalInfo.THROTTLING_MODERATE -> stringResource(R.string.label_thermal_status_moderate)
-                ThermalInfo.THROTTLING_SEVERE -> stringResource(R.string.label_thermal_status_severe)
-                ThermalInfo.THROTTLING_CRITICAL -> stringResource(R.string.label_thermal_status_critical)
-                ThermalInfo.THROTTLING_EMERGENCY -> stringResource(R.string.label_thermal_status_emergency)
-                ThermalInfo.THROTTLING_SHUTDOWN -> stringResource(R.string.label_thermal_status_shutdown)
-                else -> stringResource(R.string.label_thermal_status_none)
-            }
+            val statusText =
+                when (thermal.maxThrottlingStatus) {
+                    ThermalInfo.THROTTLING_NONE -> stringResource(R.string.label_thermal_status_none)
+                    ThermalInfo.THROTTLING_LIGHT -> stringResource(R.string.label_thermal_status_light)
+                    ThermalInfo.THROTTLING_MODERATE -> stringResource(R.string.label_thermal_status_moderate)
+                    ThermalInfo.THROTTLING_SEVERE -> stringResource(R.string.label_thermal_status_severe)
+                    ThermalInfo.THROTTLING_CRITICAL -> stringResource(R.string.label_thermal_status_critical)
+                    ThermalInfo.THROTTLING_EMERGENCY -> stringResource(R.string.label_thermal_status_emergency)
+                    ThermalInfo.THROTTLING_SHUTDOWN -> stringResource(R.string.label_thermal_status_shutdown)
+                    else -> stringResource(R.string.label_thermal_status_none)
+                }
 
             InfoDetailRow(
                 title = R.string.label_thermal_throttling_status,
                 value = statusText,
-                iconRes = if (thermal.maxThrottlingStatus > ThermalInfo.THROTTLING_NONE) R.drawable.rounded_release_alert_24 else R.drawable.rounded_device_thermostat_24
+                iconRes =
+                    if (thermal.maxThrottlingStatus >
+                        ThermalInfo.THROTTLING_NONE
+                    ) {
+                        R.drawable.rounded_release_alert_24
+                    } else {
+                        R.drawable.rounded_device_thermostat_24
+                    },
             )
         }
     }
@@ -425,7 +435,7 @@ fun BatteryInfoTabContent(
         isExpanded = showSettings,
         onToggle = { showSettings = !showSettings },
         title = R.string.action_charging_qs_tile_options,
-        description = null
+        description = null,
     )
 
     if (showSettings) {
@@ -441,35 +451,37 @@ fun BatteryInfoTabContent(
         }
 
         val items = listOf("deactivated", "adaptive", "limit")
-        val selectedItems = remember(enableDeactivated, enableAdaptive, enableLimit) {
-            mutableSetOf<String>().apply {
-                if (enableDeactivated) add("deactivated")
-                if (enableAdaptive) add("adaptive")
-                if (enableLimit) add("limit")
-            }.toSet()
-        }
+        val selectedItems =
+            remember(enableDeactivated, enableAdaptive, enableLimit) {
+                mutableSetOf<String>()
+                    .apply {
+                        if (enableDeactivated) add("deactivated")
+                        if (enableAdaptive) add("adaptive")
+                        if (enableLimit) add("limit")
+                    }.toSet()
+            }
 
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.surfaceBright,
-                        shape = Shapes.extraSmall
-                    )
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surfaceBright,
+                            shape = Shapes.extraSmall,
+                        ).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(
                     text = stringResource(R.string.charge_opt_long_press_desc),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 Text(
                     text = stringResource(R.string.charge_opt_long_press_title),
                     style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
 
                 MultiSegmentedPicker(
@@ -483,11 +495,11 @@ fun BatteryInfoTabContent(
 
                             settingsRepository.putBoolean(
                                 "charge_opt_toggle_deactivated",
-                                enableDeactivated
+                                enableDeactivated,
                             )
                             settingsRepository.putBoolean(
                                 "charge_opt_toggle_adaptive",
-                                enableAdaptive
+                                enableAdaptive,
                             )
                             settingsRepository.putBoolean("charge_opt_toggle_limit", enableLimit)
                         }
@@ -501,48 +513,53 @@ fun BatteryInfoTabContent(
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    allowEmpty = false
+                    allowEmpty = false,
                 )
             }
         }
 
         val isShellAvailableForReset =
-            com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                context
-            )
+            com.sameerasw.essentials.utils.ShellUtils
+                .isAvailable(context) &&
+                com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                    context,
+                )
         if (isShellAvailableForReset) {
             RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            MaterialTheme.colorScheme.surfaceBright,
-                            shape = Shapes.extraSmall
-                        )
-                        .padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                MaterialTheme.colorScheme.surfaceBright,
+                                shape = Shapes.extraSmall,
+                            ).padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     Text(
                         text = stringResource(R.string.label_reset_battery_stats_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     Text(
                         text = stringResource(R.string.label_reset_battery_stats_desc),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
                     Button(
                         onClick = {
-                            com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
-                            if (com.sameerasw.essentials.utils.BatteryStatsUtil.resetStats(context)) {
+                            com.sameerasw.essentials.utils.HapticUtil
+                                .performVirtualKeyHaptic(view)
+                            if (com.sameerasw.essentials.utils.BatteryStatsUtil
+                                    .resetStats(context)
+                            ) {
                                 onRefresh()
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(text = stringResource(R.string.action_reset_battery_stats))
                     }
@@ -559,7 +576,7 @@ fun BatteryInfoTabContent(
                         autoResetEnabled = isChecked
                         settingsRepository.putBoolean("auto_reset_battery_stats", isChecked)
                     },
-                    iconRes = R.drawable.rounded_cycle_24
+                    iconRes = R.drawable.rounded_cycle_24,
                 )
             }
         }
@@ -568,52 +585,66 @@ fun BatteryInfoTabContent(
     // Permission Grant Card at the very bottom if BATTERY_STATS permission is missing AND Shizuku/Root is available & permitted
     val hasStatsPerm = BatteryInfoUtil.hasBatteryStatsPermission(context)
     val isShellAvailable =
-        com.sameerasw.essentials.utils.ShellUtils.isAvailable(context) && com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-            context
-        )
-    if (!hasStatsPerm && batteryDetails.stateOfHealth == null && batteryDetails.cycleCount == null && android.os.Build.VERSION.SDK_INT >= 34 && isShellAvailable) {
+        com.sameerasw.essentials.utils.ShellUtils
+            .isAvailable(context) &&
+            com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                context,
+            )
+    if (!hasStatsPerm &&
+        batteryDetails.stateOfHealth == null &&
+        batteryDetails.cycleCount == null &&
+        android.os.Build.VERSION.SDK_INT >= 34 &&
+        isShellAvailable
+    ) {
         RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.surfaceBright,
-                        shape = Shapes.extraSmall
-                    )
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surfaceBright,
+                            shape = Shapes.extraSmall,
+                        ).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_info_24),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(R.string.label_battery_grant_stats_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
 
                 Text(
                     text = stringResource(R.string.label_battery_grant_stats_desc),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
-                if (com.sameerasw.essentials.utils.ShizukuUtils.isShizukuAvailable() && com.sameerasw.essentials.utils.ShizukuUtils.hasPermission()) {
+                if (com.sameerasw.essentials.utils.ShizukuUtils
+                        .isShizukuAvailable() &&
+                    com.sameerasw.essentials.utils.ShizukuUtils
+                        .hasPermission()
+                ) {
                     Button(
                         onClick = {
-                            com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
-                            if (com.sameerasw.essentials.utils.ShizukuUtils.grantBatteryStatsPermission()) {
+                            com.sameerasw.essentials.utils.HapticUtil
+                                .performVirtualKeyHaptic(view)
+                            if (com.sameerasw.essentials.utils.ShizukuUtils
+                                    .grantBatteryStatsPermission()
+                            ) {
                                 onRefresh()
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(text = stringResource(R.string.action_grant_shizuku))
                     }

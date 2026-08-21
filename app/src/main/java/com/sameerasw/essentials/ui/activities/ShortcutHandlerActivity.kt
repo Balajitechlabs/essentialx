@@ -51,7 +51,8 @@ class ShortcutHandlerActivity : ComponentActivity() {
         if (packageName != null) {
             setContent {
                 val viewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-                    androidx.lifecycle.viewmodel.compose.viewModel()
+                    androidx.lifecycle.viewmodel.compose
+                        .viewModel()
                 val context = androidx.compose.ui.platform.LocalContext.current
                 androidx.compose.runtime.LaunchedEffect(Unit) {
                     viewModel.check(context)
@@ -60,7 +61,7 @@ class ShortcutHandlerActivity : ComponentActivity() {
                 EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         LoadingIndicator(modifier = Modifier.scale(5f))
                     }
@@ -81,11 +82,12 @@ class ShortcutHandlerActivity : ComponentActivity() {
                     startActivity(launchIntent)
                 } else {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(
-                            this@ShortcutHandlerActivity,
-                            R.string.error_app_uninstalled,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast
+                            .makeText(
+                                this@ShortcutHandlerActivity,
+                                R.string.error_app_uninstalled,
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     }
                 }
                 finish()

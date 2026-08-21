@@ -37,23 +37,24 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun GlowSidesPicker(
     selectedSides: Set<NotificationLightingSide>,
     onSideToggled: (NotificationLightingSide, Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val options = listOf(
-        NotificationLightingSide.LEFT to R.drawable.rounded_border_left_24,
-        NotificationLightingSide.TOP to R.drawable.rounded_border_top_24,
-        NotificationLightingSide.RIGHT to R.drawable.rounded_border_right_24,
-        NotificationLightingSide.BOTTOM to R.drawable.rounded_border_bottom_24
-    )
+    val options =
+        listOf(
+            NotificationLightingSide.LEFT to R.drawable.rounded_border_left_24,
+            NotificationLightingSide.TOP to R.drawable.rounded_border_top_24,
+            NotificationLightingSide.RIGHT to R.drawable.rounded_border_right_24,
+            NotificationLightingSide.BOTTOM to R.drawable.rounded_border_bottom_24,
+        )
     val view = LocalView.current
 
     Row(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceBright,
-                shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-            )
-            .padding(10.dp),
+        modifier =
+            modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceBright,
+                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                ).padding(10.dp),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
     ) {
         val modifiers = List(options.size) { Modifier.weight(1f) }
@@ -66,16 +67,17 @@ fun GlowSidesPicker(
                     onSideToggled(side, checked)
                 },
                 modifier = modifiers[index].semantics { role = Role.Checkbox },
-                shapes = when (index) {
-                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                    options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                },
+                shapes =
+                    when (index) {
+                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                        options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                    },
             ) {
                 Icon(
                     painter = painterResource(id = iconRes),
                     contentDescription = side.name,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
             }
         }

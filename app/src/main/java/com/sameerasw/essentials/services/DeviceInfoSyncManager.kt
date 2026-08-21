@@ -31,50 +31,58 @@ object DeviceInfoSyncManager {
     private var maxTorchLevel = 1
     private var isIntensitySupported = false
 
-    private val torchCallback = object : CameraManager.TorchCallback() {
-        override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
-            val context = currentContext ?: return
-            val primaryId = FlashlightUtil.getCameraId(context)
-            if (cameraId == primaryId) {
-                isTorchOn = enabled
+    private val torchCallback =
+        object : CameraManager.TorchCallback() {
+            override fun onTorchModeChanged(
+                cameraId: String,
+                enabled: Boolean,
+            ) {
+                val context = currentContext ?: return
+                val primaryId = FlashlightUtil.getCameraId(context)
+                if (cameraId == primaryId) {
+                    isTorchOn = enabled
 
-                var level = FlashlightUtil.getCurrentLevel(context, cameraId)
-                // Fallback to last known intensity if system returns default level 1
-                if (enabled && level <= 1) {
-                    val prefs =
-                        context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-                    level = prefs.getInt("flashlight_last_intensity", level)
-                }
-
-                torchLevel = level
-                maxTorchLevel = FlashlightUtil.getMaxLevel(context, cameraId)
-                isIntensitySupported = FlashlightUtil.isIntensitySupported(context, cameraId)
-                syncDeviceInfo(context)
-
-                val intent =
-                    Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
-                        setPackage(context.packageName)
+                    var level = FlashlightUtil.getCurrentLevel(context, cameraId)
+                    // Fallback to last known intensity if system returns default level 1
+                    if (enabled && level <= 1) {
+                        val prefs =
+                            context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                        level = prefs.getInt("flashlight_last_intensity", level)
                     }
-                context.sendBroadcast(intent)
+
+                    torchLevel = level
+                    maxTorchLevel = FlashlightUtil.getMaxLevel(context, cameraId)
+                    isIntensitySupported = FlashlightUtil.isIntensitySupported(context, cameraId)
+                    syncDeviceInfo(context)
+
+                    val intent =
+                        Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
+                            setPackage(context.packageName)
+                        }
+                    context.sendBroadcast(intent)
+                }
+            }
+
+            override fun onTorchStrengthLevelChanged(
+                cameraId: String,
+                newStrengthLevel: Int,
+            ) {
+                val context = currentContext ?: return
+                val primaryId = FlashlightUtil.getCameraId(context)
+                if (cameraId == primaryId) {
+                    torchLevel = newStrengthLevel
+                    syncDeviceInfo(context)
+                }
             }
         }
 
-        override fun onTorchStrengthLevelChanged(cameraId: String, newStrengthLevel: Int) {
-            val context = currentContext ?: return
-            val primaryId = FlashlightUtil.getCameraId(context)
-            if (cameraId == primaryId) {
-                torchLevel = newStrengthLevel
-                syncDeviceInfo(context)
+    private val syncRunnable =
+        object : Runnable {
+            override fun run() {
+                syncDeviceInfo(currentContext ?: return)
+                handler.postDelayed(this, 5 * 60 * 1000) // Sync every 5 minutes
             }
         }
-    }
-
-    private val syncRunnable = object : Runnable {
-        override fun run() {
-            syncDeviceInfo(currentContext ?: return)
-            handler.postDelayed(this, 5 * 60 * 1000) // Sync every 5 minutes
-        }
-    }
 
     private var currentContext: Context? = null
     private var prefChangeListener: android.content.SharedPreferences.OnSharedPreferenceChangeListener? =
@@ -94,59 +102,83 @@ object DeviceInfoSyncManager {
         handler.postDelayed(syncRunnable, 5 * 60 * 1000)
 
         // Sync on battery change
-        context.registerReceiver(object : android.content.BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                syncDeviceInfo(context)
-            }
-        }, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        context.registerReceiver(
+            object : android.content.BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context,
+                    intent: Intent,
+                ) {
+                    syncDeviceInfo(context)
+                }
+            },
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+        )
 
         // Sync on ringer mode change
-        context.registerReceiver(object : android.content.BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                syncDeviceInfo(context)
-            }
-        }, IntentFilter(android.media.AudioManager.RINGER_MODE_CHANGED_ACTION))
+        context.registerReceiver(
+            object : android.content.BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context,
+                    intent: Intent,
+                ) {
+                    syncDeviceInfo(context)
+                }
+            },
+            IntentFilter(android.media.AudioManager.RINGER_MODE_CHANGED_ACTION),
+        )
 
         // Sync on flashlight change
         val cameraManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         cameraManager.registerTorchCallback(torchCallback, handler)
 
         // Sync on AOD change
-        val aodUri = android.provider.Settings.Secure.getUriFor("doze_always_on")
-        aodContentObserver = object : android.database.ContentObserver(handler) {
-            override fun onChange(selfChange: Boolean) {
-                syncDeviceInfo(context)
+        val aodUri =
+            android.provider.Settings.Secure
+                .getUriFor("doze_always_on")
+        aodContentObserver =
+            object : android.database.ContentObserver(handler) {
+                override fun onChange(selfChange: Boolean) {
+                    syncDeviceInfo(context)
+                }
             }
-        }
         context.contentResolver.registerContentObserver(aodUri, true, aodContentObserver!!)
 
         // Sync on Tap to wake change
-        val tapToWakeUri = android.provider.Settings.Secure.getUriFor("doze_tap_gesture")
-        tapToWakeContentObserver = object : android.database.ContentObserver(handler) {
-            override fun onChange(selfChange: Boolean) {
-                syncDeviceInfo(context)
+        val tapToWakeUri =
+            android.provider.Settings.Secure
+                .getUriFor("doze_tap_gesture")
+        tapToWakeContentObserver =
+            object : android.database.ContentObserver(handler) {
+                override fun onChange(selfChange: Boolean) {
+                    syncDeviceInfo(context)
+                }
             }
-        }
         context.contentResolver.registerContentObserver(
             tapToWakeUri,
             true,
-            tapToWakeContentObserver!!
+            tapToWakeContentObserver!!,
         )
 
         // Sync on preference change (flashlight pulse, glance, watch controls)
         val p = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         prefChangeListener =
             android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-                if (key == "flashlight_pulse_enabled" || key == "notification_glance_enabled" || key == "watch_controls_layout" || key == "watch_sync_sound_mode_enabled" || key == "watch_sync_location_reached_enabled") {
+                if (key == "flashlight_pulse_enabled" ||
+                    key == "notification_glance_enabled" ||
+                    key == "watch_controls_layout" ||
+                    key == "watch_sync_sound_mode_enabled" ||
+                    key == "watch_sync_location_reached_enabled"
+                ) {
                     syncDeviceInfo(context)
                 }
             }
         p.registerOnSharedPreferenceChangeListener(prefChangeListener)
     }
 
-    private val syncDebouncer = Runnable {
-        currentContext?.let { performSync(it) }
-    }
+    private val syncDebouncer =
+        Runnable {
+            currentContext?.let { performSync(it) }
+        }
 
     private fun syncDeviceInfo(context: Context) {
         handler.removeCallbacks(syncDebouncer)
@@ -159,9 +191,10 @@ object DeviceInfoSyncManager {
     }
 
     private fun performSync(context: Context) {
-        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
-            context.registerReceiver(null, ifilter)
-        }
+        val batteryStatus: Intent? =
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+                context.registerReceiver(null, ifilter)
+            }
 
         val level: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
         val scale: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
@@ -170,7 +203,8 @@ object DeviceInfoSyncManager {
 
         val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
         val plugged: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) ?: -1
-        val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+        val isCharging =
+            status == BatteryManager.BATTERY_STATUS_CHARGING ||
                 status == BatteryManager.BATTERY_STATUS_FULL ||
                 plugged == BatteryManager.BATTERY_PLUGGED_AC ||
                 plugged == BatteryManager.BATTERY_PLUGGED_USB ||
@@ -180,11 +214,12 @@ object DeviceInfoSyncManager {
         val ringerMode =
             (context.getSystemService(Context.AUDIO_SERVICE) as? android.media.AudioManager)?.ringerMode
                 ?: 2
-        val deviceName = android.provider.Settings.Global.getString(
-            context.contentResolver,
-            android.provider.Settings.Global.DEVICE_NAME
-        )
-            ?: android.os.Build.MODEL
+        val deviceName =
+            android.provider.Settings.Global.getString(
+                context.contentResolver,
+                android.provider.Settings.Global.DEVICE_NAME,
+            )
+                ?: android.os.Build.MODEL
 
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         val syncLocationReachedEnabled =
@@ -197,11 +232,23 @@ object DeviceInfoSyncManager {
         val travelProgress =
             if (syncLocationReachedEnabled) prefs.getFloat("travel_progress", 0f) else 0f
         val travelRemainingTime =
-            if (syncLocationReachedEnabled) (prefs.getString("travel_remaining_time", "")
-                ?: "") else ""
+            if (syncLocationReachedEnabled) {
+                (
+                    prefs.getString("travel_remaining_time", "")
+                        ?: ""
+                )
+            } else {
+                ""
+            }
         val travelRemainingDistance =
-            if (syncLocationReachedEnabled) (prefs.getString("travel_remaining_distance", "")
-                ?: "") else ""
+            if (syncLocationReachedEnabled) {
+                (
+                    prefs.getString("travel_remaining_distance", "")
+                        ?: ""
+                )
+            } else {
+                ""
+            }
         val travelIconName =
             if (syncLocationReachedEnabled) (prefs.getString("travel_icon_name", "") ?: "") else ""
         val travelIsPaused =
@@ -210,26 +257,28 @@ object DeviceInfoSyncManager {
             if (syncLocationReachedEnabled) prefs.getBoolean("travel_arrived", false) else false
 
         val flashlightPulseEnabled = prefs.getBoolean("flashlight_pulse_enabled", false)
-        val aodState = when {
-            prefs.getBoolean("notification_glance_enabled", false) -> 2
-            android.provider.Settings.Secure.getInt(
-                context.contentResolver,
-                "doze_always_on",
-                0
-            ) == 1 -> 1
+        val aodState =
+            when {
+                prefs.getBoolean("notification_glance_enabled", false) -> 2
+                android.provider.Settings.Secure.getInt(
+                    context.contentResolver,
+                    "doze_always_on",
+                    0,
+                ) == 1 -> 1
 
-            else -> 0
-        }
+                else -> 0
+            }
 
         val watchControlsLayout =
             prefs.getString("watch_controls_layout", "LOCK,SOUND,FLASHLIGHT,FLASHLIGHT_PULSE,AOD")
                 ?: "LOCK,SOUND,FLASHLIGHT,FLASHLIGHT_PULSE,AOD"
 
-        val tapToWakeEnabled = android.provider.Settings.Secure.getInt(
-            context.contentResolver,
-            "doze_tap_gesture",
-            1
-        ) == 1
+        val tapToWakeEnabled =
+            android.provider.Settings.Secure.getInt(
+                context.contentResolver,
+                "doze_tap_gesture",
+                1,
+            ) == 1
         val watchSyncSoundModeEnabled = prefs.getBoolean("watch_sync_sound_mode_enabled", false)
 
         val dataMap = putDataMapReq.dataMap

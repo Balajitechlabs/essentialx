@@ -94,30 +94,30 @@ class PixelSearchbarSettingsActivity : ComponentActivity() {
             val isPitchBlackThemeEnabled by viewModel.isPitchBlackThemeEnabled
             var showHelpSheet by remember { mutableStateOf(false) }
 
-            val pixelSearchbarFeature = remember {
-                object : Feature(
-                    id = "Pixel Searchbar",
-                    title = R.string.pixel_searchbar_settings_title,
-                    iconRes = R.drawable.rounded_search_24,
-                    category = R.string.cat_display,
-                    description = R.string.feat_pixel_searchbar_desc,
-                    aboutDescription = R.string.about_desc_pixel_searchbar,
-                    permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
-                    showToggle = true,
-                    hasMoreSettings = true
-                ) {
-                    override fun isEnabled(viewModel: MainViewModel) =
-                        viewModel.isPixelSearchbarEnabled.value
-
-                    override fun onToggle(
-                        viewModel: MainViewModel,
-                        context: Context,
-                        enabled: Boolean
+            val pixelSearchbarFeature =
+                remember {
+                    object : Feature(
+                        id = "Pixel Searchbar",
+                        title = R.string.pixel_searchbar_settings_title,
+                        iconRes = R.drawable.rounded_search_24,
+                        category = R.string.cat_display,
+                        description = R.string.feat_pixel_searchbar_desc,
+                        aboutDescription = R.string.about_desc_pixel_searchbar,
+                        permissionKeys = listOf("WRITE_SECURE_SETTINGS"),
+                        showToggle = true,
+                        hasMoreSettings = true,
                     ) {
-                        viewModel.setPixelSearchbarEnabled(enabled, context)
+                        override fun isEnabled(viewModel: MainViewModel) = viewModel.isPixelSearchbarEnabled.value
+
+                        override fun onToggle(
+                            viewModel: MainViewModel,
+                            context: Context,
+                            enabled: Boolean,
+                        ) {
+                            viewModel.setPixelSearchbarEnabled(enabled, context)
+                        }
                     }
                 }
-            }
 
             val isBlurEnabled by viewModel.isBlurEnabled
 
@@ -127,64 +127,73 @@ class PixelSearchbarSettingsActivity : ComponentActivity() {
                     containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ) { _ ->
                     val density = LocalDensity.current
-                    val statusBarHeightPx = with(density) {
-                        WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx()
-                    }
+                    val statusBarHeightPx =
+                        with(density) {
+                            WindowInsets.statusBars
+                                .asPaddingValues()
+                                .calculateTopPadding()
+                                .toPx()
+                        }
 
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .progressiveBlur(
-                                blurRadius = if (isBlurEnabled) 40f else 0f,
-                                height = statusBarHeightPx * 1.15f,
-                                direction = BlurDirection.TOP
-                            )
-                    ) {
-                        Column(
-                            modifier = Modifier
+                        modifier =
+                            Modifier
                                 .fillMaxSize()
                                 .progressiveBlur(
                                     blurRadius = if (isBlurEnabled) 40f else 0f,
-                                    height = with(density) { 150.dp.toPx() },
-                                    direction = BlurDirection.BOTTOM
-                                )
-                                .verticalScroll(rememberScrollState())
+                                    height = statusBarHeightPx * 1.15f,
+                                    direction = BlurDirection.TOP,
+                                ),
+                    ) {
+                        Column(
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .progressiveBlur(
+                                        blurRadius = if (isBlurEnabled) 40f else 0f,
+                                        height = with(density) { 150.dp.toPx() },
+                                        direction = BlurDirection.BOTTOM,
+                                    ).verticalScroll(rememberScrollState()),
                         ) {
                             Spacer(
-                                modifier = Modifier.height(
-                                    WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
-                                )
+                                modifier =
+                                    Modifier.height(
+                                        WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                                    ),
                             )
 
                             PixelSearchbarSettingsUI(
                                 viewModel = viewModel,
-                                modifier = Modifier.padding(top = 4.dp)
+                                modifier = Modifier.padding(top = 4.dp),
                             )
 
                             Spacer(
-                                modifier = Modifier.height(
-                                    WindowInsets.navigationBars.asPaddingValues()
-                                        .calculateBottomPadding() + 150.dp
-                                )
+                                modifier =
+                                    Modifier.height(
+                                        WindowInsets.navigationBars
+                                            .asPaddingValues()
+                                            .calculateBottomPadding() + 150.dp,
+                                    ),
                             )
                         }
 
                         EssentialsFloatingToolbar(
                             title = stringResource(R.string.pixel_searchbar_settings_title),
                             onBackClick = { finish() },
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .zIndex(1f),
+                            modifier =
+                                Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .zIndex(1f),
                             onHelpClick = {
                                 showHelpSheet = true
-                            }
+                            },
                         )
 
                         if (showHelpSheet) {
                             FeatureHelpBottomSheet(
                                 onDismissRequest = { showHelpSheet = false },
                                 feature = pixelSearchbarFeature,
-                                viewModel = viewModel
+                                viewModel = viewModel,
                             )
                         }
                     }
@@ -198,7 +207,7 @@ class PixelSearchbarSettingsActivity : ComponentActivity() {
 @Composable
 fun PixelSearchbarSettingsUI(
     viewModel: MainViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -207,12 +216,13 @@ fun PixelSearchbarSettingsUI(
     val currentType = viewModel.pixelSearchbarType.value
 
     val options = listOf("empty", "date", "widget", "music")
-    val labels = mapOf(
-        "empty" to stringResource(R.string.pixel_searchbar_style_empty),
-        "date" to stringResource(R.string.pixel_searchbar_style_date),
-        "widget" to stringResource(R.string.pixel_searchbar_style_widget),
-        "music" to stringResource(R.string.pixel_searchbar_style_music)
-    )
+    val labels =
+        mapOf(
+            "empty" to stringResource(R.string.pixel_searchbar_style_empty),
+            "date" to stringResource(R.string.pixel_searchbar_style_date),
+            "widget" to stringResource(R.string.pixel_searchbar_style_widget),
+            "music" to stringResource(R.string.pixel_searchbar_style_music),
+        )
 
     val awm = remember { AppWidgetManager.getInstance(context) }
     val widgetHost = remember { AppWidgetHost(context, WidgetScraperService.HOST_ID) }
@@ -221,46 +231,49 @@ fun PixelSearchbarSettingsUI(
     var pendingWidgetId by remember { mutableStateOf(AppWidgetManager.INVALID_APPWIDGET_ID) }
 
     // Single launcher — ACTION_APPWIDGET_PICK handles bind permission internally
-    val pickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val data = result.data ?: return@rememberLauncherForActivityResult
-            val widgetId = data.getIntExtra(
-                AppWidgetManager.EXTRA_APPWIDGET_ID,
-                AppWidgetManager.INVALID_APPWIDGET_ID
-            )
-            if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                val info = awm.getAppWidgetInfo(widgetId)
-                val providerName = info?.provider?.flattenToString()
-                viewModel.setPixelSearchbarType("widget", context)
-                viewModel.setPixelSearchbarWidgetId(widgetId, providerName, context)
-                WidgetScraperService.start(context)
-            }
-        } else {
-            // Deallocate the ID we pre-allocated if user cancelled
-            if (pendingWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
-                widgetHost.deleteAppWidgetId(pendingWidgetId)
-                pendingWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
+    val pickerLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data ?: return@rememberLauncherForActivityResult
+                val widgetId =
+                    data.getIntExtra(
+                        AppWidgetManager.EXTRA_APPWIDGET_ID,
+                        AppWidgetManager.INVALID_APPWIDGET_ID,
+                    )
+                if (widgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    val info = awm.getAppWidgetInfo(widgetId)
+                    val providerName = info?.provider?.flattenToString()
+                    viewModel.setPixelSearchbarType("widget", context)
+                    viewModel.setPixelSearchbarWidgetId(widgetId, providerName, context)
+                    WidgetScraperService.start(context)
+                }
+            } else {
+                // Deallocate the ID we pre-allocated if user cancelled
+                if (pendingWidgetId != AppWidgetManager.INVALID_APPWIDGET_ID) {
+                    widgetHost.deleteAppWidgetId(pendingWidgetId)
+                    pendingWidgetId = AppWidgetManager.INVALID_APPWIDGET_ID
+                }
             }
         }
-    }
 
     fun openWidgetPicker() {
         val allocatedId = widgetHost.allocateAppWidgetId()
         pendingWidgetId = allocatedId
-        val pickIntent = Intent(AppWidgetManager.ACTION_APPWIDGET_PICK).apply {
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, allocatedId)
-        }
+        val pickIntent =
+            Intent(AppWidgetManager.ACTION_APPWIDGET_PICK).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, allocatedId)
+            }
         pickerLauncher.launch(pickIntent)
     }
 
-
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         RoundedCardContainer {
             IconToggleItem(
@@ -269,28 +282,31 @@ fun PixelSearchbarSettingsUI(
                 description = "Replace Pixel Launcher default searchbar",
                 isChecked = isEnabled,
                 onCheckedChange = { enabled ->
-                    if (viewModel.isWriteSecureSettingsEnabled.value || viewModel.isShizukuPermissionGranted.value || viewModel.isRootPermissionGranted.value) {
+                    if (viewModel.isWriteSecureSettingsEnabled.value ||
+                        viewModel.isShizukuPermissionGranted.value ||
+                        viewModel.isRootPermissionGranted.value
+                    ) {
                         viewModel.setPixelSearchbarEnabled(enabled, context)
                     } else {
                         showPermissionSheet = true
                     }
-                }
+                },
             )
         }
 
         AnimatedVisibility(
             visible = isEnabled,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(
                     text = stringResource(R.string.label_replace_with),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 RoundedCardContainer {
@@ -315,7 +331,7 @@ fun PixelSearchbarSettingsUI(
                             }
                         },
                         labelProvider = { labels[it] ?: it },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
 
@@ -324,12 +340,12 @@ fun PixelSearchbarSettingsUI(
                     visible = currentType == "widget",
                     enter = expandVertically(),
                     exit = shrinkVertically(),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     val widgetProvider = viewModel.pixelSearchbarWidgetProvider.value
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         RoundedCardContainer(spacing = 2.dp) {
                             ListItem(
@@ -343,7 +359,7 @@ fun PixelSearchbarSettingsUI(
                                         painter = painterResource(id = R.drawable.rounded_widgets_24),
                                         contentDescription = null,
                                         modifier = Modifier.size(24.dp),
-                                        tint = MaterialTheme.colorScheme.primary
+                                        tint = MaterialTheme.colorScheme.primary,
                                     )
                                 },
                                 trailingContent = {
@@ -351,37 +367,42 @@ fun PixelSearchbarSettingsUI(
                                         painter = painterResource(id = R.drawable.rounded_chevron_right_24),
                                         contentDescription = null,
                                         modifier = Modifier.size(24.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                     )
                                 },
                                 supportingContent = {
                                     Text(
-                                        text = if (widgetProvider != null)
-                                            widgetProvider.substringAfterLast("/")
-                                        else
-                                            stringResource(R.string.pixel_searchbar_widget_none),
+                                        text =
+                                            if (widgetProvider != null) {
+                                                widgetProvider.substringAfterLast("/")
+                                            } else {
+                                                stringResource(R.string.pixel_searchbar_widget_none)
+                                            },
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 },
-                                colors = ListItemDefaults.colors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                                )
+                                colors =
+                                    ListItemDefaults.colors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                    ),
                             ) {
                                 Text(
-                                    text = if (widgetProvider != null)
-                                        stringResource(R.string.pixel_searchbar_widget_change)
-                                    else
-                                        stringResource(R.string.pixel_searchbar_widget_picker_title),
+                                    text =
+                                        if (widgetProvider != null) {
+                                            stringResource(R.string.pixel_searchbar_widget_change)
+                                        } else {
+                                            stringResource(R.string.pixel_searchbar_widget_picker_title)
+                                        },
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                             }
 
                             AnimatedVisibility(
                                 visible = widgetProvider != null,
                                 enter = expandVertically(),
-                                exit = shrinkVertically()
+                                exit = shrinkVertically(),
                             ) {
                                 ListItem(
                                     onClick = {
@@ -394,17 +415,18 @@ fun PixelSearchbarSettingsUI(
                                             painter = painterResource(id = R.drawable.rounded_delete_24),
                                             contentDescription = null,
                                             modifier = Modifier.size(24.dp),
-                                            tint = MaterialTheme.colorScheme.error
+                                            tint = MaterialTheme.colorScheme.error,
                                         )
                                     },
-                                    colors = ListItemDefaults.colors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceBright
-                                    )
+                                    colors =
+                                        ListItemDefaults.colors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                        ),
                                 ) {
                                     Text(
                                         text = stringResource(R.string.pixel_searchbar_widget_remove),
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.error
+                                        color = MaterialTheme.colorScheme.error,
                                     )
                                 }
                             }
@@ -421,12 +443,12 @@ fun PixelSearchbarSettingsUI(
                                 onValueChangeFinished = {
                                     viewModel.setPixelSearchbarWidgetPaddingH(
                                         viewModel.pixelSearchbarWidgetPaddingH.intValue,
-                                        context
+                                        context,
                                     )
                                 },
                                 valueRange = 0f..100f,
                                 increment = 4f,
-                                iconRes = R.drawable.rounded_rounded_corner_24
+                                iconRes = R.drawable.rounded_rounded_corner_24,
                             )
                             ConfigSliderItem(
                                 title = stringResource(R.string.pixel_searchbar_widget_padding_v),
@@ -437,12 +459,12 @@ fun PixelSearchbarSettingsUI(
                                 onValueChangeFinished = {
                                     viewModel.setPixelSearchbarWidgetPaddingV(
                                         viewModel.pixelSearchbarWidgetPaddingV.intValue,
-                                        context
+                                        context,
                                     )
                                 },
                                 valueRange = 0f..100f,
                                 increment = 4f,
-                                iconRes = R.drawable.rounded_rounded_corner_24
+                                iconRes = R.drawable.rounded_rounded_corner_24,
                             )
                         }
                     }
@@ -450,31 +472,32 @@ fun PixelSearchbarSettingsUI(
 
                 AnimatedVisibility(
                     visible = currentType == "date",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     val currentDateFormat = viewModel.pixelSearchbarDateFormat.value
-                    val dateFormats = listOf(
-                        "EEEE, MMMM d",
-                        "EEEE, MMM d",
-                        "EEE, MMM d",
-                        "EEEE, d MMMM",
-                        "d MMMM",
-                        "MMMM d",
-                        "EEE, d MMM",
-                        "yyyy-MM-dd",
-                        "dd/MM/yyyy"
-                    )
+                    val dateFormats =
+                        listOf(
+                            "EEEE, MMMM d",
+                            "EEEE, MMM d",
+                            "EEE, MMM d",
+                            "EEEE, d MMMM",
+                            "d MMMM",
+                            "MMMM d",
+                            "EEE, d MMM",
+                            "yyyy-MM-dd",
+                            "dd/MM/yyyy",
+                        )
                     val currentDate = remember { java.util.Date() }
                     val googleSansFlexRound =
                         remember { FontFamily(Font(R.font.google_sans_flex_round)) }
 
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-
                         RoundedCardContainer {
                             IconToggleItem(
                                 iconRes = R.drawable.rounded_rounded_corner_24,
@@ -483,7 +506,7 @@ fun PixelSearchbarSettingsUI(
                                 isChecked = viewModel.pixelSearchbarBackgroundPill.value,
                                 onCheckedChange = { enabled ->
                                     viewModel.setPixelSearchbarBackgroundPill(enabled, context)
-                                }
+                                },
                             )
                         }
 
@@ -493,22 +516,24 @@ fun PixelSearchbarSettingsUI(
                             text = "Date Format",
                             style = MaterialTheme.typography.titleMedium,
                             modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
 
                         RoundedCardContainer(spacing = 2.dp) {
                             dateFormats.forEach { format ->
                                 val isSelected = currentDateFormat == format
-                                val formattedDate = remember(format, currentDate) {
-                                    try {
-                                        java.text.SimpleDateFormat(
-                                            format,
-                                            java.util.Locale.getDefault()
-                                        ).format(currentDate)
-                                    } catch (e: Exception) {
-                                        format
+                                val formattedDate =
+                                    remember(format, currentDate) {
+                                        try {
+                                            java.text
+                                                .SimpleDateFormat(
+                                                    format,
+                                                    java.util.Locale.getDefault(),
+                                                ).format(currentDate)
+                                        } catch (e: Exception) {
+                                            format
+                                        }
                                     }
-                                }
 
                                 ListItem(
                                     onClick = {
@@ -523,21 +548,23 @@ fun PixelSearchbarSettingsUI(
                                                 HapticUtil.performVirtualKeyHaptic(view)
                                                 viewModel.setPixelSearchbarDateFormat(
                                                     format,
-                                                    context
+                                                    context,
                                                 )
-                                            }
+                                            },
                                         )
                                     },
-                                    colors = ListItemDefaults.colors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceBright
-                                    )
+                                    colors =
+                                        ListItemDefaults.colors(
+                                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                        ),
                                 ) {
                                     Text(
                                         text = formattedDate,
-                                        style = MaterialTheme.typography.bodyLarge.copy(
-                                            fontFamily = googleSansFlexRound
-                                        ),
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        style =
+                                            MaterialTheme.typography.bodyLarge.copy(
+                                                fontFamily = googleSansFlexRound,
+                                            ),
+                                        color = MaterialTheme.colorScheme.onSurface,
                                     )
                                 }
                             }
@@ -551,7 +578,7 @@ fun PixelSearchbarSettingsUI(
                     text = "Tap Action",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 RoundedCardContainer {
@@ -560,15 +587,16 @@ fun PixelSearchbarSettingsUI(
                         onClick = {
                             if (tapActionEnabled) {
                                 HapticUtil.performVirtualKeyHaptic(view)
-                                val intent = Intent(
-                                    context,
-                                    com.sameerasw.essentials.MainActivity::class.java
-                                ).apply {
-                                    putExtra(
-                                        "target_tab",
-                                        com.sameerasw.essentials.domain.DIYTabs.DIY.name
-                                    )
-                                }
+                                val intent =
+                                    Intent(
+                                        context,
+                                        com.sameerasw.essentials.MainActivity::class.java,
+                                    ).apply {
+                                        putExtra(
+                                            "target_tab",
+                                            com.sameerasw.essentials.domain.DIYTabs.DIY.name,
+                                        )
+                                    }
                                 context.startActivity(intent)
                             }
                         },
@@ -578,9 +606,14 @@ fun PixelSearchbarSettingsUI(
                                 painter = painterResource(id = R.drawable.rounded_rocket_launch_24),
                                 contentDescription = null,
                                 modifier = Modifier.size(24.dp),
-                                tint = if (tapActionEnabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                    alpha = 0.38f
-                                )
+                                tint =
+                                    if (tapActionEnabled) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                            alpha = 0.38f,
+                                        )
+                                    },
                             )
                         },
                         trailingContent = {
@@ -589,28 +622,39 @@ fun PixelSearchbarSettingsUI(
                                 onCheckedChange = { enabled ->
                                     HapticUtil.performVirtualKeyHaptic(view)
                                     viewModel.setPixelSearchbarTapActionEnabled(enabled, context)
-                                }
+                                },
                             )
                         },
                         supportingContent = {
                             Text(
                                 text = stringResource(R.string.pixel_searchbar_tap_action_enabled_desc),
                                 style = MaterialTheme.typography.labelMedium,
-                                color = if (tapActionEnabled) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                    alpha = 0.38f
-                                )
+                                color =
+                                    if (tapActionEnabled) {
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                            alpha = 0.38f,
+                                        )
+                                    },
                             )
                         },
-                        colors = ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.surfaceBright
-                        )
+                        colors =
+                            ListItemDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                            ),
                     ) {
                         Text(
                             text = stringResource(R.string.pixel_searchbar_tap_action_enabled),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (tapActionEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = 0.38f
-                            )
+                            color =
+                                if (tapActionEnabled) {
+                                    MaterialTheme.colorScheme.onSurface
+                                } else {
+                                    MaterialTheme.colorScheme.onSurface.copy(
+                                        alpha = 0.38f,
+                                    )
+                                },
                         )
                     }
                 }
@@ -619,18 +663,19 @@ fun PixelSearchbarSettingsUI(
     }
 
     if (showPermissionSheet) {
-        val permissionItem = remember(context, viewModel) {
-            com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItem(
-                "WRITE_SECURE_SETTINGS",
-                context,
-                viewModel
-            )
-        }
+        val permissionItem =
+            remember(context, viewModel) {
+                com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItem(
+                    "WRITE_SECURE_SETTINGS",
+                    context,
+                    viewModel,
+                )
+            }
         if (permissionItem != null) {
             PermissionsBottomSheet(
                 onDismissRequest = { showPermissionSheet = false },
                 featureTitle = "Pixel Searchbar",
-                permissions = listOf(permissionItem)
+                permissions = listOf(permissionItem),
             )
         }
     }

@@ -19,7 +19,6 @@ import com.sameerasw.essentials.utils.PermissionUtils
 
 @RequiresApi(Build.VERSION_CODES.N)
 class EssentialsOnDisplayTileService : BaseTileService() {
-
     override fun getTileLabel(): String = getString(R.string.tile_essentials_on_display)
 
     override fun getTileSubtitle(): String {
@@ -32,10 +31,9 @@ class EssentialsOnDisplayTileService : BaseTileService() {
         }
     }
 
-    override fun hasFeaturePermission(): Boolean {
-        return PermissionUtils.isAccessibilityServiceEnabled(this) &&
-                PermissionUtils.hasNotificationListenerPermission(this)
-    }
+    override fun hasFeaturePermission(): Boolean =
+        PermissionUtils.isAccessibilityServiceEnabled(this) &&
+            PermissionUtils.hasNotificationListenerPermission(this)
 
     override fun getTileIcon(): Icon? {
         val enabled = isGlanceEnabled()
@@ -47,9 +45,7 @@ class EssentialsOnDisplayTileService : BaseTileService() {
         }
     }
 
-    override fun getTileState(): Int {
-        return if (isGlanceEnabled()) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-    }
+    override fun getTileState(): Int = if (isGlanceEnabled()) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
 
     override fun onTileClick() {
         val enabled = isGlanceEnabled()
@@ -74,10 +70,9 @@ class EssentialsOnDisplayTileService : BaseTileService() {
         }
     }
 
-    private fun isGlanceEnabled(): Boolean {
-        return getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE)
+    private fun isGlanceEnabled(): Boolean =
+        getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE)
             .getBoolean(SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED, false)
-    }
 
     private fun setGlanceEnabled(enabled: Boolean) {
         getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE).edit().apply {
@@ -86,10 +81,9 @@ class EssentialsOnDisplayTileService : BaseTileService() {
         }
     }
 
-    private fun isDockedModeEnabled(): Boolean {
-        return getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE)
+    private fun isDockedModeEnabled(): Boolean =
+        getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE)
             .getBoolean(SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE, false)
-    }
 
     private fun setDockedModeEnabled(enabled: Boolean) {
         getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE).edit().apply {

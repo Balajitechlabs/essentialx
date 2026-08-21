@@ -38,17 +38,31 @@ object ExternalRouter {
         return null
     }
 
-    fun query(context: Context, path: String, extras: Bundle?): Cursor? {
+    fun query(
+        context: Context,
+        path: String,
+        extras: Bundle?,
+    ): Cursor? {
         val (handler, remaining) = getHandlerAndRemainingPath(path) ?: return null
         return handler.onQuery(context, remaining, extras)
     }
 
-    fun update(context: Context, path: String, value: String?, extras: Bundle?): Boolean {
+    fun update(
+        context: Context,
+        path: String,
+        value: String?,
+        extras: Bundle?,
+    ): Boolean {
         val (handler, remaining) = getHandlerAndRemainingPath(path) ?: return false
         return handler.onUpdate(context, remaining, value, extras)
     }
 
-    fun action(context: Context, path: String, action: String?, extras: Bundle?): Bundle? {
+    fun action(
+        context: Context,
+        path: String,
+        action: String?,
+        extras: Bundle?,
+    ): Bundle? {
         val (handler, remaining) = getHandlerAndRemainingPath(path) ?: return null
         return handler.onAction(context, remaining, action, extras)
     }

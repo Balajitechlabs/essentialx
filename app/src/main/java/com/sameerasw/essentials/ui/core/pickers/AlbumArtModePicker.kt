@@ -37,25 +37,26 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun AlbumArtModePicker(
     selectedMode: String,
     onModeSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val modes = listOf("default", "fill")
-    val icons = listOf(
-        R.drawable.rounded_award_star_24,
-        R.drawable.rounded_fullscreen_portrait_24
-    )
+    val icons =
+        listOf(
+            R.drawable.rounded_award_star_24,
+            R.drawable.rounded_fullscreen_portrait_24,
+        )
     val labels = listOf("Default", "Fill")
 
     val view = LocalView.current
 
     RoundedCardContainer(modifier = modifier) {
         Row(
-            modifier = Modifier
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceBright,
-                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                )
-                .padding(10.dp),
+            modifier =
+                Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceBright,
+                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                    ).padding(10.dp),
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
         ) {
             val modifiers = List(modes.size) { Modifier.weight(1f) }
@@ -68,16 +69,17 @@ fun AlbumArtModePicker(
                         onModeSelected(mode)
                     },
                     modifier = modifiers[index].semantics { role = Role.RadioButton },
-                    shapes = when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        modes.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    shapes =
+                        when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            modes.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
                 ) {
                     Icon(
                         painter = painterResource(id = icons[index]),
                         contentDescription = labels[index],
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }

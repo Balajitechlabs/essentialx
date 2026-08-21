@@ -58,7 +58,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun ColorPickerBottomSheet(
     colorInt: Int,
     onRetake: () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -66,40 +66,43 @@ fun ColorPickerBottomSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     var selectedFormat by remember { mutableStateOf(ColorFormatUtils.ColorFormat.HEX) }
-    val formattedColor = remember(colorInt, selectedFormat) {
-        ColorFormatUtils.formatColor(colorInt, selectedFormat)
-    }
+    val formattedColor =
+        remember(colorInt, selectedFormat) {
+            ColorFormatUtils.formatColor(colorInt, selectedFormat)
+        }
 
     EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             // Shape
             Box(
-                modifier = Modifier
-                    .size(160.dp)
-                    .clip(MaterialShapes.Cookie6Sided.toShape())
-                    .background(Color(colorInt))
-                    .border(
-                        5.dp,
-                        MaterialTheme.colorScheme.outline,
-                        MaterialShapes.Cookie6Sided.toShape()
-                    ),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(160.dp)
+                        .clip(MaterialShapes.Cookie6Sided.toShape())
+                        .background(Color(colorInt))
+                        .border(
+                            5.dp,
+                            MaterialTheme.colorScheme.outline,
+                            MaterialShapes.Cookie6Sided.toShape(),
+                        ),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_palette_24),
                     contentDescription = null,
                     modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.outline
+                    tint = MaterialTheme.colorScheme.outline,
                 )
             }
 
@@ -110,14 +113,14 @@ fun ColorPickerBottomSheet(
                     selectedItem = selectedFormat,
                     onItemSelected = { selectedFormat = it },
                     labelProvider = { it.name },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 // Formatted Color Text
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceBright,
                     shape = MaterialTheme.shapes.extraSmall,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(
                         text = formattedColor,
@@ -125,7 +128,7 @@ fun ColorPickerBottomSheet(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(16.dp),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
                 }
             }
@@ -134,7 +137,7 @@ fun ColorPickerBottomSheet(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Retake Button
                 OutlinedButton(
@@ -142,14 +145,15 @@ fun ColorPickerBottomSheet(
                         HapticUtil.performMediumHaptic(view)
                         onRetake()
                     },
-                    modifier = Modifier
-                        .weight(0.75f)
-                        .height(56.dp)
+                    modifier =
+                        Modifier
+                            .weight(0.75f)
+                            .height(56.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_colorize_24),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
 
@@ -157,22 +161,24 @@ fun ColorPickerBottomSheet(
                 OutlinedButton(
                     onClick = {
                         HapticUtil.performUIHaptic(view)
-                        val sendIntent: Intent = Intent().apply {
-                            action = Intent.ACTION_SEND
-                            putExtra(Intent.EXTRA_TEXT, formattedColor)
-                            type = "text/plain"
-                        }
+                        val sendIntent: Intent =
+                            Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, formattedColor)
+                                type = "text/plain"
+                            }
                         val shareIntent = Intent.createChooser(sendIntent, null)
                         context.startActivity(shareIntent)
                     },
-                    modifier = Modifier
-                        .weight(1.5f)
-                        .height(56.dp)
+                    modifier =
+                        Modifier
+                            .weight(1.5f)
+                            .height(56.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_share_24),
                         contentDescription = "Share",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
 
@@ -181,21 +187,23 @@ fun ColorPickerBottomSheet(
                     onClick = {
                         HapticUtil.performHeavyHaptic(view)
                         clipboardManager.setText(AnnotatedString(formattedColor))
-                        android.widget.Toast.makeText(
-                            context,
-                            "Copied to clipboard",
-                            android.widget.Toast.LENGTH_SHORT
-                        ).show()
+                        android.widget.Toast
+                            .makeText(
+                                context,
+                                "Copied to clipboard",
+                                android.widget.Toast.LENGTH_SHORT,
+                            ).show()
                         onDismissRequest()
                     },
-                    modifier = Modifier
-                        .weight(1.5f)
-                        .height(56.dp)
+                    modifier =
+                        Modifier
+                            .weight(1.5f)
+                            .height(56.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_content_copy_24),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }

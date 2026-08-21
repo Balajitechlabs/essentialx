@@ -22,11 +22,11 @@ import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
-
 import com.sameerasw.essentials.utils.DeviceLockUtils
 
-class AodForceTurnOffHandler(private val service: AccessibilityService) {
-
+class AodForceTurnOffHandler(
+    private val service: AccessibilityService,
+) {
     private var windowManager: WindowManager? = null
     private var overlayView: View? = null
     private val handler = Handler(Looper.getMainLooper())
@@ -39,7 +39,7 @@ class AodForceTurnOffHandler(private val service: AccessibilityService) {
         if (powerManager.isInteractive || isRunning) {
             Log.d(
                 "AodForceTurnOff",
-                "Skipping forceTurnOff: isInteractive=${powerManager.isInteractive}, isRunning=$isRunning"
+                "Skipping forceTurnOff: isInteractive=${powerManager.isInteractive}, isRunning=$isRunning",
             )
             return
         }
@@ -70,30 +70,33 @@ class AodForceTurnOffHandler(private val service: AccessibilityService) {
         if (overlayView != null) return
 
         windowManager = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        overlayView = FrameLayout(service).apply {
-            setBackgroundColor(Color.BLACK)
-        }
+        overlayView =
+            FrameLayout(service).apply {
+                setBackgroundColor(Color.BLACK)
+            }
 
         val type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY
 
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
-            type,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN or
-                    WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-            PixelFormat.OPAQUE
-        ).apply {
-            gravity = Gravity.CENTER
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            }
-        }
+        val params =
+            WindowManager
+                .LayoutParams(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    type,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                        WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE or
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN or
+                        WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                    PixelFormat.OPAQUE,
+                ).apply {
+                    gravity = Gravity.CENTER
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        layoutInDisplayCutoutMode =
+                            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                    }
+                }
 
         try {
             windowManager?.addView(overlayView, params)
@@ -107,10 +110,11 @@ class AodForceTurnOffHandler(private val service: AccessibilityService) {
         val powerManager = service.getSystemService(Context.POWER_SERVICE) as PowerManager
 
         @Suppress("DEPRECATION")
-        val wakeLock = powerManager.newWakeLock(
-            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
-            "Essentials:ForceTurnOffWake"
-        )
+        val wakeLock =
+            powerManager.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                "Essentials:ForceTurnOffWake",
+            )
         wakeLock.acquire(100)
     }
 

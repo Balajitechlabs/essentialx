@@ -56,7 +56,7 @@ fun DefaultTabPicker(
     selectedTab: DIYTabs,
     onTabSelected: (DIYTabs) -> Unit,
     modifier: Modifier = Modifier,
-    options: List<DIYTabs> = DIYTabs.entries
+    options: List<DIYTabs> = DIYTabs.entries,
 ) {
     val view = LocalView.current
     val isTranslationModeActive by TranslationManager.isTranslationModeEnabled
@@ -64,23 +64,26 @@ fun DefaultTabPicker(
     var showMenu by remember { mutableStateOf(false) }
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
-    val onLongClickAction: (() -> Unit)? = if (isTranslationModeActive) {
-        {
-            HapticUtil.performVirtualKeyHaptic(view)
-            showMenu = true
+    val onLongClickAction: (() -> Unit)? =
+        if (isTranslationModeActive) {
+            {
+                HapticUtil.performVirtualKeyHaptic(view)
+                showMenu = true
+            }
+        } else {
+            null
         }
-    } else null
 
     val optionTitleRes =
         options.map { if (it == DIYTabs.FREEZE) R.string.tab_freeze_title else it.title }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.extraSmall)
-            .background(MaterialTheme.colorScheme.surfaceBright),
-
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraSmall)
+                .background(MaterialTheme.colorScheme.surfaceBright),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         ListItem(
             onClick = {},
@@ -91,29 +94,31 @@ fun DefaultTabPicker(
                     painter = painterResource(id = R.drawable.rounded_widgets_24),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             },
-            contentPadding = PaddingValues(
-                horizontal = 16.dp,
-                vertical = 16.dp
-            ),
+            contentPadding =
+                PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 16.dp,
+                ),
             verticalAlignment = Alignment.CenterVertically,
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
-            ),
+            colors =
+                ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                ),
             content = {
                 Box {
                     Text(
                         text = stringResource(R.string.label_default_tab),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     if (showMenu) {
                         SegmentedDropdownMenu(
                             expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
+                            onDismissRequest = { showMenu = false },
                         ) {
                             TranslationMenuItems(
                                 title = R.string.label_default_tab,
@@ -121,19 +126,20 @@ fun DefaultTabPicker(
                                 onSelectKey = { key ->
                                     showMenu = false
                                     translationSheetKey = key
-                                }
+                                },
                             )
                         }
                     }
                 }
-            }
+            },
         )
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
         ) {
             options.forEachIndexed { index, tab ->
@@ -145,31 +151,38 @@ fun DefaultTabPicker(
                         HapticUtil.performUIHaptic(view)
                         onTabSelected(tab)
                     },
-                    modifier = Modifier
-                        .weight(1f)
-                        .semantics { role = Role.RadioButton },
-                    shapes = when {
-                        index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        index == options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .semantics { role = Role.RadioButton },
+                    shapes =
+                        when {
+                            index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            index == options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         Icon(
                             painter = painterResource(id = tab.iconRes),
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
                         )
                         Text(
-                            text = if (tab == DIYTabs.FREEZE) stringResource(R.string.tab_freeze_title) else stringResource(
-                                tab.title
-                            ),
+                            text =
+                                if (tab == DIYTabs.FREEZE) {
+                                    stringResource(R.string.tab_freeze_title)
+                                } else {
+                                    stringResource(
+                                        tab.title,
+                                    )
+                                },
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = if (isChecked) FontWeight.Bold else FontWeight.Normal,
-                            maxLines = 1
+                            maxLines = 1,
                         )
                     }
                 }
@@ -180,7 +193,7 @@ fun DefaultTabPicker(
     if (translationSheetKey != null) {
         TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

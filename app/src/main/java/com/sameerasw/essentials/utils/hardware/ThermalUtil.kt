@@ -16,7 +16,7 @@ data class ThermalItem(
     val name: String,
     val value: Float,
     val type: Int,
-    val status: Int
+    val status: Int,
 )
 
 data class ThermalInfo(
@@ -25,7 +25,7 @@ data class ThermalInfo(
     val maxGpuTemp: Float? = null,
     val batteryTemp: Float? = null,
     val skinTemp: Float? = null,
-    val maxThrottlingStatus: Int = 0
+    val maxThrottlingStatus: Int = 0,
 ) {
     companion object {
         const val THROTTLING_NONE = 0
@@ -61,7 +61,6 @@ data class ThermalInfo(
 }
 
 object ThermalUtil {
-
     fun getThermalInfo(context: Context): ThermalInfo? {
         if (!ShellUtils.hasPermission(context)) return null
 
@@ -112,7 +111,7 @@ object ThermalUtil {
             maxGpuTemp = maxGpu,
             batteryTemp = battery,
             skinTemp = skin,
-            maxThrottlingStatus = maxThrottling
+            maxThrottlingStatus = maxThrottling,
         )
     }
 }

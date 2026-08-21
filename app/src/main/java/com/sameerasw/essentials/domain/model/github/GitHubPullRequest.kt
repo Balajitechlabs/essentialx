@@ -18,9 +18,9 @@ data class GitHubPullRequest(
     @SerializedName("html_url") val htmlUrl: String,
     @SerializedName("updated_at") val updatedAt: String,
     val user: GitHubUser? = null,
-    val head: GitHubHeadRef? = null
+    val head: GitHubHeadRef? = null,
 )
 
 data class GitHubHeadRef(
-    val ref: String
+    val ref: String,
 )

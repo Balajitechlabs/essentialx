@@ -30,5 +30,5 @@ data class AutomationSummary(
     val type: String,
     val isEnabled: Boolean,
     val triggerOrStateDescription: String,
-    val actionsCount: Int
+    val actionsCount: Int,
 )

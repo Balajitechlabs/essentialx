@@ -42,7 +42,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun AlwaysOnDisplaySettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -50,15 +50,16 @@ fun AlwaysOnDisplaySettingsUI(
     var showAppSelectionSheet by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             IconToggleItem(
                 iconRes = R.drawable.rounded_mobile_text_2_24,
@@ -68,7 +69,7 @@ fun AlwaysOnDisplaySettingsUI(
                     HapticUtil.performVirtualKeyHaptic(view)
                     viewModel.setAodEnabled(checked)
                 },
-                modifier = Modifier.highlight(highlightSetting == "aod_toggle")
+                modifier = Modifier.highlight(highlightSetting == "aod_toggle"),
             )
         }
 
@@ -76,7 +77,7 @@ fun AlwaysOnDisplaySettingsUI(
             text = stringResource(R.string.feat_notification_glance_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
@@ -88,7 +89,7 @@ fun AlwaysOnDisplaySettingsUI(
                     HapticUtil.performVirtualKeyHaptic(view)
                     viewModel.toggleNotificationGlanceEnabled(checked)
                 },
-                modifier = Modifier.highlight(highlightSetting == "notification_glance_enabled")
+                modifier = Modifier.highlight(highlightSetting == "notification_glance_enabled"),
             )
 
             IconToggleItem(
@@ -99,7 +100,7 @@ fun AlwaysOnDisplaySettingsUI(
                     HapticUtil.performVirtualKeyHaptic(view)
                     viewModel.setNotificationGlanceSameAsLightingEnabled(checked)
                 },
-                modifier = Modifier.highlight(highlightSetting == "notification_glance_same_apps")
+                modifier = Modifier.highlight(highlightSetting == "notification_glance_same_apps"),
             )
 
             viewModel.isAccessibilityEnabled.value
@@ -112,17 +113,17 @@ fun AlwaysOnDisplaySettingsUI(
                     // Check latest snapshot inside lambda
                     val currentlyEnabled =
                         com.sameerasw.essentials.utils.PermissionUtils.isAccessibilityServiceEnabled(
-                            context
+                            context,
                         )
                     if (checked && !currentlyEnabled) {
                         com.sameerasw.essentials.utils.PermissionUtils.openAccessibilitySettings(
-                            context
+                            context,
                         )
                     } else {
                         viewModel.toggleAodForceTurnOffEnabled(checked)
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "aod_force_turn_off")
+                modifier = Modifier.highlight(highlightSetting == "aod_force_turn_off"),
             )
         }
 
@@ -130,14 +131,14 @@ fun AlwaysOnDisplaySettingsUI(
             text = stringResource(R.string.notification_glance_desc),
             modifier = Modifier.padding(horizontal = 16.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Text(
             text = stringResource(R.string.feat_aod_force_turn_off_desc),
             modifier = Modifier.padding(16.dp),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         if (!viewModel.isNotificationGlanceSameAsLightingEnabled.value) {
@@ -147,7 +148,7 @@ fun AlwaysOnDisplaySettingsUI(
                     showAppSelectionSheet = true
                 },
                 modifier = Modifier.fillMaxWidth(),
-                enabled = viewModel.isNotificationGlanceEnabled.value
+                enabled = viewModel.isNotificationGlanceEnabled.value,
             ) {
                 Text(stringResource(R.string.action_select_apps))
             }
@@ -162,17 +163,17 @@ fun AlwaysOnDisplaySettingsUI(
                 onSaveApps = { ctx, apps ->
                     viewModel.saveNotificationGlanceSelectedApps(
                         ctx,
-                        apps
+                        apps,
                     )
                 },
                 onAppToggle = { ctx, pkg, enabled ->
                     viewModel.updateNotificationGlanceAppEnabled(
                         ctx,
                         pkg,
-                        enabled
+                        enabled,
                     )
                 },
-                context = context
+                context = context,
             )
         }
     }

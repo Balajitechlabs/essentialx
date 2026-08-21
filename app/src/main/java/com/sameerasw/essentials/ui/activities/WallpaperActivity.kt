@@ -26,7 +26,6 @@ import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.viewmodels.MainViewModel
 
 class WallpaperActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
@@ -39,7 +38,7 @@ class WallpaperActivity : ComponentActivity() {
 
         setContent {
             val isPitchBlackThemeEnabled by settingsRepository.isPitchBlackThemeEnabled.collectAsState(
-                initial = false
+                initial = false,
             )
 
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
@@ -53,7 +52,7 @@ class WallpaperActivity : ComponentActivity() {
                     WallpaperScreen(
                         onBack = { finish() },
                         viewModel = viewModel,
-                        initialTab = initialTab
+                        initialTab = initialTab,
                     )
                 }
             }

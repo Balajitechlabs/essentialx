@@ -27,18 +27,18 @@ import java.io.InputStreamReader
 @Keep
 data class KaomojiObject(
     @SerializedName("category") val category: String,
-    @SerializedName("value") val value: String
+    @SerializedName("value") val value: String,
 )
 
 @Keep
 data class KaomojiCategory(
     val name: String,
-    val kaomojis: List<KaomojiObject>
+    val kaomojis: List<KaomojiObject>,
 )
 
 @Keep
 data class KaomojiDataResponse(
-    @SerializedName("kaomoji") val kaomoji: List<KaomojiObject>
+    @SerializedName("kaomoji") val kaomoji: List<KaomojiObject>,
 )
 
 object KaomojiData {
@@ -48,7 +48,10 @@ object KaomojiData {
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
 
-    fun load(context: Context, scope: CoroutineScope) {
+    fun load(
+        context: Context,
+        scope: CoroutineScope,
+    ) {
         if (isLoaded || _isLoading.value) return
         _isLoading.value = true
 
@@ -59,12 +62,13 @@ object KaomojiData {
                 val response = Gson().fromJson(reader, KaomojiDataResponse::class.java)
 
                 val grouped = response.kaomoji.groupBy { it.category }
-                val loadedCategories = grouped.map { (categoryName, list) ->
-                    KaomojiCategory(
-                        name = categoryName,
-                        kaomojis = list
-                    )
-                }
+                val loadedCategories =
+                    grouped.map { (categoryName, list) ->
+                        KaomojiCategory(
+                            name = categoryName,
+                            kaomojis = list,
+                        )
+                    }
 
                 // Sort categories
                 val finalCategories = loadedCategories.sortedBy { it.name }

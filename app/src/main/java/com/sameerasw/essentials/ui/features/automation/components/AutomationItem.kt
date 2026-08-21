@@ -66,29 +66,29 @@ fun AutomationItem(
     onClick: () -> Unit = {},
     onDelete: () -> Unit = {},
     onToggle: () -> Unit = {},
-    onTest: () -> Unit = {}
+    onTest: () -> Unit = {},
 ) {
-
     val view = LocalView.current
     var showMenu by remember { mutableStateOf(false) }
 
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
         shape = MaterialTheme.shapes.extraSmall,
-        modifier = modifier
-            .combinedClickable(
-                onClick = {
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    onClick()
-                },
-                onLongClick = {
-                    HapticUtil.performVirtualKeyHaptic(view)
-                    showMenu = true
-                }
-            )
-            .alpha(if (automation.isEnabled) 1f else 0.5f)
+        modifier =
+            modifier
+                .combinedClickable(
+                    onClick = {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        onClick()
+                    },
+                    onLongClick = {
+                        HapticUtil.performVirtualKeyHaptic(view)
+                        showMenu = true
+                    },
+                ).alpha(if (automation.isEnabled) 1f else 0.5f),
     ) {
         Box {
             // Dropdown Menu
@@ -99,9 +99,13 @@ fun AutomationItem(
                 offset = DpOffset(0.dp, 0.dp),
             ) {
                 val toggleText =
-                    if (automation.isEnabled) stringResource(R.string.action_disable) else stringResource(
-                        R.string.action_enable
-                    )
+                    if (automation.isEnabled) {
+                        stringResource(R.string.action_disable)
+                    } else {
+                        stringResource(
+                            R.string.action_enable,
+                        )
+                    }
                 val toggleIcon =
                     if (automation.isEnabled) R.drawable.rounded_close_24 else R.drawable.rounded_check_24
 
@@ -114,9 +118,9 @@ fun AutomationItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(toggleIcon),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
                 SegmentedDropdownMenuItem(
                     text = { Text(stringResource(R.string.action_test)) },
@@ -127,9 +131,9 @@ fun AutomationItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.rounded_play_arrow_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
                 SegmentedDropdownMenuItem(
                     text = { Text(stringResource(R.string.action_edit)) },
@@ -140,9 +144,9 @@ fun AutomationItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.rounded_edit_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
                 SegmentedDropdownMenuItem(
                     text = { Text(stringResource(R.string.action_delete)) },
@@ -153,72 +157,82 @@ fun AutomationItem(
                     leadingIcon = {
                         Icon(
                             painter = painterResource(R.drawable.rounded_delete_24),
-                            contentDescription = null
+                            contentDescription = null,
                         )
-                    }
+                    },
                 )
             }
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .height(IntrinsicSize.Min),
-                verticalAlignment = Alignment.CenterVertically
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 RoundedCardContainer(
                     cornerRadius = 18.dp,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                 ) {
-                    val icon = when (automation.type) {
-                        Automation.Type.TRIGGER -> automation.trigger?.icon
-                        Automation.Type.ACTION_SHORTCUT -> R.drawable.rounded_rocket_launch_24
-                        Automation.Type.PIXEL_SEARCHBAR -> R.drawable.rounded_search_24
-                        Automation.Type.STATE -> automation.state?.icon
-                        Automation.Type.APP -> R.drawable.rounded_apps_24
-                    }
-
-                    val titleString = when (automation.type) {
-                        Automation.Type.TRIGGER -> automation.trigger?.title?.let {
-                            stringResource(
-                                it
-                            )
+                    val icon =
+                        when (automation.type) {
+                            Automation.Type.TRIGGER -> automation.trigger?.icon
+                            Automation.Type.ACTION_SHORTCUT -> R.drawable.rounded_rocket_launch_24
+                            Automation.Type.PIXEL_SEARCHBAR -> R.drawable.rounded_search_24
+                            Automation.Type.STATE -> automation.state?.icon
+                            Automation.Type.APP -> R.drawable.rounded_apps_24
                         }
 
-                        Automation.Type.ACTION_SHORTCUT -> stringResource(R.string.diy_create_action_shortcut_title)
-                        Automation.Type.PIXEL_SEARCHBAR -> stringResource(R.string.diy_create_pixel_searchbar_title)
-                        Automation.Type.STATE -> automation.state?.title?.let { stringResource(it) }
-                        Automation.Type.APP -> stringResource(R.string.diy_create_app_title) + " (${automation.selectedApps.size})"
-                    }
+                    val titleString =
+                        when (automation.type) {
+                            Automation.Type.TRIGGER ->
+                                automation.trigger?.title?.let {
+                                    stringResource(
+                                        it,
+                                    )
+                                }
+
+                            Automation.Type.ACTION_SHORTCUT -> stringResource(R.string.diy_create_action_shortcut_title)
+                            Automation.Type.PIXEL_SEARCHBAR -> stringResource(R.string.diy_create_pixel_searchbar_title)
+                            Automation.Type.STATE -> automation.state?.title?.let { stringResource(it) }
+                            Automation.Type.APP -> stringResource(R.string.diy_create_app_title) + " (${automation.selectedApps.size})"
+                        }
 
                     if (icon != null && titleString != null) {
                         Surface(
                             color = MaterialTheme.colorScheme.secondaryContainer,
                             shape = RoundedCornerShape(16.dp),
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .padding(12.dp)
-                                    .fillMaxHeight(),
-                                verticalAlignment = Alignment.CenterVertically
+                                modifier =
+                                    Modifier
+                                        .padding(12.dp)
+                                        .fillMaxHeight(),
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 val context = LocalContext.current
-                                val validatedIcon = remember(icon) {
-                                    try {
-                                        if (context.resources.getResourceTypeName(icon) == "drawable") icon
-                                        else R.drawable.rounded_do_not_disturb_on_24
-                                    } catch (e: Exception) {
-                                        R.drawable.rounded_do_not_disturb_on_24
+                                val validatedIcon =
+                                    remember(icon) {
+                                        try {
+                                            if (context.resources.getResourceTypeName(icon) == "drawable") {
+                                                icon
+                                            } else {
+                                                R.drawable.rounded_do_not_disturb_on_24
+                                            }
+                                        } catch (e: Exception) {
+                                            R.drawable.rounded_do_not_disturb_on_24
+                                        }
                                     }
-                                }
                                 Icon(
                                     painter = painterResource(id = validatedIcon),
                                     contentDescription = null,
                                     modifier = Modifier.size(24.dp),
-                                    tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
@@ -227,66 +241,71 @@ fun AutomationItem(
                                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     fontWeight = FontWeight.SemiBold,
                                     maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
+                                    overflow = TextOverflow.Ellipsis,
                                 )
                             }
                         }
                     }
                 }
 
-
-                if (automation.type == Automation.Type.TRIGGER || automation.type == Automation.Type.ACTION_SHORTCUT || automation.type == Automation.Type.PIXEL_SEARCHBAR) {
+                if (automation.type == Automation.Type.TRIGGER ||
+                    automation.type == Automation.Type.ACTION_SHORTCUT ||
+                    automation.type == Automation.Type.PIXEL_SEARCHBAR
+                ) {
                     // Separator Icon
                     Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .padding(horizontal = 3.dp)
-                            .background(MaterialTheme.colorScheme.primaryContainer),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .size(24.dp)
+                                .clip(CircleShape)
+                                .padding(horizontal = 3.dp)
+                                .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.rounded_arrow_forward_24),
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
                 } else {
                     Column(
                         modifier = Modifier.fillMaxHeight(),
                         verticalArrangement = Arrangement.SpaceAround,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .padding(horizontal = 3.dp)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .padding(horizontal = 3.dp)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.rounded_arrow_forward_24),
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
 
                         Box(
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .padding(horizontal = 3.dp)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .size(24.dp)
+                                    .clip(CircleShape)
+                                    .padding(horizontal = 3.dp)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.rounded_arrow_back_24),
                                 contentDescription = null,
                                 modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
                     }
@@ -296,10 +315,14 @@ fun AutomationItem(
 
                 RoundedCardContainer(
                     cornerRadius = 18.dp,
-                    modifier = Modifier
-                        .weight(1f),
+                    modifier =
+                        Modifier
+                            .weight(1f),
                 ) {
-                    if (automation.type == Automation.Type.TRIGGER || automation.type == Automation.Type.ACTION_SHORTCUT || automation.type == Automation.Type.PIXEL_SEARCHBAR) {
+                    if (automation.type == Automation.Type.TRIGGER ||
+                        automation.type == Automation.Type.ACTION_SHORTCUT ||
+                        automation.type == Automation.Type.PIXEL_SEARCHBAR
+                    ) {
                         automation.actions.forEach { action ->
                             ActionItem(action = action)
                         }
@@ -317,32 +340,36 @@ fun AutomationItem(
 @Composable
 fun ActionItem(
     action: Action?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainerHigh,
         shape = RoundedCornerShape(4.dp),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             val context = LocalContext.current
             val iconId = action?.icon ?: R.drawable.rounded_do_not_disturb_on_24
-            val validatedIcon = remember(iconId) {
-                try {
-                    if (context.resources.getResourceTypeName(iconId) == "drawable") iconId
-                    else R.drawable.rounded_do_not_disturb_on_24
-                } catch (e: Exception) {
-                    R.drawable.rounded_do_not_disturb_on_24
+            val validatedIcon =
+                remember(iconId) {
+                    try {
+                        if (context.resources.getResourceTypeName(iconId) == "drawable") {
+                            iconId
+                        } else {
+                            R.drawable.rounded_do_not_disturb_on_24
+                        }
+                    } catch (e: Exception) {
+                        R.drawable.rounded_do_not_disturb_on_24
+                    }
                 }
-            }
             Icon(
                 painter = painterResource(id = validatedIcon),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column {
@@ -352,23 +379,24 @@ fun ActionItem(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
                 if (action is Action.OpenApp && action.packageName.isNotBlank()) {
-                    val appName = remember(action.packageName) {
-                        try {
-                            val pm = context.packageManager
-                            pm.getApplicationInfo(action.packageName, 0).loadLabel(pm).toString()
-                        } catch (e: Exception) {
-                            action.packageName
+                    val appName =
+                        remember(action.packageName) {
+                            try {
+                                val pm = context.packageManager
+                                pm.getApplicationInfo(action.packageName, 0).loadLabel(pm).toString()
+                            } catch (e: Exception) {
+                                action.packageName
+                            }
                         }
-                    }
                     Text(
                         text = appName,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

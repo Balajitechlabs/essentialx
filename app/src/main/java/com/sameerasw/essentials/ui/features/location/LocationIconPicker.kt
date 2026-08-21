@@ -39,27 +39,28 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun LocationIconPicker(
     selectedIconName: String,
     onIconSelected: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val icons = listOf(
-        "round_navigation_24",
-        "rounded_home_24",
-        "rounded_work_24",
-        "rounded_apartment_24",
-        "rounded_shopping_cart_24",
-        "rounded_school_24",
-        "rounded_storefront_24",
-        "rounded_fork_spoon_24",
-        "rounded_favorite_24",
-        "rounded_account_balance_24",
-        "rounded_garage_home_24",
-        "rounded_beach_access_24",
-        "rounded_local_pizza_24",
-        "rounded_train_24",
-        "rounded_directions_bus_24",
-        "rounded_flight_24",
-        "rounded_directions_boat_24"
-    )
+    val icons =
+        listOf(
+            "round_navigation_24",
+            "rounded_home_24",
+            "rounded_work_24",
+            "rounded_apartment_24",
+            "rounded_shopping_cart_24",
+            "rounded_school_24",
+            "rounded_storefront_24",
+            "rounded_fork_spoon_24",
+            "rounded_favorite_24",
+            "rounded_account_balance_24",
+            "rounded_garage_home_24",
+            "rounded_beach_access_24",
+            "rounded_local_pizza_24",
+            "rounded_train_24",
+            "rounded_directions_bus_24",
+            "rounded_flight_24",
+            "rounded_directions_boat_24",
+        )
 
     val carouselState = rememberCarouselState { icons.size }
     val context = LocalContext.current
@@ -70,7 +71,7 @@ fun LocationIconPicker(
             text = "Pick an icon",
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 8.dp),
         )
 
         HorizontalMultiBrowseCarousel(
@@ -78,9 +79,10 @@ fun LocationIconPicker(
             preferredItemWidth = 64.dp,
             itemSpacing = 4.dp,
             contentPadding = PaddingValues(horizontal = 0.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
         ) { index ->
             val iconName = icons[index]
             val isSelected = iconName == selectedIconName
@@ -88,25 +90,32 @@ fun LocationIconPicker(
                 context.resources.getIdentifier(iconName, "drawable", context.packageName)
 
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .maskClip(MaterialTheme.shapes.medium)
-                    .background(
-                        if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                        else MaterialTheme.colorScheme.background
-                    )
-                    .clickable {
-                        HapticUtil.performVirtualKeyHaptic(view)
-                        onIconSelected(iconName)
-                    },
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .maskClip(MaterialTheme.shapes.medium)
+                        .background(
+                            if (isSelected) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.background
+                            },
+                        ).clickable {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onIconSelected(iconName)
+                        },
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     painter = painterResource(id = if (iconResId != 0) iconResId else R.drawable.round_navigation_24),
                     contentDescription = null,
-                    tint = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(28.dp)
+                    tint =
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                    modifier = Modifier.size(28.dp),
                 )
             }
         }

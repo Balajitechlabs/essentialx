@@ -26,5 +26,5 @@ data class FreezeTagSummary(
     val id: String,
     val name: String,
     val appCount: Int,
-    val isFrozen: Boolean
+    val isFrozen: Boolean,
 )

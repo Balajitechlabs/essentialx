@@ -82,7 +82,7 @@ import kotlinx.coroutines.launch
 fun NotificationLightingSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -98,15 +98,15 @@ fun NotificationLightingSettingsUI(
     var cornerRadiusDp by remember {
         mutableFloatStateOf(
             viewModel.loadNotificationLightingCornerRadius(
-                context
-            )
+                context,
+            ),
         )
     }
     var strokeThicknessDp by remember {
         mutableFloatStateOf(
             viewModel.loadNotificationLightingStrokeThickness(
-                context
-            )
+                context,
+            ),
         )
     }
 
@@ -124,8 +124,6 @@ fun NotificationLightingSettingsUI(
     }
 
     Column(modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-
-
         RoundedCardContainer {
             IconToggleItem(
                 iconRes = R.drawable.rounded_power_settings_new_24,
@@ -134,7 +132,7 @@ fun NotificationLightingSettingsUI(
                 onCheckedChange = { checked ->
                     viewModel.setOnlyShowWhenScreenOff(checked, context)
                 },
-                modifier = Modifier.highlight(highlightSetting == "only_screen_off")
+                modifier = Modifier.highlight(highlightSetting == "only_screen_off"),
             )
             IconToggleItem(
                 iconRes = R.drawable.rounded_notifications_off_24,
@@ -143,7 +141,7 @@ fun NotificationLightingSettingsUI(
                 onCheckedChange = { checked ->
                     viewModel.setSkipSilentNotifications(checked, context)
                 },
-                modifier = Modifier.highlight(highlightSetting == "skip_silent_notifications")
+                modifier = Modifier.highlight(highlightSetting == "skip_silent_notifications"),
             )
             IconToggleItem(
                 iconRes = R.drawable.outline_circle_notifications_24,
@@ -152,7 +150,7 @@ fun NotificationLightingSettingsUI(
                 onCheckedChange = { checked ->
                     viewModel.setSkipPersistentNotifications(checked, context)
                 },
-                modifier = Modifier.highlight(highlightSetting == "skip_persistent_notifications")
+                modifier = Modifier.highlight(highlightSetting == "skip_persistent_notifications"),
             )
         }
 
@@ -164,29 +162,29 @@ fun NotificationLightingSettingsUI(
                 HapticUtil.performVirtualKeyHaptic(view)
                 showAppSelectionSheet = true
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(64.dp),
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_apps_24),
-                    contentDescription = "Apps"
+                    contentDescription = "Apps",
                 )
                 Text(stringResource(R.string.action_select_apps))
             }
         }
-
 
         // Style Picker
         Text(
             text = stringResource(R.string.settings_section_style),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         NotificationLightingStylePicker(
@@ -209,7 +207,7 @@ fun NotificationLightingSettingsUI(
                 text = stringResource(R.string.notification_lighting_system_mode_title),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             NotificationLightingSystemModePicker(
@@ -217,7 +215,7 @@ fun NotificationLightingSettingsUI(
                 onModeSelected = { mode ->
                     viewModel.setNotificationLightingSystemMode(mode, context)
                     viewModel.triggerNotificationLightingSystem(context)
-                }
+                },
             )
 
             // Show placement sliders for custom system ripple
@@ -226,7 +224,7 @@ fun NotificationLightingSettingsUI(
                     text = stringResource(R.string.notification_lighting_indicator_adjustment_section),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 RoundedCardContainer(modifier = Modifier) {
@@ -242,7 +240,7 @@ fun NotificationLightingSettingsUI(
                         valueFormatter = { "%.1f%%".format(it) },
                         onValueChangeFinished = {
                             viewModel.saveNotificationLightingIndicatorX(context, indicatorX)
-                        }
+                        },
                     )
 
                     ConfigSliderItem(
@@ -257,7 +255,7 @@ fun NotificationLightingSettingsUI(
                         valueFormatter = { "%.1f%%".format(it) },
                         onValueChangeFinished = {
                             viewModel.saveNotificationLightingIndicatorY(context, indicatorY)
-                        }
+                        },
                     )
                 }
             }
@@ -269,7 +267,7 @@ fun NotificationLightingSettingsUI(
                 text = stringResource(R.string.notification_lighting_stroke_adjustment_section),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(modifier = Modifier) {
@@ -283,7 +281,7 @@ fun NotificationLightingSettingsUI(
                         viewModel.triggerNotificationLightingWithRadiusAndThickness(
                             context,
                             newValue,
-                            strokeThicknessDp
+                            strokeThicknessDp,
                         )
                     },
                     valueRange = 0f..75f,
@@ -297,7 +295,7 @@ fun NotificationLightingSettingsUI(
                             viewModel.removePreviewOverlay(context)
                         }
                     },
-                    modifier = Modifier.highlight(highlightSetting == "corner_radius")
+                    modifier = Modifier.highlight(highlightSetting == "corner_radius"),
                 )
 
                 ConfigSliderItem(
@@ -310,7 +308,7 @@ fun NotificationLightingSettingsUI(
                         viewModel.triggerNotificationLightingWithRadiusAndThickness(
                             context,
                             cornerRadiusDp,
-                            newValue
+                            newValue,
                         )
                     },
                     modifier = Modifier.highlight(highlightSetting == "stroke_thickness"),
@@ -320,14 +318,14 @@ fun NotificationLightingSettingsUI(
                         // Save the stroke thickness
                         viewModel.saveNotificationLightingStrokeThickness(
                             context,
-                            strokeThicknessDp
+                            strokeThicknessDp,
                         )
                         // Wait 5 seconds then remove preview overlay
                         coroutineScope.launch {
                             delay(5000)
                             viewModel.removePreviewOverlay(context)
                         }
-                    }
+                    },
                 )
             }
         }
@@ -338,7 +336,7 @@ fun NotificationLightingSettingsUI(
                 text = stringResource(R.string.notification_lighting_glow_adjustment_section),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(modifier = Modifier) {
@@ -349,7 +347,7 @@ fun NotificationLightingSettingsUI(
                         if (isChecked) current.add(side) else current.remove(side)
                         viewModel.setNotificationLightingGlowSides(current, context)
                         viewModel.triggerNotificationLighting(context)
-                    }
+                    },
                 )
 
                 ConfigSliderItem(
@@ -361,7 +359,7 @@ fun NotificationLightingSettingsUI(
                         viewModel.triggerNotificationLightingWithRadiusAndThickness(
                             context,
                             cornerRadiusDp,
-                            newValue
+                            newValue,
                         )
                     },
                     valueRange = 1f..10f,
@@ -369,13 +367,13 @@ fun NotificationLightingSettingsUI(
                     onValueChangeFinished = {
                         viewModel.saveNotificationLightingStrokeThickness(
                             context,
-                            strokeThicknessDp
+                            strokeThicknessDp,
                         )
                         coroutineScope.launch {
                             delay(2000)
                             viewModel.removePreviewOverlay(context)
                         }
-                    }
+                    },
                 )
             }
         }
@@ -386,7 +384,7 @@ fun NotificationLightingSettingsUI(
                 text = stringResource(R.string.notification_lighting_sweep_position_title),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(modifier = Modifier) {
@@ -397,14 +395,14 @@ fun NotificationLightingSettingsUI(
                         viewModel.triggerNotificationLightingForSweep(
                             context,
                             pos,
-                            viewModel.notificationLightingSweepThickness.floatValue
+                            viewModel.notificationLightingSweepThickness.floatValue,
                         )
                         // Auto remove preview
                         coroutineScope.launch {
                             delay(5000)
                             viewModel.removePreviewOverlay(context)
                         }
-                    }
+                    },
                 )
 
                 IconToggleItem(
@@ -417,13 +415,13 @@ fun NotificationLightingSettingsUI(
                         viewModel.triggerNotificationLightingForSweep(
                             context,
                             viewModel.notificationLightingSweepPosition.value,
-                            viewModel.notificationLightingSweepThickness.floatValue
+                            viewModel.notificationLightingSweepThickness.floatValue,
                         )
                         coroutineScope.launch {
                             delay(5000)
                             viewModel.removePreviewOverlay(context)
                         }
-                    }
+                    },
                 )
 
                 if (viewModel.notificationLightingSweepRandomShapes.value) {
@@ -438,7 +436,7 @@ fun NotificationLightingSettingsUI(
                         onClick = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             showSweepShapesSheet = true
-                        }
+                        },
                     )
                 }
 
@@ -451,7 +449,7 @@ fun NotificationLightingSettingsUI(
                         viewModel.triggerNotificationLightingForSweep(
                             context,
                             viewModel.notificationLightingSweepPosition.value,
-                            newValue
+                            newValue,
                         )
                     },
                     valueRange = 1f..50f,
@@ -459,13 +457,13 @@ fun NotificationLightingSettingsUI(
                     onValueChangeFinished = {
                         viewModel.saveNotificationLightingSweepThickness(
                             context,
-                            viewModel.notificationLightingSweepThickness.floatValue
+                            viewModel.notificationLightingSweepThickness.floatValue,
                         )
                         coroutineScope.launch {
                             delay(5000)
                             viewModel.removePreviewOverlay(context)
                         }
-                    }
+                    },
                 )
             }
         }
@@ -476,7 +474,7 @@ fun NotificationLightingSettingsUI(
                 text = stringResource(R.string.notification_lighting_placement_section),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(modifier = Modifier) {
@@ -490,7 +488,7 @@ fun NotificationLightingSettingsUI(
                             context,
                             newValue,
                             indicatorY,
-                            indicatorScale
+                            indicatorScale,
                         )
                     },
                     valueRange = 0f..100f,
@@ -501,7 +499,7 @@ fun NotificationLightingSettingsUI(
                             delay(5000)
                             viewModel.removePreviewOverlay(context)
                         }
-                    }
+                    },
                 )
 
                 ConfigSliderItem(
@@ -514,7 +512,7 @@ fun NotificationLightingSettingsUI(
                             context,
                             indicatorX,
                             newValue,
-                            indicatorScale
+                            indicatorScale,
                         )
                     },
                     valueRange = 0f..100f,
@@ -525,7 +523,7 @@ fun NotificationLightingSettingsUI(
                             delay(5000)
                             viewModel.removePreviewOverlay(context)
                         }
-                    }
+                    },
                 )
             }
 
@@ -533,7 +531,7 @@ fun NotificationLightingSettingsUI(
                 text = stringResource(R.string.notification_lighting_indicator_adjustment_section),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(modifier = Modifier) {
@@ -547,7 +545,7 @@ fun NotificationLightingSettingsUI(
                             context,
                             indicatorX,
                             indicatorY,
-                            newValue
+                            newValue,
                         )
                     },
                     valueRange = 0.5f..3f,
@@ -558,7 +556,7 @@ fun NotificationLightingSettingsUI(
                             delay(5000)
                             viewModel.removePreviewOverlay(context)
                         }
-                    }
+                    },
                 )
 
                 ConfigSliderItem(
@@ -571,21 +569,22 @@ fun NotificationLightingSettingsUI(
                     valueRange = 1000f..10000f,
                     increment = 100f,
                     valueFormatter = { "%.1fs".format(it / 1000f) },
-                    onValueChangeFinished = { viewModel.triggerNotificationLighting(context) }
+                    onValueChangeFinished = { viewModel.triggerNotificationLighting(context) },
                 )
             }
         }
 
-
         // Animation Settings (Only for STROKE, GLOW and SWEEP)
-        if (style == NotificationLightingStyle.STROKE || style == NotificationLightingStyle.GLOW || style == NotificationLightingStyle.SWEEP) {
+        if (style == NotificationLightingStyle.STROKE ||
+            style == NotificationLightingStyle.GLOW ||
+            style == NotificationLightingStyle.SWEEP
+        ) {
             Text(
                 text = stringResource(R.string.settings_section_animation),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-
 
             RoundedCardContainer(modifier = Modifier) {
                 ConfigSliderItem(
@@ -599,7 +598,7 @@ fun NotificationLightingSettingsUI(
                     steps = 3,
                     increment = 1f,
                     valueFormatter = { "%.1f".format(it) },
-                    onValueChangeFinished = { viewModel.triggerNotificationLighting(context) }
+                    onValueChangeFinished = { viewModel.triggerNotificationLighting(context) },
                 )
 
                 ConfigSliderItem(
@@ -612,11 +611,10 @@ fun NotificationLightingSettingsUI(
                     valueRange = 100f..10000f,
                     increment = 100f,
                     valueFormatter = { "%.1fs".format(it / 1000f) },
-                    onValueChangeFinished = { viewModel.triggerNotificationLighting(context) }
+                    onValueChangeFinished = { viewModel.triggerNotificationLighting(context) },
                 )
             }
         }
-
 
         // Color Mode section
         if (style != NotificationLightingStyle.SYSTEM) {
@@ -624,11 +622,11 @@ fun NotificationLightingSettingsUI(
                 text = stringResource(R.string.settings_section_color_mode),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer(
-                modifier = Modifier
+                modifier = Modifier,
             ) {
                 NotificationLightingColorModePicker(
                     selectedMode = viewModel.notificationLightingColorMode.value,
@@ -636,72 +634,72 @@ fun NotificationLightingSettingsUI(
                         HapticUtil.performVirtualKeyHaptic(view)
                         viewModel.setNotificationLightingColorMode(mode, context)
                         viewModel.triggerNotificationLighting(context)
-                    }
+                    },
                 )
 
                 if (viewModel.notificationLightingColorMode.value == NotificationLightingColorMode.CUSTOM) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceBright,
-                                shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                            )
-                            .padding(bottom = 16.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    color = MaterialTheme.colorScheme.surfaceBright,
+                                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                                ).padding(bottom = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        val allColors = remember {
-                            val colors = mutableListOf<Int>()
-                            val totalColumns = 21
+                        val allColors =
+                            remember {
+                                val colors = mutableListOf<Int>()
+                                val totalColumns = 21
 
-                            for (page in 0..2) {
+                                for (page in 0..2) {
+                                    val row1 = mutableListOf<Int>()
+                                    val row2 = mutableListOf<Int>()
+                                    val row3 = mutableListOf<Int>()
 
-                                val row1 = mutableListOf<Int>()
-                                val row2 = mutableListOf<Int>()
-                                val row3 = mutableListOf<Int>()
+                                    for (col in 0..6) {
+                                        val globalCol = page * 7 + col
+                                        val hue = (globalCol.toFloat() / totalColumns) * 360f
 
-                                for (col in 0..6) {
-                                    val globalCol = page * 7 + col
-                                    val hue = (globalCol.toFloat() / totalColumns) * 360f
-
-                                    // Row 1: Light
-                                    row1.add(
-                                        android.graphics.Color.HSVToColor(
-                                            floatArrayOf(
-                                                hue,
-                                                0.4f,
-                                                1.0f
-                                            )
+                                        // Row 1: Light
+                                        row1.add(
+                                            android.graphics.Color.HSVToColor(
+                                                floatArrayOf(
+                                                    hue,
+                                                    0.4f,
+                                                    1.0f,
+                                                ),
+                                            ),
                                         )
-                                    )
-                                    // Row 2: Regular
-                                    row2.add(
-                                        android.graphics.Color.HSVToColor(
-                                            floatArrayOf(
-                                                hue,
-                                                0.85f,
-                                                1.0f
-                                            )
+                                        // Row 2: Regular
+                                        row2.add(
+                                            android.graphics.Color.HSVToColor(
+                                                floatArrayOf(
+                                                    hue,
+                                                    0.85f,
+                                                    1.0f,
+                                                ),
+                                            ),
                                         )
-                                    )
-                                    // Row 3: Dark
-                                    row3.add(
-                                        android.graphics.Color.HSVToColor(
-                                            floatArrayOf(
-                                                hue,
-                                                1.0f,
-                                                0.55f
-                                            )
+                                        // Row 3: Dark
+                                        row3.add(
+                                            android.graphics.Color.HSVToColor(
+                                                floatArrayOf(
+                                                    hue,
+                                                    1.0f,
+                                                    0.55f,
+                                                ),
+                                            ),
                                         )
-                                    )
+                                    }
+                                    colors.addAll(row1)
+                                    colors.addAll(row2)
+                                    colors.addAll(row3)
                                 }
-                                colors.addAll(row1)
-                                colors.addAll(row2)
-                                colors.addAll(row3)
+                                colors
                             }
-                            colors
-                        }
 
                         val pages = allColors.chunked(21)
                         val pagerState = rememberPagerState(pageCount = { pages.size })
@@ -709,22 +707,24 @@ fun NotificationLightingSettingsUI(
 
                         HorizontalPager(
                             state = pagerState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(170.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(170.dp),
                         ) { pageIndex ->
                             val pageColors = pages[pageIndex]
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 8.dp),
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 val rows = pageColors.chunked(7)
                                 rows.forEach { rowColors ->
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceEvenly
+                                        horizontalArrangement = Arrangement.SpaceEvenly,
                                     ) {
                                         rowColors.forEach { colorInt ->
                                             ColorCircle(
@@ -735,10 +735,10 @@ fun NotificationLightingSettingsUI(
                                                     HapticUtil.performVirtualKeyHaptic(view)
                                                     viewModel.setNotificationLightingCustomColor(
                                                         colorInt,
-                                                        context
+                                                        context,
                                                     )
                                                     viewModel.triggerNotificationLighting(context)
-                                                }
+                                                },
                                             )
                                         }
                                     }
@@ -751,17 +751,24 @@ fun NotificationLightingSettingsUI(
                             Modifier
                                 .height(8.dp)
                                 .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.Center,
                         ) {
                             repeat(pages.size) { iteration ->
                                 val color =
-                                    if (pagerState.currentPage == iteration) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+                                    if (pagerState.currentPage ==
+                                        iteration
+                                    ) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.outlineVariant
+                                    }
                                 Box(
-                                    modifier = Modifier
-                                        .padding(horizontal = 4.dp)
-                                        .clip(CircleShape)
-                                        .background(color)
-                                        .size(8.dp)
+                                    modifier =
+                                        Modifier
+                                            .padding(horizontal = 4.dp)
+                                            .clip(CircleShape)
+                                            .background(color)
+                                            .size(8.dp),
                                 )
                             }
                         }
@@ -775,14 +782,14 @@ fun NotificationLightingSettingsUI(
                 text = stringResource(R.string.settings_section_ambient_display),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Text(
                 text = stringResource(R.string.ambient_display_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer {
@@ -794,7 +801,7 @@ fun NotificationLightingSettingsUI(
                     onCheckedChange = { checked ->
                         viewModel.setAmbientDisplayEnabled(checked, context)
                     },
-                    modifier = Modifier.highlight(highlightSetting == "ambient_display")
+                    modifier = Modifier.highlight(highlightSetting == "ambient_display"),
                 )
                 if (viewModel.isAmbientDisplayEnabled.value) {
                     IconToggleItem(
@@ -805,7 +812,7 @@ fun NotificationLightingSettingsUI(
                         onCheckedChange = { checked ->
                             viewModel.setAmbientShowLockScreenEnabled(checked, context)
                         },
-                        modifier = Modifier.highlight(highlightSetting == "ambient_show_lock_screen")
+                        modifier = Modifier.highlight(highlightSetting == "ambient_show_lock_screen"),
                     )
                 }
             }
@@ -820,24 +827,24 @@ fun NotificationLightingSettingsUI(
                 onSaveApps = { ctx, apps ->
                     viewModel.saveNotificationLightingSelectedApps(
                         ctx,
-                        apps
+                        apps,
                     )
                 },
                 onAppToggle = { ctx, pkg, enabled ->
                     viewModel.updateNotificationLightingAppEnabled(
                         ctx,
                         pkg,
-                        enabled
+                        enabled,
                     )
                 },
-                context = context
+                context = context,
             )
         }
 
         if (showSweepShapesSheet) {
             SweepShapesBottomSheet(
                 viewModel = viewModel,
-                onDismissRequest = { showSweepShapesSheet = false }
+                onDismissRequest = { showSweepShapesSheet = false },
             )
         }
 
@@ -845,25 +852,27 @@ fun NotificationLightingSettingsUI(
             PermissionsBottomSheet(
                 onDismissRequest = { showPermissionsSheet = false },
                 featureTitle = R.string.notification_lighting_style_system,
-                permissions = listOf(
-                    PermissionItem(
-                        iconRes = R.drawable.rounded_adb_24,
-                        title = R.string.perm_shizuku_title,
-                        description = R.string.perm_shizuku_desc,
-                        dependentFeatures = listOf(R.string.notification_lighting_style_system),
-                        actionLabel = R.string.perm_shizuku_install_action,
-                        action = {
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://github.com/thedjchi/Shizuku")
-                            )
-                            context.startActivity(intent)
-                        },
-                        secondaryActionLabel = R.string.action_refresh,
-                        secondaryAction = { viewModel.check(context) },
-                        isGranted = viewModel.isShizukuPermissionGranted.value
-                    )
-                )
+                permissions =
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_adb_24,
+                            title = R.string.perm_shizuku_title,
+                            description = R.string.perm_shizuku_desc,
+                            dependentFeatures = listOf(R.string.notification_lighting_style_system),
+                            actionLabel = R.string.perm_shizuku_install_action,
+                            action = {
+                                val intent =
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse("https://github.com/thedjchi/Shizuku"),
+                                    )
+                                context.startActivity(intent)
+                            },
+                            secondaryActionLabel = R.string.action_refresh,
+                            secondaryAction = { viewModel.check(context) },
+                            isGranted = viewModel.isShizukuPermissionGranted.value,
+                        ),
+                    ),
             )
         }
 
@@ -871,9 +880,10 @@ fun NotificationLightingSettingsUI(
             Text(
                 text = stringResource(R.string.notification_lighting_system_disclaimer),
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
@@ -885,22 +895,24 @@ fun ColorCircle(
     color: Color,
     isSelected: Boolean,
     size: Dp = 40.dp,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
-        modifier = Modifier
-            .size(size)
-            .clip(CircleShape)
-            .background(color)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .size(size)
+                .clip(CircleShape)
+                .background(color)
+                .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
     ) {
         if (isSelected) {
             Box(
-                modifier = Modifier
-                    .size(size * 0.4f)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.8f))
+                modifier =
+                    Modifier
+                        .size(size * 0.4f)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.8f)),
             )
         }
     }
@@ -911,28 +923,30 @@ fun ColorCircle(
 private fun SweepPositionPicker(
     selectedPosition: NotificationLightingSweepPosition,
     onPositionSelected: (NotificationLightingSweepPosition) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val positions = listOf(
-        NotificationLightingSweepPosition.LEFT,
-        NotificationLightingSweepPosition.CENTER,
-        NotificationLightingSweepPosition.RIGHT
-    )
-    val labels = listOf(
-        stringResource(R.string.notification_lighting_sweep_pos_left),
-        stringResource(R.string.notification_lighting_sweep_pos_center),
-        stringResource(R.string.notification_lighting_sweep_pos_right)
-    )
+    val positions =
+        listOf(
+            NotificationLightingSweepPosition.LEFT,
+            NotificationLightingSweepPosition.CENTER,
+            NotificationLightingSweepPosition.RIGHT,
+        )
+    val labels =
+        listOf(
+            stringResource(R.string.notification_lighting_sweep_pos_left),
+            stringResource(R.string.notification_lighting_sweep_pos_center),
+            stringResource(R.string.notification_lighting_sweep_pos_right),
+        )
     val view = LocalView.current
 
     val selectedIndex = positions.indexOf(selectedPosition).coerceAtLeast(0)
 
     Row(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceBright
-            )
-            .padding(10.dp),
+        modifier =
+            modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceBright,
+                ).padding(10.dp),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
     ) {
         val modifiers = List(positions.size) { Modifier.weight(1f) }
@@ -945,15 +959,16 @@ private fun SweepPositionPicker(
                     onPositionSelected(pos)
                 },
                 modifier = modifiers[index].semantics { role = Role.RadioButton },
-                shapes = when (index) {
-                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                    positions.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                },
+                shapes =
+                    when (index) {
+                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                        positions.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                    },
             ) {
                 Text(
                     text = labels[index],
-                    style = MaterialTheme.typography.labelLarge
+                    style = MaterialTheme.typography.labelLarge,
                 )
             }
         }

@@ -33,20 +33,25 @@ import java.io.File
 
 sealed class WatermarkUiState {
     data object Idle : WatermarkUiState()
-    data object Processing : WatermarkUiState()
-    data class Success(val file: File, val bitmap: android.graphics.Bitmap? = null) :
-        WatermarkUiState()
 
-    data class Error(val message: String) : WatermarkUiState()
+    data object Processing : WatermarkUiState()
+
+    data class Success(
+        val file: File,
+        val bitmap: android.graphics.Bitmap? = null,
+    ) : WatermarkUiState()
+
+    data class Error(
+        val message: String,
+    ) : WatermarkUiState()
 }
 
 class WatermarkViewModel(
     private val watermarkEngine: WatermarkEngine,
     private val watermarkRepository: WatermarkRepository,
     private val metadataProvider: MetadataProvider,
-    private val context: Context
+    private val context: Context,
 ) : ViewModel() {
-
     companion object {
         /**
          * Executes the provide factory operation.
@@ -152,10 +157,11 @@ class WatermarkViewModel(
                     }
                 }
 
-                val decodeOptions = android.graphics.BitmapFactory.Options().apply {
-                    this.inSampleSize = inSampleSize
-                    this.inMutable = true // Ensure mutable
-                }
+                val decodeOptions =
+                    android.graphics.BitmapFactory.Options().apply {
+                        this.inSampleSize = inSampleSize
+                        this.inMutable = true // Ensure mutable
+                    }
 
                 val is2 = context.contentResolver.openInputStream(uri)
                 val bitmap = android.graphics.BitmapFactory.decodeStream(is2, null, decodeOptions)
@@ -184,8 +190,8 @@ class WatermarkViewModel(
         }
     }
 
-    private fun buildBrandString(exif: ExifData): String {
-        return if (!exif.make.isNullOrEmpty() && !exif.model.isNullOrEmpty()) {
+    private fun buildBrandString(exif: ExifData): String =
+        if (!exif.make.isNullOrEmpty() && !exif.model.isNullOrEmpty()) {
             if (exif.model.contains(exif.make, ignoreCase = true)) {
                 exif.model
             } else {
@@ -194,7 +200,6 @@ class WatermarkViewModel(
         } else {
             exif.model ?: exif.make ?: "Shot on Device"
         }
-    }
 
     /**
      * Executes the format date operation.
@@ -238,23 +243,26 @@ class WatermarkViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val inputStream = context.contentResolver.openInputStream(uri)
-                val options = android.graphics.BitmapFactory.Options().apply {
-                    inSampleSize = 2
-                }
+                val options =
+                    android.graphics.BitmapFactory.Options().apply {
+                        inSampleSize = 2
+                    }
                 val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream, null, options)
                 inputStream?.close()
 
                 if (bitmap != null) {
-                    androidx.palette.graphics.Palette.from(bitmap)
+                    androidx.palette.graphics.Palette
+                        .from(bitmap)
                         .maximumColorCount(32)
                         .clearFilters()
                         .generate { palette ->
-                            val color = palette?.vibrantSwatch?.rgb
-                                ?: palette?.mutedSwatch?.rgb
-                                ?: palette?.lightVibrantSwatch?.rgb
-                                ?: palette?.darkVibrantSwatch?.rgb
-                                ?: palette?.dominantSwatch?.rgb
-                                ?: android.graphics.Color.GRAY
+                            val color =
+                                palette?.vibrantSwatch?.rgb
+                                    ?: palette?.mutedSwatch?.rgb
+                                    ?: palette?.lightVibrantSwatch?.rgb
+                                    ?: palette?.darkVibrantSwatch?.rgb
+                                    ?: palette?.dominantSwatch?.rgb
+                                    ?: android.graphics.Color.GRAY
 
                             viewModelScope.launch {
                                 watermarkRepository.updateAccentColor(color)
@@ -284,14 +292,15 @@ class WatermarkViewModel(
                 }
 
                 // Merge transient logo settings with base options
-                val currentOptions = _options.value.copy(
-                    logoResId = _logoResId.value,
-                    showLogo = _showLogo.value,
-                    overriddenBrandText = _currentBrandText.value,
-                    customText = _currentCustomText.value,
-                    showCustomText = _currentCustomText.value.isNotEmpty(),
-                    overriddenDateText = _currentDateText.value
-                )
+                val currentOptions =
+                    _options.value.copy(
+                        logoResId = _logoResId.value,
+                        showLogo = _showLogo.value,
+                        overriddenBrandText = _currentBrandText.value,
+                        customText = _currentCustomText.value,
+                        showCustomText = _currentCustomText.value.isNotEmpty(),
+                        overriddenDateText = _currentDateText.value,
+                    )
 
                 val result = watermarkEngine.processBitmap(workingBitmap, uri, currentOptions)
 
@@ -353,7 +362,7 @@ class WatermarkViewModel(
         aperture: Boolean,
         iso: Boolean,
         shutterSpeed: Boolean,
-        date: Boolean
+        date: Boolean,
     ) {
         viewModelScope.launch {
             watermarkRepository.updateExifSettings(focalLength, aperture, iso, shutterSpeed, date)
@@ -428,7 +437,11 @@ class WatermarkViewModel(
      * @param text [String] Target text.
      * @param size [Int] Target size.
      */
-    fun setCustomTextSettings(show: Boolean, text: String, size: Int) {
+    fun setCustomTextSettings(
+        show: Boolean,
+        text: String,
+        size: Int,
+    ) {
         viewModelScope.launch {
             watermarkRepository.updateCustomTextSettings(show, text, size)
             previewSourceBitmap?.let { updatePreview() }
@@ -490,7 +503,11 @@ class WatermarkViewModel(
      * @param resId [Int?] Target res id.
      * @param size [Int] Target size.
      */
-    fun setLogoSettings(show: Boolean, resId: Int?, size: Int) {
+    fun setLogoSettings(
+        show: Boolean,
+        resId: Int?,
+        size: Int,
+    ) {
         _showLogo.value = show
         _logoResId.value = resId
         viewModelScope.launch {
@@ -557,7 +574,11 @@ class WatermarkViewModel(
      * @param custom [String] Target custom.
      * @param date [String?] Target date.
      */
-    fun updateOverriddenTexts(brand: String, custom: String, date: String?) {
+    fun updateOverriddenTexts(
+        brand: String,
+        custom: String,
+        date: String?,
+    ) {
         _currentBrandText.value = brand
         _currentCustomText.value = custom
         _currentDateText.value = date
@@ -573,38 +594,41 @@ class WatermarkViewModel(
         viewModelScope.launch {
             _uiState.value = WatermarkUiState.Processing
             try {
-                // Merge transient logo options 
-                val finalOptions = _options.value.copy(
-                    logoResId = _logoResId.value,
-                    showLogo = _showLogo.value,
-                    overriddenBrandText = _currentBrandText.value,
-                    customText = _currentCustomText.value,
-                    showCustomText = _currentCustomText.value.isNotEmpty(),
-                    overriddenDateText = _currentDateText.value
-                )
+                // Merge transient logo options
+                val finalOptions =
+                    _options.value.copy(
+                        logoResId = _logoResId.value,
+                        showLogo = _showLogo.value,
+                        overriddenBrandText = _currentBrandText.value,
+                        customText = _currentCustomText.value,
+                        showCustomText = _currentCustomText.value.isNotEmpty(),
+                        overriddenDateText = _currentDateText.value,
+                    )
                 // Process image to a temporary file first
                 val tempFile = watermarkEngine.processImage(uri, finalOptions)
 
                 // Save to MediaStore (Gallery)
-                val values = android.content.ContentValues().apply {
-                    put(
-                        android.provider.MediaStore.Images.Media.DISPLAY_NAME,
-                        "WM_${System.currentTimeMillis()}.jpg"
-                    )
-                    put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                    // RELATIVE_PATH is available on Android 10+ (API 29)
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                val values =
+                    android.content.ContentValues().apply {
                         put(
-                            android.provider.MediaStore.Images.Media.RELATIVE_PATH,
-                            "Pictures/Essentials"
+                            android.provider.MediaStore.Images.Media.DISPLAY_NAME,
+                            "WM_${System.currentTimeMillis()}.jpg",
                         )
+                        put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                        // RELATIVE_PATH is available on Android 10+ (API 29)
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                            put(
+                                android.provider.MediaStore.Images.Media.RELATIVE_PATH,
+                                "Pictures/Essentials",
+                            )
+                        }
                     }
-                }
 
                 val resolver = context.contentResolver
                 val collection =
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                        android.provider.MediaStore.Images.Media.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                        android.provider.MediaStore.Images.Media
+                            .getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY)
                     } else {
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                     }
@@ -635,19 +659,23 @@ class WatermarkViewModel(
      * @param uri [Uri] Target uri.
      * @param onShareReady [(Uri] Target on share ready.
      */
-    fun shareImage(uri: Uri, onShareReady: (Uri) -> Unit) {
+    fun shareImage(
+        uri: Uri,
+        onShareReady: (Uri) -> Unit,
+    ) {
         viewModelScope.launch {
             _uiState.value = WatermarkUiState.Processing
             try {
-                // Merge transient logo options 
-                val finalOptions = _options.value.copy(
-                    logoResId = _logoResId.value,
-                    showLogo = _showLogo.value,
-                    overriddenBrandText = _currentBrandText.value,
-                    customText = _currentCustomText.value,
-                    showCustomText = _currentCustomText.value.isNotEmpty(),
-                    overriddenDateText = _currentDateText.value
-                )
+                // Merge transient logo options
+                val finalOptions =
+                    _options.value.copy(
+                        logoResId = _logoResId.value,
+                        showLogo = _showLogo.value,
+                        overriddenBrandText = _currentBrandText.value,
+                        customText = _currentCustomText.value,
+                        showCustomText = _currentCustomText.value.isNotEmpty(),
+                        overriddenDateText = _currentDateText.value,
+                    )
                 // Process image to a temporary file
                 val tempFile = watermarkEngine.processImage(uri, finalOptions)
                 val savedUri = saveToMediaStore(tempFile)
@@ -666,23 +694,25 @@ class WatermarkViewModel(
 
     private fun saveToMediaStore(sourceFile: File): Uri? {
         try {
-            val values = android.content.ContentValues().apply {
-                put(
-                    android.provider.MediaStore.Images.Media.DISPLAY_NAME,
-                    "WM_SHARE_${System.currentTimeMillis()}.jpg"
-                )
-                put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            val values =
+                android.content.ContentValues().apply {
                     put(
-                        android.provider.MediaStore.Images.Media.RELATIVE_PATH,
-                        "Pictures/Essentials/Watermarks"
+                        android.provider.MediaStore.Images.Media.DISPLAY_NAME,
+                        "WM_SHARE_${System.currentTimeMillis()}.jpg",
                     )
+                    put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        put(
+                            android.provider.MediaStore.Images.Media.RELATIVE_PATH,
+                            "Pictures/Essentials/Watermarks",
+                        )
+                    }
                 }
-            }
             val resolver = context.contentResolver
             val collection =
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-                    android.provider.MediaStore.Images.Media.getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY)
+                    android.provider.MediaStore.Images.Media
+                        .getContentUri(android.provider.MediaStore.VOLUME_EXTERNAL_PRIMARY)
                 } else {
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 }

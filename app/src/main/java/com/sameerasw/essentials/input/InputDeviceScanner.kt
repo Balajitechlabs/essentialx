@@ -31,8 +31,8 @@ class InputDeviceScanner {
                             name = line,
                             bus = 0,
                             vendor = 0,
-                            product = 0
-                        )
+                            product = 0,
+                        ),
                     )
                 }
             }

@@ -39,7 +39,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun NotificationSnoozingSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -49,10 +49,11 @@ fun NotificationSnoozingSettingsUI(
     val snoozeOptions = viewModel.notificationSnoozeOptions.value
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         RoundedCardContainer(spacing = 2.dp) {
             IconToggleItem(
@@ -64,23 +65,23 @@ fun NotificationSnoozingSettingsUI(
                     HapticUtil.performUIHaptic(view)
                 },
                 iconRes = R.drawable.rounded_notifications_paused_24,
-                modifier = Modifier.highlight(highlightSetting == "snooze_enabled")
+                modifier = Modifier.highlight(highlightSetting == "snooze_enabled"),
             )
         }
 
         AnimatedVisibility(
             visible = isSnoozeEnabled,
             enter = expandVertically(),
-            exit = shrinkVertically()
+            exit = shrinkVertically(),
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text(
                     text = stringResource(R.string.title_snooze_durations),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 RoundedCardContainer(spacing = 2.dp) {
@@ -100,16 +101,17 @@ fun NotificationSnoozingSettingsUI(
                             if (mins >= 60) "${mins / 60}h ${mins % 60}m" else "${mins}m"
                         },
                         iconRes = R.drawable.rounded_notifications_paused_24,
-                        enabled = isSnoozeEnabled
+                        enabled = isSnoozeEnabled,
                     )
 
                     snoozeOptions.forEachIndexed { index, optionVal ->
-                        val labelRes = when (index) {
-                            0 -> R.string.label_snooze_option_1
-                            1 -> R.string.label_snooze_option_2
-                            2 -> R.string.label_snooze_option_3
-                            else -> R.string.label_snooze_option_4
-                        }
+                        val labelRes =
+                            when (index) {
+                                0 -> R.string.label_snooze_option_1
+                                1 -> R.string.label_snooze_option_2
+                                2 -> R.string.label_snooze_option_3
+                                else -> R.string.label_snooze_option_4
+                            }
                         ConfigSliderItem(
                             title = stringResource(labelRes),
                             value = optionVal.toFloat(),
@@ -121,7 +123,7 @@ fun NotificationSnoozingSettingsUI(
                                 viewModel.saveNotificationSnoozeOptions(
                                     context,
                                     snoozeDefault,
-                                    options
+                                    options,
                                 )
                                 HapticUtil.performSliderHaptic(view)
                             },
@@ -133,7 +135,7 @@ fun NotificationSnoozingSettingsUI(
                                 if (mins >= 60) "${mins / 60}h ${mins % 60}m" else "${mins}m"
                             },
                             iconRes = R.drawable.rounded_notifications_paused_24,
-                            enabled = isSnoozeEnabled
+                            enabled = isSnoozeEnabled,
                         )
                     }
                 }
@@ -142,13 +144,14 @@ fun NotificationSnoozingSettingsUI(
                     onClick = {
                         viewModel.resetNotificationSnoozeOptions(context)
                         HapticUtil.performUIHaptic(view)
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.msg_snooze_reset_success),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast
+                            .makeText(
+                                context,
+                                context.getString(R.string.msg_snooze_reset_success),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
                 ) {
                     Text(text = stringResource(R.string.action_reset_snooze))
                 }

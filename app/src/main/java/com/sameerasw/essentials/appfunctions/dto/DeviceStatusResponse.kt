@@ -32,5 +32,5 @@ data class DeviceStatusResponse(
     val isCaffeinateActive: Boolean,
     val isFlashlightOn: Boolean,
     val isAodEnabled: Boolean,
-    val isNotificationLightingEnabled: Boolean
+    val isNotificationLightingEnabled: Boolean,
 )

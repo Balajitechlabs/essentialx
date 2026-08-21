@@ -35,7 +35,7 @@ object LogManager {
         val level: String,
         val tag: String,
         val message: String,
-        val throwable: Throwable? = null
+        val throwable: Throwable? = null,
     )
 
     fun init(context: Context) {
@@ -46,7 +46,7 @@ object LogManager {
         if (crashFile.exists()) {
             try {
                 lastCrashLog = crashFile.readText()
-                // delete after reading so we don't report old crashes forever? 
+                // delete after reading so we don't report old crashes forever?
                 // meaningful to keep it until a successful report? Let's keep it for now but maybe we can clear it if needed.
                 // For now, let's keep it.
             } catch (e: Exception) {
@@ -67,27 +67,32 @@ object LogManager {
         }
     }
 
-    private fun handleCrash(context: Context, thread: Thread, throwable: Throwable) {
+    private fun handleCrash(
+        context: Context,
+        thread: Thread,
+        throwable: Throwable,
+    ) {
         val sw = StringWriter()
         val pw = PrintWriter(sw)
         throwable.printStackTrace(pw)
         val stackTrace = sw.toString()
 
-        val report = buildString {
-            append("Crash Time: ${formatDate(System.currentTimeMillis())}\n")
-            append("Thread: ${thread.name}\n")
-            append("Exception: ${throwable.javaClass.simpleName}\n")
-            append("Message: ${throwable.message}\n")
-            append("Stack Trace:\n$stackTrace\n")
-            append("\n--- Last Logs before crash ---\n")
-            synchronized(logBuffer) {
-                // Take last 50 logs for context
-                logBuffer.takeLast(50).forEach { entry ->
-                    append(formatLogEntry(entry))
-                    append("\n")
+        val report =
+            buildString {
+                append("Crash Time: ${formatDate(System.currentTimeMillis())}\n")
+                append("Thread: ${thread.name}\n")
+                append("Exception: ${throwable.javaClass.simpleName}\n")
+                append("Message: ${throwable.message}\n")
+                append("Stack Trace:\n$stackTrace\n")
+                append("\n--- Last Logs before crash ---\n")
+                synchronized(logBuffer) {
+                    // Take last 50 logs for context
+                    logBuffer.takeLast(50).forEach { entry ->
+                        append(formatLogEntry(entry))
+                        append("\n")
+                    }
                 }
             }
-        }
 
         try {
             val crashFile = File(context.filesDir, CRASH_LOG_FILENAME)
@@ -97,27 +102,45 @@ object LogManager {
         }
     }
 
-    fun log(tag: String, message: String) {
+    fun log(
+        tag: String,
+        message: String,
+    ) {
         addLog("INFO", tag, message)
         Log.i(tag, message)
     }
 
-    fun debug(tag: String, message: String) {
+    fun debug(
+        tag: String,
+        message: String,
+    ) {
         addLog("DEBUG", tag, message)
         Log.d(tag, message)
     }
 
-    fun error(tag: String, message: String, throwable: Throwable? = null) {
+    fun error(
+        tag: String,
+        message: String,
+        throwable: Throwable? = null,
+    ) {
         addLog("ERROR", tag, message, throwable)
         Log.e(tag, message, throwable)
     }
 
-    fun warn(tag: String, message: String) {
+    fun warn(
+        tag: String,
+        message: String,
+    ) {
         addLog("WARN", tag, message)
         Log.w(tag, message)
     }
 
-    private fun addLog(level: String, tag: String, message: String, throwable: Throwable? = null) {
+    private fun addLog(
+        level: String,
+        tag: String,
+        message: String,
+        throwable: Throwable? = null,
+    ) {
         synchronized(logBuffer) {
             if (logBuffer.size >= MAX_LOG_SIZE) {
                 logBuffer.removeFirst()
@@ -126,33 +149,42 @@ object LogManager {
         }
     }
 
-    fun generateReport(context: Context, settingsJson: String): String {
+    fun generateReport(
+        context: Context,
+        settingsJson: String,
+    ): String {
         val report = JSONObject()
 
         // Device Info
-        val deviceInfo = JSONObject().apply {
-            put("Manufacturer", Build.MANUFACTURER)
-            put("Model", Build.MODEL)
-            put("Brand", Build.BRAND)
-            put("Device", Build.DEVICE)
-            put("Board", Build.BOARD)
-            put("Hardware", Build.HARDWARE)
-            put("AndroidVersion", Build.VERSION.RELEASE)
-            put("SDK", Build.VERSION.SDK_INT)
-            put("SecurityPatch", Build.VERSION.SECURITY_PATCH)
-            try {
-                val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-                put("AppVersionName", pInfo.versionName)
-                put(
-                    "AppVersionCode",
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pInfo.longVersionCode else @Suppress(
-                        "DEPRECATION"
-                    ) pInfo.versionCode.toLong()
-                )
-            } catch (e: Exception) {
-                put("AppVersion", "Unknown")
+        val deviceInfo =
+            JSONObject().apply {
+                put("Manufacturer", Build.MANUFACTURER)
+                put("Model", Build.MODEL)
+                put("Brand", Build.BRAND)
+                put("Device", Build.DEVICE)
+                put("Board", Build.BOARD)
+                put("Hardware", Build.HARDWARE)
+                put("AndroidVersion", Build.VERSION.RELEASE)
+                put("SDK", Build.VERSION.SDK_INT)
+                put("SecurityPatch", Build.VERSION.SECURITY_PATCH)
+                try {
+                    val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+                    put("AppVersionName", pInfo.versionName)
+                    put(
+                        "AppVersionCode",
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            pInfo.longVersionCode
+                        } else {
+                            @Suppress(
+                                "DEPRECATION",
+                            )
+                            pInfo.versionCode.toLong()
+                        },
+                    )
+                } catch (e: Exception) {
+                    put("AppVersion", "Unknown")
+                }
             }
-        }
         report.put("device_info", deviceInfo)
 
         // Logs
@@ -185,13 +217,11 @@ object LogManager {
         return if (entry.throwable != null) {
             val sw = StringWriter()
             entry.throwable.printStackTrace(PrintWriter(sw))
-            "$base\n${sw}"
+            "$base\n$sw"
         } else {
             base
         }
     }
 
-    private fun formatDate(timestamp: Long): String {
-        return SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US).format(Date(timestamp))
-    }
+    private fun formatDate(timestamp: Long): String = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US).format(Date(timestamp))
 }

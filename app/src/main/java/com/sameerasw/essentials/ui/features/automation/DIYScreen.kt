@@ -9,7 +9,6 @@
 
 package com.sameerasw.essentials.ui.composables
 
-
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -51,7 +50,7 @@ fun DIYScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     showNewAutomationSheet: Boolean = false,
     onDismissNewAutomationSheet: () -> Unit = {},
-    onNewAutomationClick: (() -> Unit)? = null
+    onNewAutomationClick: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val automations by viewModel.automations.collectAsState()
@@ -62,25 +61,26 @@ fun DIYScreen(
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
-                    detectTapGestures(onTap = { focusManager.clearFocus() })
-                },
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
+                        detectTapGestures(onTap = { focusManager.clearFocus() })
+                    },
             verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.Start
+            horizontalAlignment = Alignment.Start,
         ) {
             if (automations.isEmpty()) {
                 val view = androidx.compose.ui.platform.LocalView.current
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            text = "No automations yet"
+                            text = "No automations yet",
                         )
                         if (onNewAutomationClick != null) {
                             Spacer(modifier = Modifier.height(16.dp))
@@ -88,7 +88,7 @@ fun DIYScreen(
                                 onClick = {
                                     HapticUtil.performVirtualKeyHaptic(view)
                                     onNewAutomationClick()
-                                }
+                                },
                             ) {
                                 Text(stringResource(R.string.action_new_automation))
                             }
@@ -96,18 +96,20 @@ fun DIYScreen(
                     }
                 }
             } else {
-                val (enabledAutomations, disabledAutomations) = remember(automations) {
-                    automations.partition { it.isEnabled }
-                }
+                val (enabledAutomations, disabledAutomations) =
+                    remember(automations) {
+                        automations.partition { it.isEnabled }
+                    }
 
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(
-                        bottom = contentPadding.calculateBottomPadding(),
-                        start = 16.dp,
-                        end = 16.dp
-                    )
+                    contentPadding =
+                        PaddingValues(
+                            bottom = contentPadding.calculateBottomPadding(),
+                            start = 16.dp,
+                            end = 16.dp,
+                        ),
                 ) {
                     item {
                         Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding()))
@@ -118,7 +120,7 @@ fun DIYScreen(
                                 text = stringResource(R.string.label_enabled),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(start = 16.dp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         item {
@@ -130,8 +132,8 @@ fun DIYScreen(
                                             context.startActivity(
                                                 AutomationEditorActivity.createIntent(
                                                     context,
-                                                    automation.id
-                                                )
+                                                    automation.id,
+                                                ),
                                             )
                                         },
                                         onDelete = {
@@ -142,7 +144,7 @@ fun DIYScreen(
                                         },
                                         onTest = {
                                             viewModel.testAutomation(automation)
-                                        }
+                                        },
                                     )
                                 }
                             }
@@ -155,7 +157,7 @@ fun DIYScreen(
                                 text = stringResource(R.string.label_disabled),
                                 style = MaterialTheme.typography.titleMedium,
                                 modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         item {
@@ -167,8 +169,8 @@ fun DIYScreen(
                                             context.startActivity(
                                                 AutomationEditorActivity.createIntent(
                                                     context,
-                                                    automation.id
-                                                )
+                                                    automation.id,
+                                                ),
                                             )
                                         },
                                         onDelete = {
@@ -179,7 +181,7 @@ fun DIYScreen(
                                         },
                                         onTest = {
                                             viewModel.testAutomation(automation)
-                                        }
+                                        },
                                     )
                                 }
                             }
@@ -199,7 +201,7 @@ fun DIYScreen(
                 onAIDescribeRequested = {
                     showGenAIPill = true
                 },
-                isGenAILoading = genAIState is com.sameerasw.essentials.viewmodels.GenAIState.Loading
+                isGenAILoading = genAIState is com.sameerasw.essentials.viewmodels.GenAIState.Loading,
             )
         }
 
@@ -223,18 +225,19 @@ fun DIYScreen(
                 },
                 isLoading = genAIState is com.sameerasw.essentials.viewmodels.GenAIState.Loading,
                 suggestion = currentSuggestion,
-                modifier = Modifier.align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.BottomCenter),
             )
         }
 
         when (val state = genAIState) {
             is com.sameerasw.essentials.viewmodels.GenAIState.Error -> {
                 androidx.compose.runtime.LaunchedEffect(state) {
-                    android.widget.Toast.makeText(
-                        context,
-                        state.message,
-                        android.widget.Toast.LENGTH_LONG
-                    ).show()
+                    android.widget.Toast
+                        .makeText(
+                            context,
+                            state.message,
+                            android.widget.Toast.LENGTH_LONG,
+                        ).show()
                     viewModel.dismissGenAISuggestion()
                 }
             }
@@ -243,6 +246,3 @@ fun DIYScreen(
         }
     }
 }
-
-
-

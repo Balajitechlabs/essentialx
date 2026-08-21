@@ -9,7 +9,6 @@
 
 package com.sameerasw.essentials
 
-
 import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -124,7 +123,6 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 class SettingsActivity : AppCompatActivity() {
-
     private val viewModel: MainViewModel by viewModels()
 
     private val shizukuPermissionResultListener =
@@ -141,7 +139,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val isDarkMode =
             (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-                    android.content.res.Configuration.UI_MODE_NIGHT_YES
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
         window.setBackgroundDrawableResource(if (isDarkMode) android.R.color.black else R.color.app_window_background)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
@@ -163,55 +161,63 @@ class SettingsActivity : AppCompatActivity() {
                 if (showBugReportSheet) {
                     com.sameerasw.essentials.ui.core.sheets.BugReportBottomSheet(
                         viewModel = viewModel,
-                        onDismissRequest = { showBugReportSheet = false }
+                        onDismissRequest = { showBugReportSheet = false },
                     )
                 }
 
-                val statusBarHeightPx = with(LocalDensity.current) {
-                    WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx()
-                }
+                val statusBarHeightPx =
+                    with(LocalDensity.current) {
+                        WindowInsets.statusBars
+                            .asPaddingValues()
+                            .calculateTopPadding()
+                            .toPx()
+                    }
                 val statusBarHeight =
                     WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
                 val isBlurEnabled by viewModel.isBlurEnabled
 
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                        .progressiveBlur(
-                            blurRadius = if (isBlurEnabled) 40f else 0f,
-                            height = statusBarHeightPx * 1.15f,
-                            direction = BlurDirection.TOP
-                        )
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .progressiveBlur(
+                                blurRadius = if (isBlurEnabled) 40f else 0f,
+                                height = statusBarHeightPx * 1.15f,
+                                direction = BlurDirection.TOP,
+                            ),
                 ) {
-                    val contentPadding = PaddingValues(
-                        top = statusBarHeight,
-                        bottom = 150.dp,
-                        start = 16.dp,
-                        end = 16.dp
-                    )
+                    val contentPadding =
+                        PaddingValues(
+                            top = statusBarHeight,
+                            bottom = 150.dp,
+                            start = 16.dp,
+                            end = 16.dp,
+                        )
 
                     SettingsContent(
                         viewModel = viewModel,
                         contentPadding = contentPadding,
-                        modifier = Modifier
-                            .progressiveBlur(
-                                blurRadius = if (isBlurEnabled) 40f else 0f,
-                                height = with(LocalDensity.current) { 150.dp.toPx() },
-                                direction = BlurDirection.BOTTOM
-                            )
+                        modifier =
+                            Modifier
+                                .progressiveBlur(
+                                    blurRadius = if (isBlurEnabled) 40f else 0f,
+                                    height = with(LocalDensity.current) { 150.dp.toPx() },
+                                    direction = BlurDirection.BOTTOM,
+                                ),
                     )
 
                     EssentialsFloatingToolbar(
                         title = stringResource(R.string.label_settings),
                         onBackClick = { finish() },
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .zIndex(1f),
+                        modifier =
+                            Modifier
+                                .align(Alignment.BottomCenter)
+                                .zIndex(1f),
                         fabAction = { showBugReportSheet = true },
                         fabIconRes = R.drawable.rounded_bug_report_24,
-                        fabContentDescription = stringResource(R.string.action_report_bug)
+                        fabContentDescription = stringResource(R.string.action_report_bug),
                     )
                 }
             }
@@ -232,7 +238,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode in 1001..1006) {
@@ -246,7 +252,7 @@ class SettingsActivity : AppCompatActivity() {
 fun SettingsContent(
     viewModel: MainViewModel,
     contentPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val isAccessibilityEnabled by viewModel.isAccessibilityEnabled
     val isWriteSecureSettingsEnabled by viewModel.isWriteSecureSettingsEnabled
@@ -276,7 +282,8 @@ fun SettingsContent(
 
     LaunchedEffect(Unit) {
         isGenAISupported =
-            com.sameerasw.essentials.domain.genai.GenAIAutomationService.isSupported()
+            com.sameerasw.essentials.domain.genai.GenAIAutomationService
+                .isSupported()
     }
 
     val isUpdateNotificationEnabled by viewModel.isUpdateNotificationEnabled
@@ -294,49 +301,58 @@ fun SettingsContent(
     var showLanguagePickerSheet by remember { mutableStateOf(false) }
     var showGitHubAuthSheet by remember { mutableStateOf(false) }
     var showTranslationWarningDialog by remember { mutableStateOf(false) }
-    val gitHubAuthViewModel: GitHubAuthViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    val gitHubAuthViewModel: GitHubAuthViewModel =
+        androidx.lifecycle.viewmodel.compose
+            .viewModel()
     val settingsRepo =
-        remember { com.sameerasw.essentials.data.repository.SettingsRepository(context) }
+        remember {
+            com.sameerasw.essentials.data.repository
+                .SettingsRepository(context)
+        }
     var currentUser by remember { mutableStateOf(settingsRepo.getGitHubUser()) }
-
 
     val isTranslationModeActive by TranslationManager.isTranslationModeEnabled
     val sessionEditsCount = TranslationManager.session.edits.size
 
-
     var openTranslationPRs by remember {
         mutableStateOf<List<com.sameerasw.essentials.domain.model.github.GitHubPullRequest>>(
-            emptyList()
+            emptyList(),
         )
     }
-    val gitHubRepo = remember { com.sameerasw.essentials.data.repository.GitHubRepository() }
+    val gitHubRepo =
+        remember {
+            com.sameerasw.essentials.data.repository
+                .GitHubRepository()
+        }
 
     androidx.compose.runtime.LaunchedEffect(isTranslationModeActive, currentUser) {
         val user = currentUser
         if (isTranslationModeActive && user != null) {
             val userToken = settingsRepo.getGitHubToken()
-            val prs = gitHubRepo.getOpenTranslationPRs(
-                owner = "sameerasw",
-                repo = "essentials",
-                author = user.login,
-                token = userToken
-            )
+            val prs =
+                gitHubRepo.getOpenTranslationPRs(
+                    owner = "sameerasw",
+                    repo = "essentials",
+                    author = user.login,
+                    token = userToken,
+                )
             openTranslationPRs = prs
         } else {
             openTranslationPRs = emptyList()
         }
     }
 
-
     val onImportConfig: (Boolean) -> Unit = { keepPrefs ->
         selectedImportUri?.let { uri ->
             try {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
                     if (viewModel.importConfigs(context, inputStream, keepPrefs)) {
-                        Toast.makeText(context, "Config imported successfully", Toast.LENGTH_SHORT)
+                        Toast
+                            .makeText(context, "Config imported successfully", Toast.LENGTH_SHORT)
                             .show()
                     } else {
-                        Toast.makeText(context, "Failed to import config", Toast.LENGTH_SHORT)
+                        Toast
+                            .makeText(context, "Failed to import config", Toast.LENGTH_SHORT)
                             .show()
                     }
                 }
@@ -350,43 +366,46 @@ fun SettingsContent(
         }
     }
 
-    val exportLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/json")
-    ) { uri ->
-        uri?.let {
-            try {
-                context.contentResolver.openOutputStream(it)?.use { outputStream ->
-                    viewModel.exportConfigs(context, outputStream)
-                    Toast.makeText(context, "Config exported successfully", Toast.LENGTH_SHORT)
-                        .show()
+    val exportLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument("application/json"),
+        ) { uri ->
+            uri?.let {
+                try {
+                    context.contentResolver.openOutputStream(it)?.use { outputStream ->
+                        viewModel.exportConfigs(context, outputStream)
+                        Toast
+                            .makeText(context, "Config exported successfully", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Failed to export config", Toast.LENGTH_SHORT).show()
+                    e.printStackTrace()
                 }
-            } catch (e: Exception) {
-                Toast.makeText(context, "Failed to export config", Toast.LENGTH_SHORT).show()
-                e.printStackTrace()
             }
         }
-    }
 
-    val importLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        uri?.let {
-            selectedImportUri = it
-            showImportConfirmSheet = true
+    val importLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { uri ->
+            uri?.let {
+                selectedImportUri = it
+                showImportConfirmSheet = true
+            }
         }
-    }
 
     if (showUpdateSheet) {
         UpdateBottomSheet(
             updateInfo = updateInfo,
             isChecking = viewModel.isCheckingUpdate.value,
-            onDismissRequest = { showUpdateSheet = false }
+            onDismissRequest = { showUpdateSheet = false },
         )
     }
 
     if (showInstructionsSheet) {
         InstructionsBottomSheet(
-            onDismissRequest = { showInstructionsSheet = false }
+            onDismissRequest = { showInstructionsSheet = false },
         )
     }
 
@@ -397,7 +416,7 @@ fun SettingsContent(
                 showUnsupportedFeaturesSheet = false
                 viewModel.setEnableUnsupportedFeatures(true, context)
             },
-            featureTitleResIds = FeatureRegistry.getUnsupportedFeatures(context).map { it.title }
+            featureTitleResIds = FeatureRegistry.getUnsupportedFeatures(context).map { it.title },
         )
     }
 
@@ -412,7 +431,7 @@ fun SettingsContent(
             },
             onConfirmMerge = {
                 onImportConfig(true)
-            }
+            },
         )
     }
 
@@ -421,29 +440,30 @@ fun SettingsContent(
         ModalBottomSheet(
             onDismissRequest = { showShizukuHelpBottomSheet = false },
             sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .padding(bottom = 32.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp)
+                        .padding(bottom = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = "Shizuku Auth Token",
                     style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
                     text = "In shizuku, in the 'Control Shizuku with automation apps' section, Open 'View intents' and copy and paste the auth token from 'Extras' section.\n\nThis allows Essentials to automate and re-start Shizuku on demand in features such as Shut-Up",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Button(
                     onClick = { showShizukuHelpBottomSheet = false },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text("Got it")
                 }
@@ -451,16 +471,16 @@ fun SettingsContent(
         }
     }
 
-
     val sentryMode by viewModel.sentryReportMode
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(contentPadding),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        horizontalAlignment = Alignment.Start
+        horizontalAlignment = Alignment.Start,
     ) {
         val view = LocalView.current
 
@@ -474,19 +494,19 @@ fun SettingsContent(
                     showInstructionsSheet = true
                 },
                 showToggle = false,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(72.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(72.dp),
             )
         }
-
 
         // Updates Section
         Text(
             text = "Updates",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
@@ -495,39 +515,39 @@ fun SettingsContent(
                 title = "Auto check for updates",
                 description = "Check for updates at app launch",
                 isChecked = isAutoUpdateEnabled,
-                onCheckedChange = { viewModel.setAutoUpdateEnabled(it, context) }
+                onCheckedChange = { viewModel.setAutoUpdateEnabled(it, context) },
             )
             IconToggleItem(
                 iconRes = R.drawable.rounded_experiment_24,
                 title = context.getString(R.string.check_pre_releases_label),
                 description = context.getString(R.string.check_pre_releases_desc),
                 isChecked = isPreReleaseCheckEnabled,
-                onCheckedChange = { viewModel.setPreReleaseCheckEnabled(it, context) }
+                onCheckedChange = { viewModel.setPreReleaseCheckEnabled(it, context) },
             )
             IconToggleItem(
                 iconRes = R.drawable.rounded_notifications_unread_24,
                 title = "Notify for new updates",
                 description = "Show a notification when an update is found",
                 isChecked = isUpdateNotificationEnabled,
-                onCheckedChange = { viewModel.setUpdateNotificationEnabled(it, context) }
+                onCheckedChange = { viewModel.setUpdateNotificationEnabled(it, context) },
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.surfaceBright,
-                        shape = MaterialTheme.shapes.extraSmall
-                    )
-                    .padding(8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surfaceBright,
+                            shape = MaterialTheme.shapes.extraSmall,
+                        ).padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 val buttonText =
                     if (isUpdateAvailable && !updateInfo?.versionName.isNullOrEmpty()) {
                         stringResource(
                             R.string.action_update_to_version,
-                            updateInfo?.versionName ?: ""
+                            updateInfo?.versionName ?: "",
                         )
                     } else {
                         stringResource(R.string.action_check_for_updates)
@@ -541,22 +561,23 @@ fun SettingsContent(
                         viewModel.checkForUpdates(context, manual = true)
                         showUpdateSheet = true
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .padding(horizontal = 4.dp),
-                    contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .padding(horizontal = 4.dp),
+                    contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp),
                 ) {
                     Icon(
                         painter = painterResource(id = buttonIconRes),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = buttonText,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
@@ -569,14 +590,14 @@ fun SettingsContent(
             text = "App Settings",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
             val appLanguage by viewModel.appLanguage
             LanguagePicker(
                 selectedLanguageCode = appLanguage,
-                onLanguageSelected = { viewModel.setAppLanguage(it) }
+                onLanguageSelected = { viewModel.setAppLanguage(it) },
             )
 
             IconToggleItem(
@@ -586,7 +607,7 @@ fun SettingsContent(
                 onCheckedChange = { isChecked ->
                     isAppHapticsEnabled.value = isChecked
                     HapticUtil.saveAppHapticsEnabled(context, isChecked)
-                }
+                },
             )
 
             IconToggleItem(
@@ -594,27 +615,27 @@ fun SettingsContent(
                 title = stringResource(R.string.setting_pitch_black_theme_title),
                 description = stringResource(R.string.setting_pitch_black_theme_desc),
                 isChecked = viewModel.isPitchBlackThemeEnabled.value,
-                onCheckedChange = { viewModel.setPitchBlackThemeEnabled(it, context) }
+                onCheckedChange = { viewModel.setPitchBlackThemeEnabled(it, context) },
             )
             val isBlurProblematic = remember { DeviceUtils.isBlurProblematicDevice() }
 
             IconToggleItem(
                 iconRes = R.drawable.rounded_blur_on_24,
                 title = stringResource(R.string.label_use_blur),
-                description = if (isBlurProblematic) {
-                    stringResource(R.string.msg_blur_compatibility_error)
-                } else {
-                    stringResource(R.string.desc_use_blur)
-                },
+                description =
+                    if (isBlurProblematic) {
+                        stringResource(R.string.msg_blur_compatibility_error)
+                    } else {
+                        stringResource(R.string.desc_use_blur)
+                    },
                 isChecked = viewModel.isBlurSettingEnabled.value,
                 onCheckedChange = { viewModel.setBlurEnabled(it, context) },
-                enabled = !isBlurProblematic
+                enabled = !isBlurProblematic,
             )
-
 
             CrashReportingPicker(
                 selectedMode = sentryMode,
-                onModeSelected = { viewModel.setSentryReportMode(it, context) }
+                onModeSelected = { viewModel.setSentryReportMode(it, context) },
             )
 
             val defaultTab by viewModel.defaultTab
@@ -623,7 +644,7 @@ fun SettingsContent(
             DefaultTabPicker(
                 selectedTab = defaultTab,
                 onTabSelected = { viewModel.setDefaultTab(it, context) },
-                options = availableTabs
+                options = availableTabs,
             )
 
             IconToggleItem(
@@ -631,7 +652,7 @@ fun SettingsContent(
                 title = stringResource(R.string.setting_swipe_tabs_title),
                 description = stringResource(R.string.setting_swipe_tabs_desc),
                 isChecked = viewModel.isSwipeTabsEnabled.value,
-                onCheckedChange = { viewModel.setSwipeTabsEnabled(it) }
+                onCheckedChange = { viewModel.setSwipeTabsEnabled(it) },
             )
         }
 
@@ -643,19 +664,19 @@ fun SettingsContent(
                 title = stringResource(R.string.setting_use_root_title),
                 description = stringResource(R.string.setting_use_root_desc),
                 isChecked = viewModel.isRootEnabled.value,
-                onCheckedChange = { viewModel.setRootEnabled(it, context) }
+                onCheckedChange = { viewModel.setRootEnabled(it, context) },
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        MaterialTheme.colorScheme.surfaceBright,
-                        shape = MaterialTheme.shapes.extraSmall
-                    )
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .background(
+                            MaterialTheme.colorScheme.surfaceBright,
+                            shape = MaterialTheme.shapes.extraSmall,
+                        ).padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 val view = LocalView.current
                 var tokenText by remember { mutableStateOf(viewModel.shizukuAuthToken.value) }
@@ -673,14 +694,15 @@ fun SettingsContent(
                     trailingIcon = {
                         IconButton(onClick = { isTokenVisible = !isTokenVisible }) {
                             Icon(
-                                painter = painterResource(
-                                    id = if (isTokenVisible) R.drawable.rounded_visibility_24 else R.drawable.rounded_visibility_off_24
-                                ),
+                                painter =
+                                    painterResource(
+                                        id = if (isTokenVisible) R.drawable.rounded_visibility_24 else R.drawable.rounded_visibility_off_24,
+                                    ),
                                 contentDescription = if (isTokenVisible) "Hide token" else "Show token",
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                         }
-                    }
+                    },
                 )
 
                 Button(
@@ -693,7 +715,7 @@ fun SettingsContent(
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_save_24),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
 
@@ -706,7 +728,7 @@ fun SettingsContent(
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_help_24),
                         contentDescription = null,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
@@ -716,9 +738,8 @@ fun SettingsContent(
                 title = stringResource(R.string.setting_use_usage_access_title),
                 description = stringResource(R.string.setting_use_usage_access_desc),
                 isChecked = viewModel.isUseUsageAccess.value,
-                onCheckedChange = { viewModel.setUseUsageAccess(it, context) }
+                onCheckedChange = { viewModel.setUseUsageAccess(it, context) },
             )
-
 
             IconToggleItem(
                 iconRes = R.drawable.rounded_release_alert_24,
@@ -731,7 +752,7 @@ fun SettingsContent(
                     } else {
                         viewModel.setEnableUnsupportedFeatures(false, context)
                     }
-                }
+                },
             )
 
             if (isGenAISupported) {
@@ -740,7 +761,7 @@ fun SettingsContent(
                     title = stringResource(R.string.settings_genai_automation_title),
                     description = stringResource(R.string.settings_genai_automation_desc),
                     isChecked = isGenAIAutomationEnabled,
-                    onCheckedChange = { viewModel.setGenAIAutomationEnabled(it, context) }
+                    onCheckedChange = { viewModel.setGenAIAutomationEnabled(it, context) },
                 )
             }
         }
@@ -749,26 +770,36 @@ fun SettingsContent(
 
         // Translations Section
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(R.string.settings_translations_section),
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
-        val currentAppLocale = LocalContext.current.resources.configuration.locales[0].language
+        val currentAppLocale =
+            LocalContext.current.resources.configuration.locales[0]
+                .language
         val isEnglishApp = currentAppLocale == "en" || currentAppLocale.isBlank()
 
         RoundedCardContainer {
             // GitHub Account Card (Tap to Sign In when logged out, Long Press to Sign Out when logged in)
             FeatureCard(
                 title = if (currentUser != null) "@${currentUser?.login}" else stringResource(R.string.action_sign_in_github),
-                description = if (currentUser != null) "Logged in as ${currentUser?.name ?: currentUser?.login}" else "Sign in required to translate",
+                description =
+                    if (currentUser !=
+                        null
+                    ) {
+                        "Logged in as ${currentUser?.name ?: currentUser?.login}"
+                    } else {
+                        "Sign in required to translate"
+                    },
                 isEnabled = true,
                 onToggle = {},
                 onClick = {
@@ -779,37 +810,44 @@ fun SettingsContent(
                 },
                 showToggle = false,
                 iconRes = R.drawable.brand_github,
-                additionalMenuItems = if (currentUser != null) {
-                    @Composable { onDismiss ->
-                        SegmentedDropdownMenuItem(
-                            text = { Text("Sign Out") },
-                            onClick = {
-                                onDismiss()
-                                HapticUtil.performUIHaptic(view)
-                                gitHubAuthViewModel.signOut(context)
-                                currentUser = null
-                                TranslationManager.isTranslationModeEnabled.value = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_logout_24),
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        )
-                    }
-                } else null
-
+                additionalMenuItems =
+                    if (currentUser != null) {
+                        @Composable { onDismiss ->
+                            SegmentedDropdownMenuItem(
+                                text = { Text("Sign Out") },
+                                onClick = {
+                                    onDismiss()
+                                    HapticUtil.performUIHaptic(view)
+                                    gitHubAuthViewModel.signOut(context)
+                                    currentUser = null
+                                    TranslationManager.isTranslationModeEnabled.value = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.rounded_logout_24),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.error,
+                                    )
+                                },
+                            )
+                        }
+                    } else {
+                        null
+                    },
             )
 
             // Translation Mode Switch (IconToggleItem - clean toggle variant without sub-menu divider)
             IconToggleItem(
                 iconRes = R.drawable.rounded_translate_24,
                 title = stringResource(R.string.settings_translate_mode),
-                description = if (isEnglishApp) "App language is English. Change app language to translate strings" else stringResource(
-                    R.string.settings_translate_mode_desc
-                ),
+                description =
+                    if (isEnglishApp) {
+                        "App language is English. Change app language to translate strings"
+                    } else {
+                        stringResource(
+                            R.string.settings_translate_mode_desc,
+                        )
+                    },
                 isChecked = isTranslationModeActive && !isEnglishApp,
                 enabled = !isEnglishApp,
                 onCheckedChange = { enabled ->
@@ -824,18 +862,18 @@ fun SettingsContent(
                     } else {
                         TranslationManager.isTranslationModeEnabled.value = false
                     }
-                }
+                },
             )
-
 
             // Pending Edits Summary Card
             if (sessionEditsCount > 0) {
                 FeatureCard(
                     title = R.string.settings_translated_texts,
-                    description = stringResource(
-                        R.string.settings_translated_texts_desc,
-                        sessionEditsCount
-                    ),
+                    description =
+                        stringResource(
+                            R.string.settings_translated_texts_desc,
+                            sessionEditsCount,
+                        ),
                     isEnabled = true,
                     onToggle = {},
                     onClick = {
@@ -843,18 +881,19 @@ fun SettingsContent(
                         showTranslationSessionSheet = true
                     },
                     showToggle = false,
-                    iconRes = R.drawable.rounded_edit_24
+                    iconRes = R.drawable.rounded_edit_24,
                 )
             }
 
             // Existing Open Translation PRs
             if (isTranslationModeActive && openTranslationPRs.isNotEmpty()) {
                 openTranslationPRs.forEach { pr ->
-                    val dateFormatted = try {
-                        pr.updatedAt.take(10)
-                    } catch (e: Exception) {
-                        ""
-                    }
+                    val dateFormatted =
+                        try {
+                            pr.updatedAt.take(10)
+                        } catch (e: Exception) {
+                            ""
+                        }
                     val subtitleText =
                         if (dateFormatted.isNotBlank()) "PR #${pr.number} • Updated $dateFormatted" else "PR #${pr.number}"
 
@@ -865,22 +904,20 @@ fun SettingsContent(
                         onToggle = {},
                         onClick = {
                             HapticUtil.performUIHaptic(view)
-                            val intent = android.content.Intent(
-                                android.content.Intent.ACTION_VIEW,
-                                android.net.Uri.parse(pr.htmlUrl)
-                            )
+                            val intent =
+                                android.content.Intent(
+                                    android.content.Intent.ACTION_VIEW,
+                                    android.net.Uri.parse(pr.htmlUrl),
+                                )
 
                             context.startActivity(intent)
                         },
                         showToggle = false,
-                        iconRes = R.drawable.brand_github
+                        iconRes = R.drawable.brand_github,
                     )
                 }
             }
         }
-
-
-
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -892,43 +929,46 @@ fun SettingsContent(
                 onToggle = {},
                 showToggle = false,
                 onClick = { viewModel.restartSystemUI() },
-                iconRes = R.drawable.rounded_refresh_24
+                iconRes = R.drawable.rounded_refresh_24,
             )
         }
-
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Permissions Section
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { isPermissionsExpanded = !isPermissionsExpanded }
-                .padding(start = 16.dp, top = 16.dp, bottom = 8.dp, end = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { isPermissionsExpanded = !isPermissionsExpanded }
+                    .padding(start = 16.dp, top = 16.dp, bottom = 8.dp, end = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     text = "Permissions",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
             Icon(
-                painter = painterResource(id = if (isPermissionsExpanded) R.drawable.rounded_keyboard_arrow_up_24 else R.drawable.rounded_keyboard_arrow_down_24),
+                painter =
+                    painterResource(
+                        id = if (isPermissionsExpanded) R.drawable.rounded_keyboard_arrow_up_24 else R.drawable.rounded_keyboard_arrow_down_24,
+                    ),
                 contentDescription = if (isPermissionsExpanded) "Collapse" else "Expand",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
         AnimatedVisibility(
             visible = isPermissionsExpanded,
             enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut()
+            exit = shrinkVertically() + fadeOut(),
         ) {
             RoundedCardContainer {
                 PermissionCard(
@@ -972,7 +1012,7 @@ fun SettingsContent(
                         isGranted = isRootPermissionGranted,
                         onActionClick = {
                             viewModel.check(context)
-                        }
+                        },
                     )
                 } else if (isShizukuAvailable) {
                     PermissionCard(
@@ -985,11 +1025,14 @@ fun SettingsContent(
                             viewModel.requestShizukuPermission()
                         },
                         secondaryActionLabel = if (isShizukuPermissionGranted && !isWriteSecureSettingsEnabled) "Auto-Grant" else null,
-                        onSecondaryActionClick = if (isShizukuPermissionGranted && !isWriteSecureSettingsEnabled) {
-                            {
-                                viewModel.grantWriteSecureSettingsWithShizuku(context)
-                            }
-                        } else null,
+                        onSecondaryActionClick =
+                            if (isShizukuPermissionGranted && !isWriteSecureSettingsEnabled) {
+                                {
+                                    viewModel.grantWriteSecureSettingsWithShizuku(context)
+                                }
+                            } else {
+                                null
+                            },
                     )
                 }
 
@@ -1015,7 +1058,7 @@ fun SettingsContent(
                         ActivityCompat.requestPermissions(
                             context as ComponentActivity,
                             arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                            1002
+                            1002,
                         )
                     },
                 )
@@ -1027,10 +1070,11 @@ fun SettingsContent(
                     actionLabel = if (isOverlayPermissionGranted) "Granted" else "Grant Permission",
                     isGranted = isOverlayPermissionGranted,
                     onActionClick = {
-                        val intent = Intent(
-                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            android.net.Uri.parse("package:${context.packageName}")
-                        )
+                        val intent =
+                            Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                android.net.Uri.parse("package:${context.packageName}"),
+                            )
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                         context.startActivity(intent)
                     },
@@ -1043,9 +1087,10 @@ fun SettingsContent(
                     actionLabel = if (isNotificationListenerEnabled) "Granted" else "Enable listener",
                     isGranted = isNotificationListenerEnabled,
                     onActionClick = {
-                        val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
+                        val intent =
+                            Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            }
                         context.startActivity(intent)
                     },
                 )
@@ -1171,7 +1216,6 @@ fun SettingsContent(
             }
         }
 
-
         Spacer(modifier = Modifier.height(16.dp))
 
         MadebySameeraswCard()
@@ -1183,12 +1227,13 @@ fun SettingsContent(
                 onAvatarLongClick = {
                     val newState = !isDeveloperModeEnabled
                     viewModel.setDeveloperModeEnabled(newState, context)
-                    Toast.makeText(
-                        context,
-                        if (newState) "Developer options enabled" else "Developer options disabled",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                    Toast
+                        .makeText(
+                            context,
+                            if (newState) "Developer options enabled" else "Developer options disabled",
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                },
             )
         }
 
@@ -1200,29 +1245,30 @@ fun SettingsContent(
                 text = "Developer Options",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             RoundedCardContainer {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = Shapes.extraSmall
-                        )
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = Shapes.extraSmall,
+                            ).padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Button(
                         onClick = {
-                            val timeStamp = SimpleDateFormat(
-                                "yyyyMMdd_HHmmss",
-                                Locale.getDefault()
-                            ).format(Date())
+                            val timeStamp =
+                                SimpleDateFormat(
+                                    "yyyyMMdd_HHmmss",
+                                    Locale.getDefault(),
+                                ).format(Date())
                             exportLauncher.launch("essentials_config_$timeStamp.json")
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         Text("Export Config")
                     }
@@ -1230,21 +1276,21 @@ fun SettingsContent(
                         onClick = {
                             importLauncher.launch(arrayOf("application/json"))
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         Text("Import Config")
                     }
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = Shapes.extraSmall
-                        )
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = Shapes.extraSmall,
+                            ).padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Button(
                         onClick = {
@@ -1253,13 +1299,13 @@ fun SettingsContent(
                             Toast.makeText(context, "Onboarding reset", Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                            ),
                     ) {
                         Text("Reset onboarding", color = MaterialTheme.colorScheme.onError)
                     }
-
 
                     Button(
                         onClick = {
@@ -1268,42 +1314,45 @@ fun SettingsContent(
                             Toast.makeText(context, "Update note reset", Toast.LENGTH_SHORT).show()
                         },
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                            ),
                     ) {
                         Text("Reset update note", color = MaterialTheme.colorScheme.onError)
                     }
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = Shapes.extraSmall
-                        )
-                        .padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceBright,
+                                shape = Shapes.extraSmall,
+                            ).padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Button(
                         onClick = {
                             HapticUtil.performVirtualKeyHaptic(view)
                             throw RuntimeException("Simulated crash from Developer Options")
                         },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(40.dp),
                         shape = ButtonDefaults.shape,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                        contentPadding = PaddingValues(0.dp)
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
+                        contentPadding = PaddingValues(0.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.simulate_crash),
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                 }
@@ -1313,7 +1362,7 @@ fun SettingsContent(
                     title = stringResource(R.string.feat_auto_accessibility_title),
                     description = stringResource(R.string.feat_auto_accessibility_desc),
                     isChecked = viewModel.isAutoAccessibilityEnabled.value,
-                    onCheckedChange = { viewModel.setAutoAccessibilityEnabled(it, context) }
+                    onCheckedChange = { viewModel.setAutoAccessibilityEnabled(it, context) },
                 )
             }
 
@@ -1325,7 +1374,7 @@ fun SettingsContent(
                     text = "Wallpaper Update",
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 val workflowToken by remember { mutableStateOf(viewModel.gitHubWorkflowToken) }
@@ -1334,16 +1383,17 @@ fun SettingsContent(
                 RoundedCardContainer {
                     if (!hasWorkflowToken) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = MaterialTheme.colorScheme.surfaceBright)
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(color = MaterialTheme.colorScheme.surfaceBright)
+                                    .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(
                                 text = "Workflow authorization is required to trigger wallpaper updates remotely.",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
 
                             val workflowAuthState by viewModel.workflowAuthState
@@ -1354,7 +1404,7 @@ fun SettingsContent(
                                         onClick = {
                                             viewModel.startWorkflowAuthFlow(context)
                                         },
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier.fillMaxWidth(),
                                     ) {
                                         Text("Grant Workflow Access")
                                     }
@@ -1363,7 +1413,7 @@ fun SettingsContent(
                                 is com.sameerasw.essentials.viewmodels.AuthState.Loading -> {
                                     Box(
                                         modifier = Modifier.fillMaxWidth(),
-                                        contentAlignment = Alignment.Center
+                                        contentAlignment = Alignment.Center,
                                     ) {
                                         CircularProgressIndicator(modifier = Modifier.size(24.dp))
                                     }
@@ -1375,43 +1425,45 @@ fun SettingsContent(
                                     Column(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
                                     ) {
                                         Text(
                                             text = "Verification Code:",
-                                            style = MaterialTheme.typography.titleSmall
+                                            style = MaterialTheme.typography.titleSmall,
                                         )
                                         Text(
                                             text = codeData.userCode,
-                                            style = MaterialTheme.typography.headlineMedium.copy(
-                                                fontWeight = FontWeight.Bold
-                                            ),
-                                            color = MaterialTheme.colorScheme.primary
+                                            style =
+                                                MaterialTheme.typography.headlineMedium.copy(
+                                                    fontWeight = FontWeight.Bold,
+                                                ),
+                                            color = MaterialTheme.colorScheme.primary,
                                         )
                                         Text(
                                             text = "Go to: ${codeData.verificationUri}",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
 
                                         Row(
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                                         ) {
                                             Button(
                                                 onClick = {
-                                                    val intent = Intent(
-                                                        Intent.ACTION_VIEW,
-                                                        Uri.parse(codeData.verificationUri)
-                                                    )
+                                                    val intent =
+                                                        Intent(
+                                                            Intent.ACTION_VIEW,
+                                                            Uri.parse(codeData.verificationUri),
+                                                        )
                                                     context.startActivity(intent)
-                                                }
+                                                },
                                             ) {
                                                 Text("Open Page")
                                             }
                                             TextButton(
                                                 onClick = {
                                                     viewModel.cancelWorkflowAuthFlow()
-                                                }
+                                                },
                                             ) {
                                                 Text("Cancel")
                                             }
@@ -1425,17 +1477,17 @@ fun SettingsContent(
                                     Column(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        verticalArrangement = Arrangement.spacedBy(8.dp),
                                     ) {
                                         Text(
                                             text = err.message,
                                             color = MaterialTheme.colorScheme.error,
-                                            style = MaterialTheme.typography.bodyMedium
+                                            style = MaterialTheme.typography.bodyMedium,
                                         )
                                         Button(
                                             onClick = {
                                                 viewModel.startWorkflowAuthFlow(context)
-                                            }
+                                            },
                                         ) {
                                             Text("Retry")
                                         }
@@ -1449,22 +1501,23 @@ fun SettingsContent(
                         }
                     } else {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(color = MaterialTheme.colorScheme.surfaceBright)
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(color = MaterialTheme.colorScheme.surfaceBright)
+                                    .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             Text(
                                 text = "Trigger unsplash wallpaper update on your website directly:",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-                                verticalAlignment = Alignment.CenterVertically
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 val triggerState by viewModel.wallpaperTriggerState
                                 val isTriggering = triggerState != null
@@ -1475,7 +1528,7 @@ fun SettingsContent(
                                         viewModel.triggerWallpaperUpdate("desktop")
                                     },
                                     modifier = Modifier.weight(1f),
-                                    enabled = !isTriggering
+                                    enabled = !isTriggering,
                                 ) {
                                     Text("Desktop")
                                 }
@@ -1485,7 +1538,7 @@ fun SettingsContent(
                                         viewModel.triggerWallpaperUpdate("both")
                                     },
                                     modifier = Modifier.weight(1f),
-                                    enabled = !isTriggering
+                                    enabled = !isTriggering,
                                 ) {
                                     Text("Both")
                                 }
@@ -1495,7 +1548,7 @@ fun SettingsContent(
                                         viewModel.triggerWallpaperUpdate("mobile")
                                     },
                                     modifier = Modifier.weight(1f),
-                                    enabled = !isTriggering
+                                    enabled = !isTriggering,
                                 ) {
                                     Text("Mobile")
                                 }
@@ -1504,19 +1557,21 @@ fun SettingsContent(
                             val triggerState by viewModel.wallpaperTriggerState
                             if (triggerState != null) {
                                 Text(
-                                    text = when (triggerState) {
-                                        "loading" -> "Sending trigger request..."
-                                        "success" -> "Trigger sent successfully!"
-                                        "error" -> "Failed to send trigger."
-                                        else -> ""
-                                    },
+                                    text =
+                                        when (triggerState) {
+                                            "loading" -> "Sending trigger request..."
+                                            "success" -> "Trigger sent successfully!"
+                                            "error" -> "Failed to send trigger."
+                                            else -> ""
+                                        },
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = when (triggerState) {
-                                        "success" -> MaterialTheme.colorScheme.primary
-                                        "error" -> MaterialTheme.colorScheme.error
-                                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                                    },
-                                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                                    color =
+                                        when (triggerState) {
+                                            "success" -> MaterialTheme.colorScheme.primary
+                                            "error" -> MaterialTheme.colorScheme.error
+                                            else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                        },
+                                    modifier = Modifier.align(Alignment.CenterHorizontally),
                                 )
                             }
                         }
@@ -1534,18 +1589,17 @@ fun SettingsContent(
             onNeedLogin = {
                 showTranslationSessionSheet = false
                 showGitHubAuthSheet = true
-            }
+            },
         )
     }
 
     if (showGitHubAuthSheet) {
-
         GitHubAuthSheet(
             viewModel = gitHubAuthViewModel,
             onDismissRequest = {
                 showGitHubAuthSheet = false
                 currentUser = settingsRepo.getGitHubUser()
-            }
+            },
         )
     }
 
@@ -1558,10 +1612,7 @@ fun SettingsContent(
                 }
                 TranslationManager.isTranslationModeEnabled.value = true
                 showTranslationWarningDialog = false
-            }
+            },
         )
     }
 }
-
-
-

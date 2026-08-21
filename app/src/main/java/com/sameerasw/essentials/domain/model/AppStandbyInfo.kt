@@ -15,5 +15,5 @@ data class AppStandbyInfo(
     val packageName: String,
     val label: String,
     val icon: Drawable?,
-    val bucket: Int
+    val bucket: Int,
 )

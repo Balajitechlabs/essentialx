@@ -37,7 +37,6 @@ import com.sameerasw.essentials.utils.OverlayHelper
  * Uses draw-over-other-apps permission.
  */
 class NotificationLightingService : Service() {
-
     private var windowManager: WindowManager? = null
     private val overlayViews = mutableListOf<View>()
     private var cornerRadiusDp: Float = OverlayHelper.CORNER_RADIUS_DP.toFloat()
@@ -72,28 +71,33 @@ class NotificationLightingService : Service() {
         createNotificationChannel()
 
         // Register screen on/off receiver to attempt to re-show overlay when screen state changes
-        screenReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                try {
-                    when (intent?.action) {
-                        Intent.ACTION_SCREEN_OFF -> {
-                            // best-effort: try to show overlay when screen goes off
-                            if (canDrawOverlays()) showOverlay()
-                        }
+        screenReceiver =
+            object : BroadcastReceiver() {
+                override fun onReceive(
+                    context: Context?,
+                    intent: Intent?,
+                ) {
+                    try {
+                        when (intent?.action) {
+                            Intent.ACTION_SCREEN_OFF -> {
+                                // best-effort: try to show overlay when screen goes off
+                                if (canDrawOverlays()) showOverlay()
+                            }
 
-                        Intent.ACTION_SCREEN_ON -> {
-                            // refresh overlay if needed
-                            if (canDrawOverlays()) showOverlay()
+                            Intent.ACTION_SCREEN_ON -> {
+                                // refresh overlay if needed
+                                if (canDrawOverlays()) showOverlay()
+                            }
                         }
+                    } catch (_: Exception) {
                     }
-                } catch (_: Exception) {
                 }
             }
-        }
-        val f = IntentFilter().apply {
-            addAction(Intent.ACTION_SCREEN_OFF)
-            addAction(Intent.ACTION_SCREEN_ON)
-        }
+        val f =
+            IntentFilter().apply {
+                addAction(Intent.ACTION_SCREEN_OFF)
+                addAction(Intent.ACTION_SCREEN_ON)
+            }
         registerReceiver(screenReceiver, f)
     }
 
@@ -108,7 +112,11 @@ class NotificationLightingService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         if (intent == null) {
             stopSelf()
             return START_NOT_STICKY
@@ -134,27 +142,34 @@ class NotificationLightingService : Service() {
             intent.getFloatExtra("stroke_thickness_dp", OverlayHelper.STROKE_DP.toFloat())
         isPreview = intent.getBooleanExtra("is_preview", false)
         val colorModeName = intent.getStringExtra("color_mode")
-        colorMode = NotificationLightingColorMode.valueOf(
-            colorModeName ?: NotificationLightingColorMode.SYSTEM.name
-        )
+        colorMode =
+            NotificationLightingColorMode.valueOf(
+                colorModeName ?: NotificationLightingColorMode.SYSTEM.name,
+            )
         customColor = intent.getIntExtra("custom_color", 0)
-        resolvedColor = if (intent.hasExtra("resolved_color") == true) intent.getIntExtra(
-            "resolved_color",
-            0
-        ) else null
+        resolvedColor =
+            if (intent.hasExtra("resolved_color") == true) {
+                intent.getIntExtra(
+                    "resolved_color",
+                    0,
+                )
+            } else {
+                null
+            }
         pulseCount = intent.getIntExtra("pulse_count", 1)
         pulseDuration = intent.getLongExtra("pulse_duration", 3000L)
         val styleName = intent.getStringExtra("style")
         edgeLightingStyle =
             if (styleName != null) NotificationLightingStyle.valueOf(styleName) else NotificationLightingStyle.STROKE
         val glowSidesArray = intent.getStringArrayExtra("glow_sides")
-        glowSides = glowSidesArray?.mapNotNull {
-            try {
-                NotificationLightingSide.valueOf(it)
-            } catch (_: Exception) {
-                null
-            }
-        }?.toSet()
+        glowSides = glowSidesArray
+            ?.mapNotNull {
+                try {
+                    NotificationLightingSide.valueOf(it)
+                } catch (_: Exception) {
+                    null
+                }
+            }?.toSet()
             ?: setOf(NotificationLightingSide.LEFT, NotificationLightingSide.RIGHT)
         indicatorX = intent.getFloatExtra("indicator_x", 50f)
         indicatorY = intent.getFloatExtra("indicator_y", 2f)
@@ -171,13 +186,14 @@ class NotificationLightingService : Service() {
             // If accessibility service is enabled, delegate to it
             if (isAccessibilityServiceEnabled()) {
                 try {
-                    val ai = Intent(
-                        applicationContext,
-                        ScreenOffAccessibilityService::class.java
-                    ).apply {
-                        action = "SHOW_NOTIFICATION_LIGHTING"
-                        putExtra("remove_preview", true)
-                    }
+                    val ai =
+                        Intent(
+                            applicationContext,
+                            ScreenOffAccessibilityService::class.java,
+                        ).apply {
+                            action = "SHOW_NOTIFICATION_LIGHTING"
+                            putExtra("remove_preview", true)
+                        }
                     applicationContext.startService(ai)
                 } catch (_: Exception) {
                 }
@@ -188,7 +204,6 @@ class NotificationLightingService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-
 
         val isForegroundStart = intent.getBooleanExtra("is_foreground_start", false)
         if (isForegroundStart && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -225,11 +240,11 @@ class NotificationLightingService : Service() {
                         }
                         putExtra(
                             "is_ambient_display",
-                            intent.getBooleanExtra("is_ambient_display", false)
+                            intent.getBooleanExtra("is_ambient_display", false),
                         )
                         putExtra(
                             "is_ambient_show_lock_screen",
-                            intent.getBooleanExtra("is_ambient_show_lock_screen", false)
+                            intent.getBooleanExtra("is_ambient_show_lock_screen", false),
                         )
                         putExtra("random_shapes", randomShapes)
                         putExtra("system_lighting_mode", systemLightingMode)
@@ -276,13 +291,15 @@ class NotificationLightingService : Service() {
     }
 
     private fun buildNotification(): Notification {
-        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(com.sameerasw.essentials.R.drawable.rounded_magnify_fullscreen_24)
-            .setContentTitle("")
-            .setContentText("")
-            .setPriority(NotificationCompat.PRIORITY_MIN)
-            .setOngoing(true)
-            .setSilent(true)
+        val builder =
+            NotificationCompat
+                .Builder(this, CHANNEL_ID)
+                .setSmallIcon(com.sameerasw.essentials.R.drawable.rounded_magnify_fullscreen_24)
+                .setContentTitle("")
+                .setContentText("")
+                .setPriority(NotificationCompat.PRIORITY_MIN)
+                .setOngoing(true)
+                .setSilent(true)
         return builder.build()
     }
 
@@ -292,11 +309,12 @@ class NotificationLightingService : Service() {
             if (nm != null) {
                 val existing = nm.getNotificationChannel(CHANNEL_ID)
                 if (existing == null) {
-                    val chan = NotificationChannel(
-                        CHANNEL_ID,
-                        "Notification Lighting",
-                        NotificationManager.IMPORTANCE_LOW
-                    )
+                    val chan =
+                        NotificationChannel(
+                            CHANNEL_ID,
+                            "Notification Lighting",
+                            NotificationManager.IMPORTANCE_LOW,
+                        )
                     chan.setSound(null, null)
                     nm.createNotificationChannel(chan)
                 }
@@ -319,29 +337,31 @@ class NotificationLightingService : Service() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
         try {
-            val color = when {
-                resolvedColor != null -> resolvedColor!!
-                colorMode == NotificationLightingColorMode.CUSTOM -> customColor
-                else -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        getColor(android.R.color.system_accent1_100)
-                    } else {
-                        getColor(com.sameerasw.essentials.R.color.purple_500)
+            val color =
+                when {
+                    resolvedColor != null -> resolvedColor!!
+                    colorMode == NotificationLightingColorMode.CUSTOM -> customColor
+                    else -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            getColor(android.R.color.system_accent1_100)
+                        } else {
+                            getColor(com.sameerasw.essentials.R.color.purple_500)
+                        }
                     }
                 }
-            }
 
-            val overlay = OverlayHelper.createOverlayView(
-                this,
-                color,
-                strokeDp = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) sweepThickness else strokeThicknessDp,
-                cornerRadiusDp = cornerRadiusDp,
-                style = edgeLightingStyle,
-                glowSides = glowSides,
-                indicatorScale = indicatorScale,
-                randomShapes = randomShapes,
-                showBackground = isAmbientDisplay
-            )
+            val overlay =
+                OverlayHelper.createOverlayView(
+                    this,
+                    color,
+                    strokeDp = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) sweepThickness else strokeThicknessDp,
+                    cornerRadiusDp = cornerRadiusDp,
+                    style = edgeLightingStyle,
+                    glowSides = glowSides,
+                    indicatorScale = indicatorScale,
+                    randomShapes = randomShapes,
+                    showBackground = isAmbientDisplay,
+                )
             val params = OverlayHelper.createOverlayLayoutParams(getOverlayType())
 
             if (OverlayHelper.addOverlayView(windowManager, overlay, params)) {
@@ -356,7 +376,7 @@ class NotificationLightingService : Service() {
                         indicatorY,
                         indicatorScale,
                         randomShapes = randomShapes,
-                        pulseDurationMillis = pulseDuration
+                        pulseDurationMillis = pulseDuration,
                     )
                 } else {
                     // Normal mode
@@ -366,22 +386,25 @@ class NotificationLightingService : Service() {
                         pulseDurationMillis = pulseDuration,
                         style = edgeLightingStyle,
                         strokeWidthDp = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) sweepThickness else strokeThicknessDp,
-                        indicatorX = if (edgeLightingStyle == NotificationLightingStyle.SWEEP) {
-                            when (sweepPosition) {
-                                "LEFT" -> 0f
-                                "RIGHT" -> 100f
-                                else -> 50f
-                            }
-                        } else indicatorX,
+                        indicatorX =
+                            if (edgeLightingStyle == NotificationLightingStyle.SWEEP) {
+                                when (sweepPosition) {
+                                    "LEFT" -> 0f
+                                    "RIGHT" -> 100f
+                                    else -> 50f
+                                }
+                            } else {
+                                indicatorX
+                            },
                         indicatorY = indicatorY,
                         indicatorScale = indicatorScale,
-                        randomShapes = randomShapes
+                        randomShapes = randomShapes,
                     ) {
                         // When pulsing completes, remove the overlay
                         OverlayHelper.fadeOutAndRemoveOverlay(
                             windowManager,
                             overlay,
-                            overlayViews
+                            overlayViews,
                         ) {
                             // When all overlays are removed, stop foreground
                             if (overlayViews.isEmpty()) {
@@ -399,28 +422,26 @@ class NotificationLightingService : Service() {
         }
     }
 
-
-    private fun getOverlayType(): Int {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    private fun getOverlayType(): Int =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         } else {
             @Suppress("DEPRECATION")
             WindowManager.LayoutParams.TYPE_PHONE
         }
-    }
 
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        return try {
-            val enabledServices = Settings.Secure.getString(
-                contentResolver,
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            )
-            val serviceName = "${packageName}/${ScreenOffAccessibilityService::class.java.name}"
+    private fun isAccessibilityServiceEnabled(): Boolean =
+        try {
+            val enabledServices =
+                Settings.Secure.getString(
+                    contentResolver,
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                )
+            val serviceName = "$packageName/${ScreenOffAccessibilityService::class.java.name}"
             enabledServices?.contains(serviceName) == true
         } catch (_: Exception) {
             false
         }
-    }
 
     private fun removeOverlay(immediate: Boolean = false) {
         val iterator = overlayViews.iterator()
@@ -450,12 +471,14 @@ class NotificationLightingService : Service() {
         }
     }
 
-    private fun canDrawOverlays(): Boolean {
-        return Settings.canDrawOverlays(this)
-    }
+    private fun canDrawOverlays(): Boolean = Settings.canDrawOverlays(this)
 
     private fun triggerSystemLighting() {
-        if (!com.sameerasw.essentials.utils.ShellUtils.hasPermission(this)) return
+        if (!com.sameerasw.essentials.utils.ShellUtils
+                .hasPermission(this)
+        ) {
+            return
+        }
 
         val wm = getSystemService(WINDOW_SERVICE) as WindowManager
         val metrics = android.util.DisplayMetrics()
@@ -463,21 +486,22 @@ class NotificationLightingService : Service() {
         val centerX = metrics.widthPixels / 2
         val centerY = metrics.heightPixels / 2
 
-        val command = when (systemLightingMode) {
-            0 -> "cmd statusbar charging-ripple"
-            1 -> "cmd statusbar auth-ripple custom $centerX $centerY"
-            else -> {
-                val posX = (indicatorX / 100f * metrics.widthPixels).toInt()
-                val posY = (indicatorY / 100f * metrics.heightPixels).toInt()
-                "cmd statusbar auth-ripple custom $posX $posY"
+        val command =
+            when (systemLightingMode) {
+                0 -> "cmd statusbar charging-ripple"
+                1 -> "cmd statusbar auth-ripple custom $centerX $centerY"
+                else -> {
+                    val posX = (indicatorX / 100f * metrics.widthPixels).toInt()
+                    val posY = (indicatorY / 100f * metrics.heightPixels).toInt()
+                    "cmd statusbar auth-ripple custom $posX $posY"
+                }
             }
-        }
 
-        com.sameerasw.essentials.utils.ShellUtils.runCommand(this, command)
+        com.sameerasw.essentials.utils.ShellUtils
+            .runCommand(this, command)
 
         // No need to keep service running for system ripples as they are fire-and-forget
         stopForeground(true)
         stopSelf()
     }
-
 }

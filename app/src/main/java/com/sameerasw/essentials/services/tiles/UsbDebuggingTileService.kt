@@ -21,13 +21,13 @@ import com.sameerasw.essentials.utils.PermissionUtils
 
 @RequiresApi(Build.VERSION_CODES.N)
 class UsbDebuggingTileService : BaseTileService() {
-
     override fun onClick() {
         if (!hasFeaturePermission()) {
-            val intent = Intent(this, FeatureSettingsActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                putExtra("feature", "Quick settings tiles")
-            }
+            val intent =
+                Intent(this, FeatureSettingsActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    putExtra("feature", "Quick settings tiles")
+                }
             startActivityAndCollapse(intent)
             return
         }
@@ -47,13 +47,9 @@ class UsbDebuggingTileService : BaseTileService() {
         }
     }
 
-    override fun hasFeaturePermission(): Boolean {
-        return PermissionUtils.canWriteSecureSettings(this)
-    }
+    override fun hasFeaturePermission(): Boolean = PermissionUtils.canWriteSecureSettings(this)
 
-    override fun getTileIcon(): Icon {
-        return Icon.createWithResource(this, R.drawable.rounded_adb_24)
-    }
+    override fun getTileIcon(): Icon = Icon.createWithResource(this, R.drawable.rounded_adb_24)
 
     override fun getTileState(): Int {
         val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
@@ -89,13 +85,12 @@ class UsbDebuggingTileService : BaseTileService() {
         }
     }
 
-    private fun isUsbDebuggingEnabled(): Boolean {
-        return try {
+    private fun isUsbDebuggingEnabled(): Boolean =
+        try {
             Settings.Global.getInt(contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
         } catch (e: Exception) {
             false
         }
-    }
 
     private fun setUsbDebuggingEnabled(enabled: Boolean) {
         try {
@@ -105,13 +100,12 @@ class UsbDebuggingTileService : BaseTileService() {
         }
     }
 
-    private fun isWifiDebuggingEnabled(): Boolean {
-        return try {
+    private fun isWifiDebuggingEnabled(): Boolean =
+        try {
             Settings.Global.getInt(contentResolver, "adb_wifi_enabled", 0) == 1
         } catch (e: Exception) {
             false
         }
-    }
 
     private fun setWifiDebuggingEnabled(enabled: Boolean) {
         try {

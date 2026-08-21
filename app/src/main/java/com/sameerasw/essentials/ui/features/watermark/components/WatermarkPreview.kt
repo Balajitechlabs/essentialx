@@ -28,18 +28,18 @@ import com.sameerasw.essentials.viewmodels.WatermarkUiState
 @Composable
 fun WatermarkPreview(
     uiState: WatermarkUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         when (uiState) {
             is WatermarkUiState.Idle -> {
                 Text(
                     text = stringResource(R.string.watermark_pick_image),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -54,7 +54,7 @@ fun WatermarkPreview(
 
                 var visibleModel by androidx.compose.runtime.remember {
                     androidx.compose.runtime.mutableStateOf(
-                        targetModel
+                        targetModel,
                     )
                 }
 
@@ -63,7 +63,7 @@ fun WatermarkPreview(
                         model = visibleModel,
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Fit
+                        contentScale = ContentScale.Fit,
                     )
 
                     if (targetModel != visibleModel) {
@@ -74,7 +74,7 @@ fun WatermarkPreview(
                             contentScale = ContentScale.Fit,
                             onSuccess = {
                                 visibleModel = targetModel
-                            }
+                            },
                         )
                     }
                 }
@@ -84,7 +84,7 @@ fun WatermarkPreview(
                 Text(
                     text = uiState.message,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }

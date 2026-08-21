@@ -48,24 +48,26 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 @Composable
 fun BatteriesSettingsUI(
     viewModel: MainViewModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // AirSync connection
-        val isAirSyncInstalled = try {
-            context.packageManager.getPackageInfo("com.sameerasw.airsync", 0)
-            true
-        } catch (e: android.content.pm.PackageManager.NameNotFoundException) {
-            false
-        }
+        val isAirSyncInstalled =
+            try {
+                context.packageManager.getPackageInfo("com.sameerasw.airsync", 0)
+                true
+            } catch (e: android.content.pm.PackageManager.NameNotFoundException) {
+                false
+            }
 
         RoundedCardContainer {
             if (isAirSyncInstalled) {
@@ -76,7 +78,7 @@ fun BatteriesSettingsUI(
                     isChecked = viewModel.isAirSyncConnectionEnabled.value,
                     onCheckedChange = {
                         viewModel.setAirSyncConnectionEnabled(it, context)
-                    }
+                    },
                 )
             } else {
                 ListItem(
@@ -87,29 +89,32 @@ fun BatteriesSettingsUI(
                             painter = painterResource(R.drawable.rounded_laptop_mac_24),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                     },
-                    contentPadding = PaddingValues(
-                        horizontal = 16.dp,
-                        vertical = 16.dp
-                    ),
+                    contentPadding =
+                        PaddingValues(
+                            horizontal = 16.dp,
+                            vertical = 16.dp,
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
-                    colors = ListItemDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.surfaceBright
-                    ),
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                        ),
                     trailingContent = {
                         Button(
                             onClick = {
                                 HapticUtil.performVirtualKeyHaptic(view)
-                                val intent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://play.google.com/store/apps/details?id=com.sameerasw.airsync")
-                                )
+                                val intent =
+                                    Intent(
+                                        Intent.ACTION_VIEW,
+                                        Uri.parse("https://play.google.com/store/apps/details?id=com.sameerasw.airsync"),
+                                    )
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                 context.startActivity(intent)
                             },
-                            colors = ButtonDefaults.filledTonalButtonColors()
+                            colors = ButtonDefaults.filledTonalButtonColors(),
                         ) {
                             Text(stringResource(R.string.action_download))
                         }
@@ -119,7 +124,7 @@ fun BatteriesSettingsUI(
                             Text(
                                 text = stringResource(R.string.download_airsync),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     },
@@ -127,9 +132,9 @@ fun BatteriesSettingsUI(
                         Text(
                             text = stringResource(R.string.download_airsync_summary),
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                    }
+                    },
                 )
             }
 
@@ -137,15 +142,16 @@ fun BatteriesSettingsUI(
             val isBluetoothEnabled = viewModel.isBluetoothDevicesEnabled.value
             val isPermissionGranted = viewModel.isBluetoothPermissionGranted.value
 
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.RequestMultiplePermissions()
-            ) { permissions ->
-                val allGranted = permissions.values.all { it }
-                if (allGranted) {
-                    viewModel.isBluetoothPermissionGranted.value = true
-                    viewModel.setBluetoothDevicesEnabled(true, context)
+            val launcher =
+                rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestMultiplePermissions(),
+                ) { permissions ->
+                    val allGranted = permissions.values.all { it }
+                    if (allGranted) {
+                        viewModel.isBluetoothPermissionGranted.value = true
+                        viewModel.setBluetoothDevicesEnabled(true, context)
+                    }
                 }
-            }
 
             IconToggleItem(
                 iconRes = R.drawable.rounded_bluetooth_24,
@@ -161,8 +167,8 @@ fun BatteriesSettingsUI(
                                 launcher.launch(
                                     arrayOf(
                                         android.Manifest.permission.BLUETOOTH_CONNECT,
-                                        android.Manifest.permission.BLUETOOTH_SCAN
-                                    )
+                                        android.Manifest.permission.BLUETOOTH_SCAN,
+                                    ),
                                 )
                             } else {
                                 viewModel.setBluetoothDevicesEnabled(true, context)
@@ -171,7 +177,7 @@ fun BatteriesSettingsUI(
                     } else {
                         viewModel.setBluetoothDevicesEnabled(false, context)
                     }
-                }
+                },
             )
 
             // Widget Background Toggle
@@ -182,7 +188,7 @@ fun BatteriesSettingsUI(
                 isChecked = viewModel.isBatteryWidgetBackgroundEnabled.value,
                 onCheckedChange = {
                     viewModel.setBatteryWidgetBackgroundEnabled(it, context)
-                }
+                },
             )
         }
 
@@ -191,31 +197,33 @@ fun BatteriesSettingsUI(
             text = stringResource(R.string.limit_max_devices),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 16.dp, bottom = 0.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer {
             ListItem(
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(
-                    horizontal = 16.dp,
-                    vertical = 16.dp
-                ),
-                colors = ListItemDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                ),
+                contentPadding =
+                    PaddingValues(
+                        horizontal = 16.dp,
+                        vertical = 16.dp,
+                    ),
+                colors =
+                    ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
                 content = {
                     Text(
                         text = stringResource(R.string.limit_max_devices_summary),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 },
                 supportingContent = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Slider(
                             value = viewModel.batteryWidgetMaxDevices.intValue.toFloat(),
@@ -228,16 +236,16 @@ fun BatteriesSettingsUI(
                             },
                             valueRange = 1f..8f,
                             steps = 6,
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = viewModel.batteryWidgetMaxDevices.intValue.toString(),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
-                }
+                },
             )
         }
     }

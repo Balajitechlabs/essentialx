@@ -102,7 +102,6 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun SetupFeatures(
     viewModel: MainViewModel,
@@ -110,7 +109,7 @@ fun SetupFeatures(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     searchRequested: Boolean = false,
     onSearchHandled: () -> Unit = {},
-    onHelpClick: () -> Unit = {}
+    onHelpClick: () -> Unit = {},
 ) {
     val isAccessibilityEnabled by viewModel.isAccessibilityEnabled
     val isWriteSecureSettingsEnabled by viewModel.isWriteSecureSettingsEnabled
@@ -130,7 +129,6 @@ fun SetupFeatures(
     val pinnedFeatureKeys by viewModel.pinnedFeatureKeys
     val context = LocalContext.current
 
-
     var showSheet by remember { mutableStateOf(false) }
     var currentFeature by remember { mutableStateOf<Int?>(null) }
 
@@ -138,12 +136,13 @@ fun SetupFeatures(
     var showHelpSheet by remember { mutableStateOf(false) }
     var selectedHelpFeature by remember {
         mutableStateOf<com.sameerasw.essentials.domain.model.Feature?>(
-            null
+            null,
         )
     }
 
     val watchViewModel: com.sameerasw.essentials.viewmodels.WatchViewModel =
-        androidx.lifecycle.viewmodel.compose.viewModel()
+        androidx.lifecycle.viewmodel.compose
+            .viewModel()
     val isWearUpdateRequired = watchViewModel.isWearUpdateRequired.value
 
     LaunchedEffect(Unit) {
@@ -171,7 +170,7 @@ fun SetupFeatures(
         isOverlayPermissionGranted,
         isNotificationLightingAccessibilityEnabled,
         isReadPhoneStateEnabled,
-        currentFeature
+        currentFeature,
     ) {
         if (showSheet && currentFeature != null) {
             val missing = mutableListOf<PermissionItem>()
@@ -187,8 +186,8 @@ fun SetupFeatures(
                                 action = {
                                     context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                                 },
-                                isGranted = isAccessibilityEnabled
-                            )
+                                isGranted = isAccessibilityEnabled,
+                            ),
                         )
                     }
                 }
@@ -215,12 +214,11 @@ fun SetupFeatures(
                                     viewModel.isWriteSecureSettingsEnabled.value =
                                         viewModel.canWriteSecureSettings(context)
                                 },
-                                isGranted = isWriteSecureSettingsEnabled
-                            )
+                                isGranted = isWriteSecureSettingsEnabled,
+                            ),
                         )
                     }
                 }
-
 
                 R.string.feat_notification_lighting_title -> {
                     if (!isOverlayPermissionGranted) {
@@ -232,15 +230,16 @@ fun SetupFeatures(
                                 dependentFeatures = PermissionRegistry.getFeatures("DRAW_OVERLAYS"),
                                 actionLabel = R.string.perm_action_grant,
                                 action = {
-                                    val intent = Intent(
-                                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                        "package:${context.packageName}".toUri()
-                                    )
+                                    val intent =
+                                        Intent(
+                                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                            "package:${context.packageName}".toUri(),
+                                        )
                                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                     context.startActivity(intent)
                                 },
-                                isGranted = isOverlayPermissionGranted
-                            )
+                                isGranted = isOverlayPermissionGranted,
+                            ),
                         )
                     }
                     if (!isNotificationLightingAccessibilityEnabled) {
@@ -256,8 +255,8 @@ fun SetupFeatures(
                                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                     context.startActivity(intent)
                                 },
-                                isGranted = isNotificationLightingAccessibilityEnabled
-                            )
+                                isGranted = isNotificationLightingAccessibilityEnabled,
+                            ),
                         )
                     }
                     if (!isNotificationListenerEnabled) {
@@ -269,8 +268,8 @@ fun SetupFeatures(
                                 dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
                                 actionLabel = R.string.perm_action_grant,
                                 action = { viewModel.requestNotificationListenerPermission(context) },
-                                isGranted = isNotificationListenerEnabled
-                            )
+                                isGranted = isNotificationListenerEnabled,
+                            ),
                         )
                     }
                 }
@@ -289,8 +288,8 @@ fun SetupFeatures(
                                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                     context.startActivity(intent)
                                 },
-                                isGranted = isAccessibilityEnabled
-                            )
+                                isGranted = isAccessibilityEnabled,
+                            ),
                         )
                     }
                 }
@@ -309,8 +308,8 @@ fun SetupFeatures(
                                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                     context.startActivity(intent)
                                 },
-                                isGranted = isAccessibilityEnabled
-                            )
+                                isGranted = isAccessibilityEnabled,
+                            ),
                         )
                     }
                     if (!isWriteSecureSettingsEnabled) {
@@ -324,8 +323,8 @@ fun SetupFeatures(
                                 action = {
                                     // instructions
                                 },
-                                isGranted = isWriteSecureSettingsEnabled
-                            )
+                                isGranted = isWriteSecureSettingsEnabled,
+                            ),
                         )
                     }
                 }
@@ -340,8 +339,8 @@ fun SetupFeatures(
                                 dependentFeatures = PermissionRegistry.getFeatures("WRITE_SECURE_SETTINGS"),
                                 actionLabel = R.string.perm_action_grant,
                                 action = { viewModel.requestWriteSecureSettingsPermission(context) },
-                                isGranted = isWriteSecureSettingsEnabled
-                            )
+                                isGranted = isWriteSecureSettingsEnabled,
+                            ),
                         )
                     }
                     if (!isWriteSettingsEnabled) {
@@ -353,8 +352,8 @@ fun SetupFeatures(
                                 dependentFeatures = PermissionRegistry.getFeatures("WRITE_SETTINGS"),
                                 actionLabel = R.string.perm_action_grant,
                                 action = { viewModel.requestWriteSettingsPermission(context) },
-                                isGranted = isWriteSettingsEnabled
-                            )
+                                isGranted = isWriteSettingsEnabled,
+                            ),
                         )
                     }
                     if (!viewModel.isUsageStatsPermissionGranted.value) {
@@ -366,8 +365,8 @@ fun SetupFeatures(
                                 dependentFeatures = PermissionRegistry.getFeatures("USAGE_STATS"),
                                 actionLabel = R.string.perm_action_grant,
                                 action = { viewModel.requestUsageStatsPermission(context) },
-                                isGranted = viewModel.isUsageStatsPermissionGranted.value
-                            )
+                                isGranted = viewModel.isUsageStatsPermissionGranted.value,
+                            ),
                         )
                     }
                 }
@@ -383,10 +382,11 @@ fun SetupFeatures(
                                     dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
                                     action = {
                                         viewModel.isRootPermissionGranted.value =
-                                            com.sameerasw.essentials.utils.RootUtils.isRootPermissionGranted()
+                                            com.sameerasw.essentials.utils.RootUtils
+                                                .isRootPermissionGranted()
                                     },
-                                    isGranted = isRootPermissionGranted
-                                )
+                                    isGranted = isRootPermissionGranted,
+                                ),
                             )
                         }
                     } else {
@@ -398,15 +398,16 @@ fun SetupFeatures(
                                     description = R.string.perm_shizuku_desc,
                                     dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
                                     action = {
-                                        val intent = Intent(
-                                            Intent.ACTION_VIEW,
-                                            "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api".toUri()
-                                        )
+                                        val intent =
+                                            Intent(
+                                                Intent.ACTION_VIEW,
+                                                "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api".toUri(),
+                                            )
                                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                         context.startActivity(intent)
                                     },
-                                    isGranted = isShizukuAvailable
-                                )
+                                    isGranted = isShizukuAvailable,
+                                ),
                             )
                         } else if (!isShizukuPermissionGranted) {
                             missing.add(
@@ -416,8 +417,8 @@ fun SetupFeatures(
                                     description = R.string.perm_shizuku_grant_desc,
                                     dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
                                     action = { viewModel.requestShizukuPermission() },
-                                    isGranted = isShizukuPermissionGranted
-                                )
+                                    isGranted = isShizukuPermissionGranted,
+                                ),
                             )
                         }
                     }
@@ -437,8 +438,8 @@ fun SetupFeatures(
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     context.startActivity(intent)
                                 },
-                                isGranted = isAccessibilityEnabled
-                            )
+                                isGranted = isAccessibilityEnabled,
+                            ),
                         )
                     }
                 }
@@ -453,8 +454,8 @@ fun SetupFeatures(
                                 dependentFeatures = PermissionRegistry.getFeatures("READ_PHONE_STATE"),
                                 actionLabel = R.string.perm_action_grant,
                                 action = { viewModel.requestReadPhoneStatePermission(context as Activity) },
-                                isGranted = isReadPhoneStateEnabled
-                            )
+                                isGranted = isReadPhoneStateEnabled,
+                            ),
                         )
                     }
                     if (!isNotificationListenerEnabled) {
@@ -466,8 +467,8 @@ fun SetupFeatures(
                                 dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
                                 actionLabel = R.string.perm_action_grant,
                                 action = { viewModel.requestNotificationListenerPermission(context) },
-                                isGranted = isNotificationListenerEnabled
-                            )
+                                isGranted = isNotificationListenerEnabled,
+                            ),
                         )
                     }
                 }
@@ -487,8 +488,8 @@ fun SetupFeatures(
                                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                                     context.startActivity(intent)
                                 },
-                                isGranted = isAccessibilityEnabled
-                            )
+                                isGranted = isAccessibilityEnabled,
+                            ),
                         )
                     }
                     if (!isNotificationListenerEnabled) {
@@ -500,8 +501,8 @@ fun SetupFeatures(
                                 dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
                                 actionLabel = R.string.perm_action_grant,
                                 action = { viewModel.requestNotificationListenerPermission(context) },
-                                isGranted = isNotificationListenerEnabled
-                            )
+                                isGranted = isNotificationListenerEnabled,
+                            ),
                         )
                     }
                 }
@@ -514,258 +515,271 @@ fun SetupFeatures(
     }
 
     if (showSheet && currentFeature != null) {
-        val permissionItems = when (currentFeature) {
-            R.string.feat_screen_off_widget_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_settings_accessibility_24,
-                    title = R.string.perm_accessibility_title,
-                    description = R.string.perm_accessibility_desc_common,
-                    dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
-                    actionLabel = R.string.perm_action_grant,
-                    action = {
-                        context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                    },
-                    isGranted = isAccessibilityEnabled
-                )
-            )
+        val permissionItems =
+            when (currentFeature) {
+                R.string.feat_screen_off_widget_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_settings_accessibility_24,
+                            title = R.string.perm_accessibility_title,
+                            description = R.string.perm_accessibility_desc_common,
+                            dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
+                            actionLabel = R.string.perm_action_grant,
+                            action = {
+                                context.startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                            },
+                            isGranted = isAccessibilityEnabled,
+                        ),
+                    )
 
-            R.string.feat_statusbar_icons_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_security_24,
-                    title = R.string.perm_write_secure_title,
-                    description = R.string.perm_write_secure_desc_common,
-                    dependentFeatures = PermissionRegistry.getFeatures("WRITE_SECURE_SETTINGS"),
-                    actionLabel = R.string.perm_action_copy_adb,
-                    action = {
-                        val adbCommand =
-                            "adb shell pm grant com.sameerasw.essentials android.permission.WRITE_SECURE_SETTINGS"
-                        val clipboard =
-                            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                        val clip = ClipData.newPlainText("adb_command", adbCommand)
-                        clipboard.setPrimaryClip(clip)
-                    },
-                    secondaryActionLabel = R.string.perm_action_check,
-                    secondaryAction = {
-                        viewModel.isWriteSecureSettingsEnabled.value =
-                            viewModel.canWriteSecureSettings(context)
-                    },
-                    isGranted = isWriteSecureSettingsEnabled
-                )
-            )
+                R.string.feat_statusbar_icons_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_security_24,
+                            title = R.string.perm_write_secure_title,
+                            description = R.string.perm_write_secure_desc_common,
+                            dependentFeatures = PermissionRegistry.getFeatures("WRITE_SECURE_SETTINGS"),
+                            actionLabel = R.string.perm_action_copy_adb,
+                            action = {
+                                val adbCommand =
+                                    "adb shell pm grant com.sameerasw.essentials android.permission.WRITE_SECURE_SETTINGS"
+                                val clipboard =
+                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newPlainText("adb_command", adbCommand)
+                                clipboard.setPrimaryClip(clip)
+                            },
+                            secondaryActionLabel = R.string.perm_action_check,
+                            secondaryAction = {
+                                viewModel.isWriteSecureSettingsEnabled.value =
+                                    viewModel.canWriteSecureSettings(context)
+                            },
+                            isGranted = isWriteSecureSettingsEnabled,
+                        ),
+                    )
 
-            R.string.feat_notification_lighting_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_magnify_fullscreen_24,
-                    title = R.string.perm_overlay_title,
-                    description = R.string.perm_overlay_desc,
-                    dependentFeatures = PermissionRegistry.getFeatures("DRAW_OVERLAYS"),
-                    actionLabel = R.string.perm_action_grant,
-                    action = {
-                        val intent = Intent(
-                            Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                            "package:${context.packageName}".toUri()
-                        )
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    },
-                    isGranted = isOverlayPermissionGranted
-                ),
-                PermissionItem(
-                    iconRes = R.drawable.rounded_settings_accessibility_24,
-                    title = R.string.perm_accessibility_title,
-                    description = R.string.perm_accessibility_desc_lighting,
-                    dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
-                    actionLabel = R.string.perm_action_enable,
-                    action = {
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    },
-                    isGranted = isNotificationLightingAccessibilityEnabled
-                ),
-                PermissionItem(
-                    iconRes = R.drawable.rounded_notifications_unread_24,
-                    title = R.string.perm_notif_listener_title,
-                    description = R.string.perm_notif_listener_desc_lighting,
-                    dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
-                    actionLabel = R.string.perm_action_grant,
-                    action = { viewModel.requestNotificationListenerPermission(context) },
-                    isGranted = isNotificationListenerEnabled
-                )
-            )
-
-            R.string.feat_button_remap_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_settings_accessibility_24,
-                    title = R.string.perm_accessibility_title,
-                    description = R.string.perm_accessibility_desc_remap,
-                    dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
-                    actionLabel = R.string.perm_action_enable,
-                    action = {
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    },
-                    isGranted = isAccessibilityEnabled
-                )
-            )
-
-            R.string.feat_snooze_notifications_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_snooze_24,
-                    title = R.string.perm_notif_listener_title,
-                    description = R.string.perm_notif_listener_desc_snooze,
-                    dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
-                    actionLabel = R.string.perm_action_grant,
-                    action = { viewModel.requestNotificationListenerPermission(context) },
-                    isGranted = isNotificationListenerEnabled
-                )
-            )
-
-            R.string.feat_dynamic_night_light_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_settings_accessibility_24,
-                    title = R.string.perm_accessibility_title,
-                    description = R.string.perm_accessibility_desc_night_light,
-                    dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
-                    actionLabel = R.string.perm_action_enable,
-                    action = {
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    },
-                    isGranted = isAccessibilityEnabled
-                ),
-                PermissionItem(
-                    iconRes = R.drawable.rounded_security_24,
-                    title = R.string.perm_write_secure_title,
-                    description = R.string.perm_write_secure_desc_night_light,
-                    dependentFeatures = PermissionRegistry.getFeatures("WRITE_SECURE_SETTINGS"),
-                    actionLabel = R.string.perm_action_how_to,
-                    action = { /* instructions */ },
-                    isGranted = isWriteSecureSettingsEnabled
-                )
-            )
-
-            R.string.feat_screen_locked_security_title -> {
-                val shellItems = mutableListOf<PermissionItem>()
-                if (isRootEnabled) {
-                    if (!isRootPermissionGranted) {
-                        shellItems.add(
-                            PermissionItem(
-                                iconRes = R.drawable.rounded_security_24,
-                                title = R.string.perm_root_title,
-                                description = R.string.perm_root_desc,
-                                dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
-                                action = {
-                                    viewModel.isRootPermissionGranted.value =
-                                        com.sameerasw.essentials.utils.RootUtils.isRootPermissionGranted()
-                                },
-                                isGranted = isRootPermissionGranted
-                            )
-                        )
-                    }
-                } else {
-                    if (!isShizukuAvailable) {
-                        shellItems.add(
-                            PermissionItem(
-                                iconRes = R.drawable.rounded_adb_24,
-                                title = R.string.perm_shizuku_title,
-                                description = R.string.perm_shizuku_desc,
-                                dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
-                                actionLabel = R.string.perm_shizuku_install_action,
-                                action = {
-                                    val intent = Intent(
-                                        Intent.ACTION_VIEW,
-                                        "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api".toUri()
+                R.string.feat_notification_lighting_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_magnify_fullscreen_24,
+                            title = R.string.perm_overlay_title,
+                            description = R.string.perm_overlay_desc,
+                            dependentFeatures = PermissionRegistry.getFeatures("DRAW_OVERLAYS"),
+                            actionLabel = R.string.perm_action_grant,
+                            action = {
+                                val intent =
+                                    Intent(
+                                        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                        "package:${context.packageName}".toUri(),
                                     )
-                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                    context.startActivity(intent)
-                                },
-                                isGranted = isShizukuAvailable
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                context.startActivity(intent)
+                            },
+                            isGranted = isOverlayPermissionGranted,
+                        ),
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_settings_accessibility_24,
+                            title = R.string.perm_accessibility_title,
+                            description = R.string.perm_accessibility_desc_lighting,
+                            dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
+                            actionLabel = R.string.perm_action_enable,
+                            action = {
+                                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                context.startActivity(intent)
+                            },
+                            isGranted = isNotificationLightingAccessibilityEnabled,
+                        ),
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_notifications_unread_24,
+                            title = R.string.perm_notif_listener_title,
+                            description = R.string.perm_notif_listener_desc_lighting,
+                            dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
+                            actionLabel = R.string.perm_action_grant,
+                            action = { viewModel.requestNotificationListenerPermission(context) },
+                            isGranted = isNotificationListenerEnabled,
+                        ),
+                    )
+
+                R.string.feat_button_remap_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_settings_accessibility_24,
+                            title = R.string.perm_accessibility_title,
+                            description = R.string.perm_accessibility_desc_remap,
+                            dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
+                            actionLabel = R.string.perm_action_enable,
+                            action = {
+                                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                context.startActivity(intent)
+                            },
+                            isGranted = isAccessibilityEnabled,
+                        ),
+                    )
+
+                R.string.feat_snooze_notifications_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_snooze_24,
+                            title = R.string.perm_notif_listener_title,
+                            description = R.string.perm_notif_listener_desc_snooze,
+                            dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
+                            actionLabel = R.string.perm_action_grant,
+                            action = { viewModel.requestNotificationListenerPermission(context) },
+                            isGranted = isNotificationListenerEnabled,
+                        ),
+                    )
+
+                R.string.feat_dynamic_night_light_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_settings_accessibility_24,
+                            title = R.string.perm_accessibility_title,
+                            description = R.string.perm_accessibility_desc_night_light,
+                            dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
+                            actionLabel = R.string.perm_action_enable,
+                            action = {
+                                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                context.startActivity(intent)
+                            },
+                            isGranted = isAccessibilityEnabled,
+                        ),
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_security_24,
+                            title = R.string.perm_write_secure_title,
+                            description = R.string.perm_write_secure_desc_night_light,
+                            dependentFeatures = PermissionRegistry.getFeatures("WRITE_SECURE_SETTINGS"),
+                            actionLabel = R.string.perm_action_how_to,
+                            action = { /* instructions */ },
+                            isGranted = isWriteSecureSettingsEnabled,
+                        ),
+                    )
+
+                R.string.feat_screen_locked_security_title -> {
+                    val shellItems = mutableListOf<PermissionItem>()
+                    if (isRootEnabled) {
+                        if (!isRootPermissionGranted) {
+                            shellItems.add(
+                                PermissionItem(
+                                    iconRes = R.drawable.rounded_security_24,
+                                    title = R.string.perm_root_title,
+                                    description = R.string.perm_root_desc,
+                                    dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
+                                    action = {
+                                        viewModel.isRootPermissionGranted.value =
+                                            com.sameerasw.essentials.utils.RootUtils
+                                                .isRootPermissionGranted()
+                                    },
+                                    isGranted = isRootPermissionGranted,
+                                ),
                             )
-                        )
-                    } else if (!isShizukuPermissionGranted) {
-                        shellItems.add(
-                            PermissionItem(
-                                iconRes = R.drawable.rounded_adb_24,
-                                title = R.string.perm_shizuku_grant_title,
-                                description = R.string.perm_shizuku_grant_desc,
-                                dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
-                                actionLabel = R.string.perm_action_grant,
-                                action = { viewModel.requestShizukuPermission() },
-                                isGranted = isShizukuPermissionGranted
+                        }
+                    } else {
+                        if (!isShizukuAvailable) {
+                            shellItems.add(
+                                PermissionItem(
+                                    iconRes = R.drawable.rounded_adb_24,
+                                    title = R.string.perm_shizuku_title,
+                                    description = R.string.perm_shizuku_desc,
+                                    dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
+                                    actionLabel = R.string.perm_shizuku_install_action,
+                                    action = {
+                                        val intent =
+                                            Intent(
+                                                Intent.ACTION_VIEW,
+                                                "https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api".toUri(),
+                                            )
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                        context.startActivity(intent)
+                                    },
+                                    isGranted = isShizukuAvailable,
+                                ),
                             )
-                        )
+                        } else if (!isShizukuPermissionGranted) {
+                            shellItems.add(
+                                PermissionItem(
+                                    iconRes = R.drawable.rounded_adb_24,
+                                    title = R.string.perm_shizuku_grant_title,
+                                    description = R.string.perm_shizuku_grant_desc,
+                                    dependentFeatures = listOf(R.string.feat_screen_locked_security_title),
+                                    actionLabel = R.string.perm_action_grant,
+                                    action = { viewModel.requestShizukuPermission() },
+                                    isGranted = isShizukuPermissionGranted,
+                                ),
+                            )
+                        }
                     }
+                    shellItems
                 }
-                shellItems
+
+                R.string.feat_app_lock_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_settings_accessibility_24,
+                            title = R.string.perm_accessibility_title,
+                            description = R.string.perm_accessibility_desc_common,
+                            dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
+                            actionLabel = R.string.perm_action_enable,
+                            action = {
+                                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                context.startActivity(intent)
+                            },
+                            isGranted = isAccessibilityEnabled,
+                        ),
+                    )
+
+                R.string.feat_call_vibrations_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_mobile_24,
+                            title = R.string.permission_read_phone_state_title,
+                            description = R.string.permission_read_phone_state_desc_call_vibrations,
+                            dependentFeatures = PermissionRegistry.getFeatures("READ_PHONE_STATE"),
+                            actionLabel = R.string.perm_action_grant,
+                            action = { viewModel.requestReadPhoneStatePermission(context as Activity) },
+                            isGranted = isReadPhoneStateEnabled,
+                        ),
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_notifications_unread_24,
+                            title = R.string.perm_notif_listener_title,
+                            description = R.string.perm_notif_listener_desc_lighting,
+                            dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
+                            actionLabel = R.string.perm_action_grant,
+                            action = { viewModel.requestNotificationListenerPermission(context) },
+                            isGranted = isNotificationListenerEnabled,
+                        ),
+                    )
+
+                R.string.feat_essentials_on_display_title ->
+                    listOf(
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_settings_accessibility_24,
+                            title = R.string.perm_accessibility_title,
+                            description = R.string.perm_accessibility_desc_essentials_on_display,
+                            dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
+                            actionLabel = R.string.perm_action_enable,
+                            action = {
+                                val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                context.startActivity(intent)
+                            },
+                            isGranted = isAccessibilityEnabled,
+                        ),
+                        PermissionItem(
+                            iconRes = R.drawable.rounded_notifications_unread_24,
+                            title = R.string.perm_notif_listener_title,
+                            description = R.string.perm_notif_listener_desc_lighting,
+                            dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
+                            actionLabel = R.string.perm_action_grant,
+                            action = { viewModel.requestNotificationListenerPermission(context) },
+                            isGranted = isNotificationListenerEnabled,
+                        ),
+                    )
+
+                else -> emptyList()
             }
-
-            R.string.feat_app_lock_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_settings_accessibility_24,
-                    title = R.string.perm_accessibility_title,
-                    description = R.string.perm_accessibility_desc_common,
-                    dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
-                    actionLabel = R.string.perm_action_enable,
-                    action = {
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    },
-                    isGranted = isAccessibilityEnabled
-                )
-            )
-
-            R.string.feat_call_vibrations_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_mobile_24,
-                    title = R.string.permission_read_phone_state_title,
-                    description = R.string.permission_read_phone_state_desc_call_vibrations,
-                    dependentFeatures = PermissionRegistry.getFeatures("READ_PHONE_STATE"),
-                    actionLabel = R.string.perm_action_grant,
-                    action = { viewModel.requestReadPhoneStatePermission(context as Activity) },
-                    isGranted = isReadPhoneStateEnabled
-                ),
-                PermissionItem(
-                    iconRes = R.drawable.rounded_notifications_unread_24,
-                    title = R.string.perm_notif_listener_title,
-                    description = R.string.perm_notif_listener_desc_lighting,
-                    dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
-                    actionLabel = R.string.perm_action_grant,
-                    action = { viewModel.requestNotificationListenerPermission(context) },
-                    isGranted = isNotificationListenerEnabled
-                )
-            )
-
-            R.string.feat_essentials_on_display_title -> listOf(
-                PermissionItem(
-                    iconRes = R.drawable.rounded_settings_accessibility_24,
-                    title = R.string.perm_accessibility_title,
-                    description = R.string.perm_accessibility_desc_essentials_on_display,
-                    dependentFeatures = PermissionRegistry.getFeatures("ACCESSIBILITY"),
-                    actionLabel = R.string.perm_action_enable,
-                    action = {
-                        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        context.startActivity(intent)
-                    },
-                    isGranted = isAccessibilityEnabled
-                ),
-                PermissionItem(
-                    iconRes = R.drawable.rounded_notifications_unread_24,
-                    title = R.string.perm_notif_listener_title,
-                    description = R.string.perm_notif_listener_desc_lighting,
-                    dependentFeatures = PermissionRegistry.getFeatures("NOTIFICATION_LISTENER"),
-                    actionLabel = R.string.perm_action_grant,
-                    action = { viewModel.requestNotificationListenerPermission(context) },
-                    isGranted = isNotificationListenerEnabled
-                )
-            )
-
-            else -> emptyList()
-        }
 
         if (showSheet && permissionItems.isNotEmpty() && currentFeature != null) {
             PermissionsBottomSheet(
@@ -775,7 +789,7 @@ fun SetupFeatures(
                 onHelpClick = {
                     showSheet = false
                     onHelpClick()
-                }
+                },
             )
         }
     }
@@ -784,7 +798,7 @@ fun SetupFeatures(
 
     if (showInstructionsSheet) {
         com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet(
-            onDismissRequest = { showInstructionsSheet = false }
+            onDismissRequest = { showInstructionsSheet = false },
         )
     }
 
@@ -794,7 +808,7 @@ fun SetupFeatures(
                 showHelpSheet = false
                 selectedHelpFeature = null
             },
-            feature = selectedHelpFeature!!
+            feature = selectedHelpFeature!!,
         )
     }
 
@@ -814,15 +828,15 @@ fun SetupFeatures(
     LocalSoftwareKeyboardController.current
     WindowInsets.isImeVisible
 
-
     val pullRefreshState = rememberPullToRefreshState()
     var isRefreshing by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
-    val allFeatures = FeatureRegistry.getFilteredFeatures(
-        context,
-        viewModel.isEnableUnsupportedFeatures.value
-    )
+    val allFeatures =
+        FeatureRegistry.getFilteredFeatures(
+            context,
+            viewModel.isEnableUnsupportedFeatures.value,
+        )
 
     LaunchedEffect(searchRequested) {
         if (searchRequested) {
@@ -837,17 +851,18 @@ fun SetupFeatures(
     var shouldResetRefreshing by rememberSaveable { mutableStateOf(false) }
 
     androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
-        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
-            if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
-                if (shouldResetRefreshing) {
-                    scope.launch {
-                        delay(200)
-                        isRefreshing = false
-                        shouldResetRefreshing = false
+        val observer =
+            androidx.lifecycle.LifecycleEventObserver { _, event ->
+                if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                    if (shouldResetRefreshing) {
+                        scope.launch {
+                            delay(200)
+                            isRefreshing = false
+                            shouldResetRefreshing = false
+                        }
                     }
                 }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -858,11 +873,12 @@ fun SetupFeatures(
         if (isRefreshing) {
             HapticUtil.performUIHaptic(view)
             val intent = Intent(context, YourAndroidActivity::class.java)
-            val options = androidx.core.app.ActivityOptionsCompat.makeCustomAnimation(
-                context,
-                R.anim.anim_slide_in_top,
-                R.anim.anim_stay
-            )
+            val options =
+                androidx.core.app.ActivityOptionsCompat.makeCustomAnimation(
+                    context,
+                    R.anim.anim_slide_in_top,
+                    R.anim.anim_stay,
+                )
             context.startActivity(intent, options.toBundle())
             shouldResetRefreshing = true
         }
@@ -893,7 +909,7 @@ fun SetupFeatures(
         onRefresh = { isRefreshing = true },
         state = pullRefreshState,
         indicator = { },
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
     ) {
         val deviceInfo = DeviceUtils.getDeviceInfo(context)
         val displayFraction = if (isRefreshing) 1f else pullRefreshState.distanceFraction
@@ -902,67 +918,86 @@ fun SetupFeatures(
 
         val cardExpansion by androidx.compose.animation.core.animateDpAsState(
             targetValue = 120.dp * displayFraction.coerceIn(0f, 1f),
-            animationSpec = androidx.compose.animation.core.spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
-            label = "cardExpansion"
+            animationSpec =
+                androidx.compose.animation.core
+                    .spring(stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow),
+            label = "cardExpansion",
         )
 
         val containerColor by androidx.compose.animation.animateColorAsState(
             targetValue = if (thresholdPassed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceContainerLow,
-            animationSpec = androidx.compose.animation.core.tween(durationMillis = 300),
-            label = "containerColor"
+            animationSpec =
+                androidx.compose.animation.core
+                    .tween(durationMillis = 300),
+            label = "containerColor",
         )
 
         val contentColor by androidx.compose.animation.animateColorAsState(
             targetValue = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary,
-            animationSpec = androidx.compose.animation.core.tween(durationMillis = 300),
-            label = "contentColor"
+            animationSpec =
+                androidx.compose.animation.core
+                    .tween(durationMillis = 300),
+            label = "contentColor",
         )
 
         val borderColor by androidx.compose.animation.animateColorAsState(
             targetValue = if (thresholdPassed) Color.Transparent else MaterialTheme.colorScheme.outlineVariant,
-            animationSpec = androidx.compose.animation.core.tween(durationMillis = 300),
-            label = "borderColor"
+            animationSpec =
+                androidx.compose.animation.core
+                    .tween(durationMillis = 300),
+            label = "borderColor",
         )
 
         val chevronAlpha by androidx.compose.animation.core.animateFloatAsState(
             targetValue = if (thresholdPassed) 0f else 1f,
-            animationSpec = androidx.compose.animation.core.tween(durationMillis = 300),
-            label = "chevronAlpha"
+            animationSpec =
+                androidx.compose.animation.core
+                    .tween(durationMillis = 300),
+            label = "chevronAlpha",
         )
 
         val chevronWidth by androidx.compose.animation.core.animateDpAsState(
             targetValue = if (thresholdPassed) 0.dp else 24.dp + 8.dp, // size + spacer
-            animationSpec = androidx.compose.animation.core.tween(durationMillis = 300),
-            label = "chevronWidth"
+            animationSpec =
+                androidx.compose.animation.core
+                    .tween(durationMillis = 300),
+            label = "chevronWidth",
         )
 
         val fontWeight by androidx.compose.animation.core.animateIntAsState(
             targetValue = if (thresholdPassed) 700 else 500,
-            animationSpec = androidx.compose.animation.core.tween(durationMillis = 100),
-            label = "fontWeight"
+            animationSpec =
+                androidx.compose.animation.core
+                    .tween(durationMillis = 100),
+            label = "fontWeight",
         )
 
         val textScale by androidx.compose.animation.core.animateFloatAsState(
             targetValue = if (thresholdPassed) 1.5f else 1f,
-            animationSpec = androidx.compose.animation.core.tween(durationMillis = 300),
-            label = "textScale"
+            animationSpec =
+                androidx.compose.animation.core
+                    .tween(durationMillis = 300),
+            label = "textScale",
         )
 
-        val fontWidth = remember(displayFraction) {
-            (100f + (displayFraction.coerceIn(0f, 1f) * 50f)).toInt().toFloat()
-        }
-        val fontFamily = remember(fontWidth, fontWeight) {
-            FontFamily(
-                Font(
-                    R.font.google_sans_flex,
-                    variationSettings = FontVariation.Settings(
-                        FontVariation.width(fontWidth),
-                        FontVariation.weight(fontWeight),
-                        FontVariation.Setting("ROND", 100f)
-                    )
+        val fontWidth =
+            remember(displayFraction) {
+                (100f + (displayFraction.coerceIn(0f, 1f) * 50f)).toInt().toFloat()
+            }
+        val fontFamily =
+            remember(fontWidth, fontWeight) {
+                FontFamily(
+                    Font(
+                        R.font.google_sans_flex,
+                        variationSettings =
+                            FontVariation.Settings(
+                                FontVariation.width(fontWidth),
+                                FontVariation.weight(fontWeight),
+                                FontVariation.Setting("ROND", 100f),
+                            ),
+                    ),
                 )
-            )
-        }
+            }
 
         val searchQuery = viewModel.searchQuery.value
         val searchResults = viewModel.searchResults.value
@@ -972,7 +1007,7 @@ fun SetupFeatures(
         LazyColumn(
             state = lazyListState,
             modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding() + 64.dp)
+            contentPadding = PaddingValues(bottom = contentPadding.calculateBottomPadding() + 64.dp),
         ) {
             item {
                 // My Android Hero Card
@@ -981,60 +1016,67 @@ fun SetupFeatures(
                         HapticUtil.performUIHaptic(view)
                         context.startActivity(Intent(context, YourAndroidActivity::class.java))
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 0.dp, bottom = 0.dp)
-                        .height(64.dp + statusBarPadding + cardExpansion),
-                    shape = RoundedCornerShape(
-                        topStart = 0.dp,
-                        topEnd = 0.dp,
-                        bottomStart = 28.dp,
-                        bottomEnd = 28.dp
-                    ),
-                    colors = CardDefaults.outlinedCardColors(
-                        containerColor = containerColor,
-                        contentColor = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                    ),
-                    border = BorderStroke(1.dp, borderColor)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .padding(top = 0.dp, bottom = 0.dp)
+                            .height(64.dp + statusBarPadding + cardExpansion),
+                    shape =
+                        RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 0.dp,
+                            bottomStart = 28.dp,
+                            bottomEnd = 28.dp,
+                        ),
+                    colors =
+                        CardDefaults.outlinedCardColors(
+                            containerColor = containerColor,
+                            contentColor = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                        ),
+                    border = BorderStroke(1.dp, borderColor),
                 ) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                            verticalArrangement = Arrangement.Center,
                         ) {
                             Spacer(modifier = Modifier.height(statusBarPadding))
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
-                                    modifier = Modifier
-                                        .width(chevronWidth)
-                                        .graphicsLayer { alpha = chevronAlpha }
+                                    modifier =
+                                        Modifier
+                                            .width(chevronWidth)
+                                            .graphicsLayer { alpha = chevronAlpha },
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(
                                             imageVector = Icons.Rounded.KeyboardArrowDown,
                                             contentDescription = null,
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .graphicsLayer {
-                                                    rotationZ =
-                                                        (displayFraction * 180f).coerceIn(0f, 180f)
-                                                },
-                                            tint = contentColor
+                                            modifier =
+                                                Modifier
+                                                    .size(24.dp)
+                                                    .graphicsLayer {
+                                                        rotationZ =
+                                                            (displayFraction * 180f).coerceIn(0f, 180f)
+                                                    },
+                                            tint = contentColor,
                                         )
                                         Spacer(modifier = Modifier.width(8.dp))
                                     }
                                 }
                                 Text(
                                     text = deviceInfo.deviceName,
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontFamily = fontFamily
-                                    ),
-                                    modifier = Modifier.graphicsLayer {
-                                        scaleX = textScale
-                                        scaleY = textScale
-                                    },
-                                    color = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                    style =
+                                        MaterialTheme.typography.titleMedium.copy(
+                                            fontFamily = fontFamily,
+                                        ),
+                                    modifier =
+                                        Modifier.graphicsLayer {
+                                            scaleX = textScale
+                                            scaleY = textScale
+                                        },
+                                    color = if (thresholdPassed) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                                 )
                             }
                         }
@@ -1051,12 +1093,13 @@ fun SetupFeatures(
                     },
                     maxLines = 1,
                     textStyle = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 16.dp)
-                        .defaultMinSize(minHeight = 64.dp)
-                        .focusRequester(focusRequester)
-                        .onFocusChanged { isFocused = it.isFocused },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 16.dp)
+                            .defaultMinSize(minHeight = 64.dp)
+                            .focusRequester(focusRequester)
+                            .onFocusChanged { isFocused = it.isFocused },
                     leadingIcon = {
                         Box(modifier = Modifier.padding(start = 16.dp, end = 8.dp)) {
                             if (isSearchingViewModel) {
@@ -1065,28 +1108,30 @@ fun SetupFeatures(
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_search_24),
                                     contentDescription = stringResource(R.string.label_search_content_description),
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(24.dp),
                                 )
                             }
                         }
                     },
                     placeholder = {
-                        if (!isFocused && searchQuery.isEmpty())
+                        if (!isFocused && searchQuery.isEmpty()) {
                             Text(
                                 text = stringResource(R.string.search_placeholder),
                                 style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
-                                modifier = Modifier.basicMarquee()
+                                modifier = Modifier.basicMarquee(),
                             )
+                        }
                     },
                     shape = MaterialTheme.shapes.extraExtraLarge,
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest
-                    ),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        ),
                     trailingIcon = {
                         if (isFocused || searchQuery.isNotEmpty()) {
                             IconButton(onClick = {
@@ -1098,11 +1143,11 @@ fun SetupFeatures(
                             }) {
                                 Icon(
                                     imageVector = Icons.Rounded.Clear,
-                                    contentDescription = "Clear search"
+                                    contentDescription = "Clear search",
                                 )
                             }
                         }
-                    }
+                    },
                 )
             }
 
@@ -1111,7 +1156,7 @@ fun SetupFeatures(
                 AnimatedVisibility(
                     visible = !isFocused && pinnedFeatureKeys.isNotEmpty() && searchQuery.isEmpty(),
                     enter = fadeIn() + expandVertically(),
-                    exit = fadeOut() + shrinkVertically()
+                    exit = fadeOut() + shrinkVertically(),
                 ) {
                     FavoriteCarousel(
                         pinnedKeys = pinnedFeatureKeys,
@@ -1121,13 +1166,13 @@ fun SetupFeatures(
                                 feature = feature,
                                 action = {
                                     feature.onClick(context, viewModel)
-                                }
+                                },
                             )
                         },
                         onFeatureLongClick = { feature ->
                             viewModel.togglePinFeature(feature.id)
                         },
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 16.dp),
                     )
                 }
             }
@@ -1139,23 +1184,24 @@ fun SetupFeatures(
                         allFeatures = allFeatures,
                         pinnedFeatureKeys = pinnedFeatureKeys,
                         context = context,
-                        viewModel = viewModel
+                        viewModel = viewModel,
                     )
                 }
             } else if (isFocused && searchQuery.isNotEmpty()) {
                 if (!isSearchingViewModel && searchResults.isEmpty()) {
                     item {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 64.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 64.dp),
                             verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = "¯\\_(ツ)_/¯",
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
                                 text = stringResource(id = R.string.search_no_results, searchQuery),
@@ -1164,9 +1210,10 @@ fun SetupFeatures(
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                                 maxLines = 2,
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .padding(horizontal = 32.dp)
+                                modifier =
+                                    Modifier
+                                        .padding(top = 8.dp)
+                                        .padding(horizontal = 32.dp),
                             )
                         }
                     }
@@ -1178,7 +1225,7 @@ fun SetupFeatures(
                         allFeatures = allFeatures,
                         pinnedFeatureKeys = pinnedFeatureKeys,
                         context = context,
-                        viewModel = viewModel
+                        viewModel = viewModel,
                     )
                 }
             } else if (!isFocused) {
@@ -1186,46 +1233,55 @@ fun SetupFeatures(
                     allFeatures.filter { it.parentFeatureId == null && it.isVisibleInMain }
                 val featureMap = topLevelFeatures.associateBy { it.id }
 
-                val sectionFeatureIdsList = listOf(
+                val sectionFeatureIdsList =
                     listOf(
-                        "Notifications",
-                        "Sound",
-                        "Display",
-                        "Maps power saving mode",
-                        "Daily Wallpaper",
-                        "Widgets"
-                    ),
-                    listOf(
-                        "Input",
-                        "Power and battery",
-                        "Quick settings tiles",
-                        "Watch"
-                    ),
-                    listOf(
-                        "Security",
-                        "Networks"
-                    ),
-                    listOf(
-                        "Location reached",
-                        "Watermark"
+                        listOf(
+                            "Notifications",
+                            "Sound",
+                            "Display",
+                            "Maps power saving mode",
+                            "Daily Wallpaper",
+                            "Widgets",
+                        ),
+                        listOf(
+                            "Input",
+                            "Power and battery",
+                            "Quick settings tiles",
+                            "Watch",
+                        ),
+                        listOf(
+                            "Security",
+                            "Networks",
+                        ),
+                        listOf(
+                            "Location reached",
+                            "Watermark",
+                        ),
                     )
-                )
 
                 val assignedIds = sectionFeatureIdsList.flatten().toSet()
                 val unassignedFeatures = topLevelFeatures.filter { it.id !in assignedIds }
 
-                val sections = sectionFeatureIdsList.map { ids ->
-                    ids.mapNotNull { featureMap[it] }
-                }.filter { it.isNotEmpty() } + if (unassignedFeatures.isNotEmpty()) listOf(
-                    unassignedFeatures
-                ) else emptyList()
+                val sections =
+                    sectionFeatureIdsList
+                        .map { ids ->
+                            ids.mapNotNull { featureMap[it] }
+                        }.filter { it.isNotEmpty() } +
+                        if (unassignedFeatures.isNotEmpty()) {
+                            listOf(
+                                unassignedFeatures,
+                            )
+                        } else {
+                            emptyList()
+                        }
 
                 sections.forEachIndexed { sectionIndex, sectionFeatures ->
                     item {
                         RoundedCardContainer(
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-                                .padding(bottom = 12.dp),
+                            modifier =
+                                Modifier
+                                    .padding(horizontal = 16.dp)
+                                    .padding(bottom = 12.dp),
                         ) {
                             sectionFeatures.forEach { feature ->
                                 FeatureCard(
@@ -1238,7 +1294,7 @@ fun SetupFeatures(
                                             isToggle = true,
                                             action = {
                                                 feature.onToggle(viewModel, context, enabled)
-                                            }
+                                            },
                                         )
                                     },
                                     onClick = {
@@ -1247,7 +1303,7 @@ fun SetupFeatures(
                                             feature = feature,
                                             action = {
                                                 feature.onClick(context, viewModel)
-                                            }
+                                            },
                                         )
                                     },
                                     iconRes = feature.iconRes,
@@ -1269,13 +1325,16 @@ fun SetupFeatures(
                                     onPinToggle = {
                                         viewModel.togglePinFeature(feature.id)
                                     },
-                                    onHelpClick = if (feature.aboutDescription != null) {
-                                        {
-                                            selectedHelpFeature = feature
-                                            showHelpSheet = true
-                                        }
-                                    } else null,
-                                    hasBadge = if (feature.id == "Watch") isWearUpdateRequired else false
+                                    onHelpClick =
+                                        if (feature.aboutDescription != null) {
+                                            {
+                                                selectedHelpFeature = feature
+                                                showHelpSheet = true
+                                            }
+                                        } else {
+                                            null
+                                        },
+                                    hasBadge = if (feature.id == "Watch") isWearUpdateRequired else false,
                                 )
                             }
                         }
@@ -1291,9 +1350,10 @@ fun SetupFeatures(
                         title = R.string.label_help_guide,
                         description = R.string.label_help_guide,
                         iconRes = R.drawable.rounded_help_24,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .padding(top = 16.dp, bottom = 12.dp)
+                        modifier =
+                            Modifier
+                                .padding(horizontal = 16.dp)
+                                .padding(top = 16.dp, bottom = 12.dp),
                     )
                 }
             }
@@ -1307,52 +1367,54 @@ private fun RecentSearchesSection(
     allFeatures: List<com.sameerasw.essentials.domain.model.Feature>,
     pinnedFeatureKeys: List<String>,
     context: Context,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
 ) {
     if (recentSearches.isEmpty()) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 64.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 64.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             Icon(
                 imageVector = Icons.Rounded.Search,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             )
             Text(
                 text = stringResource(R.string.label_no_recent_searches),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(top = 16.dp),
             )
         }
     } else {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = stringResource(R.string.label_recent_searches),
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Text(
                 text = stringResource(R.string.label_clear_all),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.clickable { viewModel.clearRecentSearches() }
+                modifier = Modifier.clickable { viewModel.clearRecentSearches() },
             )
         }
 
         RoundedCardContainer(
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp),
         ) {
             recentSearches.forEach { result ->
                 FeatureCard(
@@ -1383,17 +1445,17 @@ private fun RecentSearchesSection(
                                         if (targetFeatureKey == "LiveWallpaper" || targetFeatureKey == "Daily Wallpaper") {
                                             Intent(
                                                 context,
-                                                com.sameerasw.essentials.ui.activities.WallpaperActivity::class.java
+                                                com.sameerasw.essentials.ui.activities.WallpaperActivity::class.java,
                                             ).apply {
                                                 putExtra(
                                                     "tab",
-                                                    if (targetFeatureKey == "LiveWallpaper") "live" else "daily"
+                                                    if (targetFeatureKey == "LiveWallpaper") "live" else "daily",
                                                 )
                                             }
                                         } else {
                                             Intent(
                                                 context,
-                                                FeatureSettingsActivity::class.java
+                                                FeatureSettingsActivity::class.java,
                                             ).apply {
                                                 putExtra("feature", targetFeatureKey)
                                                 highlightKey?.let {
@@ -1402,7 +1464,7 @@ private fun RecentSearchesSection(
                                             }
                                         }
                                     context.startActivity(intent)
-                                }
+                                },
                             )
                         }
                     },
@@ -1414,7 +1476,7 @@ private fun RecentSearchesSection(
                     isPinned = pinnedFeatureKeys.contains(result.featureKey),
                     onPinToggle = {
                         viewModel.togglePinFeature(result.featureKey)
-                    }
+                    },
                 )
             }
         }
@@ -1427,14 +1489,14 @@ private fun SearchResultsSection(
     allFeatures: List<com.sameerasw.essentials.domain.model.Feature>,
     pinnedFeatureKeys: List<String>,
     context: Context,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
 ) {
     if (searchResults.isNotEmpty()) {
         Text(
             text = stringResource(R.string.search_results_title),
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 32.dp, top = 16.dp, bottom = 8.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         RoundedCardContainer(
@@ -1469,22 +1531,22 @@ private fun SearchResultsSection(
                                         if (targetFeatureKey == "LiveWallpaper" || targetFeatureKey == "Daily Wallpaper") {
                                             Intent(
                                                 context,
-                                                com.sameerasw.essentials.ui.activities.WallpaperActivity::class.java
+                                                com.sameerasw.essentials.ui.activities.WallpaperActivity::class.java,
                                             ).apply {
                                                 putExtra(
                                                     "tab",
-                                                    if (targetFeatureKey == "LiveWallpaper") "live" else "daily"
+                                                    if (targetFeatureKey == "LiveWallpaper") "live" else "daily",
                                                 )
                                             }
                                         } else if (targetFeatureKey == "App updates") {
                                             Intent(
                                                 context,
-                                                com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java
+                                                com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java,
                                             )
                                         } else {
                                             Intent(
                                                 context,
-                                                FeatureSettingsActivity::class.java
+                                                FeatureSettingsActivity::class.java,
                                             ).apply {
                                                 putExtra("feature", targetFeatureKey)
                                                 highlightKey?.let {
@@ -1493,24 +1555,24 @@ private fun SearchResultsSection(
                                             }
                                         }
                                     context.startActivity(intent)
-                                }
+                                },
                             )
                         } else {
                             val intent =
                                 if (result.featureKey == "LiveWallpaper" || result.featureKey == "Daily Wallpaper") {
                                     Intent(
                                         context,
-                                        com.sameerasw.essentials.ui.activities.WallpaperActivity::class.java
+                                        com.sameerasw.essentials.ui.activities.WallpaperActivity::class.java,
                                     ).apply {
                                         putExtra(
                                             "tab",
-                                            if (result.featureKey == "LiveWallpaper") "live" else "daily"
+                                            if (result.featureKey == "LiveWallpaper") "live" else "daily",
                                         )
                                     }
                                 } else if (result.featureKey == "App updates") {
                                     Intent(
                                         context,
-                                        com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java
+                                        com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java,
                                     )
                                 } else {
                                     Intent(context, FeatureSettingsActivity::class.java).apply {
@@ -1528,11 +1590,18 @@ private fun SearchResultsSection(
                     showToggle = false,
                     hasMoreSettings = true,
                     isBeta = result.isBeta,
-                    descriptionOverride = if (result.parentFeature != null) "${result.parentFeature} > ${result.description}" else result.description,
+                    descriptionOverride =
+                        if (result.parentFeature !=
+                            null
+                        ) {
+                            "${result.parentFeature} > ${result.description}"
+                        } else {
+                            result.description
+                        },
                     isPinned = pinnedFeatureKeys.contains(result.featureKey),
                     onPinToggle = {
                         viewModel.togglePinFeature(result.featureKey)
-                    }
+                    },
                 )
             }
         }

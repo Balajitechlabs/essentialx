@@ -18,5 +18,5 @@ data class ScaleAnimationsProfile(
     val smallestWidth: Int = 360,
     val touchSensitivityEnabled: Boolean = false,
     val autoRotateEnabled: Boolean = false,
-    val screenTimeout: Long = 30000L
+    val screenTimeout: Long = 30000L,
 )

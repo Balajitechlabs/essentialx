@@ -42,18 +42,20 @@ fun LocationAlarmCard(
     onPause: () -> Unit,
     onResume: () -> Unit,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val view = androidx.compose.ui.platform.LocalView.current
 
     ListItem(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceBright, MaterialTheme.shapes.extraSmall)
-            .clickable {
-                com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
-                onClick()
-            },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceBright, MaterialTheme.shapes.extraSmall)
+                .clickable {
+                    com.sameerasw.essentials.utils.HapticUtil
+                        .performVirtualKeyHaptic(view)
+                    onClick()
+                },
         leadingContent = {
             val context = androidx.compose.ui.platform.LocalContext.current
             val iconResId =
@@ -62,7 +64,7 @@ fun LocationAlarmCard(
                 painter = painterResource(id = if (iconResId != 0) iconResId else R.drawable.round_navigation_24),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
         },
         headlineContent = {
@@ -70,22 +72,24 @@ fun LocationAlarmCard(
                 text = alarm.name.ifEmpty { "Destination" },
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         },
         supportingContent = {
             val context = androidx.compose.ui.platform.LocalContext.current
-            val lastTravelledText = alarm.lastTravelled?.let {
-                stringResource(
-                    R.string.location_reached_last_travelled,
-                    com.sameerasw.essentials.utils.TimeUtil.formatRelativeDate(it, context)
-                )
-            } ?: stringResource(R.string.location_reached_never)
+            val lastTravelledText =
+                alarm.lastTravelled?.let {
+                    stringResource(
+                        R.string.location_reached_last_travelled,
+                        com.sameerasw.essentials.utils.TimeUtil
+                            .formatRelativeDate(it, context),
+                    )
+                } ?: stringResource(R.string.location_reached_never)
 
             Text(
                 text = lastTravelledText,
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         trailingContent = {
@@ -93,55 +97,61 @@ fun LocationAlarmCard(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     IconButton(
                         onClick = {
-                            com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
+                            com.sameerasw.essentials.utils.HapticUtil
+                                .performVirtualKeyHaptic(view)
                             if (alarm.isPaused) onResume() else onPause()
                         },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
+                        colors =
+                            IconButtonDefaults.iconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ),
                     ) {
                         Icon(
                             painter = painterResource(if (alarm.isPaused) R.drawable.round_play_arrow_24 else R.drawable.rounded_pause_24),
-                            contentDescription = if (alarm.isPaused) "Resume" else "Pause"
+                            contentDescription = if (alarm.isPaused) "Resume" else "Pause",
                         )
                     }
 
                     IconButton(
                         onClick = {
-                            com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
+                            com.sameerasw.essentials.utils.HapticUtil
+                                .performVirtualKeyHaptic(view)
                             onStop()
                         },
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.error
-                        )
+                        colors =
+                            IconButtonDefaults.iconButtonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.error,
+                            ),
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.rounded_close_24),
-                            contentDescription = "Stop"
+                            contentDescription = "Stop",
                         )
                     }
                 }
             } else if (!isAnyTracking) {
                 IconButton(
                     onClick = {
-                        com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(view)
+                        com.sameerasw.essentials.utils.HapticUtil
+                            .performVirtualKeyHaptic(view)
                         onStart()
                     },
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.size(48.dp)
+                    colors =
+                        IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    modifier = Modifier.size(48.dp),
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.rounded_play_arrow_24),
-                        contentDescription = "Start"
+                        contentDescription = "Start",
                     )
                 }
             }
         },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
 }

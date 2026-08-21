@@ -15,12 +15,11 @@ import android.content.Context
 import androidx.annotation.Keep
 
 object BluetoothBatteryUtils {
-
     @Keep
     data class BluetoothDeviceBattery(
         val name: String,
         val level: Int,
-        val address: String
+        val address: String,
     )
 
     @SuppressLint("MissingPermission")
@@ -29,18 +28,20 @@ object BluetoothBatteryUtils {
             context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager
         val adapter = bluetoothManager?.adapter ?: return emptyList()
 
-        val isEnabled = try {
-            adapter.isEnabled
-        } catch (e: SecurityException) {
-            false
-        }
+        val isEnabled =
+            try {
+                adapter.isEnabled
+            } catch (e: SecurityException) {
+                false
+            }
         if (!isEnabled) return emptyList()
 
-        val devices = try {
-            adapter.bondedDevices
-        } catch (e: SecurityException) {
-            return emptyList()
-        }
+        val devices =
+            try {
+                adapter.bondedDevices
+            } catch (e: SecurityException) {
+                return emptyList()
+            }
 
         val batteryList = mutableListOf<BluetoothDeviceBattery>()
 

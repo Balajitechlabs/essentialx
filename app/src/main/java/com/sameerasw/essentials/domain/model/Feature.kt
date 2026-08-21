@@ -24,7 +24,7 @@ data class SearchSetting(
     @StringRes val description: Int,
     val targetSettingHighlightKey: String,
     @androidx.annotation.ArrayRes val keywordRes: Int = 0,
-    @StringRes val category: Int? = null
+    @StringRes val category: Int? = null,
 )
 
 /**
@@ -46,26 +46,38 @@ abstract class Feature(
     @StringRes val authTitle: Int = 0,
     @StringRes val authSubtitle: Int = 0,
     @StringRes val aboutDescription: Int? = null,
-    @androidx.annotation.RawRes val animationRes: Int = 0
+    @androidx.annotation.RawRes val animationRes: Int = 0,
 ) {
     val requiresAuth: Boolean = category == com.sameerasw.essentials.R.string.cat_protection
 
     abstract fun isEnabled(viewModel: MainViewModel): Boolean
 
-    open fun isToggleEnabled(viewModel: MainViewModel, context: Context): Boolean = true
+    open fun isToggleEnabled(
+        viewModel: MainViewModel,
+        context: Context,
+    ): Boolean = true
 
     open fun isDeviceSupported(context: Context): Boolean = true
 
-    abstract fun onToggle(viewModel: MainViewModel, context: Context, enabled: Boolean)
+    abstract fun onToggle(
+        viewModel: MainViewModel,
+        context: Context,
+        enabled: Boolean,
+    )
 
-    open fun onClick(context: Context, viewModel: MainViewModel) {
+    open fun onClick(
+        context: Context,
+        viewModel: MainViewModel,
+    ) {
         val targetFeatureId =
             if (!hasMoreSettings && parentFeatureId != null) parentFeatureId else id
-        context.startActivity(Intent(context, FeatureSettingsActivity::class.java).apply {
-            putExtra("feature", targetFeatureId)
-            if (!hasMoreSettings && parentFeatureId != null) {
-                putExtra("highlight_setting", id)
-            }
-        })
+        context.startActivity(
+            Intent(context, FeatureSettingsActivity::class.java).apply {
+                putExtra("feature", targetFeatureId)
+                if (!hasMoreSettings && parentFeatureId != null) {
+                    putExtra("highlight_setting", id)
+                }
+            },
+        )
     }
 }

@@ -14,5 +14,5 @@ data class AppTag(
     val name: String,
     val colorHex: String,
     val iconName: String,
-    val neverAutoFreeze: Boolean = false
+    val neverAutoFreeze: Boolean = false,
 )

@@ -77,7 +77,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun ButtonRemapSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -112,11 +112,12 @@ fun ButtonRemapSettingsUI(
 
     // Check Shizuku status on resume
     androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                shizukuStatus = shizukuHelper.getStatus()
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    shizukuStatus = shizukuHelper.getStatus()
+                }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -125,13 +126,21 @@ fun ButtonRemapSettingsUI(
 
     fun getMissingPermissionsHelper(action: Action?): List<String> {
         if (action == null) return emptyList()
-        val resolvedPermissions = action.permissions.map { permKey ->
-            if (permKey == "SHIZUKU" || permKey == "ROOT") {
-                if (com.sameerasw.essentials.utils.ShellUtils.isRootEnabled(context)) "ROOT" else "SHIZUKU"
-            } else {
-                permKey
-            }
-        }.distinct()
+        val resolvedPermissions =
+            action.permissions
+                .map { permKey ->
+                    if (permKey == "SHIZUKU" || permKey == "ROOT") {
+                        if (com.sameerasw.essentials.utils.ShellUtils
+                                .isRootEnabled(context)
+                        ) {
+                            "ROOT"
+                        } else {
+                            "SHIZUKU"
+                        }
+                    } else {
+                        permKey
+                    }
+                }.distinct()
 
         return resolvedPermissions.filter { permKey ->
             when (permKey) {
@@ -145,12 +154,13 @@ fun ButtonRemapSettingsUI(
         }
     }
 
-    val currentAction: Action? = when (selectedScreenTab) {
-        0 if selectedButtonTab == 0 -> viewModel.volumeUpActionOff.value
-        0 if selectedButtonTab == 1 -> viewModel.volumeDownActionOff.value
-        1 if selectedButtonTab == 0 -> viewModel.volumeUpActionOn.value
-        else -> viewModel.volumeDownActionOn.value
-    }
+    val currentAction: Action? =
+        when (selectedScreenTab) {
+            0 if selectedButtonTab == 0 -> viewModel.volumeUpActionOff.value
+            0 if selectedButtonTab == 1 -> viewModel.volumeDownActionOff.value
+            1 if selectedButtonTab == 0 -> viewModel.volumeUpActionOn.value
+            else -> viewModel.volumeDownActionOn.value
+        }
 
     val onActionSelected: (Action?) -> Unit = { action ->
         when (selectedScreenTab) {
@@ -162,10 +172,11 @@ fun ButtonRemapSettingsUI(
     }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Master Toggle
         RoundedCardContainer(spacing = 2.dp) {
@@ -174,17 +185,18 @@ fun ButtonRemapSettingsUI(
                 title = stringResource(R.string.button_remap_enable_title),
                 isChecked = viewModel.isButtonRemapEnabled.value,
                 onCheckedChange = { viewModel.setButtonRemapEnabled(it, context) },
-                modifier = Modifier.highlight(highlightSetting == "enable_remap")
+                modifier = Modifier.highlight(highlightSetting == "enable_remap"),
             )
 
             AnimatedVisibility(
                 visible = viewModel.isButtonRemapEnabled.value,
                 enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
+                exit = shrinkVertically() + fadeOut(),
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     val isRootEnabled =
-                        com.sameerasw.essentials.utils.ShellUtils.isRootEnabled(context)
+                        com.sameerasw.essentials.utils.ShellUtils
+                            .isRootEnabled(context)
                     IconToggleItem(
                         iconRes = if (isRootEnabled) R.drawable.rounded_numbers_24 else R.drawable.rounded_adb_24,
                         title = stringResource(R.string.button_remap_use_shizuku_title),
@@ -193,9 +205,11 @@ fun ButtonRemapSettingsUI(
                         onCheckedChange = { enabled ->
                             if (enabled) {
                                 val shellHasPermission =
-                                    com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
+                                    com.sameerasw.essentials.utils.ShellUtils
+                                        .hasPermission(context)
                                 val shellIsAvailable =
-                                    com.sameerasw.essentials.utils.ShellUtils.isAvailable(context)
+                                    com.sameerasw.essentials.utils.ShellUtils
+                                        .isAvailable(context)
 
                                 if (shellHasPermission) {
                                     viewModel.setButtonRemapUseShizuku(true, context)
@@ -209,58 +223,67 @@ fun ButtonRemapSettingsUI(
                                     viewModel.setButtonRemapUseShizuku(true, context)
                                     com.sameerasw.essentials.utils.ShellUtils.runCommand(
                                         context,
-                                        "id"
+                                        "id",
                                     )
                                 } else {
                                     viewModel.setButtonRemapUseShizuku(true, context)
                                     val toastRes =
                                         if (isRootEnabled) R.string.root_not_available_toast else R.string.shizuku_not_running_toast
-                                    android.widget.Toast.makeText(
-                                        context,
-                                        context.getString(toastRes),
-                                        android.widget.Toast.LENGTH_SHORT
-                                    ).show()
+                                    android.widget.Toast
+                                        .makeText(
+                                            context,
+                                            context.getString(toastRes),
+                                            android.widget.Toast.LENGTH_SHORT,
+                                        ).show()
                                 }
                             } else {
                                 viewModel.setButtonRemapUseShizuku(false, context)
                             }
                         },
-                        modifier = Modifier.highlight(highlightSetting == "shizuku_remap")
+                        modifier = Modifier.highlight(highlightSetting == "shizuku_remap"),
                     )
 
                     AnimatedVisibility(
                         visible = viewModel.isButtonRemapUseShizuku.value,
                         enter = expandVertically() + fadeIn(),
-                        exit = shrinkVertically() + fadeOut()
+                        exit = shrinkVertically() + fadeOut(),
                     ) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    color = MaterialTheme.colorScheme.surfaceBright,
-                                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                                )
-                                .padding(12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        color = MaterialTheme.colorScheme.surfaceBright,
+                                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                                    ).padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             val shellAvailable =
-                                com.sameerasw.essentials.utils.ShellUtils.isAvailable(context)
+                                com.sameerasw.essentials.utils.ShellUtils
+                                    .isAvailable(context)
                             val shellPermission =
-                                com.sameerasw.essentials.utils.ShellUtils.hasPermission(context)
+                                com.sameerasw.essentials.utils.ShellUtils
+                                    .hasPermission(context)
 
                             val statusText =
                                 if (shellPermission && viewModel.shizukuDetectedDevicePath.value != null) {
                                     stringResource(
                                         R.string.shizuku_detected_prefix,
-                                        viewModel.shizukuDetectedDevicePath.value ?: ""
+                                        viewModel.shizukuDetectedDevicePath.value ?: "",
                                     )
                                 } else if (isRootEnabled) {
-                                    if (shellPermission) "Root Access: Granted" else if (shellAvailable) "Root Access: Found" else "Root Access: Not Found"
+                                    if (shellPermission) {
+                                        "Root Access: Granted"
+                                    } else if (shellAvailable) {
+                                        "Root Access: Found"
+                                    } else {
+                                        "Root Access: Not Found"
+                                    }
                                 } else {
                                     stringResource(
                                         R.string.shizuku_status_prefix,
-                                        shizukuStatus.name
+                                        shizukuStatus.name,
                                     )
                                 }
 
@@ -270,10 +293,14 @@ fun ButtonRemapSettingsUI(
                                 color = if (shellPermission) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                                 maxLines = 1,
                                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
 
-                            if (!shellPermission && !isRootEnabled && shizukuStatus != ShizukuStatus.READY && shizukuStatus != ShizukuStatus.PERMISSION_NEEDED) {
+                            if (!shellPermission &&
+                                !isRootEnabled &&
+                                shizukuStatus != ShizukuStatus.READY &&
+                                shizukuStatus != ShizukuStatus.PERMISSION_NEEDED
+                            ) {
                                 Button(
                                     onClick = {
                                         try {
@@ -284,14 +311,15 @@ fun ButtonRemapSettingsUI(
                                         }
                                     },
                                     modifier = Modifier.height(32.dp),
-                                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
-                                        horizontal = 12.dp,
-                                        vertical = 0.dp
-                                    )
+                                    contentPadding =
+                                        androidx.compose.foundation.layout.PaddingValues(
+                                            horizontal = 12.dp,
+                                            vertical = 0.dp,
+                                        ),
                                 ) {
                                     Text(
                                         stringResource(R.string.shizuku_open_button),
-                                        style = MaterialTheme.typography.labelSmall
+                                        style = MaterialTheme.typography.labelSmall,
                                     )
                                 }
                             }
@@ -304,7 +332,7 @@ fun ButtonRemapSettingsUI(
         AnimatedVisibility(
             visible = viewModel.isButtonRemapEnabled.value,
             enter = expandVertically() + fadeIn(),
-            exit = shrinkVertically() + fadeOut()
+            exit = shrinkVertically() + fadeOut(),
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 // Haptic Feedback (Common)
@@ -312,18 +340,19 @@ fun ButtonRemapSettingsUI(
                     text = stringResource(R.string.settings_section_haptic),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 RoundedCardContainer(spacing = 0.dp) {
                     HapticFeedbackPicker(
                         selectedFeedback = viewModel.remapHapticType.value,
                         onFeedbackSelected = { viewModel.setRemapHapticType(it, context) },
-                        options = listOf(
-                            R.string.haptic_none to HapticFeedbackType.NONE,
-                            R.string.haptic_tick to HapticFeedbackType.TICK,
-                            R.string.haptic_double to HapticFeedbackType.DOUBLE
-                        ),
-                        modifier = Modifier.highlight(highlightSetting == "remap_haptic")
+                        options =
+                            listOf(
+                                R.string.haptic_none to HapticFeedbackType.NONE,
+                                R.string.haptic_tick to HapticFeedbackType.TICK,
+                                R.string.haptic_double to HapticFeedbackType.DOUBLE,
+                            ),
+                        modifier = Modifier.highlight(highlightSetting == "remap_haptic"),
                     )
                 }
 
@@ -331,15 +360,16 @@ fun ButtonRemapSettingsUI(
                     text = stringResource(R.string.button_remap_section_long_press),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 // Button Picker & Tabs
                 RoundedCardContainer(spacing = 2.dp) {
-                    val screenOptions = listOf(
-                        stringResource(R.string.screen_off),
-                        stringResource(R.string.screen_on)
-                    )
+                    val screenOptions =
+                        listOf(
+                            stringResource(R.string.screen_off),
+                            stringResource(R.string.screen_on),
+                        )
                     SegmentedPicker(
                         items = screenOptions,
                         selectedItem = if (selectedScreenTab == 0) screenOptions[0] else screenOptions[1],
@@ -347,12 +377,13 @@ fun ButtonRemapSettingsUI(
                             HapticUtil.performUIHaptic(view)
                             selectedScreenTab = screenOptions.indexOf(it)
                         },
-                        labelProvider = { it }
+                        labelProvider = { it },
                     )
-                    val buttonOptions = listOf(
-                        stringResource(R.string.volume_up),
-                        stringResource(R.string.volume_down)
-                    )
+                    val buttonOptions =
+                        listOf(
+                            stringResource(R.string.volume_up),
+                            stringResource(R.string.volume_down),
+                        )
                     SegmentedPicker(
                         items = buttonOptions,
                         selectedItem = if (selectedButtonTab == 0) buttonOptions[0] else buttonOptions[1],
@@ -360,7 +391,7 @@ fun ButtonRemapSettingsUI(
                             HapticUtil.performUIHaptic(view)
                             selectedButtonTab = buttonOptions.indexOf(it)
                         },
-                        labelProvider = { it }
+                        labelProvider = { it },
                     )
                 }
 
@@ -375,15 +406,17 @@ fun ButtonRemapSettingsUI(
                 }
 
                 // Categorized Actions List
-                val actionCategories = remember(selectedScreenTab) {
-                    ActionRegistry.getCategories(screenOnOnly = selectedScreenTab == 1)
-                }
+                val actionCategories =
+                    remember(selectedScreenTab) {
+                        ActionRegistry.getCategories(screenOnOnly = selectedScreenTab == 1)
+                    }
 
                 var expandedActionCategory by remember(selectedScreenTab, selectedButtonTab) {
                     mutableStateOf<Int?>(
-                        actionCategories.firstOrNull { category ->
-                            category.actions.any { currentAction != null && it::class == currentAction::class }
-                        }?.titleRes ?: actionCategories.firstOrNull()?.titleRes
+                        actionCategories
+                            .firstOrNull { category ->
+                                category.actions.any { currentAction != null && it::class == currentAction::class }
+                            }?.titleRes ?: actionCategories.firstOrNull()?.titleRes,
                     )
                 }
 
@@ -395,7 +428,7 @@ fun ButtonRemapSettingsUI(
                         onToggleExpand = {
                             expandedActionCategory =
                                 if (expandedActionCategory == category.titleRes) null else category.titleRes
-                        }
+                        },
                     ) {
                         category.actions.forEach { action ->
                             val resolvedAction =
@@ -414,7 +447,10 @@ fun ButtonRemapSettingsUI(
                                 title = stringResource(resolvedAction.title),
                                 iconRes = resolvedAction.icon,
                                 isSelected = isSelected,
-                                hasSettings = resolvedAction.isConfigurable || resolvedAction is Action.ToggleFlashlight || resolvedAction is Action.LikeCurrentSong,
+                                hasSettings =
+                                    resolvedAction.isConfigurable ||
+                                        resolvedAction is Action.ToggleFlashlight ||
+                                        resolvedAction is Action.LikeCurrentSong,
                                 onClick = {
                                     onActionSelected(resolvedAction)
                                     if (missing.isNotEmpty()) {
@@ -457,7 +493,7 @@ fun ButtonRemapSettingsUI(
                                         is Action.CustomSettings -> showCustomSettingsSettings = true
                                         else -> {}
                                     }
-                                }
+                                },
                             )
                         }
                     }
@@ -468,12 +504,15 @@ fun ButtonRemapSettingsUI(
         // Hint
         RoundedCardContainer {
             Text(
-                text = if (selectedScreenTab == 0)
-                    stringResource(R.string.button_remap_screen_off_hint)
-                else stringResource(R.string.button_remap_screen_on_hint),
+                text =
+                    if (selectedScreenTab == 0) {
+                        stringResource(R.string.button_remap_screen_off_hint)
+                    } else {
+                        stringResource(R.string.button_remap_screen_on_hint)
+                    },
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(16.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -483,26 +522,27 @@ fun ButtonRemapSettingsUI(
         LikeSongSettingsSheet(
             onDismiss = { showLikeSongOptions.value = false },
             viewModel = viewModel,
-            context = context
+            context = context,
         )
     }
 
     if (showFlashlightOptions) {
         ModalBottomSheet(
             onDismissRequest = { showFlashlightOptions = false },
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
                     text = stringResource(R.string.flashlight_options_title),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 RoundedCardContainer(spacing = 2.dp) {
@@ -511,7 +551,7 @@ fun ButtonRemapSettingsUI(
                         title = stringResource(R.string.flashlight_fade_title),
                         description = stringResource(R.string.flashlight_fade_desc),
                         isChecked = viewModel.isFlashlightFadeEnabled.value,
-                        onCheckedChange = { viewModel.setFlashlightFadeEnabled(it, context) }
+                        onCheckedChange = { viewModel.setFlashlightFadeEnabled(it, context) },
                     )
 
                     IconToggleItem(
@@ -521,7 +561,7 @@ fun ButtonRemapSettingsUI(
                         isChecked = viewModel.isFlashlightAlwaysTurnOffEnabled.value,
                         onCheckedChange = {
                             viewModel.setFlashlightAlwaysTurnOffEnabled(it, context)
-                        }
+                        },
                     )
                 }
 
@@ -530,10 +570,11 @@ fun ButtonRemapSettingsUI(
                         HapticUtil.performVirtualKeyHaptic(view)
                         showFlashlightOptions = false
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    shape = MaterialTheme.shapes.extraLarge
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                    shape = MaterialTheme.shapes.extraLarge,
                 ) {
                     Text(stringResource(R.string.action_done))
                 }
@@ -549,7 +590,7 @@ fun ButtonRemapSettingsUI(
                 showDimSettings = false
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
@@ -561,7 +602,7 @@ fun ButtonRemapSettingsUI(
                 showScreenOffSettings = false
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
@@ -573,7 +614,7 @@ fun ButtonRemapSettingsUI(
                 showDeviceEffectsSettings = false
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
@@ -585,7 +626,7 @@ fun ButtonRemapSettingsUI(
                 showSoundModeSettings = false
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
@@ -597,7 +638,7 @@ fun ButtonRemapSettingsUI(
                 showSetVolumeSettings = false
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
@@ -609,14 +650,17 @@ fun ButtonRemapSettingsUI(
                 showSometimesEssentialsSettings = false
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
     if (showFreezeTagSettings && configAction is Action.FreezeTag) {
-        val availableTags = remember {
-            com.sameerasw.essentials.data.repository.SettingsRepository(context).getFreezeTags()
-        }
+        val availableTags =
+            remember {
+                com.sameerasw.essentials.data.repository
+                    .SettingsRepository(context)
+                    .getFreezeTags()
+            }
         com.sameerasw.essentials.ui.core.sheets.FreezeTagSettingsSheet(
             initialAction = configAction as Action.FreezeTag,
             availableTags = availableTags,
@@ -625,7 +669,7 @@ fun ButtonRemapSettingsUI(
                 showFreezeTagSettings = false
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
@@ -636,18 +680,19 @@ fun ButtonRemapSettingsUI(
                 val newAction = Action.OpenApp(packageName = app.packageName)
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
     if (showFreezeAppsSettings && (configAction is Action.FreezeApps || configAction is Action.UnfreezeApps)) {
         AppSelectionSheet(
             onDismissRequest = {
-                val finalAction = when (val action = configAction) {
-                    is Action.FreezeApps -> action.copy(packageNames = temporarySelectedAppsForAction)
-                    is Action.UnfreezeApps -> action.copy(packageNames = temporarySelectedAppsForAction)
-                    else -> configAction
-                }
+                val finalAction =
+                    when (val action = configAction) {
+                        is Action.FreezeApps -> action.copy(packageNames = temporarySelectedAppsForAction)
+                        is Action.UnfreezeApps -> action.copy(packageNames = temporarySelectedAppsForAction)
+                        else -> configAction
+                    }
                 if (finalAction != null) {
                     onActionSelected(finalAction)
                 }
@@ -660,7 +705,7 @@ fun ButtonRemapSettingsUI(
             onSaveApps = { _, selections ->
                 temporarySelectedAppsForAction =
                     selections.filter { it.isEnabled }.map { it.packageName }
-            }
+            },
         )
     }
 
@@ -671,7 +716,7 @@ fun ButtonRemapSettingsUI(
                 onActionSelected(Action.Keyboard(newIme))
                 configAction = null
             },
-            selectedIme = (configAction as? Action.Keyboard)?.inputMethodId
+            selectedIme = (configAction as? Action.Keyboard)?.inputMethodId,
         )
     }
 
@@ -683,16 +728,17 @@ fun ButtonRemapSettingsUI(
                 showCustomSettingsSettings = false
                 onActionSelected(newAction)
                 configAction = null
-            }
+            },
         )
     }
 
     if (showPermissionSheet) {
-        val permissionItems = com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItems(
-            permissionKeysToShow,
-            context,
-            viewModel
-        )
+        val permissionItems =
+            com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItems(
+                permissionKeysToShow,
+                context,
+                viewModel,
+            )
         if (permissionItems.isNotEmpty()) {
             com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet(
                 onDismissRequest = {
@@ -700,7 +746,7 @@ fun ButtonRemapSettingsUI(
                     permissionKeysToShow = emptyList()
                 },
                 featureTitle = permissionFeatureTitle,
-                permissions = permissionItems
+                permissions = permissionItems,
             )
         }
     }
@@ -714,54 +760,54 @@ fun RemapActionItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     hasSettings: Boolean = false,
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
 ) {
     val view = LocalView.current
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable {
-                HapticUtil.performUIHaptic(view)
-                onClick()
-            }
-            .background(
-                color = MaterialTheme.colorScheme.surfaceBright,
-                shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-            )
-            .padding(12.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable {
+                    HapticUtil.performUIHaptic(view)
+                    onClick()
+                }.background(
+                    color = MaterialTheme.colorScheme.surfaceBright,
+                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                ).padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         RadioButton(
             selected = isSelected,
-            onClick = onClick
+            onClick = onClick,
         )
 
-        val resolvedTitle = when (title) {
-            is Int -> stringResource(id = title)
-            is String -> title
-            else -> ""
-        }
+        val resolvedTitle =
+            when (title) {
+                is Int -> stringResource(id = title)
+                is String -> title
+                else -> ""
+            }
 
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = resolvedTitle,
             modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
 
         Text(
             text = resolvedTitle,
             style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.weight(1f),
-            color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+            color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
         )
         if (hasSettings && isSelected) {
             IconButton(onClick = onSettingsClick) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_settings_24),
                     contentDescription = stringResource(R.string.content_desc_settings),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             }
         }

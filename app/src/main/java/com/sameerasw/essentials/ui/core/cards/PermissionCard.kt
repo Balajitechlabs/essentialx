@@ -66,46 +66,52 @@ fun PermissionCard(
     shizukuActionEnabled: Boolean = false,
     onShizukuActionClick: (() -> Unit)? = null,
     instructions: Any? = null,
-    description: Any? = null
+    description: Any? = null,
 ) {
     val grantedGreen = Color(0xFF4CAF50)
     val view = LocalView.current
 
-    val resolvedTitle = when (title) {
-        is Int -> stringResource(id = title)
-        is String -> title
-        else -> ""
-    }
+    val resolvedTitle =
+        when (title) {
+            is Int -> stringResource(id = title)
+            is String -> title
+            else -> ""
+        }
 
-    val resolvedDescription = when (description) {
-        is Int -> stringResource(id = description)
-        is String -> description
-        else -> null
-    }
+    val resolvedDescription =
+        when (description) {
+            is Int -> stringResource(id = description)
+            is String -> description
+            else -> null
+        }
 
-    val resolvedActionLabel = when (actionLabel) {
-        is Int -> stringResource(id = actionLabel)
-        is String -> actionLabel
-        else -> ""
-    }
+    val resolvedActionLabel =
+        when (actionLabel) {
+            is Int -> stringResource(id = actionLabel)
+            is String -> actionLabel
+            else -> ""
+        }
 
-    val resolvedSecondaryLabel = when (secondaryActionLabel) {
-        is Int -> stringResource(id = secondaryActionLabel)
-        is String -> secondaryActionLabel
-        else -> null
-    }
+    val resolvedSecondaryLabel =
+        when (secondaryActionLabel) {
+            is Int -> stringResource(id = secondaryActionLabel)
+            is String -> secondaryActionLabel
+            else -> null
+        }
 
-    val resolvedShizukuLabel = when (shizukuActionLabel) {
-        is Int -> stringResource(id = shizukuActionLabel)
-        is String -> shizukuActionLabel
-        else -> null
-    }
+    val resolvedShizukuLabel =
+        when (shizukuActionLabel) {
+            is Int -> stringResource(id = shizukuActionLabel)
+            is String -> shizukuActionLabel
+            else -> null
+        }
 
-    val resolvedInstructions = when (instructions) {
-        is Int -> stringResource(id = instructions)
-        is String -> instructions
-        else -> null
-    }
+    val resolvedInstructions =
+        when (instructions) {
+            is Int -> stringResource(id = instructions)
+            is String -> instructions
+            else -> null
+        }
 
     var showMenu by remember { mutableStateOf(false) }
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
@@ -114,13 +120,14 @@ fun PermissionCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraSmall,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright,
+            ),
     ) {
         Column(
             modifier = Modifier.padding(bottom = 12.dp, start = 4.dp, end = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Box {
                 ListItem(
@@ -132,15 +139,16 @@ fun PermissionCard(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    ),
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent,
+                        ),
                     leadingContent = {
                         Icon(
                             painter = painterResource(id = iconRes),
                             contentDescription = null,
                             tint = if (isGranted) grantedGreen else MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(36.dp)
+                            modifier = Modifier.size(36.dp),
                         )
                     },
                     supportingContent = {
@@ -149,21 +157,22 @@ fun PermissionCard(
                                 Text(
                                     text = resolvedDescription,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
                             Text(text = "Required for:", style = MaterialTheme.typography.bodySmall)
                             Spacer(modifier = Modifier.height(4.dp))
                             dependentFeatures.forEach { f ->
-                                val resolvedFeature = when (f) {
-                                    is Int -> stringResource(id = f)
-                                    is String -> f
-                                    else -> ""
-                                }
+                                val resolvedFeature =
+                                    when (f) {
+                                        is Int -> stringResource(id = f)
+                                        is String -> f
+                                        else -> ""
+                                    }
                                 Text(
                                     text = "• $resolvedFeature",
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
                                 )
                             }
                         }
@@ -172,31 +181,33 @@ fun PermissionCard(
                         Text(
                             text = resolvedTitle,
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
-                    }
+                    },
                 )
 
                 if (isTranslationModeActive) {
                     SegmentedDropdownMenu(
                         expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        onDismissRequest = { showMenu = false },
                     ) {
                         val context = LocalContext.current
                         val keyTitle =
                             remember(title) { TranslationManager.resolveKey(context, title) }
-                        val keyDesc = remember(description) {
-                            TranslationManager.resolveKey(
-                                context,
-                                description
-                            )
-                        }
-                        val keyInst = remember(instructions) {
-                            TranslationManager.resolveKey(
-                                context,
-                                instructions
-                            )
-                        }
+                        val keyDesc =
+                            remember(description) {
+                                TranslationManager.resolveKey(
+                                    context,
+                                    description,
+                                )
+                            }
+                        val keyInst =
+                            remember(instructions) {
+                                TranslationManager.resolveKey(
+                                    context,
+                                    instructions,
+                                )
+                            }
 
                         if (keyTitle != null) {
                             SegmentedDropdownMenuItem(
@@ -208,9 +219,9 @@ fun PermissionCard(
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(id = R.drawable.rounded_translate_24),
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
-                                }
+                                },
                             )
                         }
 
@@ -224,9 +235,9 @@ fun PermissionCard(
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(id = R.drawable.rounded_translate_24),
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
-                                }
+                                },
                             )
                         }
 
@@ -240,9 +251,9 @@ fun PermissionCard(
                                 leadingIcon = {
                                     Icon(
                                         painter = painterResource(id = R.drawable.rounded_translate_24),
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
-                                }
+                                },
                             )
                         }
                     }
@@ -254,14 +265,14 @@ fun PermissionCard(
                     if (resolvedSecondaryLabel != null && onSecondaryActionClick != null) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             OutlinedButton(
                                 onClick = {
                                     HapticUtil.performVirtualKeyHaptic(view)
                                     onActionClick()
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             ) {
                                 Text(resolvedActionLabel)
                             }
@@ -271,7 +282,7 @@ fun PermissionCard(
                                     HapticUtil.performVirtualKeyHaptic(view)
                                     onSecondaryActionClick()
                                 },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             ) {
                                 Text(resolvedSecondaryLabel)
                             }
@@ -282,7 +293,7 @@ fun PermissionCard(
                                 HapticUtil.performVirtualKeyHaptic(view)
                                 onActionClick()
                             },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             Text(resolvedActionLabel)
                         }
@@ -290,28 +301,28 @@ fun PermissionCard(
                 } else {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         if (resolvedInstructions != null) {
                             Text(
                                 text = resolvedInstructions,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(bottom = 4.dp)
+                                modifier = Modifier.padding(bottom = 4.dp),
                             )
                         }
 
                         if (resolvedSecondaryLabel != null && onSecondaryActionClick != null) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 OutlinedButton(
                                     onClick = {
                                         HapticUtil.performVirtualKeyHaptic(view)
                                         onActionClick()
                                     },
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
                                 ) {
                                     Text(resolvedActionLabel)
                                 }
@@ -321,7 +332,7 @@ fun PermissionCard(
                                         HapticUtil.performVirtualKeyHaptic(view)
                                         onSecondaryActionClick()
                                     },
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
                                 ) {
                                     Text(resolvedSecondaryLabel)
                                 }
@@ -332,7 +343,7 @@ fun PermissionCard(
                                     HapticUtil.performVirtualKeyHaptic(view)
                                     onActionClick()
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(resolvedActionLabel)
                             }
@@ -345,7 +356,7 @@ fun PermissionCard(
                                     onShizukuActionClick()
                                 },
                                 enabled = shizukuActionEnabled,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(resolvedShizukuLabel)
                             }
@@ -359,7 +370,7 @@ fun PermissionCard(
     if (translationSheetKey != null) {
         TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

@@ -42,22 +42,21 @@ import com.sameerasw.essentials.ui.components.HelpAndGuidesContent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InstructionsBottomSheet(
-    onDismissRequest: () -> Unit
-) {
+fun InstructionsBottomSheet(onDismissRequest: () -> Unit) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {
                 Text(
@@ -65,7 +64,7 @@ fun InstructionsBottomSheet(
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 4.dp, top = 8.dp)
+                    modifier = Modifier.padding(bottom = 4.dp, top = 8.dp),
                 )
             }
 
@@ -79,18 +78,19 @@ fun InstructionsBottomSheet(
                     text = stringResource(R.string.need_more_support_reach_out),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = 4.dp),
                 )
             }
 
             item {
                 FlowRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 32.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 32.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalArrangement = Arrangement.spacedBy(6.dp),
-                    maxItemsInEachRow = 3
+                    maxItemsInEachRow = 3,
                 ) {
                     Button(
                         onClick = {
@@ -98,12 +98,12 @@ fun InstructionsBottomSheet(
                             val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                             context.startActivity(intent)
                         },
-                        modifier = Modifier.padding(horizontal = 4.dp)
+                        modifier = Modifier.padding(horizontal = 4.dp),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.brand_github),
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.action_view_on_github))
@@ -112,30 +112,32 @@ fun InstructionsBottomSheet(
                     OutlinedButton(
                         onClick = {
                             val mailUri = "mailto:mail@sameerasw.com".toUri()
-                            val emailIntent = Intent(Intent.ACTION_SENDTO, mailUri).apply {
-                                putExtra(Intent.EXTRA_SUBJECT, "Hello from Essentials")
-                            }
+                            val emailIntent =
+                                Intent(Intent.ACTION_SENDTO, mailUri).apply {
+                                    putExtra(Intent.EXTRA_SUBJECT, "Hello from Essentials")
+                                }
                             try {
                                 context.startActivity(
                                     Intent.createChooser(
                                         emailIntent,
-                                        context.getString(R.string.send_email_chooser_title)
-                                    )
+                                        context.getString(R.string.send_email_chooser_title),
+                                    ),
                                 )
                             } catch (e: ActivityNotFoundException) {
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.error_no_email_app),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                Toast
+                                    .makeText(
+                                        context,
+                                        context.getString(R.string.error_no_email_app),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
                             }
                         },
-                        modifier = Modifier.padding(horizontal = 4.dp)
+                        modifier = Modifier.padding(horizontal = 4.dp),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_mail_24),
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.email_label))
@@ -147,12 +149,12 @@ fun InstructionsBottomSheet(
                             val intent = Intent(Intent.ACTION_VIEW, websiteUrl.toUri())
                             context.startActivity(intent)
                         },
-                        modifier = Modifier.padding(horizontal = 4.dp)
+                        modifier = Modifier.padding(horizontal = 4.dp),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.brand_telegram),
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(18.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.support_group_label))

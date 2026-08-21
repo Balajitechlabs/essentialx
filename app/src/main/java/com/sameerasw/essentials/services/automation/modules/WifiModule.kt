@@ -36,41 +36,47 @@ class WifiModule : AutomationModule {
     private var appContext: Context? = null
     private val activeNetworkSsids = java.util.concurrent.ConcurrentHashMap<Network, String>()
 
-    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
-        override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
-            if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return
-            val ssid = currentWifiSsid()
-            if (ssid == null) {
-                Log.d(
-                    ID,
-                    "Wi-Fi capabilities changed but SSID unavailable (check location permission/services)"
-                )
-                return
+    private val networkCallback =
+        object : ConnectivityManager.NetworkCallback() {
+            override fun onCapabilitiesChanged(
+                network: Network,
+                capabilities: NetworkCapabilities,
+            ) {
+                if (!capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) return
+                val ssid = currentWifiSsid()
+                if (ssid == null) {
+                    Log.d(
+                        ID,
+                        "Wi-Fi capabilities changed but SSID unavailable (check location permission/services)",
+                    )
+                    return
+                }
+                if (activeNetworkSsids[network] == ssid) return
+                Log.d(ID, "Wi-Fi connected: $ssid")
+                activeNetworkSsids[network] = ssid
+                handleTrigger { it is Trigger.WifiConnected && it.ssid == ssid }
             }
-            if (activeNetworkSsids[network] == ssid) return
-            Log.d(ID, "Wi-Fi connected: $ssid")
-            activeNetworkSsids[network] = ssid
-            handleTrigger { it is Trigger.WifiConnected && it.ssid == ssid }
-        }
 
-        override fun onLost(network: Network) {
-            val ssid = activeNetworkSsids.remove(network) ?: return
-            Log.d(ID, "Wi-Fi disconnected: $ssid")
-            handleTrigger { it is Trigger.WifiDisconnected && it.ssid == ssid }
+            override fun onLost(network: Network) {
+                val ssid = activeNetworkSsids.remove(network) ?: return
+                Log.d(ID, "Wi-Fi disconnected: $ssid")
+                handleTrigger { it is Trigger.WifiDisconnected && it.ssid == ssid }
+            }
         }
-    }
 
     override fun start(context: Context) {
         appContext = context.applicationContext
         val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager = manager
-        val request = NetworkRequest.Builder()
-            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-            // Default builder requires validated internet access; many Wi-Fi networks
-            // (captive portals, offline IoT/local networks) never satisfy that, so the
-            // callback would otherwise never fire for them.
-            .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-            .build()
+        val request =
+            NetworkRequest
+                .Builder()
+                .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                // Default builder requires validated internet access; many Wi-Fi networks
+                // (captive portals, offline IoT/local networks) never satisfy that, so the
+                // callback would otherwise never fire for them.
+                .removeCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                .build()
         try {
             manager.registerNetworkCallback(request, networkCallback)
         } catch (e: Exception) {
@@ -86,12 +92,13 @@ class WifiModule : AutomationModule {
     private fun currentWifiSsid(): String? {
         val wifiManager =
             appContext?.getSystemService(Context.WIFI_SERVICE) as? WifiManager ?: return null
-        val ssid = try {
-            wifiManager.connectionInfo?.ssid
-        } catch (e: Exception) {
-            Log.w(ID, "Failed to read current SSID", e)
-            null
-        }
+        val ssid =
+            try {
+                wifiManager.connectionInfo?.ssid
+            } catch (e: Exception) {
+                Log.w(ID, "Failed to read current SSID", e)
+                null
+            }
         if (ssid.isNullOrEmpty() || ssid == UNKNOWN_SSID) return null
         return ssid.removeSurrounding("\"")
     }
@@ -114,7 +121,8 @@ class WifiModule : AutomationModule {
     private fun handleTrigger(matches: (Trigger) -> Boolean) {
         val context = appContext ?: return
         scope.launch {
-            automations.filter { it.type == Automation.Type.TRIGGER && it.trigger?.let(matches) == true }
+            automations
+                .filter { it.type == Automation.Type.TRIGGER && it.trigger?.let(matches) == true }
                 .forEach { automation ->
                     automation.actions.forEach { action ->
                         CombinedActionExecutor.execute(context, action)

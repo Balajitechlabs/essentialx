@@ -32,7 +32,7 @@ fun SegmentedDropdownMenu(
     modifier: Modifier = Modifier,
     offset: DpOffset = DpOffset(0.dp, 0.dp),
     containerColor: Color = Color.Transparent,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     DropdownMenu(
         expanded = expanded,
@@ -41,12 +41,12 @@ fun SegmentedDropdownMenu(
         offset = offset,
         containerColor = containerColor,
         tonalElevation = 0.dp,
-        shadowElevation = 0.dp
+        shadowElevation = 0.dp,
     ) {
         RoundedCardContainer(
             cornerRadius = 16.dp,
             spacing = 2.dp,
-            content = content
+            content = content,
         )
     }
 }
@@ -60,31 +60,34 @@ fun SegmentedDropdownMenuItem(
     trailingIcon: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     itemContainerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    colors: MenuItemColors = MenuDefaults.itemColors(
-        textColor = MaterialTheme.colorScheme.onSurface,
-        leadingIconColor = MaterialTheme.colorScheme.onSurface,
-        trailingIconColor = MaterialTheme.colorScheme.onSurface,
-        disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
-    )
+    colors: MenuItemColors =
+        MenuDefaults.itemColors(
+            textColor = MaterialTheme.colorScheme.onSurface,
+            leadingIconColor = MaterialTheme.colorScheme.onSurface,
+            trailingIconColor = MaterialTheme.colorScheme.onSurface,
+            disabledTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+        ),
 ) {
     val view = androidx.compose.ui.platform.LocalView.current
     val dismiss = LocalDropdownMenuDismiss.current
     DropdownMenuItem(
         text = text,
         onClick = {
-            com.sameerasw.essentials.utils.HapticUtil.performUIHaptic(view)
+            com.sameerasw.essentials.utils.HapticUtil
+                .performUIHaptic(view)
             onClick()
             dismiss?.invoke()
         },
-        modifier = modifier
-            .clip(MaterialTheme.shapes.extraSmall)
-            .background(itemContainerColor),
+        modifier =
+            modifier
+                .clip(MaterialTheme.shapes.extraSmall)
+                .background(itemContainerColor),
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         enabled = enabled,
-        colors = colors
+        colors = colors,
     )
 }
 

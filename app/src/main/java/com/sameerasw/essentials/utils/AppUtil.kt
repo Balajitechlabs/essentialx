@@ -46,34 +46,38 @@ object AppUtil {
                 val pm = context.packageManager
 
                 // Get all installed applications
-                val allApps = pm.getInstalledApplications(0)
-                    .filter { appInfo ->
-                        // Filter out our own app
-                        !appInfo.packageName.contains("essentials")
+                val allApps =
+                    pm
+                        .getInstalledApplications(0)
+                        .filter { appInfo ->
+                            // Filter out our own app
+                            !appInfo.packageName.contains("essentials")
+                        }
+
+                val apps =
+                    allApps.mapNotNull { appInfo ->
+                        try {
+                            // More accurate system app detection
+                            val flags = appInfo.flags
+                            val isSystemApp =
+                                (flags and ApplicationInfo.FLAG_SYSTEM) != 0 &&
+                                    (flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0
+
+                            val app =
+                                NotificationApp(
+                                    packageName = appInfo.packageName,
+                                    appName = pm.getApplicationLabel(appInfo).toString(),
+                                    isEnabled = false,
+                                    icon = getLowQualityIcon(context, appInfo.packageName).asImageBitmap(),
+                                    isSystemApp = isSystemApp,
+                                    lastUpdated = System.currentTimeMillis(),
+                                )
+                            app
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Error loading app ${appInfo.packageName}: ${e.message}")
+                            null
+                        }
                     }
-
-                val apps = allApps.mapNotNull { appInfo ->
-                    try {
-                        // More accurate system app detection
-                        val flags = appInfo.flags
-                        val isSystemApp = (flags and ApplicationInfo.FLAG_SYSTEM) != 0 &&
-                                (flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0
-
-                        val app = NotificationApp(
-                            packageName = appInfo.packageName,
-                            appName = pm.getApplicationLabel(appInfo).toString(),
-                            isEnabled = false,
-                            icon = getLowQualityIcon(context, appInfo.packageName).asImageBitmap(),
-                            isSystemApp = isSystemApp,
-                            lastUpdated = System.currentTimeMillis()
-                        )
-                        app
-                    } catch (e: Exception) {
-                        Log.w(TAG, "Error loading app ${appInfo.packageName}: ${e.message}")
-                        null
-                    }
-                }
-
 
                 // Log some examples
                 apps.filter { !it.isSystemApp }.take(5).map { it.appName }
@@ -91,36 +95,39 @@ object AppUtil {
      */
     suspend fun getAppsByPackageNames(
         context: Context,
-        packageNames: List<String>
-    ): List<NotificationApp> = withContext(Dispatchers.IO) {
-        try {
-            val pm = context.packageManager
-            val apps = packageNames.mapNotNull { packageName ->
-                try {
-                    val appInfo = pm.getApplicationInfo(packageName, 0)
-                    val flags = appInfo.flags
-                    val isSystemApp = (flags and ApplicationInfo.FLAG_SYSTEM) != 0 &&
-                            (flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0
+        packageNames: List<String>,
+    ): List<NotificationApp> =
+        withContext(Dispatchers.IO) {
+            try {
+                val pm = context.packageManager
+                val apps =
+                    packageNames.mapNotNull { packageName ->
+                        try {
+                            val appInfo = pm.getApplicationInfo(packageName, 0)
+                            val flags = appInfo.flags
+                            val isSystemApp =
+                                (flags and ApplicationInfo.FLAG_SYSTEM) != 0 &&
+                                    (flags and ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) == 0
 
-                    NotificationApp(
-                        packageName = appInfo.packageName,
-                        appName = pm.getApplicationLabel(appInfo).toString(),
-                        isEnabled = false,
-                        icon = getLowQualityIcon(context, packageName).asImageBitmap(),
-                        isSystemApp = isSystemApp,
-                        lastUpdated = System.currentTimeMillis()
-                    )
-                } catch (e: Exception) {
-                    Log.w(TAG, "Error loading app $packageName: ${e.message}")
-                    null
-                }
+                            NotificationApp(
+                                packageName = appInfo.packageName,
+                                appName = pm.getApplicationLabel(appInfo).toString(),
+                                isEnabled = false,
+                                icon = getLowQualityIcon(context, packageName).asImageBitmap(),
+                                isSystemApp = isSystemApp,
+                                lastUpdated = System.currentTimeMillis(),
+                            )
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Error loading app $packageName: ${e.message}")
+                            null
+                        }
+                    }
+                apps.sortedBy { it.appName.lowercase() }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error getting apps by package name: ${e.message}")
+                emptyList()
             }
-            apps.sortedBy { it.appName.lowercase() }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error getting apps by package name: ${e.message}")
-            emptyList()
         }
-    }
 
     /**
      * Merge installed apps with saved app selections, keeping user settings and adding new apps
@@ -128,21 +135,26 @@ object AppUtil {
     fun mergeWithSavedApps(
         installedApps: List<NotificationApp>,
         savedSelections: List<AppSelection>,
-        defaultEnabled: Boolean = false
+        defaultEnabled: Boolean = false,
     ): List<NotificationApp> {
         val savedSelectionsMap = savedSelections.associateBy { it.packageName }
 
-        return installedApps.map { installedApp ->
-            val savedSelection = savedSelectionsMap[installedApp.packageName]
-            installedApp.copy(isEnabled = savedSelection?.isEnabled ?: defaultEnabled)
-        }.sortedBy { it.appName.lowercase() }
+        return installedApps
+            .map { installedApp ->
+                val savedSelection = savedSelectionsMap[installedApp.packageName]
+                installedApp.copy(isEnabled = savedSelection?.isEnabled ?: defaultEnabled)
+            }.sortedBy { it.appName.lowercase() }
     }
 
     /**
      * Extracts the brand color from an app's icon using the Palette API.
      * Uses internal cache for efficiency.
      */
-    fun getAppBrandColor(context: Context, packageName: String, callback: (Int) -> Unit) {
+    fun getAppBrandColor(
+        context: Context,
+        packageName: String,
+        callback: (Int) -> Unit,
+    ) {
         // Check cache first
         colorCache[packageName]?.let {
             callback(it)
@@ -156,9 +168,10 @@ object AppUtil {
 
             // Generate palette asynchronously
             Palette.from(bitmap).generate { palette ->
-                val color = palette?.getVibrantColor(Color.TRANSPARENT)
-                    ?: palette?.getDominantColor(Color.GRAY)
-                    ?: Color.GRAY
+                val color =
+                    palette?.getVibrantColor(Color.TRANSPARENT)
+                        ?: palette?.getDominantColor(Color.GRAY)
+                        ?: Color.GRAY
 
                 // Cache the result
                 colorCache[packageName] = color
@@ -173,34 +186,39 @@ object AppUtil {
     /**
      * Helper to load and scale an app icon to a lower resolution for better performance.
      */
-    private fun getLowQualityIcon(context: Context, packageName: String): Bitmap {
+    private fun getLowQualityIcon(
+        context: Context,
+        packageName: String,
+    ): Bitmap {
         // Check cache first
         iconCache[packageName]?.let { return it }
 
-        val drawable = try {
-            context.packageManager.getApplicationIcon(packageName)
-        } catch (e: Exception) {
-            context.packageManager.defaultActivityIcon
-        }
+        val drawable =
+            try {
+                context.packageManager.getApplicationIcon(packageName)
+            } catch (e: Exception) {
+                context.packageManager.defaultActivityIcon
+            }
 
-        val bitmap = when (drawable) {
-            is BitmapDrawable -> {
-                val b = drawable.bitmap
-                if (b.width > ICON_SIZE || b.height > ICON_SIZE) {
-                    Bitmap.createScaledBitmap(b, ICON_SIZE, ICON_SIZE, true)
-                } else {
-                    b
+        val bitmap =
+            when (drawable) {
+                is BitmapDrawable -> {
+                    val b = drawable.bitmap
+                    if (b.width > ICON_SIZE || b.height > ICON_SIZE) {
+                        Bitmap.createScaledBitmap(b, ICON_SIZE, ICON_SIZE, true)
+                    } else {
+                        b
+                    }
+                }
+
+                else -> {
+                    val bmp = createBitmap(ICON_SIZE, ICON_SIZE)
+                    val canvas = Canvas(bmp)
+                    drawable.setBounds(0, 0, ICON_SIZE, ICON_SIZE)
+                    drawable.draw(canvas)
+                    bmp
                 }
             }
-
-            else -> {
-                val bmp = createBitmap(ICON_SIZE, ICON_SIZE)
-                val canvas = Canvas(bmp)
-                drawable.setBounds(0, 0, ICON_SIZE, ICON_SIZE)
-                drawable.draw(canvas)
-                bmp
-            }
-        }
 
         // Cache the result
         iconCache[packageName] = bitmap
@@ -214,7 +232,10 @@ object AppUtil {
      * @param size [Int?] Target size.
      * @return The resulting Bitmap data.
      */
-    fun drawableToBitmap(drawable: android.graphics.drawable.Drawable, size: Int? = null): Bitmap {
+    fun drawableToBitmap(
+        drawable: android.graphics.drawable.Drawable,
+        size: Int? = null,
+    ): Bitmap {
         if (drawable is BitmapDrawable && size == null) {
             return drawable.bitmap
         }
@@ -222,11 +243,12 @@ object AppUtil {
         val width = size ?: drawable.intrinsicWidth.coerceAtLeast(1)
         val height = size ?: drawable.intrinsicHeight.coerceAtLeast(1)
 
-        val bitmap = Bitmap.createBitmap(
-            width,
-            height,
-            Bitmap.Config.ARGB_8888
-        )
+        val bitmap =
+            Bitmap.createBitmap(
+                width,
+                height,
+                Bitmap.Config.ARGB_8888,
+            )
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, width, height)
         drawable.draw(canvas)
@@ -236,12 +258,16 @@ object AppUtil {
     /**
      * Get a properly sized icon for shortcuts
      */
-    fun getShortcutIcon(context: Context, packageName: String): Bitmap {
-        val drawable = try {
-            context.packageManager.getApplicationIcon(packageName)
-        } catch (e: Exception) {
-            context.packageManager.defaultActivityIcon
-        }
+    fun getShortcutIcon(
+        context: Context,
+        packageName: String,
+    ): Bitmap {
+        val drawable =
+            try {
+                context.packageManager.getApplicationIcon(packageName)
+            } catch (e: Exception) {
+                context.packageManager.defaultActivityIcon
+            }
         return drawableToBitmap(drawable, SHORTCUT_ICON_SIZE)
     }
 
@@ -252,14 +278,16 @@ object AppUtil {
      * @param packageName [String] Target package name.
      * @return The resulting String? data.
      */
-    fun getAppVersion(context: Context, packageName: String): String? {
-        return try {
+    fun getAppVersion(
+        context: Context,
+        packageName: String,
+    ): String? =
+        try {
             val pInfo = context.packageManager.getPackageInfo(packageName, 0)
             pInfo.versionName
         } catch (e: Exception) {
             null
         }
-    }
 
     /**
      * Checks if the device is currently in Car Mode or projecting Android Auto
@@ -272,7 +300,11 @@ object AppUtil {
 
         // 2. Check Configuration
         val config = context.resources.configuration
-        if ((config.uiMode and android.content.res.Configuration.UI_MODE_TYPE_MASK) == android.content.res.Configuration.UI_MODE_TYPE_CAR) return true
+        if ((config.uiMode and android.content.res.Configuration.UI_MODE_TYPE_MASK) ==
+            android.content.res.Configuration.UI_MODE_TYPE_CAR
+        ) {
+            return true
+        }
 
         // 3. Check for Android Auto Projection (Virtual Displays)
         val displayManager =
@@ -292,10 +324,11 @@ object AppUtil {
 
         // 4. Check for active Car packages
         try {
-            val carPackages = listOf(
-                "com.google.android.projection.gearhead",
-                "com.google.android.apps.auto.carservice"
-            )
+            val carPackages =
+                listOf(
+                    "com.google.android.projection.gearhead",
+                    "com.google.android.apps.auto.carservice",
+                )
             val activityManager =
                 context.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager
             val processes = activityManager?.runningAppProcesses

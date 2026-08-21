@@ -29,18 +29,21 @@ object DIYRepository {
     val automations = _automations.asStateFlow()
 
     private var prefs: SharedPreferences? = null
-    private val gson = GsonBuilder()
-        .registerTypeAdapter(Trigger::class.java, SealedAdapter(Trigger::class))
-        .registerTypeAdapter(State::class.java, SealedAdapter(State::class))
-        .registerTypeAdapter(Action::class.java, SealedAdapter(Action::class))
-        .create()
+    private val gson =
+        GsonBuilder()
+            .registerTypeAdapter(Trigger::class.java, SealedAdapter(Trigger::class))
+            .registerTypeAdapter(State::class.java, SealedAdapter(State::class))
+            .registerTypeAdapter(Action::class.java, SealedAdapter(Action::class))
+            .create()
 
-    private class SealedAdapter<T : Any>(private val kClass: KClass<T>) : JsonSerializer<T>,
+    private class SealedAdapter<T : Any>(
+        private val kClass: KClass<T>,
+    ) : JsonSerializer<T>,
         JsonDeserializer<T> {
         override fun serialize(
             src: T,
             typeOfSrc: java.lang.reflect.Type,
-            context: JsonSerializationContext
+            context: JsonSerializationContext,
         ): JsonElement {
             val element = context.serialize(src)
             if (element.isJsonObject) {
@@ -52,7 +55,7 @@ object DIYRepository {
         override fun deserialize(
             json: JsonElement,
             typeOfT: java.lang.reflect.Type,
-            context: JsonDeserializationContext
+            context: JsonDeserializationContext,
         ): T? {
             val typeName = json.asJsonObject.get("type").asString
             val subClass = kClass.sealedSubclasses.firstOrNull { it.simpleName == typeName }
@@ -81,16 +84,17 @@ object DIYRepository {
 
     fun reloadAutomations() {
         val json = prefs?.getString(KEY_AUTOMATIONS, null)
-        val loadedList: List<Automation> = if (json != null) {
-            try {
-                val type = object : com.google.gson.reflect.TypeToken<List<Automation>>() {}.type
-                gson.fromJson(json, type) ?: emptyList()
-            } catch (e: Exception) {
+        val loadedList: List<Automation> =
+            if (json != null) {
+                try {
+                    val type = object : com.google.gson.reflect.TypeToken<List<Automation>>() {}.type
+                    gson.fromJson(json, type) ?: emptyList()
+                } catch (e: Exception) {
+                    emptyList()
+                }
+            } else {
                 emptyList()
             }
-        } else {
-            emptyList()
-        }
         _automations.value = loadedList
         updateActionShortcutLauncherState()
     }
@@ -127,30 +131,30 @@ object DIYRepository {
         updateActionShortcutLauncherState()
     }
 
-    fun getAutomation(id: String): Automation? {
-        return _automations.value.find { it.id == id }
-    }
+    fun getAutomation(id: String): Automation? = _automations.value.find { it.id == id }
 
     private fun updateActionShortcutLauncherState() {
         val context = appContext ?: return
         val showLauncher =
             _automations.value.any { it.type == Automation.Type.ACTION_SHORTCUT && it.isEnabled }
-        val componentName = android.content.ComponentName(
-            context,
-            "com.sameerasw.essentials.ActionShortcutLauncher"
-        )
+        val componentName =
+            android.content.ComponentName(
+                context,
+                "com.sameerasw.essentials.ActionShortcutLauncher",
+            )
         try {
-            val targetState = if (showLauncher) {
-                android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-            } else {
-                android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
-            }
+            val targetState =
+                if (showLauncher) {
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+                }
             val currentState = context.packageManager.getComponentEnabledSetting(componentName)
             if (currentState != targetState) {
                 context.packageManager.setComponentEnabledSetting(
                     componentName,
                     targetState,
-                    android.content.pm.PackageManager.DONT_KILL_APP
+                    android.content.pm.PackageManager.DONT_KILL_APP,
                 )
             }
         } catch (e: Exception) {

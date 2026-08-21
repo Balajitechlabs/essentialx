@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 class FavoritesWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = FavoritesWidget()
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         super.onReceive(context, intent)
 
         val action = intent.action
@@ -42,7 +45,7 @@ class FavoritesWidgetReceiver : GlanceAppWidgetReceiver() {
                     android.util.Log.e(
                         "FavoritesWidget",
                         "Error updating favorites widget on broadcast",
-                        e
+                        e,
                     )
                 }
             }

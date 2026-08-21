@@ -55,7 +55,7 @@ fun CrashReportingPicker(
     selectedMode: String,
     onModeSelected: (String) -> Unit,
     modifier: Modifier = Modifier,
-    iconRes: Int = R.drawable.rounded_bug_report_24
+    iconRes: Int = R.drawable.rounded_bug_report_24,
 ) {
     val view = LocalView.current
     val isTranslationModeActive by TranslationManager.isTranslationModeEnabled
@@ -64,24 +64,29 @@ fun CrashReportingPicker(
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
     val options = listOf("off", "auto")
-    val labels = listOf(
-        R.string.sentry_mode_off,
-        R.string.sentry_mode_auto
-    )
+    val labels =
+        listOf(
+            R.string.sentry_mode_off,
+            R.string.sentry_mode_auto,
+        )
 
-    val onLongClickAction: (() -> Unit)? = if (isTranslationModeActive) {
-        {
-            HapticUtil.performVirtualKeyHaptic(view)
-            showMenu = true
+    val onLongClickAction: (() -> Unit)? =
+        if (isTranslationModeActive) {
+            {
+                HapticUtil.performVirtualKeyHaptic(view)
+                showMenu = true
+            }
+        } else {
+            null
         }
-    } else null
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(MaterialTheme.shapes.extraSmall)
-            .background(MaterialTheme.colorScheme.surfaceBright),
-        verticalArrangement = Arrangement.spacedBy(0.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(MaterialTheme.shapes.extraSmall)
+                .background(MaterialTheme.colorScheme.surfaceBright),
+        verticalArrangement = Arrangement.spacedBy(0.dp),
     ) {
         ListItem(
             onClick = {},
@@ -92,29 +97,31 @@ fun CrashReportingPicker(
                     painter = painterResource(id = iconRes),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             },
-            contentPadding = PaddingValues(
-                horizontal = 16.dp,
-                vertical = 16.dp
-            ),
+            contentPadding =
+                PaddingValues(
+                    horizontal = 16.dp,
+                    vertical = 16.dp,
+                ),
             verticalAlignment = Alignment.CenterVertically,
-            colors = ListItemDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
-            ),
+            colors =
+                ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                ),
             content = {
                 Box {
                     Text(
                         text = stringResource(R.string.sentry_report_mode_title),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
 
                     if (showMenu) {
                         SegmentedDropdownMenu(
                             expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
+                            onDismissRequest = { showMenu = false },
                         ) {
                             TranslationMenuItems(
                                 title = R.string.sentry_report_mode_title,
@@ -122,19 +129,20 @@ fun CrashReportingPicker(
                                 onSelectKey = { key ->
                                     showMenu = false
                                     translationSheetKey = key
-                                }
+                                },
                             )
                         }
                     }
                 }
-            }
+            },
         )
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
         ) {
             options.forEachIndexed { index, option ->
@@ -146,20 +154,22 @@ fun CrashReportingPicker(
                         HapticUtil.performUIHaptic(view)
                         onModeSelected(option)
                     },
-                    modifier = Modifier
-                        .weight(1f)
-                        .semantics { role = Role.RadioButton },
-                    shapes = when {
-                        index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        index == options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .semantics { role = Role.RadioButton },
+                    shapes =
+                        when {
+                            index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            index == options.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
                 ) {
                     Text(
                         text = stringResource(labels[index]),
                         style = MaterialTheme.typography.labelLarge,
                         fontWeight = if (isChecked) FontWeight.Bold else FontWeight.Normal,
-                        maxLines = 1
+                        maxLines = 1,
                     )
                 }
             }
@@ -169,7 +179,7 @@ fun CrashReportingPicker(
     if (translationSheetKey != null) {
         TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

@@ -47,7 +47,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun ShutUpSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightKey: String? = null
+    highlightKey: String? = null,
 ) {
     val context = LocalContext.current
     var isAppSelectionSheetOpen by remember { mutableStateOf(false) }
@@ -56,16 +56,16 @@ fun ShutUpSettingsUI(
     val configs by viewModel.shutUpConfigs
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             ConfigSliderItem(
                 title = stringResource(R.string.shut_up_restore_delay_title),
@@ -75,12 +75,12 @@ fun ShutUpSettingsUI(
                 increment = 1f,
                 valueFormatter = { "${it.toInt()}s" },
                 iconRes = R.drawable.rounded_timer_24,
-                subtitle = stringResource(R.string.shut_up_restore_delay_desc)
+                subtitle = stringResource(R.string.shut_up_restore_delay_desc),
             )
 
             RestoreModePicker(
                 selectedMode = viewModel.shutUpRestoreMode.value,
-                onModeSelected = { viewModel.setShutUpRestoreMode(it) }
+                onModeSelected = { viewModel.setShutUpRestoreMode(it) },
             )
 
             FeatureCard(
@@ -91,37 +91,38 @@ fun ShutUpSettingsUI(
                 showToggle = false,
                 hasMoreSettings = true,
                 onToggle = {},
-                onClick = { isAppSelectionSheetOpen = true }
+                onClick = { isAppSelectionSheetOpen = true },
             )
         }
-
 
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             configs.forEach { config ->
-                val appName = remember(config.packageName) {
-                    try {
-                        val appInfo =
-                            context.packageManager.getApplicationInfo(config.packageName, 0)
-                        context.packageManager.getApplicationLabel(appInfo).toString()
-                    } catch (e: Exception) {
-                        config.packageName
+                val appName =
+                    remember(config.packageName) {
+                        try {
+                            val appInfo =
+                                context.packageManager.getApplicationInfo(config.packageName, 0)
+                            context.packageManager.getApplicationLabel(appInfo).toString()
+                        } catch (e: Exception) {
+                            config.packageName
+                        }
                     }
-                }
 
-                val appIconPainter = remember(config.packageName) {
-                    try {
-                        val drawable = context.packageManager.getApplicationIcon(config.packageName)
-                        androidx.compose.ui.graphics.painter.BitmapPainter(
-                            AppUtil.drawableToBitmap(drawable).asImageBitmap()
-                        )
-                    } catch (e: Exception) {
-                        null
+                val appIconPainter =
+                    remember(config.packageName) {
+                        try {
+                            val drawable = context.packageManager.getApplicationIcon(config.packageName)
+                            androidx.compose.ui.graphics.painter.BitmapPainter(
+                                AppUtil.drawableToBitmap(drawable).asImageBitmap(),
+                            )
+                        } catch (e: Exception) {
+                            null
+                        }
                     }
-                }
 
                 FeatureCard(
                     title = appName,
@@ -136,12 +137,12 @@ fun ShutUpSettingsUI(
                         IconButton(
                             onClick = {
                                 viewModel.createShutUpShortcut(context, config)
-                            }
+                            },
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_add_24),
                                 contentDescription = stringResource(R.string.action_create_shortcut),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                     },
@@ -155,11 +156,11 @@ fun ShutUpSettingsUI(
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_delete_24),
-                                    contentDescription = null
+                                    contentDescription = null,
                                 )
-                            }
+                            },
                         )
-                    }
+                    },
                 )
             }
         }
@@ -168,7 +169,7 @@ fun ShutUpSettingsUI(
             text = stringResource(R.string.shut_up_description),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(16.dp),
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         if (isAppSelectionSheetOpen) {
@@ -177,24 +178,26 @@ fun ShutUpSettingsUI(
                 onLoadApps = { ctx ->
                     viewModel.shutUpConfigs.value.map { AppSelection(it.packageName, true) }
                 },
-                onSaveApps = { ctx, apps -> viewModel.saveShutUpSelectedApps(ctx, apps) }
+                onSaveApps = { ctx, apps -> viewModel.saveShutUpSelectedApps(ctx, apps) },
             )
         }
 
         if (selectedConfigForEditing != null) {
             val frozenApps = remember { viewModel.loadFreezeSelectedApps(context) }
-            val isFrozen = remember(selectedConfigForEditing) {
-                frozenApps.any { it.packageName == selectedConfigForEditing?.packageName }
-            }
+            val isFrozen =
+                remember(selectedConfigForEditing) {
+                    frozenApps.any { it.packageName == selectedConfigForEditing?.packageName }
+                }
 
             ShutUpPerAppSettingsSheet(
                 onDismissRequest = { selectedConfigForEditing = null },
-                config = configs.find { it.packageName == selectedConfigForEditing?.packageName }
-                    ?: selectedConfigForEditing!!,
+                config =
+                    configs.find { it.packageName == selectedConfigForEditing?.packageName }
+                        ?: selectedConfigForEditing!!,
                 onConfigChanged = { viewModel.updateShutUpConfig(it) },
                 onCreateShortcut = { viewModel.createShutUpShortcut(context, it) },
                 isFrozen = isFrozen,
-                viewModel = viewModel
+                viewModel = viewModel,
             )
         }
     }

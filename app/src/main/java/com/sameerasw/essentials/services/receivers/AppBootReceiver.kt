@@ -16,7 +16,10 @@ import android.util.Log
 import com.sameerasw.essentials.utils.ServiceUtils
 
 class AppBootReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
             Log.d("AppBootReceiver", "Device rebooted, starting essential services")
             ServiceUtils.startRequiredServices(context)

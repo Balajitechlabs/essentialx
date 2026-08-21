@@ -14,13 +14,15 @@ import com.sameerasw.essentials.R
 object PermissionRegistry {
     private val registry = mutableMapOf<String, MutableList<Int>>()
 
-    fun register(permissionKey: String, featureTitleRes: Int) {
+    fun register(
+        permissionKey: String,
+        featureTitleRes: Int,
+    ) {
         val list = registry.getOrPut(permissionKey) { mutableListOf() }
         if (!list.contains(featureTitleRes)) list.add(featureTitleRes)
     }
 
-    fun getFeatures(permissionKey: String): List<Int> =
-        registry[permissionKey]?.toList() ?: emptyList()
+    fun getFeatures(permissionKey: String): List<Int> = registry[permissionKey]?.toList() ?: emptyList()
 }
 
 // Register existing dependencies
@@ -41,17 +43,17 @@ fun initPermissionRegistry() {
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_lock_screen_clock_title)
     PermissionRegistry.register(
         "WRITE_SECURE_SETTINGS",
-        R.string.feat_allow_overlays_in_settings_title
+        R.string.feat_allow_overlays_in_settings_title,
     )
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_networks_title)
     PermissionRegistry.register(
         "WRITE_SECURE_SETTINGS",
-        R.string.feat_network_download_rate_limit_title
+        R.string.feat_network_download_rate_limit_title,
     )
     PermissionRegistry.register("WRITE_SECURE_SETTINGS", R.string.feat_mobile_data_always_on_title)
     PermissionRegistry.register(
         "WRITE_SECURE_SETTINGS",
-        R.string.feat_wireless_display_certification_title
+        R.string.feat_wireless_display_certification_title,
     )
 
     // Shizuku permission

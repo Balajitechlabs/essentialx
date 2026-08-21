@@ -55,7 +55,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun SoundModeSettingsSheet(
     initialAction: Action.SoundMode,
     onDismiss: () -> Unit,
-    onSave: (Action.SoundMode) -> Unit
+    onSave: (Action.SoundMode) -> Unit,
 ) {
     val view = LocalView.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -64,54 +64,57 @@ fun SoundModeSettingsSheet(
 
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.diy_action_sound_mode),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             // Info Card
             Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceBright
-                ),
-                shape = RoundedCornerShape(24.dp)
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceBright,
+                    ),
+                shape = RoundedCornerShape(24.dp),
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     val infoTitle = "Sound Mode"
                     Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = ColorUtil.getPastelColorFor(infoTitle),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .size(40.dp)
+                                .background(
+                                    color = ColorUtil.getPastelColorFor(infoTitle),
+                                    shape = CircleShape,
+                                ),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.rounded_info_24),
                             contentDescription = null,
                             tint = ColorUtil.getVibrantColorFor(infoTitle),
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         )
                     }
                     Text(
                         text = stringResource(R.string.diy_sound_mode_desc),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -120,48 +123,50 @@ fun SoundModeSettingsSheet(
             RoundedCardContainer(spacing = 2.dp) {
                 Action.SoundModeType.entries.forEach { mode ->
                     val isSelected = selectedMode == mode
-                    val title = when (mode) {
-                        Action.SoundModeType.SOUND -> stringResource(R.string.sound_mode_sound)
-                        Action.SoundModeType.VIBRATE -> stringResource(R.string.sound_mode_vibrate)
-                        Action.SoundModeType.SILENT -> stringResource(R.string.sound_mode_silent)
-                    }
-                    val icon = when (mode) {
-                        Action.SoundModeType.SOUND -> R.drawable.rounded_volume_up_24
-                        Action.SoundModeType.VIBRATE -> R.drawable.rounded_mobile_vibrate_24
-                        Action.SoundModeType.SILENT -> R.drawable.rounded_volume_off_24
-                    }
+                    val title =
+                        when (mode) {
+                            Action.SoundModeType.SOUND -> stringResource(R.string.sound_mode_sound)
+                            Action.SoundModeType.VIBRATE -> stringResource(R.string.sound_mode_vibrate)
+                            Action.SoundModeType.SILENT -> stringResource(R.string.sound_mode_silent)
+                        }
+                    val icon =
+                        when (mode) {
+                            Action.SoundModeType.SOUND -> R.drawable.rounded_volume_up_24
+                            Action.SoundModeType.VIBRATE -> R.drawable.rounded_mobile_vibrate_24
+                            Action.SoundModeType.SILENT -> R.drawable.rounded_volume_off_24
+                        }
 
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable {
-                                HapticUtil.performUIHaptic(view)
-                                selectedMode = mode
-                            }
-                            .background(MaterialTheme.colorScheme.surfaceBright)
-                            .padding(16.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    HapticUtil.performUIHaptic(view)
+                                    selectedMode = mode
+                                }.background(MaterialTheme.colorScheme.surfaceBright)
+                                .padding(16.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         RadioButton(
                             selected = isSelected,
                             onClick = {
                                 HapticUtil.performUIHaptic(view)
                                 selectedMode = mode
-                            }
+                            },
                         )
                         Icon(
                             painter = painterResource(id = icon),
                             contentDescription = null,
                             modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                         Text(
                             text = title,
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.weight(1f),
-                            color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -170,7 +175,7 @@ fun SoundModeSettingsSheet(
             // Buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Button(
                     onClick = {
@@ -178,15 +183,16 @@ fun SoundModeSettingsSheet(
                         onDismiss()
                     },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceBright,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_close_24),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(stringResource(R.string.action_cancel))
@@ -197,12 +203,12 @@ fun SoundModeSettingsSheet(
                         HapticUtil.performVirtualKeyHaptic(view)
                         onSave(initialAction.copy(mode = selectedMode))
                     },
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_check_24),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.size(8.dp))
                     Text(stringResource(R.string.action_save))

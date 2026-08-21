@@ -53,58 +53,60 @@ private enum class NetworkPermissionModule {
     MOBILE_DATA_ALWAYS_ON,
     WIRELESS_DISPLAY_CERTIFICATION,
     SIM_NAMES,
-    NONE
+    NONE,
 }
 
 @Composable
 fun NetworksSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
     var requestingPermissionFor by remember { mutableStateOf(NetworkPermissionModule.NONE) }
 
-    val presetValues = remember {
-        intArrayOf(
-            -1,         // Disabled
-            16000,      // 128 Kbps
-            32000,      // 256 Kbps
-            64000,      // 512 Kbps
-            125000,     // 1 Mbps
-            250000,     // 2 Mbps
-            625000,     // 5 Mbps
-            1250000,    // 10 Mbps
-            1875000,    // 15 Mbps
-            3125000,    // 25 Mbps
-            6250000,    // 50 Mbps
-            12500000,   // 100 Mbps
-            18750000,   // 150 Mbps
-            25000000,   // 200 Mbps
-            31250000    // 250 Mbps
-        )
-    }
+    val presetValues =
+        remember {
+            intArrayOf(
+                -1, // Disabled
+                16000, // 128 Kbps
+                32000, // 256 Kbps
+                64000, // 512 Kbps
+                125000, // 1 Mbps
+                250000, // 2 Mbps
+                625000, // 5 Mbps
+                1250000, // 10 Mbps
+                1875000, // 15 Mbps
+                3125000, // 25 Mbps
+                6250000, // 50 Mbps
+                12500000, // 100 Mbps
+                18750000, // 150 Mbps
+                25000000, // 200 Mbps
+                31250000, // 250 Mbps
+            )
+        }
     val disabledLabel = stringResource(R.string.rate_limit_disabled)
-    val presetLabels = remember(disabledLabel) {
-        listOf(
-            disabledLabel,
-            "128 Kbps",
-            "256 Kbps",
-            "512 Kbps",
-            "1 Mbps",
-            "2 Mbps",
-            "5 Mbps",
-            "10 Mbps",
-            "15 Mbps",
-            "25 Mbps",
-            "50 Mbps",
-            "100 Mbps",
-            "150 Mbps",
-            "200 Mbps",
-            "250 Mbps"
-        )
-    }
+    val presetLabels =
+        remember(disabledLabel) {
+            listOf(
+                disabledLabel,
+                "128 Kbps",
+                "256 Kbps",
+                "512 Kbps",
+                "1 Mbps",
+                "2 Mbps",
+                "5 Mbps",
+                "10 Mbps",
+                "15 Mbps",
+                "25 Mbps",
+                "50 Mbps",
+                "100 Mbps",
+                "150 Mbps",
+                "200 Mbps",
+                "250 Mbps",
+            )
+        }
 
     val isShizukuAvailable = viewModel.isShizukuAvailable.value
     val isShizukuGranted = viewModel.isShizukuPermissionGranted.value
@@ -120,107 +122,132 @@ fun NetworksSettingsUI(
 
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.refreshNetworksState(context)
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    viewModel.refreshNetworksState(context)
+                }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
-    val hasReadPhoneState = ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.READ_PHONE_STATE
-    ) == PackageManager.PERMISSION_GRANTED
+    val hasReadPhoneState =
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_PHONE_STATE,
+        ) == PackageManager.PERMISSION_GRANTED
     val hasSimNamesPermission = isShellGranted && hasReadPhoneState
 
     var showSimNamesSheet by remember { mutableStateOf(false) }
 
     if (showSimNamesSheet) {
         SimNamesBottomSheet(
-            onDismissRequest = { showSimNamesSheet = false }
+            onDismissRequest = { showSimNamesSheet = false },
         )
     }
 
     if (requestingPermissionFor != NetworkPermissionModule.NONE) {
         val permissionsList = mutableListOf<PermissionItem>()
 
-        val shizukuPermission = PermissionItem(
-            iconRes = R.drawable.rounded_adb_24,
-            title = if (!isShizukuAvailable) R.string.perm_shizuku_title else R.string.perm_shizuku_grant_title,
-            description = if (!isShizukuAvailable) R.string.perm_shizuku_desc else R.string.perm_shizuku_grant_desc,
-            dependentFeatures = listOf(
-                R.string.feat_network_download_rate_limit_title,
-                R.string.feat_mobile_data_always_on_title,
-                R.string.feat_wireless_display_certification_title,
-                R.string.feat_sim_names_title
-            ),
-            actionLabel = if (!isShizukuAvailable) R.string.perm_shizuku_install_action else if (isShellGranted) R.string.perm_action_granted else R.string.perm_action_grant,
-            action = {
-                if (!isShizukuAvailable) {
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api")
-                    )
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    context.startActivity(intent)
-                } else {
-                    viewModel.requestShizukuPermission()
-                }
-            },
-            isGranted = isShellGranted
-        )
+        val shizukuPermission =
+            PermissionItem(
+                iconRes = R.drawable.rounded_adb_24,
+                title = if (!isShizukuAvailable) R.string.perm_shizuku_title else R.string.perm_shizuku_grant_title,
+                description = if (!isShizukuAvailable) R.string.perm_shizuku_desc else R.string.perm_shizuku_grant_desc,
+                dependentFeatures =
+                    listOf(
+                        R.string.feat_network_download_rate_limit_title,
+                        R.string.feat_mobile_data_always_on_title,
+                        R.string.feat_wireless_display_certification_title,
+                        R.string.feat_sim_names_title,
+                    ),
+                actionLabel =
+                    if (!isShizukuAvailable) {
+                        R.string.perm_shizuku_install_action
+                    } else if (isShellGranted) {
+                        R.string.perm_action_granted
+                    } else {
+                        R.string.perm_action_grant
+                    },
+                action = {
+                    if (!isShizukuAvailable) {
+                        val intent =
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"),
+                            )
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(intent)
+                    } else {
+                        viewModel.requestShizukuPermission()
+                    }
+                },
+                isGranted = isShellGranted,
+            )
         permissionsList.add(shizukuPermission)
 
         if (requestingPermissionFor == NetworkPermissionModule.SIM_NAMES) {
-            val phoneStatePermission = PermissionItem(
-                iconRes = R.drawable.rounded_mobile_vibrate_24,
-                title = R.string.permission_read_phone_state_title,
-                description = R.string.permission_read_phone_state_desc_call_vibrations,
-                dependentFeatures = listOf(R.string.feat_sim_names_title),
-                actionLabel = if (hasReadPhoneState) R.string.perm_action_granted else R.string.perm_action_grant,
-                action = {
-                    (context as? Activity)?.let {
-                        ActivityCompat.requestPermissions(
-                            it,
-                            arrayOf(Manifest.permission.READ_PHONE_STATE),
-                            102
-                        )
-                    }
-                },
-                isGranted = hasReadPhoneState
-            )
+            val phoneStatePermission =
+                PermissionItem(
+                    iconRes = R.drawable.rounded_mobile_vibrate_24,
+                    title = R.string.permission_read_phone_state_title,
+                    description = R.string.permission_read_phone_state_desc_call_vibrations,
+                    dependentFeatures = listOf(R.string.feat_sim_names_title),
+                    actionLabel = if (hasReadPhoneState) R.string.perm_action_granted else R.string.perm_action_grant,
+                    action = {
+                        (context as? Activity)?.let {
+                            ActivityCompat.requestPermissions(
+                                it,
+                                arrayOf(Manifest.permission.READ_PHONE_STATE),
+                                102,
+                            )
+                        }
+                    },
+                    isGranted = hasReadPhoneState,
+                )
             permissionsList.add(phoneStatePermission)
         }
 
         PermissionsBottomSheet(
             onDismissRequest = { requestingPermissionFor = NetworkPermissionModule.NONE },
-            featureTitle = if (requestingPermissionFor == NetworkPermissionModule.SIM_NAMES) R.string.feat_sim_names_title else R.string.feat_networks_title,
-            permissions = permissionsList
+            featureTitle =
+                if (requestingPermissionFor ==
+                    NetworkPermissionModule.SIM_NAMES
+                ) {
+                    R.string.feat_sim_names_title
+                } else {
+                    R.string.feat_networks_title
+                },
+            permissions = permissionsList,
         )
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             val currentRateLimit = viewModel.networkDownloadRateLimit.intValue
-            val currentIndex = remember(currentRateLimit) {
-                val idx = presetValues.indexOf(currentRateLimit)
-                if (idx != -1) idx
-                else presetValues.indices.minByOrNull { kotlin.math.abs(presetValues[it] - currentRateLimit) }
-                    ?: 0
-            }
+            val currentIndex =
+                remember(currentRateLimit) {
+                    val idx = presetValues.indexOf(currentRateLimit)
+                    if (idx != -1) {
+                        idx
+                    } else {
+                        presetValues.indices.minByOrNull { kotlin.math.abs(presetValues[it] - currentRateLimit) }
+                            ?: 0
+                    }
+                }
             var sliderValue by remember(currentIndex) { mutableFloatStateOf(currentIndex.toFloat()) }
 
             ConfigSliderItem(
@@ -248,7 +275,7 @@ fun NetworksSettingsUI(
                 },
                 iconRes = R.drawable.rounded_cell_wifi_24,
                 enabled = true,
-                modifier = Modifier.highlight(highlightSetting == "network_download_rate_limit_slider")
+                modifier = Modifier.highlight(highlightSetting == "network_download_rate_limit_slider"),
             )
 
             IconToggleItem(
@@ -269,7 +296,7 @@ fun NetworksSettingsUI(
                     }
                 },
                 iconRes = R.drawable.rounded_mobile_24,
-                modifier = Modifier.highlight(highlightSetting == "mobile_data_always_on_toggle")
+                modifier = Modifier.highlight(highlightSetting == "mobile_data_always_on_toggle"),
             )
 
             IconToggleItem(
@@ -292,7 +319,7 @@ fun NetworksSettingsUI(
                     }
                 },
                 iconRes = R.drawable.rounded_cast_24,
-                modifier = Modifier.highlight(highlightSetting == "wireless_display_certification_toggle")
+                modifier = Modifier.highlight(highlightSetting == "wireless_display_certification_toggle"),
             )
 
             IconToggleItem(
@@ -307,7 +334,7 @@ fun NetworksSettingsUI(
                         requestingPermissionFor = NetworkPermissionModule.SIM_NAMES
                     }
                 },
-                modifier = Modifier.highlight(highlightSetting == "sim_names_item")
+                modifier = Modifier.highlight(highlightSetting == "sim_names_item"),
             )
         }
     }

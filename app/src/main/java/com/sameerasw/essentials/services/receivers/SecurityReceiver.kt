@@ -17,18 +17,23 @@ import com.sameerasw.essentials.domain.MapsState
 import com.sameerasw.essentials.utils.ShellUtils
 
 class SecurityReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         val settingsRepository = SettingsRepository(context)
-        val isDisableQsEnabled = settingsRepository.getBoolean(
-            SettingsRepository.KEY_SCREEN_LOCKED_SECURITY_ENABLED,
-            false
-        )
+        val isDisableQsEnabled =
+            settingsRepository.getBoolean(
+                SettingsRepository.KEY_SCREEN_LOCKED_SECURITY_ENABLED,
+                false,
+            )
         val isHideSystemIconsEnabled =
             settingsRepository.getBoolean(SettingsRepository.KEY_HIDE_SYSTEM_ICONS, false)
-        val isHideSystemIconsLockedOnlyEnabled = settingsRepository.getBoolean(
-            SettingsRepository.KEY_HIDE_SYSTEM_ICONS_LOCKED_ONLY,
-            false
-        )
+        val isHideSystemIconsLockedOnlyEnabled =
+            settingsRepository.getBoolean(
+                SettingsRepository.KEY_HIDE_SYSTEM_ICONS_LOCKED_ONLY,
+                false,
+            )
 
         when (intent.action) {
             Intent.ACTION_SCREEN_OFF -> {
@@ -36,7 +41,7 @@ class SecurityReceiver : BroadcastReceiver() {
                 if (MapsState.isEnabled && MapsState.hasNavigationNotification) {
                     ShellUtils.runCommand(
                         context,
-                        "am start -n com.google.android.apps.maps/com.google.android.apps.gmm.features.minmode.MinModeActivity"
+                        "am start -n com.google.android.apps.maps/com.google.android.apps.gmm.features.minmode.MinModeActivity",
                     )
                 }
 
@@ -45,7 +50,7 @@ class SecurityReceiver : BroadcastReceiver() {
                     com.sameerasw.essentials.utils.StatusBarManager.requestDisable(
                         context,
                         "DisableQsWhenLocked",
-                        setOf(com.sameerasw.essentials.utils.StatusBarManager.FLAG_QUICK_SETTINGS)
+                        setOf(com.sameerasw.essentials.utils.StatusBarManager.FLAG_QUICK_SETTINGS),
                     )
                 }
 
@@ -54,7 +59,7 @@ class SecurityReceiver : BroadcastReceiver() {
                     com.sameerasw.essentials.utils.StatusBarManager.requestDisable(
                         context,
                         "StatusBarIconAdvancedLocked",
-                        setOf(com.sameerasw.essentials.utils.StatusBarManager.FLAG_SYSTEM_ICONS)
+                        setOf(com.sameerasw.essentials.utils.StatusBarManager.FLAG_SYSTEM_ICONS),
                     )
                 }
             }
@@ -63,11 +68,11 @@ class SecurityReceiver : BroadcastReceiver() {
                 // Restore QS and System Icons on unlock
                 com.sameerasw.essentials.utils.StatusBarManager.requestRestore(
                     context,
-                    "DisableQsWhenLocked"
+                    "DisableQsWhenLocked",
                 )
                 com.sameerasw.essentials.utils.StatusBarManager.requestRestore(
                     context,
-                    "StatusBarIconAdvancedLocked"
+                    "StatusBarIconAdvancedLocked",
                 )
             }
         }

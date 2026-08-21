@@ -21,11 +21,11 @@ data class ExifData(
     val shutterSpeed: String? = null,
     val iso: String? = null,
     val date: String? = null,
-    val focalLength: String? = null
+    val focalLength: String? = null,
 )
 
 class MetadataProvider(
-    private val context: Context
+    private val context: Context,
 ) {
     fun extractExif(uri: Uri): ExifData {
         var inputStream: InputStream? = null
@@ -40,16 +40,21 @@ class MetadataProvider(
                 model = exif.getAttribute(ExifInterface.TAG_MODEL),
                 aperture = exif.getAttribute(ExifInterface.TAG_F_NUMBER)?.let { "f/$it" },
                 shutterSpeed = exif.getAttribute(ExifInterface.TAG_EXPOSURE_TIME)?.let { "${it}s" },
-                iso = exif.getAttribute(ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY)
-                    ?.let { "ISO $it" },
+                iso =
+                    exif
+                        .getAttribute(ExifInterface.TAG_PHOTOGRAPHIC_SENSITIVITY)
+                        ?.let { "ISO $it" },
                 date = exif.getAttribute(ExifInterface.TAG_DATETIME_ORIGINAL),
-                focalLength = exif.getAttributeDouble(ExifInterface.TAG_FOCAL_LENGTH, 0.0).let {
-                    if (it > 0) {
-                        val formatted =
-                            if (it % 1.0 == 0.0) it.toInt().toString() else it.toString()
-                        "${formatted}mm"
-                    } else null
-                }
+                focalLength =
+                    exif.getAttributeDouble(ExifInterface.TAG_FOCAL_LENGTH, 0.0).let {
+                        if (it > 0) {
+                            val formatted =
+                                if (it % 1.0 == 0.0) it.toInt().toString() else it.toString()
+                            "${formatted}mm"
+                        } else {
+                            null
+                        }
+                    },
             )
         } catch (e: Exception) {
             e.printStackTrace()

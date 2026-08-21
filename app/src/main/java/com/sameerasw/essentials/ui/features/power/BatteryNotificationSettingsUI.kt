@@ -28,15 +28,16 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun BatteryNotificationSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightKey: String? = null
+    highlightKey: String? = null,
 ) {
     val context = LocalContext.current
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         RoundedCardContainer {
             IconToggleItem(
@@ -46,15 +47,14 @@ fun BatteryNotificationSettingsUI(
                 isChecked = viewModel.isBatteryNotificationEnabled.value,
                 onCheckedChange = { enabled ->
                     viewModel.setBatteryNotificationEnabled(enabled, context)
-                }
+                },
             )
         }
 
         com.sameerasw.essentials.translation.TranslatableText(
             stringResId = R.string.battery_notification_hint,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
     }
 }
-

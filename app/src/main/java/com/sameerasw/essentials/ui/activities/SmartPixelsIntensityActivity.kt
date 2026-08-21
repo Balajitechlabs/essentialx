@@ -68,7 +68,7 @@ class SmartPixelsIntensityActivity : ComponentActivity() {
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 SmartPixelsIntensityOverlay(
                     viewModel = viewModel,
-                    onDismiss = { finish() }
+                    onDismiss = { finish() },
                 )
             }
         }
@@ -78,7 +78,7 @@ class SmartPixelsIntensityActivity : ComponentActivity() {
 @Composable
 fun SmartPixelsIntensityOverlay(
     viewModel: MainViewModel,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -94,44 +94,47 @@ fun SmartPixelsIntensityOverlay(
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.4f))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onDismiss() },
-        contentAlignment = Alignment.Center
-    ) {
-        Card(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth()
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f))
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null,
-                    enabled = true
-                ) { /* Stop propagation */ },
+                ) { onDismiss() },
+        contentAlignment = Alignment.Center,
+    ) {
+        Card(
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        enabled = true,
+                    ) { /* Stop propagation */ },
             shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.rounded_grain_24),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
 
                 Text(
                     text = stringResource(R.string.smart_pixels_intensity_title),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
 
                 Slider(
@@ -143,17 +146,17 @@ fun SmartPixelsIntensityOverlay(
                             HapticUtil.performSliderHaptic(view)
                         }
                     },
-                    valueRange = 10f..90f
+                    valueRange = 10f..90f,
                 )
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
                     OutlinedButton(
                         onClick = onDismiss,
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.dp),
                     ) {
                         Text(stringResource(R.string.action_done))
                     }
@@ -164,7 +167,7 @@ fun SmartPixelsIntensityOverlay(
                             onDismiss()
                         },
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(16.dp)
+                        shape = RoundedCornerShape(16.dp),
                     ) {
                         Text(stringResource(R.string.action_turn_off))
                     }

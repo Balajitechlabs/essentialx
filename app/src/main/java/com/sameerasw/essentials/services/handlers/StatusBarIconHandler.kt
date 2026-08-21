@@ -32,35 +32,42 @@ import kotlinx.coroutines.launch
 /**
  * Handler for dynamic status bar icon management in the background.
  */
-class StatusBarIconHandler(private val context: Context) {
+class StatusBarIconHandler(
+    private val context: Context,
+) {
     private val scope = CoroutineScope(Dispatchers.Main + Job())
     private var smartDataJob: Job? = null
 
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
-        override fun onAvailable(network: Network) {
-            updateAll()
+    private val networkCallback =
+        object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                updateAll()
+            }
+
+            override fun onLost(network: Network) {
+                updateAll()
+            }
+
+            override fun onCapabilitiesChanged(
+                network: Network,
+                networkCapabilities: NetworkCapabilities,
+            ) {
+                updateAll()
+            }
         }
 
-        override fun onLost(network: Network) {
-            updateAll()
+    private val batteryReceiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context,
+                intent: Intent,
+            ) {
+                updateBatteryPercentage()
+            }
         }
-
-        override fun onCapabilitiesChanged(
-            network: Network,
-            networkCapabilities: NetworkCapabilities
-        ) {
-            updateAll()
-        }
-    }
-
-    private val batteryReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            updateBatteryPercentage()
-        }
-    }
 
     fun register() {
         try {
@@ -70,11 +77,12 @@ class StatusBarIconHandler(private val context: Context) {
             startPollingFallback()
         }
 
-        val filter = IntentFilter().apply {
-            addAction(Intent.ACTION_POWER_CONNECTED)
-            addAction(Intent.ACTION_POWER_DISCONNECTED)
-            addAction(Intent.ACTION_BATTERY_CHANGED)
-        }
+        val filter =
+            IntentFilter().apply {
+                addAction(Intent.ACTION_POWER_CONNECTED)
+                addAction(Intent.ACTION_POWER_DISCONNECTED)
+                addAction(Intent.ACTION_BATTERY_CHANGED)
+            }
         context.registerReceiver(batteryReceiver, filter)
 
         updateAll()
@@ -107,7 +115,10 @@ class StatusBarIconHandler(private val context: Context) {
         }
     }
 
-    private fun updateNetworkIcons(isSmartWiFiEnabled: Boolean, isSmartDataEnabled: Boolean) {
+    private fun updateNetworkIcons(
+        isSmartWiFiEnabled: Boolean,
+        isSmartDataEnabled: Boolean,
+    ) {
         val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
 
         // 1. Get current states
@@ -115,9 +126,11 @@ class StatusBarIconHandler(private val context: Context) {
         val networkType = getCurrentNetworkType()
 
         // 2. Load user preferences for all icons
-        val visibilities = StatusBarIconRegistry.ALL_ICONS.associate { icon ->
-            icon.id to prefs.getBoolean(icon.preferencesKey, icon.defaultVisible)
-        }.toMutableMap()
+        val visibilities =
+            StatusBarIconRegistry.ALL_ICONS
+                .associate { icon ->
+                    icon.id to prefs.getBoolean(icon.preferencesKey, icon.defaultVisible)
+                }.toMutableMap()
 
         // 3. Apply Smart WiFi logic
         if (isSmartWiFiEnabled) {
@@ -127,21 +140,28 @@ class StatusBarIconHandler(private val context: Context) {
 
         // 4. Apply Smart Data logic
         if (isSmartDataEnabled && !(isSmartWiFiEnabled && isWifiConnected)) {
-            val selectedNetworkTypes = prefs.getStringSet(
-                StatusBarIconViewModel.PREF_SELECTED_NETWORK_TYPES,
-                setOf(NetworkType.NETWORK_4G.name, NetworkType.NETWORK_5G.name)
-            )?.map { NetworkType.valueOf(it) }?.toSet() ?: emptySet()
+            val selectedNetworkTypes =
+                prefs
+                    .getStringSet(
+                        StatusBarIconViewModel.PREF_SELECTED_NETWORK_TYPES,
+                        setOf(NetworkType.NETWORK_4G.name, NetworkType.NETWORK_5G.name),
+                    )?.map { NetworkType.valueOf(it) }
+                    ?.toSet() ?: emptySet()
 
-            val shouldHideMobileData = selectedNetworkTypes.contains(networkType) ||
-                    (selectedNetworkTypes.contains(NetworkType.NETWORK_OTHER) &&
+            val shouldHideMobileData =
+                selectedNetworkTypes.contains(networkType) ||
+                    (
+                        selectedNetworkTypes.contains(NetworkType.NETWORK_OTHER) &&
                             !setOf(
                                 NetworkType.NETWORK_5G,
                                 NetworkType.NETWORK_4G,
-                                NetworkType.NETWORK_3G
-                            ).contains(networkType))
+                                NetworkType.NETWORK_3G,
+                            ).contains(networkType)
+                    )
 
             visibilities["mobile_data"] =
-                visibilities["mobile_data"] == true && !shouldHideMobileData
+                visibilities["mobile_data"] == true &&
+                !shouldHideMobileData
         }
 
         // 5. Update system settings
@@ -155,17 +175,22 @@ class StatusBarIconHandler(private val context: Context) {
 
         if (mode != 2) return // Only handle "Charging Only" mode here
 
-        val batteryStatus: Intent? = IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
-            context.registerReceiver(null, ifilter)
-        }
+        val batteryStatus: Intent? =
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED).let { ifilter ->
+                context.registerReceiver(null, ifilter)
+            }
         val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
-        val isCharging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+        val isCharging =
+            status == BatteryManager.BATTERY_STATUS_CHARGING ||
                 status == BatteryManager.BATTERY_STATUS_FULL
 
         updateSettingsValue("status_bar_show_battery_percent", if (isCharging) 1 else 0)
     }
 
-    private fun updateSettingsValue(key: String, value: Int) {
+    private fun updateSettingsValue(
+        key: String,
+        value: Int,
+    ) {
         try {
             Settings.System.putInt(context.contentResolver, key, value)
         } catch (e: Exception) {
@@ -190,8 +215,9 @@ class StatusBarIconHandler(private val context: Context) {
     private fun getCurrentNetworkType(): NetworkType {
         return try {
             val network = connectivityManager.activeNetwork ?: return NetworkType.NETWORK_OTHER
-            val capabilities = connectivityManager.getNetworkCapabilities(network)
-                ?: return NetworkType.NETWORK_OTHER
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(network)
+                    ?: return NetworkType.NETWORK_OTHER
 
             if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
                 return NetworkType.NETWORK_OTHER
@@ -210,13 +236,15 @@ class StatusBarIconHandler(private val context: Context) {
             when (networkType) {
                 TelephonyManager.NETWORK_TYPE_NR -> NetworkType.NETWORK_5G
                 TelephonyManager.NETWORK_TYPE_LTE,
-                TelephonyManager.NETWORK_TYPE_HSPAP -> NetworkType.NETWORK_4G
+                TelephonyManager.NETWORK_TYPE_HSPAP,
+                -> NetworkType.NETWORK_4G
 
                 TelephonyManager.NETWORK_TYPE_HSDPA,
                 TelephonyManager.NETWORK_TYPE_HSUPA,
                 TelephonyManager.NETWORK_TYPE_HSPA,
                 TelephonyManager.NETWORK_TYPE_UMTS,
-                TelephonyManager.NETWORK_TYPE_TD_SCDMA -> NetworkType.NETWORK_3G
+                TelephonyManager.NETWORK_TYPE_TD_SCDMA,
+                -> NetworkType.NETWORK_3G
 
                 else -> NetworkType.NETWORK_OTHER
             }
@@ -227,11 +255,12 @@ class StatusBarIconHandler(private val context: Context) {
 
     private fun startPollingFallback() {
         smartDataJob?.cancel()
-        smartDataJob = scope.launch {
-            while (true) {
-                updateAll()
-                delay(10000)
+        smartDataJob =
+            scope.launch {
+                while (true) {
+                    updateAll()
+                    delay(10000)
+                }
             }
-        }
     }
 }

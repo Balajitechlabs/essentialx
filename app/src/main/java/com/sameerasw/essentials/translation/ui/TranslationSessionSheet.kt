@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TranslationSessionSheet(
     onDismissRequest: () -> Unit,
-    onNeedLogin: () -> Unit
+    onNeedLogin: () -> Unit,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
@@ -87,30 +87,31 @@ fun TranslationSessionSheet(
             onDismissRequest()
         },
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column {
                     Text(
                         text = stringResource(R.string.settings_translated_texts),
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
                         text = "${edits.size} edit(s)",
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 
@@ -123,7 +124,7 @@ fun TranslationSessionSheet(
                             TranslationManager.discardSession()
                             edits.clear()
                             onDismissRequest()
-                        }
+                        },
                     ) {
                         Text(stringResource(R.string.translation_discard))
                     }
@@ -147,42 +148,44 @@ fun TranslationSessionSheet(
                                     "Automated translation submission from Essentials app.\n\n```json\n$jsonPayload\n```"
                                 Log.d(
                                     "TranslationSessionSheet",
-                                    "Posting submission comment for user: ${currentUser.login}"
+                                    "Posting submission comment for user: ${currentUser.login}",
                                 )
-                                val success = gitHubRepository.addDiscussionComment(
-                                    token = token,
-                                    owner = "sameerasw",
-                                    repo = "essentials",
-                                    discussionNumber = 601,
-                                    body = commentBody
-                                )
+                                val success =
+                                    gitHubRepository.addDiscussionComment(
+                                        token = token,
+                                        owner = "sameerasw",
+                                        repo = "essentials",
+                                        discussionNumber = 601,
+                                        body = commentBody,
+                                    )
                                 isSubmitting = false
                                 if (success) {
                                     Log.d(
                                         "TranslationSessionSheet",
-                                        "Discussion comment posted successfully"
+                                        "Discussion comment posted successfully",
                                     )
                                     successSubmitted = true
                                     TranslationManager.discardSession()
                                 } else {
                                     Log.e(
                                         "TranslationSessionSheet",
-                                        "Posting discussion comment failed"
+                                        "Posting discussion comment failed",
                                     )
                                     errorMessage =
                                         context.getString(R.string.translation_submit_error)
                                 }
                             }
                         },
-                        enabled = !isSubmitting && edits.isNotEmpty() && !successSubmitted
+                        enabled = !isSubmitting && edits.isNotEmpty() && !successSubmitted,
                     ) {
                         if (isSubmitting) {
                             CircularProgressIndicator(
-                                modifier = Modifier
-                                    .height(16.dp)
-                                    .width(16.dp),
+                                modifier =
+                                    Modifier
+                                        .height(16.dp)
+                                        .width(16.dp),
                                 strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.onPrimary
+                                color = MaterialTheme.colorScheme.onPrimary,
                             )
                         } else {
                             Text(stringResource(R.string.translation_submit))
@@ -195,7 +198,7 @@ fun TranslationSessionSheet(
                 Text(
                     text = errorMessage!!,
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
 
@@ -204,7 +207,7 @@ fun TranslationSessionSheet(
                     text = stringResource(R.string.translation_submitted),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             }
 
@@ -212,11 +215,11 @@ fun TranslationSessionSheet(
             if (edits.isNotEmpty()) {
                 RoundedCardContainer {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
+                        verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         items(
                             items = edits,
-                            key = { "${it.key}_${it.locale}" }
+                            key = { "${it.key}_${it.locale}" },
                         ) { edit ->
                             ListItem(
                                 headlineContent = {
@@ -224,7 +227,7 @@ fun TranslationSessionSheet(
                                         text = "Key: ${edit.key} (${edit.locale.uppercase()})",
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
                                     )
                                 },
                                 supportingContent = {
@@ -232,37 +235,40 @@ fun TranslationSessionSheet(
                                         Text(
                                             text = "Original: ${edit.originalValue}",
                                             style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         )
                                         Text(
                                             text = "New: ${edit.newValue}",
                                             style = MaterialTheme.typography.bodyMedium,
                                             fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onSurface
+                                            color = MaterialTheme.colorScheme.onSurface,
                                         )
                                     }
                                 },
-                                trailingContent = if (!successSubmitted) {
-                                    {
-                                        IconButton(
-                                            onClick = {
-                                                HapticUtil.performUIHaptic(view)
-                                                TranslationManager.removeEdit(edit.key, edit.locale)
-                                                edits.remove(edit)
+                                trailingContent =
+                                    if (!successSubmitted) {
+                                        {
+                                            IconButton(
+                                                onClick = {
+                                                    HapticUtil.performUIHaptic(view)
+                                                    TranslationManager.removeEdit(edit.key, edit.locale)
+                                                    edits.remove(edit)
+                                                },
+                                            ) {
+                                                Icon(
+                                                    painter = painterResource(R.drawable.rounded_delete_24),
+                                                    contentDescription = "Remove edit",
+                                                    tint = MaterialTheme.colorScheme.error,
+                                                )
                                             }
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(R.drawable.rounded_delete_24),
-                                                contentDescription = "Remove edit",
-                                                tint = MaterialTheme.colorScheme.error
-                                            )
                                         }
-                                    }
-                                } else null,
-
-                                modifier = Modifier
-                                    .clip(MaterialTheme.shapes.extraSmall)
-                                    .background(color = MaterialTheme.colorScheme.surfaceBright)
+                                    } else {
+                                        null
+                                    },
+                                modifier =
+                                    Modifier
+                                        .clip(MaterialTheme.shapes.extraSmall)
+                                        .background(color = MaterialTheme.colorScheme.surfaceBright),
                             )
                         }
                     }
@@ -272,7 +278,7 @@ fun TranslationSessionSheet(
                     text = "No pending edits",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 24.dp)
+                    modifier = Modifier.padding(bottom = 24.dp),
                 )
             }
         }

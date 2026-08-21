@@ -31,28 +31,31 @@ import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
 
 object CombinedActionExecutor {
-
-    suspend fun execute(context: Context, action: Action) {
+    suspend fun execute(
+        context: Context,
+        action: Action,
+    ) {
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
             when (action) {
                 is Action.TurnOnLowPower -> setLowPowerMode(context, true)
                 is Action.TurnOffLowPower -> setLowPowerMode(context, false)
                 is Action.HapticVibration -> {
-                    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        val manager =
-                            context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
-                        manager.defaultVibrator
-                    } else {
-                        @Suppress("DEPRECATION")
-                        context.getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
-                    }
+                    val vibrator =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            val manager =
+                                context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
+                            manager.defaultVibrator
+                        } else {
+                            @Suppress("DEPRECATION")
+                            context.getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+                        }
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         vibrator.vibrate(
                             android.os.VibrationEffect.createOneShot(
                                 50,
-                                android.os.VibrationEffect.DEFAULT_AMPLITUDE
-                            )
+                                android.os.VibrationEffect.DEFAULT_AMPLITUDE,
+                            ),
                         )
                     } else {
                         @Suppress("DEPRECATION")
@@ -67,18 +70,23 @@ object CombinedActionExecutor {
                         context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
                     try {
                         camManager.cameraIdList[0]
-                        camManager.registerTorchCallback(object : CameraManager.TorchCallback() {
-                            override fun onTorchModeChanged(cameraId: String, enabled: Boolean) {
-                                super.onTorchModeChanged(cameraId, enabled)
-                                camManager.unregisterTorchCallback(this)
-                                try {
-                                    camManager.setTorchMode(cameraId, !enabled)
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
+                        camManager.registerTorchCallback(
+                            object : CameraManager.TorchCallback() {
+                                override fun onTorchModeChanged(
+                                    cameraId: String,
+                                    enabled: Boolean,
+                                ) {
+                                    super.onTorchModeChanged(cameraId, enabled)
+                                    camManager.unregisterTorchCallback(this)
+                                    try {
+                                        camManager.setTorchMode(cameraId, !enabled)
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
                                 }
-                            }
-                        }, null)
-
+                            },
+                            null,
+                        )
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -87,7 +95,7 @@ object CombinedActionExecutor {
                 is Action.DimWallpaper -> {
                     com.sameerasw.essentials.utils.ShellUtils.runCommand(
                         context,
-                        "cmd wallpaper set-dim-amount ${action.dimAmount}"
+                        "cmd wallpaper set-dim-amount ${action.dimAmount}",
                     )
                 }
 
@@ -99,21 +107,24 @@ object CombinedActionExecutor {
                             try {
                                 if (action.enabled) {
                                     // ENABLE/UPDATE EFFECTS
-                                    val effectsBuilder = try {
-                                        android.service.notification.ZenDeviceEffects.Builder()
-                                    } catch (e: NoSuchMethodError) {
+                                    val effectsBuilder =
                                         try {
-                                            val constructor =
-                                                android.service.notification.ZenDeviceEffects.Builder::class.java.getConstructor(
-                                                    android.service.notification.ZenDeviceEffects::class.java
-                                                )
-                                            constructor.newInstance(null)
-                                        } catch (refE: Exception) {
-                                            null
-                                        }
-                                    } ?: return@withContext
+                                            android.service.notification.ZenDeviceEffects
+                                                .Builder()
+                                        } catch (e: NoSuchMethodError) {
+                                            try {
+                                                val constructor =
+                                                    android.service.notification.ZenDeviceEffects.Builder::class.java.getConstructor(
+                                                        android.service.notification.ZenDeviceEffects::class.java,
+                                                    )
+                                                constructor.newInstance(null)
+                                            } catch (refE: Exception) {
+                                                null
+                                            }
+                                        } ?: return@withContext
 
-                                    effectsBuilder.setShouldDisplayGrayscale(action.grayscale)
+                                    effectsBuilder
+                                        .setShouldDisplayGrayscale(action.grayscale)
                                         .setShouldSuppressAmbientDisplay(action.suppressAmbient)
                                         .setShouldDimWallpaper(action.dimWallpaper)
                                         .setShouldUseNightMode(action.nightMode)
@@ -124,33 +135,40 @@ object CombinedActionExecutor {
                                     val existingRule =
                                         nm.automaticZenRules.values.find { it.name == "Essentials Focus" }
                                     val ruleKey =
-                                        existingRule?.let { nm.automaticZenRules.entries.find { entry -> entry.value == it }?.key }
+                                        existingRule?.let {
+                                            nm.automaticZenRules.entries
+                                                .find { entry -> entry.value == it }
+                                                ?.key
+                                        }
 
-                                    val componentName = android.content.ComponentName(
-                                        context,
-                                        com.sameerasw.essentials.services.EssentialsConditionProvider::class.java
-                                    )
+                                    val componentName =
+                                        android.content.ComponentName(
+                                            context,
+                                            com.sameerasw.essentials.services.EssentialsConditionProvider::class.java,
+                                        )
                                     val conditionUri =
                                         com.sameerasw.essentials.services.EssentialsConditionProvider.CONDITION_URI
 
-                                    val ruleBuilder = android.app.AutomaticZenRule.Builder(
-                                        "Essentials Focus",
-                                        conditionUri
-                                    )
-                                        .setOwner(componentName)
-                                        .setDeviceEffects(effects)
-                                        .setInterruptionFilter(android.app.NotificationManager.INTERRUPTION_FILTER_PRIORITY)
-                                        .setZenPolicy(
-                                            android.service.notification.ZenPolicy.Builder()
-                                                .allowAlarms(true).build()
-                                        )
-                                        .setConditionId(conditionUri)
-                                        .setConfigurationActivity(
-                                            android.content.ComponentName(
-                                                context,
-                                                com.sameerasw.essentials.MainActivity::class.java
+                                    val ruleBuilder =
+                                        android.app.AutomaticZenRule
+                                            .Builder(
+                                                "Essentials Focus",
+                                                conditionUri,
+                                            ).setOwner(componentName)
+                                            .setDeviceEffects(effects)
+                                            .setInterruptionFilter(android.app.NotificationManager.INTERRUPTION_FILTER_PRIORITY)
+                                            .setZenPolicy(
+                                                android.service.notification.ZenPolicy
+                                                    .Builder()
+                                                    .allowAlarms(true)
+                                                    .build(),
+                                            ).setConditionId(conditionUri)
+                                            .setConfigurationActivity(
+                                                android.content.ComponentName(
+                                                    context,
+                                                    com.sameerasw.essentials.MainActivity::class.java,
+                                                ),
                                             )
-                                        )
 
                                     if (ruleKey != null) {
                                         nm.updateAutomaticZenRule(ruleKey, ruleBuilder.build())
@@ -161,14 +179,13 @@ object CombinedActionExecutor {
                                     // Trigger the condition to be TRUE
                                     com.sameerasw.essentials.services.EssentialsConditionProvider.setConditionState(
                                         context,
-                                        true
+                                        true,
                                     )
 
                                     android.util.Log.d(
                                         "DeviceEffects",
-                                        "Updated ZenRule for Device Effects"
+                                        "Updated ZenRule for Device Effects",
                                     )
-
                                 } else {
                                     // DISABLE EFFECTS
                                     val existingRuleEntry =
@@ -181,15 +198,14 @@ object CombinedActionExecutor {
                                     // Also notify condition false just in case
                                     com.sameerasw.essentials.services.EssentialsConditionProvider.setConditionState(
                                         context,
-                                        false
+                                        false,
                                     )
 
                                     android.util.Log.d(
                                         "DeviceEffects",
-                                        "Disabled ZenRule for Device Effects"
+                                        "Disabled ZenRule for Device Effects",
                                     )
                                 }
-
                             } catch (e: Throwable) {
                                 e.printStackTrace()
                             }
@@ -200,11 +216,12 @@ object CombinedActionExecutor {
                 is Action.SoundMode -> {
                     val audioManager =
                         context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                    val ringerMode = when (action.mode) {
-                        Action.SoundModeType.SOUND -> AudioManager.RINGER_MODE_NORMAL
-                        Action.SoundModeType.VIBRATE -> AudioManager.RINGER_MODE_VIBRATE
-                        Action.SoundModeType.SILENT -> AudioManager.RINGER_MODE_SILENT
-                    }
+                    val ringerMode =
+                        when (action.mode) {
+                            Action.SoundModeType.SOUND -> AudioManager.RINGER_MODE_NORMAL
+                            Action.SoundModeType.VIBRATE -> AudioManager.RINGER_MODE_VIBRATE
+                            Action.SoundModeType.SILENT -> AudioManager.RINGER_MODE_SILENT
+                        }
                     try {
                         audioManager.ringerMode = ringerMode
                     } catch (e: Exception) {
@@ -213,14 +230,15 @@ object CombinedActionExecutor {
                 }
 
                 is Action.ScreenOff -> {
-                    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        val manager =
-                            context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
-                        manager.defaultVibrator
-                    } else {
-                        @Suppress("DEPRECATION")
-                        context.getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
-                    }
+                    val vibrator =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            val manager =
+                                context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as android.os.VibratorManager
+                            manager.defaultVibrator
+                        } else {
+                            @Suppress("DEPRECATION")
+                            context.getSystemService(Context.VIBRATOR_SERVICE) as android.os.Vibrator
+                        }
                     if (action.haptic != HapticFeedbackType.NONE) {
                         performHapticFeedback(vibrator, action.haptic)
                     }
@@ -233,14 +251,14 @@ object CombinedActionExecutor {
                     am.dispatchMediaKeyEvent(
                         KeyEvent(
                             KeyEvent.ACTION_DOWN,
-                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
-                        )
+                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+                        ),
                     )
                     am.dispatchMediaKeyEvent(
                         KeyEvent(
                             KeyEvent.ACTION_UP,
-                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
-                        )
+                            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE,
+                        ),
                     )
                 }
 
@@ -249,14 +267,14 @@ object CombinedActionExecutor {
                     am.dispatchMediaKeyEvent(
                         KeyEvent(
                             KeyEvent.ACTION_DOWN,
-                            KeyEvent.KEYCODE_MEDIA_NEXT
-                        )
+                            KeyEvent.KEYCODE_MEDIA_NEXT,
+                        ),
                     )
                     am.dispatchMediaKeyEvent(
                         KeyEvent(
                             KeyEvent.ACTION_UP,
-                            KeyEvent.KEYCODE_MEDIA_NEXT
-                        )
+                            KeyEvent.KEYCODE_MEDIA_NEXT,
+                        ),
                     )
                 }
 
@@ -265,22 +283,23 @@ object CombinedActionExecutor {
                     am.dispatchMediaKeyEvent(
                         KeyEvent(
                             KeyEvent.ACTION_DOWN,
-                            KeyEvent.KEYCODE_MEDIA_PREVIOUS
-                        )
+                            KeyEvent.KEYCODE_MEDIA_PREVIOUS,
+                        ),
                     )
                     am.dispatchMediaKeyEvent(
                         KeyEvent(
                             KeyEvent.ACTION_UP,
-                            KeyEvent.KEYCODE_MEDIA_PREVIOUS
-                        )
+                            KeyEvent.KEYCODE_MEDIA_PREVIOUS,
+                        ),
                     )
                 }
 
                 is Action.AIAssistant -> {
                     try {
-                        val intent = Intent(Intent.ACTION_ASSIST).apply {
-                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                        }
+                        val intent =
+                            Intent(Intent.ACTION_ASSIST).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                            }
                         context.startActivity(intent)
                     } catch (e: Exception) {
                         e.printStackTrace()
@@ -293,11 +312,12 @@ object CombinedActionExecutor {
                         if (serviceInst != null) {
                             serviceInst.performGlobalAction(android.accessibilityservice.AccessibilityService.GLOBAL_ACTION_TAKE_SCREENSHOT)
                         } else {
-                            Toast.makeText(
-                                context,
-                                "Accessibility service is not running",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast
+                                .makeText(
+                                    context,
+                                    "Accessibility service is not running",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                         }
                     }
                 }
@@ -312,35 +332,39 @@ object CombinedActionExecutor {
                         prefs.edit().putInt("last_media_volume", currentVolume).apply()
                         am.setStreamVolume(AudioManager.STREAM_MUSIC, 0, AudioManager.FLAG_SHOW_UI)
                     } else {
-                        val lastVolume = prefs.getInt(
-                            "last_media_volume",
-                            am.getStreamMaxVolume(AudioManager.STREAM_MUSIC) / 2
-                        )
+                        val lastVolume =
+                            prefs.getInt(
+                                "last_media_volume",
+                                am.getStreamMaxVolume(AudioManager.STREAM_MUSIC) / 2,
+                            )
                         am.setStreamVolume(
                             AudioManager.STREAM_MUSIC,
                             lastVolume,
-                            AudioManager.FLAG_SHOW_UI
+                            AudioManager.FLAG_SHOW_UI,
                         )
                     }
                 }
 
                 is Action.SetVolume -> {
                     val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-                    val streamType = when (action.channel) {
-                        Action.VolumeChannel.MUSIC -> AudioManager.STREAM_MUSIC
-                        Action.VolumeChannel.RING -> AudioManager.STREAM_RING
-                        Action.VolumeChannel.ALARM -> AudioManager.STREAM_ALARM
-                        Action.VolumeChannel.CALL -> AudioManager.STREAM_VOICE_CALL
-                        Action.VolumeChannel.NOTIFICATION -> AudioManager.STREAM_NOTIFICATION
-                        Action.VolumeChannel.SYSTEM -> AudioManager.STREAM_SYSTEM
-                    }
+                    val streamType =
+                        when (action.channel) {
+                            Action.VolumeChannel.MUSIC -> AudioManager.STREAM_MUSIC
+                            Action.VolumeChannel.RING -> AudioManager.STREAM_RING
+                            Action.VolumeChannel.ALARM -> AudioManager.STREAM_ALARM
+                            Action.VolumeChannel.CALL -> AudioManager.STREAM_VOICE_CALL
+                            Action.VolumeChannel.NOTIFICATION -> AudioManager.STREAM_NOTIFICATION
+                            Action.VolumeChannel.SYSTEM -> AudioManager.STREAM_SYSTEM
+                        }
                     val max = am.getStreamMaxVolume(streamType)
                     val target = (action.level / 100f * max).toInt().coerceIn(0, max)
                     am.setStreamVolume(streamType, target, AudioManager.FLAG_SHOW_UI)
                 }
 
                 is Action.CycleSoundModes -> {
-                    com.sameerasw.essentials.services.handlers.SoundModeHandler(context).cycleNextMode()
+                    com.sameerasw.essentials.services.handlers
+                        .SoundModeHandler(context)
+                        .cycleNextMode()
                 }
 
                 is Action.ToggleMute -> {
@@ -348,10 +372,12 @@ object CombinedActionExecutor {
                     val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                     if (nm.isNotificationPolicyAccessGranted) {
                         try {
-                            am.ringerMode = if (am.ringerMode == AudioManager.RINGER_MODE_SILENT)
-                                AudioManager.RINGER_MODE_NORMAL
-                            else
-                                AudioManager.RINGER_MODE_SILENT
+                            am.ringerMode =
+                                if (am.ringerMode == AudioManager.RINGER_MODE_SILENT) {
+                                    AudioManager.RINGER_MODE_NORMAL
+                                } else {
+                                    AudioManager.RINGER_MODE_SILENT
+                                }
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
@@ -363,10 +389,12 @@ object CombinedActionExecutor {
                     val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                     if (nm.isNotificationPolicyAccessGranted) {
                         try {
-                            am.ringerMode = if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE)
-                                AudioManager.RINGER_MODE_NORMAL
-                            else
-                                AudioManager.RINGER_MODE_VIBRATE
+                            am.ringerMode =
+                                if (am.ringerMode == AudioManager.RINGER_MODE_VIBRATE) {
+                                    AudioManager.RINGER_MODE_NORMAL
+                                } else {
+                                    AudioManager.RINGER_MODE_VIBRATE
+                                }
                         } catch (e: Exception) {
                             e.printStackTrace()
                         }
@@ -376,13 +404,14 @@ object CombinedActionExecutor {
                 is Action.LikeCurrentSong -> {
                     context.sendBroadcast(
                         Intent("com.sameerasw.essentials.ACTION_LIKE_CURRENT_SONG").setPackage(
-                            context.packageName
-                        )
+                            context.packageName,
+                        ),
                     )
                 }
 
                 is Action.CircleToSearch -> {
-                    com.sameerasw.essentials.utils.OmniTriggerUtil.trigger(context)
+                    com.sameerasw.essentials.utils.OmniTriggerUtil
+                        .trigger(context)
                 }
 
                 is Action.OpenApp -> {
@@ -404,19 +433,20 @@ object CombinedActionExecutor {
 
                 is Action.SometimesEssentials -> {
                     val repository =
-                        com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                        com.sameerasw.essentials.data.repository
+                            .SettingsRepository(context)
 
                     if (action.changeNotificationLighting) {
                         repository.putBoolean(
                             com.sameerasw.essentials.data.repository.SettingsRepository.KEY_EDGE_LIGHTING_ENABLED,
-                            action.notificationLightingEnabled
+                            action.notificationLightingEnabled,
                         )
                     }
 
                     if (action.changeFlashlightPulse) {
                         repository.putBoolean(
                             com.sameerasw.essentials.data.repository.SettingsRepository.KEY_FLASHLIGHT_PULSE_ENABLED,
-                            action.flashlightPulseEnabled
+                            action.flashlightPulseEnabled,
                         )
                     }
 
@@ -427,7 +457,7 @@ object CombinedActionExecutor {
                     if (action.changeSmartPixels) {
                         repository.putBoolean(
                             com.sameerasw.essentials.data.repository.SettingsRepository.KEY_SMART_PIXELS_ENABLED,
-                            action.smartPixelsEnabled
+                            action.smartPixelsEnabled,
                         )
                     }
 
@@ -436,33 +466,33 @@ object CombinedActionExecutor {
                             "Off" -> {
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED,
-                                    false
+                                    false,
                                 )
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE,
-                                    false
+                                    false,
                                 )
                             }
 
                             "On" -> {
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED,
-                                    true
+                                    true,
                                 )
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE,
-                                    false
+                                    false,
                                 )
                             }
 
                             "Docked" -> {
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ENABLED,
-                                    true
+                                    true,
                                 )
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_DOCKED_MODE,
-                                    true
+                                    true,
                                 )
                             }
                         }
@@ -474,7 +504,7 @@ object CombinedActionExecutor {
                                 repository.setAodEnabled(false)
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED,
-                                    false
+                                    false,
                                 )
                             }
 
@@ -482,7 +512,7 @@ object CombinedActionExecutor {
                                 repository.setAodEnabled(true)
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED,
-                                    false
+                                    false,
                                 )
                             }
 
@@ -490,7 +520,7 @@ object CombinedActionExecutor {
                                 repository.setAodEnabled(true)
                                 repository.putBoolean(
                                     com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AOD_FORCE_TURN_OFF_ENABLED,
-                                    true
+                                    true,
                                 )
                             }
                         }
@@ -506,15 +536,15 @@ object CombinedActionExecutor {
                             repository.setFontWeight(profile.fontWeight)
                             repository.setAnimationScale(
                                 android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
-                                profile.animatorDurationScale
+                                profile.animatorDurationScale,
                             )
                             repository.setAnimationScale(
                                 android.provider.Settings.Global.TRANSITION_ANIMATION_SCALE,
-                                profile.transitionAnimationScale
+                                profile.transitionAnimationScale,
                             )
                             repository.setAnimationScale(
                                 android.provider.Settings.Global.WINDOW_ANIMATION_SCALE,
-                                profile.windowAnimationScale
+                                profile.windowAnimationScale,
                             )
                             repository.setSmallestWidth(profile.smallestWidth)
                             repository.setTouchSensitivityEnabled(profile.touchSensitivityEnabled)
@@ -526,49 +556,57 @@ object CombinedActionExecutor {
                     if (action.changeLockScreenClock) {
                         val key = "lock_screen_custom_clock_face"
                         val value = "{\"clockId\":\"${action.lockScreenClockStyle}\"}"
-                        val success = try {
-                            android.provider.Settings.Secure.putString(
-                                context.contentResolver,
-                                key,
-                                value
-                            )
-                        } catch (e: Exception) {
-                            false
-                        }
+                        val success =
+                            try {
+                                android.provider.Settings.Secure.putString(
+                                    context.contentResolver,
+                                    key,
+                                    value,
+                                )
+                            } catch (e: Exception) {
+                                false
+                            }
                         if (!success) {
                             val command = "settings put secure $key $value"
-                            com.sameerasw.essentials.utils.ShellUtils.runCommand(context, command)
+                            com.sameerasw.essentials.utils.ShellUtils
+                                .runCommand(context, command)
                         }
                     }
 
                     if (action.changeSyncSoundModeWatch) {
                         val prefs =
                             context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
-                        prefs.edit().putBoolean(
-                            "watch_sync_sound_mode_enabled",
-                            action.syncSoundModeWatchEnabled
-                        ).apply()
+                        prefs
+                            .edit()
+                            .putBoolean(
+                                "watch_sync_sound_mode_enabled",
+                                action.syncSoundModeWatchEnabled,
+                            ).apply()
                     }
                 }
 
                 is Action.FreezeTag -> {
                     val repository =
-                        com.sameerasw.essentials.data.repository.SettingsRepository(context)
+                        com.sameerasw.essentials.data.repository
+                            .SettingsRepository(context)
                     val appTagMap = repository.getFreezeAppTagMap()
                     val selectedTags = action.tagIds.toSet()
 
                     if (selectedTags.isNotEmpty()) {
-                        val matchingPackages = appTagMap.filterValues { tags ->
-                            tags.any { selectedTags.contains(it) }
-                        }.keys
+                        val matchingPackages =
+                            appTagMap
+                                .filterValues { tags ->
+                                    tags.any { selectedTags.contains(it) }
+                                }.keys
 
                         matchingPackages.forEach { pkg ->
                             if (action.mode == "Freeze") {
-                                com.sameerasw.essentials.utils.FreezeManager.freezeApp(context, pkg)
+                                com.sameerasw.essentials.utils.FreezeManager
+                                    .freezeApp(context, pkg)
                             } else {
                                 com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(
                                     context,
-                                    pkg
+                                    pkg,
                                 )
                             }
                         }
@@ -589,47 +627,50 @@ object CombinedActionExecutor {
                         val stubClass = Class.forName(stubClassName)
                         val interfaceClass = Class.forName(interfaceClassName)
 
-                        val serviceInstance = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            org.lsposed.hiddenapibypass.HiddenApiBypass.invoke(
-                                stubClass,
-                                null,
-                                "asInterface",
-                                ShizukuBinderWrapper(binder)
-                            )
-                        } else {
-                            val asInterfaceMethod =
-                                stubClass.getMethod("asInterface", android.os.IBinder::class.java)
-                            asInterfaceMethod.invoke(null, ShizukuBinderWrapper(binder))
-                        }
-
-                        val tasks = if (useActivityTask) {
-                            org.lsposed.hiddenapibypass.HiddenApiBypass.invoke(
-                                interfaceClass,
-                                serviceInstance,
-                                "getTasks",
-                                5,
-                                false,
-                                false,
-                                0
-                            ) as List<*>
-                        } else {
+                        val serviceInstance =
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                org.lsposed.hiddenapibypass.HiddenApiBypass.invoke(
+                                    stubClass,
+                                    null,
+                                    "asInterface",
+                                    ShizukuBinderWrapper(binder),
+                                )
+                            } else {
+                                val asInterfaceMethod =
+                                    stubClass.getMethod("asInterface", android.os.IBinder::class.java)
+                                asInterfaceMethod.invoke(null, ShizukuBinderWrapper(binder))
+                            }
+
+                        val tasks =
+                            if (useActivityTask) {
                                 org.lsposed.hiddenapibypass.HiddenApiBypass.invoke(
                                     interfaceClass,
                                     serviceInstance,
                                     "getTasks",
                                     5,
-                                    0
+                                    false,
+                                    false,
+                                    0,
                                 ) as List<*>
                             } else {
-                                val getTasksMethod = interfaceClass.getMethod(
-                                    "getTasks",
-                                    Int::class.javaPrimitiveType,
-                                    Int::class.javaPrimitiveType
-                                )
-                                getTasksMethod.invoke(serviceInstance, 5, 0) as List<*>
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                    org.lsposed.hiddenapibypass.HiddenApiBypass.invoke(
+                                        interfaceClass,
+                                        serviceInstance,
+                                        "getTasks",
+                                        5,
+                                        0,
+                                    ) as List<*>
+                                } else {
+                                    val getTasksMethod =
+                                        interfaceClass.getMethod(
+                                            "getTasks",
+                                            Int::class.javaPrimitiveType,
+                                            Int::class.javaPrimitiveType,
+                                        )
+                                    getTasksMethod.invoke(serviceInstance, 5, 0) as List<*>
+                                }
                             }
-                        }
 
                         var targetTaskId = -1
                         for (task in tasks) {
@@ -654,29 +695,32 @@ object CombinedActionExecutor {
                                     interfaceClass,
                                     serviceInstance,
                                     "startSystemLockTaskMode",
-                                    targetTaskId
+                                    targetTaskId,
                                 )
                             } else {
-                                val startLockTaskMethod = interfaceClass.getMethod(
-                                    "startSystemLockTaskMode",
-                                    Int::class.javaPrimitiveType
-                                )
+                                val startLockTaskMethod =
+                                    interfaceClass.getMethod(
+                                        "startSystemLockTaskMode",
+                                        Int::class.javaPrimitiveType,
+                                    )
                                 startLockTaskMethod.invoke(serviceInstance, targetTaskId)
                             }
                         } else {
-                            Toast.makeText(
-                                context,
-                                "No active foreground task found",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                            Toast
+                                .makeText(
+                                    context,
+                                    "No active foreground task found",
+                                    Toast.LENGTH_SHORT,
+                                ).show()
                         }
                     } catch (e: Exception) {
                         e.printStackTrace()
-                        Toast.makeText(
-                            context,
-                            "Failed to pin app: ${e.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast
+                            .makeText(
+                                context,
+                                "Failed to pin app: ${e.message}",
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     }
                 }
                 is Action.TurnOnWifi -> setWifiEnabled(context, true)
@@ -687,12 +731,14 @@ object CombinedActionExecutor {
                 is Action.TurnOffAutoBrightness -> setAutoBrightnessEnabled(context, false)
                 is Action.FreezeApps -> {
                     action.packageNames.forEach { pkg ->
-                        com.sameerasw.essentials.utils.FreezeManager.freezeApp(context, pkg)
+                        com.sameerasw.essentials.utils.FreezeManager
+                            .freezeApp(context, pkg)
                     }
                 }
                 is Action.UnfreezeApps -> {
                     action.packageNames.forEach { pkg ->
-                        com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(context, pkg)
+                        com.sameerasw.essentials.utils.FreezeManager
+                            .unfreezeApp(context, pkg)
                     }
                 }
 
@@ -703,57 +749,63 @@ object CombinedActionExecutor {
                                 Settings.Secure.putString(
                                     context.contentResolver,
                                     Settings.Secure.DEFAULT_INPUT_METHOD,
-                                    action.inputMethodId
+                                    action.inputMethodId,
                                 )
                             }
                             return@withContext
                         }
-                        Toast.makeText(
-                            context,
-                            R.string.diy_set_keyboard_permission_required,
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast
+                            .makeText(
+                                context,
+                                R.string.diy_set_keyboard_permission_required,
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     } catch (e: Exception) {
-                        Toast.makeText(
-                            context,
-                            context.getString(
-                                R.string.diy_set_keyboard_switch_failed,
-                                e.message ?: ""
-                            ),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast
+                            .makeText(
+                                context,
+                                context.getString(
+                                    R.string.diy_set_keyboard_switch_failed,
+                                    e.message ?: "",
+                                ),
+                                Toast.LENGTH_SHORT,
+                            ).show()
                     }
                 }
 
                 is Action.CustomSettings -> {
                     val resolver = context.contentResolver
                     for (entry in action.entries) {
-                        val success = try {
-                            when (entry.table) {
-                                Action.SettingsTable.SYSTEM -> Settings.System.putString(resolver, entry.key, entry.value)
-                                Action.SettingsTable.SECURE -> Settings.Secure.putString(resolver, entry.key, entry.value)
-                                Action.SettingsTable.GLOBAL -> Settings.Global.putString(resolver, entry.key, entry.value)
+                        val success =
+                            try {
+                                when (entry.table) {
+                                    Action.SettingsTable.SYSTEM -> Settings.System.putString(resolver, entry.key, entry.value)
+                                    Action.SettingsTable.SECURE -> Settings.Secure.putString(resolver, entry.key, entry.value)
+                                    Action.SettingsTable.GLOBAL -> Settings.Global.putString(resolver, entry.key, entry.value)
+                                }
+                            } catch (e: Exception) {
+                                false
                             }
-                        } catch (e: Exception) {
-                            false
-                        }
                         if (!success) {
-                            val tableArg = when (entry.table) {
-                                Action.SettingsTable.SYSTEM -> "system"
-                                Action.SettingsTable.SECURE -> "secure"
-                                Action.SettingsTable.GLOBAL -> "global"
-                            }
+                            val tableArg =
+                                when (entry.table) {
+                                    Action.SettingsTable.SYSTEM -> "system"
+                                    Action.SettingsTable.SECURE -> "secure"
+                                    Action.SettingsTable.GLOBAL -> "global"
+                                }
                             val safeValue = if (entry.value.contains(" ")) "\"${entry.value}\"" else entry.value
                             ShellUtils.runCommand(context, "settings put $tableArg ${entry.key} $safeValue")
                         }
                     }
                 }
             }
-
         }
     }
 
-    private fun toggleFlashlight(context: Context, on: Boolean) {
+    private fun toggleFlashlight(
+        context: Context,
+        on: Boolean,
+    ) {
         val camManager = context.getSystemService(Context.CAMERA_SERVICE) as CameraManager
         try {
             val cameraId = camManager.cameraIdList[0]
@@ -763,63 +815,82 @@ object CombinedActionExecutor {
         }
     }
 
-    private fun isHotspotEnabled(context: Context): Boolean {
-        return try {
+    private fun isHotspotEnabled(context: Context): Boolean =
+        try {
             val wifiManager =
                 context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-            val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                org.lsposed.hiddenapibypass.HiddenApiBypass.invoke(
-                    WifiManager::class.java,
-                    wifiManager,
-                    "isWifiApEnabled"
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                WifiManager::class.java.getMethod("isWifiApEnabled").invoke(wifiManager)
-            }
+            val result =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    org.lsposed.hiddenapibypass.HiddenApiBypass.invoke(
+                        WifiManager::class.java,
+                        wifiManager,
+                        "isWifiApEnabled",
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    WifiManager::class.java.getMethod("isWifiApEnabled").invoke(wifiManager)
+                }
             result as? Boolean ?: false
         } catch (e: Exception) {
             e.printStackTrace()
             false
         }
-    }
 
-    private fun setHotspotEnabled(context: Context, enabled: Boolean) {
+    private fun setHotspotEnabled(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val command = if (enabled) "cmd wifi start-softap" else "cmd wifi stop-softap"
-        com.sameerasw.essentials.utils.ShellUtils.runCommand(context, command)
+        com.sameerasw.essentials.utils.ShellUtils
+            .runCommand(context, command)
     }
 
-    private fun setLowPowerMode(context: Context, on: Boolean) {
+    private fun setLowPowerMode(
+        context: Context,
+        on: Boolean,
+    ) {
         val value = if (on) 1 else 0
         try {
-            android.provider.Settings.Global.putInt(context.contentResolver, "low_power", value)
+            android.provider.Settings.Global
+                .putInt(context.contentResolver, "low_power", value)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private fun setWifiEnabled(context: Context, enabled: Boolean) {
+    private fun setWifiEnabled(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val state = if (enabled) "enable" else "disable"
-        com.sameerasw.essentials.utils.ShellUtils.runCommand(context, "svc wifi $state")
+        com.sameerasw.essentials.utils.ShellUtils
+            .runCommand(context, "svc wifi $state")
     }
 
-    private fun setCellularDataEnabled(context: Context, enabled: Boolean) {
+    private fun setCellularDataEnabled(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val state = if (enabled) "enable" else "disable"
-        com.sameerasw.essentials.utils.ShellUtils.runCommand(context, "svc data $state")
+        com.sameerasw.essentials.utils.ShellUtils
+            .runCommand(context, "svc data $state")
     }
 
-    private fun setAutoBrightnessEnabled(context: Context, enabled: Boolean) {
+    private fun setAutoBrightnessEnabled(
+        context: Context,
+        enabled: Boolean,
+    ) {
         val value = if (enabled) 1 else 0
         try {
             android.provider.Settings.System.putInt(
                 context.contentResolver,
                 android.provider.Settings.System.SCREEN_BRIGHTNESS_MODE,
-                value
+                value,
             )
         } catch (e: Exception) {
             com.sameerasw.essentials.utils.ShellUtils.runCommand(
                 context,
-                "settings put system screen_brightness_mode $value"
+                "settings put system screen_brightness_mode $value",
             )
         }
     }

@@ -19,7 +19,6 @@ import com.sameerasw.essentials.utils.PermissionUtils
 
 @RequiresApi(Build.VERSION_CODES.N)
 class SmartPixelsTileService : BaseTileService() {
-
     private val prefs by lazy {
         getSharedPreferences(SettingsRepository.PREFS_NAME, MODE_PRIVATE)
     }
@@ -34,11 +33,13 @@ class SmartPixelsTileService : BaseTileService() {
 
     override fun getTileLabel(): String = getString(R.string.feat_smart_pixels_title)
 
-    override fun getTileSubtitle(): String = if (prefs.getBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED, false)) getString(R.string.on) else getString(R.string.off)
+    override fun getTileSubtitle(): String =
+        if (prefs.getBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED, false)) getString(R.string.on) else getString(R.string.off)
 
     override fun hasFeaturePermission(): Boolean = PermissionUtils.isAccessibilityServiceEnabled(this)
 
     override fun getTileIcon(): Icon = Icon.createWithResource(this, R.drawable.rounded_grain_24)
 
-    override fun getTileState(): Int = if (prefs.getBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED, false)) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+    override fun getTileState(): Int =
+        if (prefs.getBoolean(SettingsRepository.KEY_SMART_PIXELS_ENABLED, false)) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
 }

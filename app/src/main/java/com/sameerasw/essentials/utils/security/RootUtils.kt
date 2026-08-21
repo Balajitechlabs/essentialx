@@ -13,16 +13,14 @@ import java.io.DataOutputStream
 import java.io.IOException
 
 object RootUtils {
-
-    fun isRootAvailable(): Boolean {
-        return try {
+    fun isRootAvailable(): Boolean =
+        try {
             val process = Runtime.getRuntime().exec(arrayOf("sh", "-c", "which su"))
             val exitCode = process.waitFor()
             exitCode == 0
         } catch (e: Exception) {
             false
         }
-    }
 
     fun isRootPermissionGranted(): Boolean {
         // In many root managers, 'su -c id' will return 0 if granted
@@ -45,9 +43,13 @@ object RootUtils {
             os.writeBytes("exit\n")
             os.flush()
             process.waitFor() == 0
-        } catch (@Suppress("UNUSED_PARAMETER") e: IOException) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: IOException,
+        ) {
             false
-        } catch (@Suppress("UNUSED_PARAMETER") e: InterruptedException) {
+        } catch (
+            @Suppress("UNUSED_PARAMETER") e: InterruptedException,
+        ) {
             false
         } finally {
             try {
@@ -61,11 +63,10 @@ object RootUtils {
         }
     }
 
-    fun newProcess(cmd: Array<String>): Process? {
-        return try {
+    fun newProcess(cmd: Array<String>): Process? =
+        try {
             Runtime.getRuntime().exec(arrayOf("su", "-c", cmd.joinToString(" ")))
         } catch (e: Exception) {
             null
         }
-    }
 }

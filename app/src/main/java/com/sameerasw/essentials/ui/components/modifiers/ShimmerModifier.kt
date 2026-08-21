@@ -24,41 +24,47 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-fun Modifier.shimmer(): Modifier = composed {
-    val transition = rememberInfiniteTransition(label = "shimmer")
-    val translateAnim = transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1000,
-                easing = FastOutSlowInEasing
-            ),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "shimmer_translate"
-    )
+fun Modifier.shimmer(): Modifier =
+    composed {
+        val transition = rememberInfiniteTransition(label = "shimmer")
+        val translateAnim =
+            transition.animateFloat(
+                initialValue = 0f,
+                targetValue = 1000f,
+                animationSpec =
+                    infiniteRepeatable(
+                        animation =
+                            tween(
+                                durationMillis = 1000,
+                                easing = FastOutSlowInEasing,
+                            ),
+                        repeatMode = RepeatMode.Restart,
+                    ),
+                label = "shimmer_translate",
+            )
 
-    val shimmerColors = remember {
-        listOf(
-            Color.Unspecified,
-            Color.Unspecified,
-            Color.Unspecified,
-        )
-    }.let {
-        listOf(
-            MaterialTheme.colorScheme.surfaceContainerHighest,
-            MaterialTheme.colorScheme.surfaceContainerHigh,
-            MaterialTheme.colorScheme.surfaceContainerHighest,
-        )
-    }
+        val shimmerColors =
+            remember {
+                listOf(
+                    Color.Unspecified,
+                    Color.Unspecified,
+                    Color.Unspecified,
+                )
+            }.let {
+                listOf(
+                    MaterialTheme.colorScheme.surfaceContainerHighest,
+                    MaterialTheme.colorScheme.surfaceContainerHigh,
+                    MaterialTheme.colorScheme.surfaceContainerHighest,
+                )
+            }
 
-    this.drawBehind {
-        val brush = Brush.linearGradient(
-            colors = shimmerColors,
-            start = Offset(translateAnim.value - 500f, translateAnim.value - 500f),
-            end = Offset(translateAnim.value, translateAnim.value)
-        )
-        drawRect(brush)
+        this.drawBehind {
+            val brush =
+                Brush.linearGradient(
+                    colors = shimmerColors,
+                    start = Offset(translateAnim.value - 500f, translateAnim.value - 500f),
+                    end = Offset(translateAnim.value, translateAnim.value),
+                )
+            drawRect(brush)
+        }
     }
-}

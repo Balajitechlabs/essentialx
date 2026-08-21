@@ -35,12 +35,12 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 fun LottieFeatureAnimation(
     resId: Int,
     height: Dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(resId))
     val progress by animateLottieCompositionAsState(
         composition = composition,
-        iterations = LottieConstants.IterateForever
+        iterations = LottieConstants.IterateForever,
     )
 
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -48,40 +48,42 @@ fun LottieFeatureAnimation(
         composition?.let { it.bounds.width().toFloat() / it.bounds.height().toFloat() } ?: 1f
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(height),
-        contentAlignment = androidx.compose.ui.Alignment.Center
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(height),
+        contentAlignment = androidx.compose.ui.Alignment.Center,
     ) {
         LottieAnimation(
             composition = composition,
             progress = { progress },
-            modifier = Modifier
-                .fillMaxHeight()
-                .aspectRatio(aspect)
-                .padding(vertical = 16.dp)
-                .graphicsLayer(
-                    compositingStrategy = CompositingStrategy.Offscreen,
-                    clip = true,
-                    shape = androidx.compose.foundation.shape.GenericShape { size, _ ->
-                        val trim = size.height * 0.073f
-                        addRect(
-                            androidx.compose.ui.geometry.Rect(
-                                0f,
-                                trim,
-                                size.width,
-                                size.height - trim
-                            )
+            modifier =
+                Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(aspect)
+                    .padding(vertical = 16.dp)
+                    .graphicsLayer(
+                        compositingStrategy = CompositingStrategy.Offscreen,
+                        clip = true,
+                        shape =
+                            androidx.compose.foundation.shape.GenericShape { size, _ ->
+                                val trim = size.height * 0.073f
+                                addRect(
+                                    androidx.compose.ui.geometry.Rect(
+                                        0f,
+                                        trim,
+                                        size.width,
+                                        size.height - trim,
+                                    ),
+                                )
+                            },
+                    ).drawWithContent {
+                        drawContent()
+                        drawRect(
+                            color = primaryColor.copy(alpha = 0.7f),
+                            blendMode = BlendMode.SrcAtop,
                         )
-                    }
-                )
-                .drawWithContent {
-                    drawContent()
-                    drawRect(
-                        color = primaryColor.copy(alpha = 0.7f),
-                        blendMode = BlendMode.SrcAtop
-                    )
-                }
+                    },
         )
     }
 }

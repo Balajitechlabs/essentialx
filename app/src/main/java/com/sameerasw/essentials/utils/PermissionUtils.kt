@@ -22,7 +22,6 @@ import com.sameerasw.essentials.services.receivers.SecurityDeviceAdminReceiver
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 
 object PermissionUtils {
-
     /**
      * Executes the is accessibility service enabled operation.
      *
@@ -30,10 +29,11 @@ object PermissionUtils {
      * @return The resulting Boolean data.
      */
     fun isAccessibilityServiceEnabled(context: Context): Boolean {
-        val enabledServices = Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        )
+        val enabledServices =
+            Settings.Secure.getString(
+                context.contentResolver,
+                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+            )
         val serviceName = "${context.packageName}/${ScreenOffAccessibilityService::class.java.name}"
         return enabledServices?.contains(serviceName) == true
     }
@@ -44,10 +44,9 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun canWriteSecureSettings(context: Context): Boolean {
-        return context.checkSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS) ==
-                android.content.pm.PackageManager.PERMISSION_GRANTED
-    }
+    fun canWriteSecureSettings(context: Context): Boolean =
+        context.checkSelfPermission(android.Manifest.permission.WRITE_SECURE_SETTINGS) ==
+            android.content.pm.PackageManager.PERMISSION_GRANTED
 
     /**
      * Executes the has notification listener permission operation.
@@ -57,10 +56,11 @@ object PermissionUtils {
      */
     fun hasNotificationListenerPermission(context: Context): Boolean {
         return try {
-            val enabledServices = Settings.Secure.getString(
-                context.contentResolver,
-                "enabled_notification_listeners"
-            ) ?: return false
+            val enabledServices =
+                Settings.Secure.getString(
+                    context.contentResolver,
+                    "enabled_notification_listeners",
+                ) ?: return false
             val componentName = ComponentName(context, NotificationListener::class.java)
             enabledServices.contains(componentName.flattenToString())
         } catch (_: Exception) {
@@ -74,13 +74,12 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun canDrawOverlays(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    fun canDrawOverlays(context: Context): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Settings.canDrawOverlays(context)
         } else {
             true
         }
-    }
 
     /**
      * Executes the is device admin active operation.
@@ -100,19 +99,19 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun isNotificationLightingAccessibilityServiceEnabled(context: Context): Boolean {
-        return try {
-            val enabledServices = Settings.Secure.getString(
-                context.contentResolver,
-                Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-            )
+    fun isNotificationLightingAccessibilityServiceEnabled(context: Context): Boolean =
+        try {
+            val enabledServices =
+                Settings.Secure.getString(
+                    context.contentResolver,
+                    Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+                )
             val serviceName =
                 "${context.packageName}/${ScreenOffAccessibilityService::class.java.name}"
             enabledServices?.contains(serviceName) == true
         } catch (e: Exception) {
             false
         }
-    }
 
     /**
      * Executes the is default browser operation.
@@ -120,27 +119,31 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun isDefaultBrowser(context: Context): Boolean {
-        return try {
+    fun isDefaultBrowser(context: Context): Boolean =
+        try {
             val pm = context.packageManager
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("http://www.example.com"))
-            val resolveInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm.resolveActivity(
-                    browserIntent,
-                    android.content.pm.PackageManager.ResolveInfoFlags.of(android.content.pm.PackageManager.MATCH_DEFAULT_ONLY.toLong())
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                pm.resolveActivity(
-                    browserIntent,
-                    android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
-                )
-            }
+            val resolveInfo =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    pm.resolveActivity(
+                        browserIntent,
+                        android.content.pm.PackageManager.ResolveInfoFlags
+                            .of(
+                                android.content.pm.PackageManager.MATCH_DEFAULT_ONLY
+                                    .toLong(),
+                            ),
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    pm.resolveActivity(
+                        browserIntent,
+                        android.content.pm.PackageManager.MATCH_DEFAULT_ONLY,
+                    )
+                }
             resolveInfo?.activityInfo?.packageName == context.packageName
         } catch (e: Exception) {
             false
         }
-    }
 
     /**
      * Executes the open accessibility settings operation.
@@ -163,12 +166,11 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun hasLocationPermission(context: Context): Boolean {
-        return androidx.core.content.ContextCompat.checkSelfPermission(
+    fun hasLocationPermission(context: Context): Boolean =
+        androidx.core.content.ContextCompat.checkSelfPermission(
             context,
-            android.Manifest.permission.ACCESS_FINE_LOCATION
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-    }
 
     /**
      * Executes the has background location permission operation.
@@ -176,16 +178,15 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun hasBackgroundLocationPermission(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    fun hasBackgroundLocationPermission(context: Context): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             androidx.core.content.ContextCompat.checkSelfPermission(
                 context,
-                android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                android.Manifest.permission.ACCESS_BACKGROUND_LOCATION,
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         } else {
             true
         }
-    }
 
     /**
      * Executes the can use full screen intent operation.
@@ -193,15 +194,14 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun canUseFullScreenIntent(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+    fun canUseFullScreenIntent(context: Context): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             val nm =
                 context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
             nm.canUseFullScreenIntent()
         } else {
             true
         }
-    }
 
     /**
      * Executes the is keyboard enabled operation.
@@ -222,10 +222,11 @@ object PermissionUtils {
      * @return The resulting Boolean data.
      */
     fun isKeyboardSelected(context: Context): Boolean {
-        val defaultIme = Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.DEFAULT_INPUT_METHOD
-        )
+        val defaultIme =
+            Settings.Secure.getString(
+                context.contentResolver,
+                Settings.Secure.DEFAULT_INPUT_METHOD,
+            )
         return defaultIme?.startsWith(context.packageName) == true
     }
 
@@ -235,9 +236,7 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun canWriteSystemSettings(context: Context): Boolean {
-        return Settings.System.canWrite(context)
-    }
+    fun canWriteSystemSettings(context: Context): Boolean = Settings.System.canWrite(context)
 
     /**
      * Executes the has bluetooth permission operation.
@@ -245,23 +244,22 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun hasBluetoothPermission(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    fun hasBluetoothPermission(context: Context): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             androidx.core.content.ContextCompat.checkSelfPermission(
                 context,
-                android.Manifest.permission.BLUETOOTH_CONNECT
+                android.Manifest.permission.BLUETOOTH_CONNECT,
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED &&
-                    androidx.core.content.ContextCompat.checkSelfPermission(
-                        context,
-                        android.Manifest.permission.BLUETOOTH_SCAN
-                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.BLUETOOTH_SCAN,
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         } else {
             androidx.core.content.ContextCompat.checkSelfPermission(
                 context,
-                android.Manifest.permission.BLUETOOTH
+                android.Manifest.permission.BLUETOOTH,
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         }
-    }
 
     /**
      * Executes the has read phone state permission operation.
@@ -269,33 +267,37 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun hasReadPhoneStatePermission(context: Context): Boolean {
-        return androidx.core.content.ContextCompat.checkSelfPermission(
+    fun hasReadPhoneStatePermission(context: Context): Boolean =
+        androidx.core.content.ContextCompat.checkSelfPermission(
             context,
-            android.Manifest.permission.READ_PHONE_STATE
+            android.Manifest.permission.READ_PHONE_STATE,
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-    }
 
     fun hasCallPermissions(context: Context): Boolean {
-        val hasPhoneState = androidx.core.content.ContextCompat.checkSelfPermission(
-            context,
-            android.Manifest.permission.READ_PHONE_STATE
-        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val hasPhoneState =
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.READ_PHONE_STATE,
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
 
-        val hasAnswerCalls = android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O || androidx.core.content.ContextCompat.checkSelfPermission(
-            context,
-            android.Manifest.permission.ANSWER_PHONE_CALLS
-        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val hasAnswerCalls =
+            android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O ||
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    context,
+                    android.Manifest.permission.ANSWER_PHONE_CALLS,
+                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
 
-        val hasContacts = androidx.core.content.ContextCompat.checkSelfPermission(
-            context,
-            android.Manifest.permission.READ_CONTACTS
-        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val hasContacts =
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.READ_CONTACTS,
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
 
-        val hasCallLog = androidx.core.content.ContextCompat.checkSelfPermission(
-            context,
-            android.Manifest.permission.READ_CALL_LOG
-        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val hasCallLog =
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.READ_CALL_LOG,
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
 
         return hasPhoneState && hasAnswerCalls && hasContacts && hasCallLog
     }
@@ -318,12 +320,11 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun hasReadCalendarPermission(context: Context): Boolean {
-        return androidx.core.content.ContextCompat.checkSelfPermission(
+    fun hasReadCalendarPermission(context: Context): Boolean =
+        androidx.core.content.ContextCompat.checkSelfPermission(
             context,
-            android.Manifest.permission.READ_CALENDAR
+            android.Manifest.permission.READ_CALENDAR,
         ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-    }
 
     /**
      * Executes the open notification policy settings operation.
@@ -382,16 +383,15 @@ object PermissionUtils {
      * @param context [Context] Target context.
      * @return The resulting Boolean data.
      */
-    fun isPostNotificationsEnabled(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    fun isPostNotificationsEnabled(context: Context): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             androidx.core.content.ContextCompat.checkSelfPermission(
                 context,
-                android.Manifest.permission.POST_NOTIFICATIONS
+                android.Manifest.permission.POST_NOTIFICATIONS,
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         } else {
             true
         }
-    }
 
     /**
      * Executes the has usage stats permission operation.
@@ -401,19 +401,20 @@ object PermissionUtils {
      */
     fun hasUsageStatsPermission(context: Context): Boolean {
         val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as android.app.AppOpsManager
-        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            appOps.unsafeCheckOpNoThrow(
-                android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(),
-                context.packageName
-            )
-        } else {
-            appOps.checkOpNoThrow(
-                android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(),
-                context.packageName
-            )
-        }
+        val mode =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                appOps.unsafeCheckOpNoThrow(
+                    android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(),
+                    context.packageName,
+                )
+            } else {
+                appOps.checkOpNoThrow(
+                    android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
+                    android.os.Process.myUid(),
+                    context.packageName,
+                )
+            }
         return mode == android.app.AppOpsManager.MODE_ALLOWED
     }
 

@@ -38,12 +38,13 @@ fun HapticFeedbackPicker(
     selectedFeedback: HapticFeedbackType,
     onFeedbackSelected: (HapticFeedbackType) -> Unit,
     modifier: Modifier = Modifier,
-    options: List<Pair<Int, HapticFeedbackType>> = listOf<Pair<Int, HapticFeedbackType>>(
-        R.string.haptic_none to HapticFeedbackType.NONE,
-        R.string.haptic_subtle to HapticFeedbackType.SUBTLE,
-        R.string.haptic_double to HapticFeedbackType.DOUBLE,
-        R.string.haptic_click to HapticFeedbackType.CLICK
-    )
+    options: List<Pair<Int, HapticFeedbackType>> =
+        listOf<Pair<Int, HapticFeedbackType>>(
+            R.string.haptic_none to HapticFeedbackType.NONE,
+            R.string.haptic_subtle to HapticFeedbackType.SUBTLE,
+            R.string.haptic_double to HapticFeedbackType.DOUBLE,
+            R.string.haptic_click to HapticFeedbackType.CLICK,
+        ),
 ) {
     val labels = options.map { it.first }
     val types = options.map { it.second }
@@ -51,12 +52,12 @@ fun HapticFeedbackPicker(
     val selectedIndex = types.indexOf(selectedFeedback).coerceAtLeast(0)
 
     Row(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceBright,
-                shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-            )
-            .padding(10.dp),
+        modifier =
+            modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceBright,
+                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                ).padding(10.dp),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
     ) {
         val modifiers = List(labels.size) { Modifier.weight(1f) }
@@ -68,21 +69,20 @@ fun HapticFeedbackPicker(
                     onFeedbackSelected(types[index])
                 },
                 modifier = modifiers[index].semantics { role = Role.RadioButton },
-                shapes = when (index) {
-                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                    labels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                },
+                shapes =
+                    when (index) {
+                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                        labels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                    },
             ) {
                 Text(
                     stringResource(label),
                     fontSize = dimensionResource(R.dimen.font_small).value.sp,
                     modifier = Modifier.basicMarquee(),
-                    maxLines = 1
+                    maxLines = 1,
                 )
             }
         }
     }
 }
-
-

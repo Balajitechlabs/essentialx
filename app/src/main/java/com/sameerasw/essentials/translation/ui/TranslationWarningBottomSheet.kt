@@ -53,7 +53,7 @@ import com.sameerasw.essentials.utils.HapticUtil
 @Composable
 fun TranslationWarningBottomSheet(
     onDismissRequest: () -> Unit,
-    onConfirm: (dontShowAgain: Boolean) -> Unit
+    onConfirm: (dontShowAgain: Boolean) -> Unit,
 ) {
     val view = LocalView.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -62,34 +62,37 @@ fun TranslationWarningBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
-        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            color = ColorUtil.getPastelColorFor("TranslationMode"),
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(40.dp)
+                            .background(
+                                color = ColorUtil.getPastelColorFor("TranslationMode"),
+                                shape = CircleShape,
+                            ),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_translate_24),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = ColorUtil.getVibrantColorFor("TranslationMode")
+                        tint = ColorUtil.getVibrantColorFor("TranslationMode"),
                     )
                 }
 
@@ -97,130 +100,132 @@ fun TranslationWarningBottomSheet(
                     text = stringResource(R.string.translation_warning_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
             RoundedCardContainer {
                 ListItem(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.extraSmall)
-                        .background(MaterialTheme.colorScheme.surfaceBright),
+                    modifier =
+                        Modifier
+                            .clip(MaterialTheme.shapes.extraSmall)
+                            .background(MaterialTheme.colorScheme.surfaceBright),
                     leadingContent = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_check_24),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(22.dp),
                         )
                     },
                     headlineContent = {
                         Text(
                             text = stringResource(R.string.translation_warning_point1_title),
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
                         )
                     },
                     supportingContent = {
                         Text(
                             text = stringResource(R.string.translation_warning_point1_desc),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
-
-                    )
+                )
 
                 ListItem(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.extraSmall)
-                        .background(MaterialTheme.colorScheme.surfaceBright),
+                    modifier =
+                        Modifier
+                            .clip(MaterialTheme.shapes.extraSmall)
+                            .background(MaterialTheme.colorScheme.surfaceBright),
                     leadingContent = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_edit_24),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(22.dp),
                         )
                     },
                     headlineContent = {
                         Text(
                             text = stringResource(R.string.translation_warning_point2_title),
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
                         )
                     },
                     supportingContent = {
                         Text(
                             text = stringResource(R.string.translation_warning_point2_desc),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
-
-                    )
+                )
 
                 ListItem(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.extraSmall)
-                        .background(MaterialTheme.colorScheme.surfaceBright),
+                    modifier =
+                        Modifier
+                            .clip(MaterialTheme.shapes.extraSmall)
+                            .background(MaterialTheme.colorScheme.surfaceBright),
                     leadingContent = {
                         Icon(
                             painter = painterResource(id = R.drawable.brand_github),
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(22.dp)
+                            modifier = Modifier.size(22.dp),
                         )
                     },
                     headlineContent = {
                         Text(
                             text = stringResource(R.string.translation_warning_point3_title),
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
                         )
                     },
                     supportingContent = {
                         Text(
                             text = stringResource(R.string.translation_warning_point3_desc),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     },
-
-                    )
+                )
             }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { dontShowAgain = !dontShowAgain }
-                    .padding(horizontal = 8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { dontShowAgain = !dontShowAgain }
+                        .padding(horizontal = 8.dp),
             ) {
                 Checkbox(
                     checked = dontShowAgain,
-                    onCheckedChange = { dontShowAgain = it }
+                    onCheckedChange = { dontShowAgain = it },
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.translation_warning_do_not_show),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
             // Action Buttons
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 24.dp),
-                horizontalArrangement = Arrangement.End
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                horizontalArrangement = Arrangement.End,
             ) {
                 OutlinedButton(
                     onClick = {
                         HapticUtil.performUIHaptic(view)
                         onDismissRequest()
-                    }
+                    },
                 ) {
                     Text(stringResource(R.string.action_cancel))
                 }
@@ -231,11 +236,11 @@ fun TranslationWarningBottomSheet(
                     onClick = {
                         HapticUtil.performUIHaptic(view)
                         onConfirm(dontShowAgain)
-                    }
+                    },
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.rounded_check_24),
-                        contentDescription = null
+                        contentDescription = null,
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(stringResource(R.string.action_i_understand))

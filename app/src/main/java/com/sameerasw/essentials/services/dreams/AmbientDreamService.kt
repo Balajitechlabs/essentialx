@@ -40,7 +40,6 @@ import java.io.File
 import java.util.Random
 
 class AmbientDreamService : DreamService() {
-
     private var googleSansFlex: Typeface? = null
     private var googleSans: Typeface? = null
 
@@ -102,83 +101,104 @@ class AmbientDreamService : DreamService() {
 
     private var currentController: android.media.session.MediaController? = null
 
-    private val sessionListener = MediaSessionManager.OnActiveSessionsChangedListener { sessions ->
-        updateActiveSession(sessions)
-    }
-
-    private val mediaCallback = object : android.media.session.MediaController.Callback() {
-        override fun onMetadataChanged(metadata: android.media.MediaMetadata?) {
-            handler.post {
-                val title = metadata?.getString(android.media.MediaMetadata.METADATA_KEY_TITLE)
-                val artist = metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ARTIST)
-
-                trackTitle = title
-                artistName = artist
-
-                currentController?.let { isAlreadyLiked = checkIsLiked(it) }
-
-                val artBitmap = extractBitmap(metadata)
-                updateMetadata(artBitmap)
-            }
+    private val sessionListener =
+        MediaSessionManager.OnActiveSessionsChangedListener { sessions ->
+            updateActiveSession(sessions)
         }
 
-        override fun onPlaybackStateChanged(state: android.media.session.PlaybackState?) {
-            handler.post {
-                val isPlaying = state?.state == android.media.session.PlaybackState.STATE_PLAYING
-                if (isPlaying && !isMusicMode) {
-                    switchToMusicMode()
-                } else if (!isPlaying && isMusicMode) {
-                    switchToClockMode()
+    private val mediaCallback =
+        object : android.media.session.MediaController.Callback() {
+            override fun onMetadataChanged(metadata: android.media.MediaMetadata?) {
+                handler.post {
+                    val title = metadata?.getString(android.media.MediaMetadata.METADATA_KEY_TITLE)
+                    val artist = metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ARTIST)
+
+                    trackTitle = title
+                    artistName = artist
+
+                    currentController?.let { isAlreadyLiked = checkIsLiked(it) }
+
+                    val artBitmap = extractBitmap(metadata)
+                    updateMetadata(artBitmap)
+                }
+            }
+
+            override fun onPlaybackStateChanged(state: android.media.session.PlaybackState?) {
+                handler.post {
+                    val isPlaying = state?.state == android.media.session.PlaybackState.STATE_PLAYING
+                    if (isPlaying && !isMusicMode) {
+                        switchToMusicMode()
+                    } else if (!isPlaying && isMusicMode) {
+                        switchToClockMode()
+                    }
                 }
             }
         }
-    }
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private val volumeHideRunnable = Runnable {
-        volumeStrokeView?.animate()?.alpha(0f)?.setDuration(500)?.start()
-        bottomVolumeProgressView?.animate()?.alpha(0f)?.setDuration(500)?.start()
-    }
-
-    private val burnInProtectionRunnable = object : Runnable {
-        override fun run() {
-            if (isDetached) return
-
-            // Revert to clock if Android Auto is running
-            if (com.sameerasw.essentials.utils.AppUtil.isAndroidAutoRunning(this@AmbientDreamService)) {
-                switchToClockMode()
-            }
-
-            shiftUi()
-            handler.postDelayed(this, 60000) // Every minute
+    private val volumeHideRunnable =
+        Runnable {
+            volumeStrokeView
+                ?.animate()
+                ?.alpha(0f)
+                ?.setDuration(500)
+                ?.start()
+            bottomVolumeProgressView
+                ?.animate()
+                ?.alpha(0f)
+                ?.setDuration(500)
+                ?.start()
         }
-    }
 
-    private val progressUpdateRunnable = object : Runnable {
-        override fun run() {
-            if (isDetached) return
+    private val burnInProtectionRunnable =
+        object : Runnable {
+            override fun run() {
+                if (isDetached) return
 
-            // Revert to clock if Android Auto is running
-            if (com.sameerasw.essentials.utils.AppUtil.isAndroidAutoRunning(this@AmbientDreamService)) {
-                switchToClockMode()
-                return
+                // Revert to clock if Android Auto is running
+                if (com.sameerasw.essentials.utils.AppUtil
+                        .isAndroidAutoRunning(this@AmbientDreamService)
+                ) {
+                    switchToClockMode()
+                }
+
+                shiftUi()
+                handler.postDelayed(this, 60000) // Every minute
             }
-
-            handler.postDelayed(this, 1000L)
         }
-    }
+
+    private val progressUpdateRunnable =
+        object : Runnable {
+            override fun run() {
+                if (isDetached) return
+
+                // Revert to clock if Android Auto is running
+                if (com.sameerasw.essentials.utils.AppUtil
+                        .isAndroidAutoRunning(this@AmbientDreamService)
+                ) {
+                    switchToClockMode()
+                    return
+                }
+
+                handler.postDelayed(this, 1000L)
+            }
+        }
 
     private var isDetached = false
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (isDetached) return
-            if (intent?.action == "SHOW_AMBIENT_GLANCE") {
-                handleIntent(intent)
+    private val receiver =
+        object : BroadcastReceiver() {
+            override fun onReceive(
+                context: Context?,
+                intent: Intent?,
+            ) {
+                if (isDetached) return
+                if (intent?.action == "SHOW_AMBIENT_GLANCE") {
+                    handleIntent(intent)
+                }
             }
         }
-    }
 
     private var volumeReceiver: BroadcastReceiver? = null
 
@@ -201,10 +221,11 @@ class AmbientDreamService : DreamService() {
         // Register Media Session Listener
         try {
             val mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-            val componentName = android.content.ComponentName(
-                this,
-                NotificationListener::class.java
-            )
+            val componentName =
+                android.content.ComponentName(
+                    this,
+                    NotificationListener::class.java,
+                )
             mediaSessionManager.addOnActiveSessionsChangedListener(sessionListener, componentName)
             updateActiveSession(mediaSessionManager.getActiveSessions(componentName))
         } catch (e: Exception) {
@@ -212,9 +233,10 @@ class AmbientDreamService : DreamService() {
         }
 
         // Request initial state
-        val requestIntent = Intent("com.sameerasw.essentials.ACTION_REQUEST_AMBIENT_GLANCE").apply {
-            setPackage(packageName)
-        }
+        val requestIntent =
+            Intent("com.sameerasw.essentials.ACTION_REQUEST_AMBIENT_GLANCE").apply {
+                setPackage(packageName)
+            }
         sendBroadcast(requestIntent)
 
         // Also do direct check
@@ -225,13 +247,15 @@ class AmbientDreamService : DreamService() {
     }
 
     private fun setupUI() {
-        container = FrameLayout(this).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            setBackgroundColor(Color.BLACK)
-        }
+        container =
+            FrameLayout(this).apply {
+                layoutParams =
+                    ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    )
+                setBackgroundColor(Color.BLACK)
+            }
 
         setupContentUI(container!!)
 
@@ -242,143 +266,168 @@ class AmbientDreamService : DreamService() {
         val mode = getAlbumArtMode()
 
         // 0. Background for Fill mode
-        backgroundImageView = ImageView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            scaleType = ImageView.ScaleType.CENTER_CROP
-            alpha = if (mode == "fill" && isMusicMode) 0.7f else 0f
-            setImageDrawable(ColorDrawable(Color.DKGRAY))
-
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                setRenderEffect(
-                    android.graphics.RenderEffect.createBlurEffect(
-                        30f,
-                        30f,
-                        android.graphics.Shader.TileMode.CLAMP
+        backgroundImageView =
+            ImageView(this).apply {
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT,
                     )
-                )
-            }
-        }
-        backgroundNextImageView = ImageView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            scaleType = ImageView.ScaleType.CENTER_CROP
-            alpha = 0f
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                alpha = if (mode == "fill" && isMusicMode) 0.7f else 0f
+                setImageDrawable(ColorDrawable(Color.DKGRAY))
 
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                setRenderEffect(
-                    android.graphics.RenderEffect.createBlurEffect(
-                        30f,
-                        30f,
-                        android.graphics.Shader.TileMode.CLAMP
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    setRenderEffect(
+                        android.graphics.RenderEffect.createBlurEffect(
+                            30f,
+                            30f,
+                            android.graphics.Shader.TileMode.CLAMP,
+                        ),
                     )
-                )
+                }
             }
-        }
-        backgroundScrim = View(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            // Radial gradient for vignette effect (dark edges, clear center)
-            background = android.graphics.drawable.GradientDrawable().apply {
-                gradientType = android.graphics.drawable.GradientDrawable.RADIAL_GRADIENT
-                colors = intArrayOf(0x00000000, 0xFF000000.toInt())
-                gradientRadius = resources.displayMetrics.widthPixels.toFloat() * 1.1f
-                setGradientCenter(0.5f, 0.5f)
+        backgroundNextImageView =
+            ImageView(this).apply {
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                    )
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                alpha = 0f
+
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    setRenderEffect(
+                        android.graphics.RenderEffect.createBlurEffect(
+                            30f,
+                            30f,
+                            android.graphics.Shader.TileMode.CLAMP,
+                        ),
+                    )
+                }
             }
-            alpha = if (mode == "fill" && isMusicMode) 1f else 0f
-        }
+        backgroundScrim =
+            View(this).apply {
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                    )
+                // Radial gradient for vignette effect (dark edges, clear center)
+                background =
+                    android.graphics.drawable.GradientDrawable().apply {
+                        gradientType = android.graphics.drawable.GradientDrawable.RADIAL_GRADIENT
+                        colors = intArrayOf(0x00000000, 0xFF000000.toInt())
+                        gradientRadius = resources.displayMetrics.widthPixels.toFloat() * 1.1f
+                        setGradientCenter(0.5f, 0.5f)
+                    }
+                alpha = if (mode == "fill" && isMusicMode) 1f else 0f
+            }
         parentInfo.addView(backgroundImageView)
         parentInfo.addView(backgroundNextImageView)
         parentInfo.addView(backgroundScrim)
 
         // 1. Clock at top
-        clockView = object : TextClock(this) {
-            override fun onDetachedFromWindow() {
-                try {
-                    super.onDetachedFromWindow()
-                } catch (e: IllegalArgumentException) {
-                    e.printStackTrace()
+        clockView =
+            object : TextClock(this) {
+                override fun onDetachedFromWindow() {
+                    try {
+                        super.onDetachedFromWindow()
+                    } catch (e: IllegalArgumentException) {
+                        e.printStackTrace()
+                    }
                 }
+            }.apply {
+                val isFill = mode == "fill" && isMusicMode
+                format12Hour = if (isFill) "hh\nmm" else "hh\nmm"
+                format24Hour = if (isFill) "HH\nmm" else "HH\nmm"
+                setLineSpacing(0f, 0.8f)
+                setTextColor(Color.WHITE)
+                gravity = Gravity.CENTER
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        Gravity.CENTER,
+                    )
+                typeface = googleSansFlex
+                alpha = 0.8f
             }
-        }.apply {
-            val isFill = mode == "fill" && isMusicMode
-            format12Hour = if (isFill) "hh\nmm" else "hh\nmm"
-            format24Hour = if (isFill) "HH\nmm" else "HH\nmm"
-            setLineSpacing(0f, 0.8f)
-            setTextColor(Color.WHITE)
-            gravity = Gravity.CENTER
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER
-            )
-            typeface = googleSansFlex
-            alpha = 0.8f
-        }
         parentInfo.addView(clockView)
 
         // 2. Center Content (Art + Volume Stroke)
-        centerContainer = FrameLayout(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.CENTER
-            )
-        }
+        centerContainer =
+            FrameLayout(this).apply {
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        Gravity.CENTER,
+                    )
+            }
 
         val size = dpToPx(320f)
 
-        currentPolygon = com.sameerasw.essentials.utils.AmbientMusicShapeHelper.getRandomPolygon()
+        currentPolygon =
+            com.sameerasw.essentials.utils.AmbientMusicShapeHelper
+                .getRandomPolygon()
         currentShapePath =
-            com.sameerasw.essentials.utils.AmbientMusicShapeHelper.getRandomShapePath(size.toFloat())
+            com.sameerasw.essentials.utils.AmbientMusicShapeHelper
+                .getRandomShapePath(size.toFloat())
 
         // Container for clipping
-        clipContainer = FrameLayout(this).apply {
-            layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
-            outlineProvider = object : android.view.ViewOutlineProvider() {
-                override fun getOutline(view: View, outline: android.graphics.Outline) {
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                        currentShapePath?.let { outline.setPath(it) }
-                    } else {
-                        outline.setOval(0, 0, view.width, view.height)
+        clipContainer =
+            FrameLayout(this).apply {
+                layoutParams = FrameLayout.LayoutParams(size, size, Gravity.CENTER)
+                outlineProvider =
+                    object : android.view.ViewOutlineProvider() {
+                        override fun getOutline(
+                            view: View,
+                            outline: android.graphics.Outline,
+                        ) {
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                                currentShapePath?.let { outline.setPath(it) }
+                            } else {
+                                outline.setOval(0, 0, view.width, view.height)
+                            }
+                        }
                     }
-                }
+                clipToOutline = true
             }
-            clipToOutline = true
-        }
 
-        imageView = ImageView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            scaleType = ImageView.ScaleType.CENTER_CROP
-            setImageDrawable(ColorDrawable(Color.DKGRAY))
-        }
+        imageView =
+            ImageView(this).apply {
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                    )
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                setImageDrawable(ColorDrawable(Color.DKGRAY))
+            }
 
-        nextImageView = ImageView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            scaleType = ImageView.ScaleType.CENTER_CROP
-            alpha = 0f
-        }
+        nextImageView =
+            ImageView(this).apply {
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                    )
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                alpha = 0f
+            }
 
         // Dark overlay
-        val scrim = View(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
-            )
-            setBackgroundColor(0x40000000)
-        }
+        val scrim =
+            View(this).apply {
+                layoutParams =
+                    FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                    )
+                setBackgroundColor(0x40000000)
+            }
 
         clipContainer?.addView(imageView)
         clipContainer?.addView(nextImageView)
@@ -387,160 +436,189 @@ class AmbientDreamService : DreamService() {
 
         // Volume Icon
         val iconSize = dpToPx(56f)
-        volumeIconView = ImageView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(iconSize, iconSize, Gravity.CENTER)
-            setColorFilter(Color.WHITE)
-            alpha = 0f // Hidden initially
-        }
+        volumeIconView =
+            ImageView(this).apply {
+                layoutParams = FrameLayout.LayoutParams(iconSize, iconSize, Gravity.CENTER)
+                setColorFilter(Color.WHITE)
+                alpha = 0f // Hidden initially
+            }
         centerContainer?.addView(volumeIconView)
 
         // Volume Stroke
-        volumeStrokeView = VolumeStrokeView(this, currentShapePath!!, 0).apply {
-            layoutParams =
-                FrameLayout.LayoutParams(size + dpToPx(20f), size + dpToPx(20f), Gravity.CENTER)
-            setColor(Color.GRAY)
-            alpha = 0f // Hidden by default, only shown on volume change
-        }
+        volumeStrokeView =
+            VolumeStrokeView(this, currentShapePath!!, 0).apply {
+                layoutParams =
+                    FrameLayout.LayoutParams(size + dpToPx(20f), size + dpToPx(20f), Gravity.CENTER)
+                setColor(Color.GRAY)
+                alpha = 0f // Hidden by default, only shown on volume change
+            }
         centerContainer?.addView(volumeStrokeView)
 
         parentInfo.addView(centerContainer)
 
         // 3. Bottom Text Content
-        textContainer = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER_HORIZONTAL
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            ).apply {
-                bottomMargin = dpToPx(120f)
+        textContainer =
+            LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                gravity = Gravity.CENTER_HORIZONTAL
+                layoutParams =
+                    FrameLayout
+                        .LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT,
+                            FrameLayout.LayoutParams.WRAP_CONTENT,
+                            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+                        ).apply {
+                            bottomMargin = dpToPx(120f)
+                        }
             }
-        }
 
-        titleView = TextView(this).apply {
-            textSize = 22f
-            typeface = googleSansFlex
-            setTextColor(Color.WHITE)
-            gravity = Gravity.CENTER
-            layoutParams =
-                LinearLayout.LayoutParams(dpToPx(280f), LinearLayout.LayoutParams.WRAP_CONTENT)
-                    .apply {
-                        setMargins(dpToPx(24f), 0, dpToPx(24f), dpToPx(4f))
-                    }
-            maxLines = 1
-            ellipsize = android.text.TextUtils.TruncateAt.END
-        }
+        titleView =
+            TextView(this).apply {
+                textSize = 22f
+                typeface = googleSansFlex
+                setTextColor(Color.WHITE)
+                gravity = Gravity.CENTER
+                layoutParams =
+                    LinearLayout
+                        .LayoutParams(dpToPx(280f), LinearLayout.LayoutParams.WRAP_CONTENT)
+                        .apply {
+                            setMargins(dpToPx(24f), 0, dpToPx(24f), dpToPx(4f))
+                        }
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            }
 
-        artistView = TextView(this).apply {
-            textSize = 15f
-            typeface = googleSansFlex
-            setTextColor(0xCCFFFFFF.toInt())
-            gravity = Gravity.CENTER
-            layoutParams =
-                LinearLayout.LayoutParams(dpToPx(240f), LinearLayout.LayoutParams.WRAP_CONTENT)
-                    .apply {
-                        setMargins(dpToPx(24f), 0, dpToPx(24f), 0)
-                    }
-            maxLines = 1
-            ellipsize = android.text.TextUtils.TruncateAt.END
-        }
+        artistView =
+            TextView(this).apply {
+                textSize = 15f
+                typeface = googleSansFlex
+                setTextColor(0xCCFFFFFF.toInt())
+                gravity = Gravity.CENTER
+                layoutParams =
+                    LinearLayout
+                        .LayoutParams(dpToPx(240f), LinearLayout.LayoutParams.WRAP_CONTENT)
+                        .apply {
+                            setMargins(dpToPx(24f), 0, dpToPx(24f), 0)
+                        }
+                maxLines = 1
+                ellipsize = android.text.TextUtils.TruncateAt.END
+            }
 
         textContainer?.addView(titleView)
         textContainer?.addView(artistView)
 
         // Like Status Icon
-        likeStatusView = ImageView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(dpToPx(24f), dpToPx(24f)).apply {
-                topMargin = dpToPx(16f)
+        likeStatusView =
+            ImageView(this).apply {
+                layoutParams =
+                    LinearLayout.LayoutParams(dpToPx(24f), dpToPx(24f)).apply {
+                        topMargin = dpToPx(16f)
+                    }
+                setColorFilter(Color.WHITE)
+                setImageResource(R.drawable.rounded_favorite_24)
+                alpha = 0.8f
             }
-            setColorFilter(Color.WHITE)
-            setImageResource(R.drawable.rounded_favorite_24)
-            alpha = 0.8f
-        }
         textContainer?.addView(likeStatusView)
 
         parentInfo.addView(textContainer)
 
         if (volumeReceiver == null) {
-            volumeReceiver = object : BroadcastReceiver() {
-                override fun onReceive(context: Context?, intent: Intent?) {
-                    if (isDetached) return
-                    if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
-                        val audioManager =
-                            context?.getSystemService(AUDIO_SERVICE) as? android.media.AudioManager
-                        audioManager?.let {
-                            val current =
-                                it.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
-                            val max = it.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
-                            val perc = (current.toFloat() / max.toFloat() * 100).toInt()
+            volumeReceiver =
+                object : BroadcastReceiver() {
+                    override fun onReceive(
+                        context: Context?,
+                        intent: Intent?,
+                    ) {
+                        if (isDetached) return
+                        if (intent?.action == "android.media.VOLUME_CHANGED_ACTION") {
+                            val audioManager =
+                                context?.getSystemService(AUDIO_SERVICE) as? android.media.AudioManager
+                            audioManager?.let {
+                                val current =
+                                    it.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
+                                val max = it.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
+                                val perc = (current.toFloat() / max.toFloat() * 100).toInt()
 
-                            if (isMusicMode) {
-                                val isFill = getAlbumArtMode() == "fill"
-                                if (isFill) {
-                                    bottomVolumeProgressView?.updatePercentage(perc)
-                                    bottomVolumeProgressView?.animate()?.alpha(1f)?.setDuration(300)
-                                        ?.start()
-                                } else {
-                                    volumeStrokeView?.setColor(Color.WHITE)
-                                    volumeStrokeView?.updatePercentage(perc)
-                                    volumeStrokeView?.animate()?.alpha(1f)?.setDuration(300)
-                                        ?.start()
+                                if (isMusicMode) {
+                                    val isFill = getAlbumArtMode() == "fill"
+                                    if (isFill) {
+                                        bottomVolumeProgressView?.updatePercentage(perc)
+                                        bottomVolumeProgressView
+                                            ?.animate()
+                                            ?.alpha(1f)
+                                            ?.setDuration(300)
+                                            ?.start()
+                                    } else {
+                                        volumeStrokeView?.setColor(Color.WHITE)
+                                        volumeStrokeView?.updatePercentage(perc)
+                                        volumeStrokeView
+                                            ?.animate()
+                                            ?.alpha(1f)
+                                            ?.setDuration(300)
+                                            ?.start()
+                                    }
+
+                                    handler.removeCallbacks(volumeHideRunnable)
+                                    handler.postDelayed(volumeHideRunnable, 3000)
+
+                                    handler.removeCallbacks(revertToMusicRunnable)
+                                    handler.postDelayed(revertToMusicRunnable, 5000)
                                 }
-
-                                handler.removeCallbacks(volumeHideRunnable)
-                                handler.postDelayed(volumeHideRunnable, 3000)
-
-                                handler.removeCallbacks(revertToMusicRunnable)
-                                handler.postDelayed(revertToMusicRunnable, 5000)
                             }
                         }
                     }
                 }
-            }
             registerReceiver(
                 volumeReceiver,
                 IntentFilter("android.media.VOLUME_CHANGED_ACTION"),
-                RECEIVER_EXPORTED
+                RECEIVER_EXPORTED,
             )
         }
 
         // 4. Notification Icons at bottom
-        notificationIconsLayout = LinearLayout(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            ).apply {
-                bottomMargin = dpToPx(60f)
+        notificationIconsLayout =
+            LinearLayout(this).apply {
+                layoutParams =
+                    FrameLayout
+                        .LayoutParams(
+                            FrameLayout.LayoutParams.WRAP_CONTENT,
+                            FrameLayout.LayoutParams.WRAP_CONTENT,
+                            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+                        ).apply {
+                            bottomMargin = dpToPx(60f)
+                        }
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER
+                dividerDrawable =
+                    android.graphics.drawable.GradientDrawable().apply {
+                        setSize(dpToPx(12f), 0)
+                    }
+                showDividers = LinearLayout.SHOW_DIVIDER_MIDDLE
             }
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER
-            dividerDrawable = android.graphics.drawable.GradientDrawable().apply {
-                setSize(dpToPx(12f), 0)
-            }
-            showDividers = LinearLayout.SHOW_DIVIDER_MIDDLE
-        }
         parentInfo.addView(notificationIconsLayout)
 
         val audioManager = getSystemService(AUDIO_SERVICE) as? android.media.AudioManager
-        val initialPerc = audioManager?.let {
-            val current = it.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
-            val max = it.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
-            (current.toFloat() / max.toFloat() * 100).toInt()
-        } ?: 0
+        val initialPerc =
+            audioManager?.let {
+                val current = it.getStreamVolume(android.media.AudioManager.STREAM_MUSIC)
+                val max = it.getStreamMaxVolume(android.media.AudioManager.STREAM_MUSIC)
+                (current.toFloat() / max.toFloat() * 100).toInt()
+            } ?: 0
 
-        bottomVolumeProgressView = BottomVolumeProgressView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(
-                dpToPx(240f),
-                dpToPx(20f),
-                Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            ).apply {
-                bottomMargin = dpToPx(30f)
+        bottomVolumeProgressView =
+            BottomVolumeProgressView(this).apply {
+                layoutParams =
+                    FrameLayout
+                        .LayoutParams(
+                            dpToPx(240f),
+                            dpToPx(20f),
+                            Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+                        ).apply {
+                            bottomMargin = dpToPx(30f)
+                        }
+                updatePercentage(initialPerc)
+                alpha = 0f
             }
-            updatePercentage(initialPerc)
-            alpha = 0f
-        }
         parentInfo.addView(bottomVolumeProgressView)
 
         // Hide music elements initially
@@ -550,10 +628,11 @@ class AmbientDreamService : DreamService() {
         // Clock is visible in Idle Mode (Screensaver default)
         clockView?.alpha = 1f
         clockView?.textSize = 80f // Large for idle
-        clockView?.layoutParams = (clockView?.layoutParams as FrameLayout.LayoutParams).apply {
-            gravity = Gravity.CENTER
-            topMargin = 0
-        }
+        clockView?.layoutParams =
+            (clockView?.layoutParams as FrameLayout.LayoutParams).apply {
+                gravity = Gravity.CENTER
+                topMargin = 0
+            }
     }
 
     override fun onDetachedFromWindow() {
@@ -591,7 +670,9 @@ class AmbientDreamService : DreamService() {
         if (isDetached) return
 
         // Skip if Android Auto is running
-        if (com.sameerasw.essentials.utils.AppUtil.isAndroidAutoRunning(this)) {
+        if (com.sameerasw.essentials.utils.AppUtil
+                .isAndroidAutoRunning(this)
+        ) {
             switchToClockMode()
             return
         }
@@ -604,15 +685,17 @@ class AmbientDreamService : DreamService() {
 
         if (!isMusicMode) {
             val mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-            val componentName = android.content.ComponentName(
-                this,
-                NotificationListener::class.java
-            )
-            val sessions = try {
-                mediaSessionManager.getActiveSessions(componentName)
-            } catch (e: Exception) {
-                emptyList()
-            }
+            val componentName =
+                android.content.ComponentName(
+                    this,
+                    NotificationListener::class.java,
+                )
+            val sessions =
+                try {
+                    mediaSessionManager.getActiveSessions(componentName)
+                } catch (e: Exception) {
+                    emptyList()
+                }
             val anyPlaying =
                 sessions.any { it.playbackState?.state == android.media.session.PlaybackState.STATE_PLAYING }
             if (!anyPlaying) {
@@ -651,18 +734,30 @@ class AmbientDreamService : DreamService() {
                 val isFill = getAlbumArtMode() == "fill"
                 if (isFill) {
                     bottomVolumeProgressView?.updatePercentage(volumePercentage)
-                    bottomVolumeProgressView?.animate()?.alpha(1f)?.setDuration(300)?.start()
+                    bottomVolumeProgressView
+                        ?.animate()
+                        ?.alpha(1f)
+                        ?.setDuration(300)
+                        ?.start()
                 } else {
                     if (volumeKey == 24) {
                         volumeIconView?.setImageResource(R.drawable.rounded_volume_up_24)
                     } else if (volumeKey == 25) {
                         volumeIconView?.setImageResource(R.drawable.rounded_volume_down_24)
                     }
-                    volumeIconView?.animate()?.alpha(1f)?.setDuration(200)?.start()
+                    volumeIconView
+                        ?.animate()
+                        ?.alpha(1f)
+                        ?.setDuration(200)
+                        ?.start()
 
                     volumeStrokeView?.setColor(Color.WHITE)
                     volumeStrokeView?.updatePercentage(volumePercentage)
-                    volumeStrokeView?.animate()?.alpha(1f)?.setDuration(300)?.start()
+                    volumeStrokeView
+                        ?.animate()
+                        ?.alpha(1f)
+                        ?.setDuration(300)
+                        ?.start()
                 }
 
                 // Show and schedule hide
@@ -676,9 +771,18 @@ class AmbientDreamService : DreamService() {
             // Like status animation & refresh
             likeStatusView?.setImageResource(if (isAlreadyLiked) R.drawable.round_favorite_24 else R.drawable.rounded_favorite_24)
             if (eventType == "like") {
-                likeStatusView?.animate()?.scaleX(1.2f)?.scaleY(1.2f)?.setDuration(150)
+                likeStatusView
+                    ?.animate()
+                    ?.scaleX(1.2f)
+                    ?.scaleY(1.2f)
+                    ?.setDuration(150)
                     ?.withEndAction {
-                        likeStatusView?.animate()?.scaleX(1f)?.scaleY(1f)?.setDuration(150)?.start()
+                        likeStatusView
+                            ?.animate()
+                            ?.scaleX(1f)
+                            ?.scaleY(1f)
+                            ?.setDuration(150)
+                            ?.start()
                     }?.start()
             } else if (eventType == "like_update") {
                 updateMetadata()
@@ -695,12 +799,13 @@ class AmbientDreamService : DreamService() {
             packages.distinct().forEach { pkg ->
                 try {
                     val icon = packageManager.getApplicationIcon(pkg)
-                    val imageView = ImageView(this).apply {
-                        layoutParams =
-                            LinearLayout.LayoutParams(dpToPx(28f), dpToPx(28f))
-                        setImageDrawable(icon)
-                        alpha = 0.8f
-                    }
+                    val imageView =
+                        ImageView(this).apply {
+                            layoutParams =
+                                LinearLayout.LayoutParams(dpToPx(28f), dpToPx(28f))
+                            setImageDrawable(icon)
+                            alpha = 0.8f
+                        }
                     layout.addView(imageView)
                 } catch (_: Exception) {
                 }
@@ -708,11 +813,16 @@ class AmbientDreamService : DreamService() {
         }
     }
 
-    private val revertToMusicRunnable = Runnable {
-        eventType = "play_pause"
-        volumeIconView?.animate()?.alpha(0f)?.setDuration(200)?.start()
-        volumeStrokeView?.setColor(Color.GRAY)
-    }
+    private val revertToMusicRunnable =
+        Runnable {
+            eventType = "play_pause"
+            volumeIconView
+                ?.animate()
+                ?.alpha(0f)
+                ?.setDuration(200)
+                ?.start()
+            volumeStrokeView?.setColor(Color.GRAY)
+        }
 
     private fun updateActiveSession(sessions: List<android.media.session.MediaController>?) {
         if (isDetached) return
@@ -759,10 +869,11 @@ class AmbientDreamService : DreamService() {
     }
 
     private fun getMediaSessions(manager: MediaSessionManager): List<android.media.session.MediaController> {
-        val componentName = android.content.ComponentName(
-            this,
-            NotificationListener::class.java
-        )
+        val componentName =
+            android.content.ComponentName(
+                this,
+                NotificationListener::class.java,
+            )
         return try {
             manager.getActiveSessions(componentName)
         } catch (e: SecurityException) {
@@ -785,7 +896,9 @@ class AmbientDreamService : DreamService() {
         if (isMusicMode) return
 
         // Skip if Android Auto is running
-        if (com.sameerasw.essentials.utils.AppUtil.isAndroidAutoRunning(this)) {
+        if (com.sameerasw.essentials.utils.AppUtil
+                .isAndroidAutoRunning(this)
+        ) {
             return
         }
         isMusicMode = true
@@ -794,37 +907,61 @@ class AmbientDreamService : DreamService() {
         val isFill = mode == "fill"
 
         // Move Clock based on mode
-        clockView?.animate()?.alpha(0f)?.setDuration(150)?.withEndAction {
-            if (isFill) {
-                clockView?.format12Hour = "hh\nmm"
-                clockView?.format24Hour = "HH\nmm"
-                clockView?.setLineSpacing(0f, 0.8f)
-                applyClockFontVariations(clockView!!, true)
-                clockView?.layoutParams =
-                    (clockView?.layoutParams as FrameLayout.LayoutParams).apply {
-                        gravity = Gravity.CENTER
-                        topMargin = -dpToPx(40f)
-                    }
-            } else {
-                clockView?.textSize = 24f
-                clockView?.format12Hour = "hh:mm"
-                clockView?.format24Hour = "HH:mm"
-                clockView?.setLineSpacing(0f, 1f)
-                applyClockFontVariations(clockView!!, false)
-                clockView?.layoutParams =
-                    (clockView?.layoutParams as FrameLayout.LayoutParams).apply {
-                        gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                        topMargin = dpToPx(100f)
-                    }
-            }
-            clockView?.requestLayout()
-            clockView?.animate()?.alpha(0.8f)?.setDuration(150)?.start()
-        }?.start()
+        clockView
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(150)
+            ?.withEndAction {
+                if (isFill) {
+                    clockView?.format12Hour = "hh\nmm"
+                    clockView?.format24Hour = "HH\nmm"
+                    clockView?.setLineSpacing(0f, 0.8f)
+                    applyClockFontVariations(clockView!!, true)
+                    clockView?.layoutParams =
+                        (clockView?.layoutParams as FrameLayout.LayoutParams).apply {
+                            gravity = Gravity.CENTER
+                            topMargin = -dpToPx(40f)
+                        }
+                } else {
+                    clockView?.textSize = 24f
+                    clockView?.format12Hour = "hh:mm"
+                    clockView?.format24Hour = "HH:mm"
+                    clockView?.setLineSpacing(0f, 1f)
+                    applyClockFontVariations(clockView!!, false)
+                    clockView?.layoutParams =
+                        (clockView?.layoutParams as FrameLayout.LayoutParams).apply {
+                            gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                            topMargin = dpToPx(100f)
+                        }
+                }
+                clockView?.requestLayout()
+                clockView
+                    ?.animate()
+                    ?.alpha(0.8f)
+                    ?.setDuration(150)
+                    ?.start()
+            }?.start()
 
-        centerContainer?.animate()?.alpha(if (isFill) 0f else 1f)?.setDuration(300)?.start()
-        textContainer?.animate()?.alpha(1f)?.setDuration(300)?.start()
-        backgroundImageView?.animate()?.alpha(if (isFill) 0.7f else 0f)?.setDuration(300)?.start()
-        backgroundScrim?.animate()?.alpha(if (isFill) 1f else 0f)?.setDuration(300)?.start()
+        centerContainer
+            ?.animate()
+            ?.alpha(if (isFill) 0f else 1f)
+            ?.setDuration(300)
+            ?.start()
+        textContainer
+            ?.animate()
+            ?.alpha(1f)
+            ?.setDuration(300)
+            ?.start()
+        backgroundImageView
+            ?.animate()
+            ?.alpha(if (isFill) 0.7f else 0f)
+            ?.setDuration(300)
+            ?.start()
+        backgroundScrim
+            ?.animate()
+            ?.alpha(if (isFill) 1f else 0f)
+            ?.setDuration(300)
+            ?.start()
 
         handler.post(progressUpdateRunnable)
     }
@@ -834,28 +971,61 @@ class AmbientDreamService : DreamService() {
         isMusicMode = false
 
         // Move Clock to Center
-        clockView?.animate()?.alpha(0f)?.setDuration(150)?.withEndAction {
-            clockView?.textSize = 80f
-            clockView?.format12Hour = "hh\nmm"
-            clockView?.format24Hour = "HH\nmm"
-            clockView?.setLineSpacing(0f, 0.8f)
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                clockView?.fontVariationSettings = null
-            }
-            clockView?.layoutParams = (clockView?.layoutParams as FrameLayout.LayoutParams).apply {
-                gravity = Gravity.CENTER
-                topMargin = 0
-            }
-            clockView?.requestLayout()
-            clockView?.animate()?.alpha(1f)?.setDuration(150)?.start()
-        }?.start()
+        clockView
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(150)
+            ?.withEndAction {
+                clockView?.textSize = 80f
+                clockView?.format12Hour = "hh\nmm"
+                clockView?.format24Hour = "HH\nmm"
+                clockView?.setLineSpacing(0f, 0.8f)
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    clockView?.fontVariationSettings = null
+                }
+                clockView?.layoutParams =
+                    (clockView?.layoutParams as FrameLayout.LayoutParams).apply {
+                        gravity = Gravity.CENTER
+                        topMargin = 0
+                    }
+                clockView?.requestLayout()
+                clockView
+                    ?.animate()
+                    ?.alpha(1f)
+                    ?.setDuration(150)
+                    ?.start()
+            }?.start()
 
-        centerContainer?.animate()?.alpha(0f)?.setDuration(300)?.start()
-        textContainer?.animate()?.alpha(0f)?.setDuration(300)?.start()
-        backgroundImageView?.animate()?.alpha(0f)?.setDuration(300)?.start()
-        backgroundNextImageView?.animate()?.alpha(0f)?.setDuration(300)?.start()
-        backgroundScrim?.animate()?.alpha(0f)?.setDuration(300)?.start()
-        bottomVolumeProgressView?.animate()?.alpha(0f)?.setDuration(300)?.start()
+        centerContainer
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(300)
+            ?.start()
+        textContainer
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(300)
+            ?.start()
+        backgroundImageView
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(300)
+            ?.start()
+        backgroundNextImageView
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(300)
+            ?.start()
+        backgroundScrim
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(300)
+            ?.start()
+        bottomVolumeProgressView
+            ?.animate()
+            ?.alpha(0f)
+            ?.setDuration(300)
+            ?.start()
     }
 
     private fun updateMetadata(directBitmap: android.graphics.Bitmap? = null) {
@@ -869,54 +1039,63 @@ class AmbientDreamService : DreamService() {
         val mode = getAlbumArtMode()
         val isFill = mode == "fill"
 
-        val newPolygon = com.sameerasw.essentials.utils.AmbientMusicShapeHelper.getPolygon(
-            "${trackTitle}_${artistName}",
-            randomEnabled
-        )
+        val newPolygon =
+            com.sameerasw.essentials.utils.AmbientMusicShapeHelper.getPolygon(
+                "${trackTitle}_$artistName",
+                randomEnabled,
+            )
 
         if (currentPolygon != null && currentPolygon != newPolygon) {
             val morph = androidx.graphics.shapes.Morph(currentPolygon!!, newPolygon)
             morphAnimator?.cancel()
-            morphAnimator = android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
-                duration = 800
-                interpolator = android.view.animation.PathInterpolator(0.4f, 0f, 0.2f, 1f)
-                addUpdateListener { animator ->
-                    val progress = animator.animatedValue as Float
-                    currentShapePath?.let { path ->
-                        com.sameerasw.essentials.utils.AmbientMusicShapeHelper.updatePathFromMorph(
-                            morph, progress, size, path, progress * 360f
-                        )
-                        volumeStrokeView?.updatePath(path)
-                        clipContainer?.invalidateOutline()
-                    }
-
-                    nextImageView?.alpha = progress
-                    if (isFill) {
-                        backgroundNextImageView?.alpha = progress * 0.7f
-                        backgroundImageView?.alpha = (1f - progress) * 0.7f
-                    }
-                }
-                addListener(object : android.animation.AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: android.animation.Animator) {
-                        imageView?.setImageDrawable(nextImageView?.drawable)
-                        if (isFill) {
-                            backgroundImageView?.setImageDrawable(backgroundNextImageView?.drawable)
-                            backgroundImageView?.alpha = 0.7f
-                        } else {
-                            backgroundImageView?.alpha = 0f
+            morphAnimator =
+                android.animation.ValueAnimator.ofFloat(0f, 1f).apply {
+                    duration = 800
+                    interpolator = android.view.animation.PathInterpolator(0.4f, 0f, 0.2f, 1f)
+                    addUpdateListener { animator ->
+                        val progress = animator.animatedValue as Float
+                        currentShapePath?.let { path ->
+                            com.sameerasw.essentials.utils.AmbientMusicShapeHelper.updatePathFromMorph(
+                                morph,
+                                progress,
+                                size,
+                                path,
+                                progress * 360f,
+                            )
+                            volumeStrokeView?.updatePath(path)
+                            clipContainer?.invalidateOutline()
                         }
-                        nextImageView?.alpha = 0f
-                        backgroundNextImageView?.alpha = 0f
+
+                        nextImageView?.alpha = progress
+                        if (isFill) {
+                            backgroundNextImageView?.alpha = progress * 0.7f
+                            backgroundImageView?.alpha = (1f - progress) * 0.7f
+                        }
                     }
-                })
-                start()
-            }
+                    addListener(
+                        object : android.animation.AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: android.animation.Animator) {
+                                imageView?.setImageDrawable(nextImageView?.drawable)
+                                if (isFill) {
+                                    backgroundImageView?.setImageDrawable(backgroundNextImageView?.drawable)
+                                    backgroundImageView?.alpha = 0.7f
+                                } else {
+                                    backgroundImageView?.alpha = 0f
+                                }
+                                nextImageView?.alpha = 0f
+                                backgroundNextImageView?.alpha = 0f
+                            }
+                        },
+                    )
+                    start()
+                }
         } else {
-            currentShapePath = com.sameerasw.essentials.utils.AmbientMusicShapeHelper.getShapePath(
-                "${trackTitle}_${artistName}",
-                size,
-                randomEnabled
-            )
+            currentShapePath =
+                com.sameerasw.essentials.utils.AmbientMusicShapeHelper.getShapePath(
+                    "${trackTitle}_$artistName",
+                    size,
+                    randomEnabled,
+                )
             volumeStrokeView?.updatePath(currentShapePath!!)
             clipContainer?.invalidateOutline()
 
@@ -929,25 +1108,49 @@ class AmbientDreamService : DreamService() {
         updateAlbumArt(directBitmap)
 
         // Handle Background Alpha for Fill mode
-        backgroundImageView?.animate()?.alpha(if (isFill) 0.7f else 0f)?.setDuration(500)?.start()
-        backgroundScrim?.animate()?.alpha(if (isFill) 1f else 0f)?.setDuration(500)?.start()
-        centerContainer?.animate()?.alpha(if (isFill) 0f else 1f)?.setDuration(500)?.start()
-        textContainer?.animate()?.alpha(1f)?.setDuration(500)?.start()
+        backgroundImageView
+            ?.animate()
+            ?.alpha(if (isFill) 0.7f else 0f)
+            ?.setDuration(500)
+            ?.start()
+        backgroundScrim
+            ?.animate()
+            ?.alpha(if (isFill) 1f else 0f)
+            ?.setDuration(500)
+            ?.start()
+        centerContainer
+            ?.animate()
+            ?.alpha(if (isFill) 0f else 1f)
+            ?.setDuration(500)
+            ?.start()
+        textContainer
+            ?.animate()
+            ?.alpha(1f)
+            ?.setDuration(500)
+            ?.start()
 
         // Update Clock Layout based on mode
         clockView?.let { clock ->
-            clock.animate().alpha(0f).setDuration(250).withEndAction {
-                clock.format12Hour = if (isFill) "hh\nmm" else "hh:mm"
-                clock.format24Hour = if (isFill) "HH\nmm" else "HH:mm"
-                applyClockFontVariations(clock, isFill)
-                (clock.layoutParams as FrameLayout.LayoutParams).apply {
-                    gravity =
-                        if (isFill) Gravity.CENTER else Gravity.TOP or Gravity.CENTER_HORIZONTAL
-                    topMargin = if (isFill) -dpToPx(40f) else dpToPx(100f)
-                }
-                clock.requestLayout()
-                clock.animate().alpha(0.8f).setDuration(250).start()
-            }.start()
+            clock
+                .animate()
+                .alpha(0f)
+                .setDuration(250)
+                .withEndAction {
+                    clock.format12Hour = if (isFill) "hh\nmm" else "hh:mm"
+                    clock.format24Hour = if (isFill) "HH\nmm" else "HH:mm"
+                    applyClockFontVariations(clock, isFill)
+                    (clock.layoutParams as FrameLayout.LayoutParams).apply {
+                        gravity =
+                            if (isFill) Gravity.CENTER else Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                        topMargin = if (isFill) -dpToPx(40f) else dpToPx(100f)
+                    }
+                    clock.requestLayout()
+                    clock
+                        .animate()
+                        .alpha(0.8f)
+                        .setDuration(250)
+                        .start()
+                }.start()
         }
     }
 
@@ -965,7 +1168,10 @@ class AmbientDreamService : DreamService() {
         }
     }
 
-    private fun updateAlbumArt(directBitmap: android.graphics.Bitmap? = null, retryCount: Int = 0) {
+    private fun updateAlbumArt(
+        directBitmap: android.graphics.Bitmap? = null,
+        retryCount: Int = 0,
+    ) {
         if (directBitmap != null) {
             applyBitmaps(directBitmap)
             return
@@ -976,7 +1182,7 @@ class AmbientDreamService : DreamService() {
         if (title == null) return
 
         try {
-            val hashToUse = kotlin.math.abs("${title}_${artist}".hashCode().toLong())
+            val hashToUse = kotlin.math.abs("${title}_$artist".hashCode().toLong())
 
             // 1. Try Memory Cache first (Instant)
             val cachedBitmap =
@@ -1049,8 +1255,9 @@ class AmbientDreamService : DreamService() {
         }
         if (bitmap == null) {
             // In DreamService we don't have easy access to SBN, so we rely on metadata URI if available
-            val artUri = metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
-                ?: metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ART_URI)
+            val artUri =
+                metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
+                    ?: metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ART_URI)
             if (artUri != null) {
                 try {
                     val stream = contentResolver.openInputStream(android.net.Uri.parse(artUri))
@@ -1068,11 +1275,15 @@ class AmbientDreamService : DreamService() {
             val pbState = session.playbackState ?: return false
             for (action in pbState.customActions) {
                 val name = action.name.toString()
-                if (name.contains("Unlike", true) || name.contains(
+                if (name.contains("Unlike", true) ||
+                    name.contains(
                         "Unheart",
-                        true
-                    ) || name.contains("Remove", true)
-                ) return true
+                        true,
+                    ) ||
+                    name.contains("Remove", true)
+                ) {
+                    return true
+                }
             }
             val metadata = session.metadata
             if (metadata != null) {
@@ -1091,16 +1302,28 @@ class AmbientDreamService : DreamService() {
 
         fun getRandomShift() = (random.nextFloat() * 2 * maxShiftPx) - maxShiftPx
 
-        clockView?.animate()?.translationY(getRandomShift())?.setDuration(1000)?.start()
-        centerContainer?.animate()?.translationY(getRandomShift())?.setDuration(1000)?.start()
-        textContainer?.animate()?.translationY(getRandomShift())?.setDuration(1000)?.start()
+        clockView
+            ?.animate()
+            ?.translationY(getRandomShift())
+            ?.setDuration(1000)
+            ?.start()
+        centerContainer
+            ?.animate()
+            ?.translationY(getRandomShift())
+            ?.setDuration(1000)
+            ?.start()
+        textContainer
+            ?.animate()
+            ?.translationY(getRandomShift())
+            ?.setDuration(1000)
+            ?.start()
     }
 
     private fun createScallopPath(
         width: Float,
         height: Float,
         count: Int,
-        depth: Float
+        depth: Float,
     ): Path {
         val path = Path()
         val radius = width / 2f
@@ -1128,19 +1351,22 @@ class AmbientDreamService : DreamService() {
     }
 
     private fun getAlbumArtMode(): String {
-        val prefs = getSharedPreferences(
-            com.sameerasw.essentials.data.repository.SettingsRepository.PREFS_NAME,
-            MODE_PRIVATE
-        )
-        val selectedMode = prefs.getString(
-            com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ALBUM_ART_MODE,
-            "default"
-        ) ?: "default"
+        val prefs =
+            getSharedPreferences(
+                com.sameerasw.essentials.data.repository.SettingsRepository.PREFS_NAME,
+                MODE_PRIVATE,
+            )
+        val selectedMode =
+            prefs.getString(
+                com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_ALBUM_ART_MODE,
+                "default",
+            ) ?: "default"
 
-        val forceFillWhileCharging = prefs.getBoolean(
-            com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_FORCE_FILL_WHILE_CHARGING,
-            false
-        )
+        val forceFillWhileCharging =
+            prefs.getBoolean(
+                com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_FORCE_FILL_WHILE_CHARGING,
+                false,
+            )
         if (forceFillWhileCharging) {
             val batteryStatus: Intent? =
                 registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
@@ -1155,42 +1381,51 @@ class AmbientDreamService : DreamService() {
     }
 
     private fun isRandomShapesEnabled(): Boolean {
-        val prefs = getSharedPreferences(
-            com.sameerasw.essentials.data.repository.SettingsRepository.PREFS_NAME,
-            MODE_PRIVATE
-        )
+        val prefs =
+            getSharedPreferences(
+                com.sameerasw.essentials.data.repository.SettingsRepository.PREFS_NAME,
+                MODE_PRIVATE,
+            )
         return prefs.getBoolean(
             com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_RANDOM_SHAPES,
-            false
+            false,
         )
     }
 
-    private fun applyClockFontVariations(clock: TextClock, isFill: Boolean) {
-        val prefs = getSharedPreferences(
-            com.sameerasw.essentials.data.repository.SettingsRepository.PREFS_NAME,
-            MODE_PRIVATE
-        )
+    private fun applyClockFontVariations(
+        clock: TextClock,
+        isFill: Boolean,
+    ) {
+        val prefs =
+            getSharedPreferences(
+                com.sameerasw.essentials.data.repository.SettingsRepository.PREFS_NAME,
+                MODE_PRIVATE,
+            )
 
         if (isFill) {
-            val size = prefs.getInt(
-                com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_CLOCK_SIZE,
-                80
-            )
+            val size =
+                prefs.getInt(
+                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_CLOCK_SIZE,
+                    80,
+                )
             clock.textSize = size.toFloat()
 
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                val weight = prefs.getInt(
-                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_CLOCK_WEIGHT,
-                    400
-                )
-                val width = prefs.getInt(
-                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_CLOCK_WIDTH,
-                    100
-                )
-                val roundness = prefs.getInt(
-                    com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_CLOCK_ROUNDNESS,
-                    50
-                )
+                val weight =
+                    prefs.getInt(
+                        com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_CLOCK_WEIGHT,
+                        400,
+                    )
+                val width =
+                    prefs.getInt(
+                        com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_CLOCK_WIDTH,
+                        100,
+                    )
+                val roundness =
+                    prefs.getInt(
+                        com.sameerasw.essentials.data.repository.SettingsRepository.KEY_AMBIENT_MUSIC_GLANCE_CLOCK_ROUNDNESS,
+                        50,
+                    )
                 clock.fontVariationSettings = "'wght' $weight, 'wdth' $width, 'ROND' $roundness"
             }
         } else {
@@ -1211,17 +1446,18 @@ class AmbientDreamService : DreamService() {
     private inner class VolumeStrokeView(
         context: Context,
         private var petalPath: Path,
-        private val percentage: Int
+        private val percentage: Int,
     ) : View(context) {
         private var currentPercentage: Float = percentage.toFloat()
         private var animator: android.animation.ValueAnimator? = null
 
-        private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.GRAY
-            style = Paint.Style.STROKE
-            strokeWidth = dpToPx(6f).toFloat()
-            strokeCap = Paint.Cap.ROUND
-        }
+        private val paint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.GRAY
+                style = Paint.Style.STROKE
+                strokeWidth = dpToPx(6f).toFloat()
+                strokeCap = Paint.Cap.ROUND
+            }
         private var pathMeasure = PathMeasure(petalPath, false)
         private val progressPath = Path()
         private var isDetached = false
@@ -1240,7 +1476,8 @@ class AmbientDreamService : DreamService() {
         fun updatePercentage(newPercentage: Int) {
             animator?.cancel()
             animator =
-                android.animation.ValueAnimator.ofFloat(currentPercentage, newPercentage.toFloat())
+                android.animation.ValueAnimator
+                    .ofFloat(currentPercentage, newPercentage.toFloat())
                     .apply {
                         duration = 300
                         interpolator = android.view.animation.DecelerateInterpolator()
@@ -1280,24 +1517,28 @@ class AmbientDreamService : DreamService() {
         }
     }
 
-    private inner class BottomVolumeProgressView(context: Context) : View(context) {
+    private inner class BottomVolumeProgressView(
+        context: Context,
+    ) : View(context) {
         private var currentPercentage: Float = 0f
         private var animator: android.animation.ValueAnimator? = null
         private var waveAnimator: android.animation.ValueAnimator? = null
         private var phaseShift = 0f
 
-        private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = Color.WHITE
-            style = Paint.Style.STROKE
-            strokeWidth = dpToPx(3f).toFloat()
-            strokeCap = Paint.Cap.ROUND
-        }
-        private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = 0x33FFFFFF
-            style = Paint.Style.STROKE
-            strokeWidth = dpToPx(3f).toFloat()
-            strokeCap = Paint.Cap.ROUND
-        }
+        private val paint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.WHITE
+                style = Paint.Style.STROKE
+                strokeWidth = dpToPx(3f).toFloat()
+                strokeCap = Paint.Cap.ROUND
+            }
+        private val trackPaint =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                color = 0x33FFFFFF
+                style = Paint.Style.STROKE
+                strokeWidth = dpToPx(3f).toFloat()
+                strokeCap = Paint.Cap.ROUND
+            }
 
         private val path = Path()
         private val trackPath = Path()
@@ -1319,7 +1560,8 @@ class AmbientDreamService : DreamService() {
         fun updatePercentage(newPercentage: Int) {
             animator?.cancel()
             animator =
-                android.animation.ValueAnimator.ofFloat(currentPercentage, newPercentage.toFloat())
+                android.animation.ValueAnimator
+                    .ofFloat(currentPercentage, newPercentage.toFloat())
                     .apply {
                         duration = 300
                         interpolator = android.view.animation.DecelerateInterpolator()

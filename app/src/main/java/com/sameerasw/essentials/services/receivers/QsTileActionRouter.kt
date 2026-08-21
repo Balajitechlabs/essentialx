@@ -21,8 +21,10 @@ import com.sameerasw.essentials.services.tiles.FlashlightTileService
 import com.sameerasw.essentials.utils.HapticUtil
 
 class QsTileActionRouter : BroadcastReceiver() {
-
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         if (intent.action != ACTION_TRIGGER_TILE) return
 
         val serviceClassName = intent.getStringExtra(EXTRA_SERVICE_CLASS_NAME) ?: return
@@ -58,7 +60,7 @@ class QsTileActionRouter : BroadcastReceiver() {
                         val attachBaseContextMethod =
                             android.content.ContextWrapper::class.java.getDeclaredMethod(
                                 "attachBaseContext",
-                                Context::class.java
+                                Context::class.java,
                             )
                         attachBaseContextMethod.isAccessible = true
                         attachBaseContextMethod.invoke(tileService, context)
@@ -75,17 +77,19 @@ class QsTileActionRouter : BroadcastReceiver() {
         }
 
         // Notify widget to update state after action
-        val updateIntent = Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
-            setPackage(context.packageName)
-        }
+        val updateIntent =
+            Intent("com.sameerasw.essentials.action.QS_TILES_WIDGET_UPDATE").apply {
+                setPackage(context.packageName)
+            }
         context.sendBroadcast(updateIntent)
     }
 
     private fun fallbackLaunch(context: Context) {
         try {
-            val launchIntent = Intent(context, MainActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
+            val launchIntent =
+                Intent(context, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
             context.startActivity(launchIntent)
         } catch (e: Exception) {
             Log.e("QsTileActionRouter", "Failed to launch activity", e)

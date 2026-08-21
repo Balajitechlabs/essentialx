@@ -43,7 +43,7 @@ import com.sameerasw.essentials.ui.theme.GoogleSansFlexRounded
 fun WhatsNewCustomContent() {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         // Feature 1: Specs Retired
         WhatsNewItemCard(
@@ -51,7 +51,7 @@ fun WhatsNewCustomContent() {
             desc = stringResource(R.string.whats_new_specs_desc),
             iconRes = R.drawable.rounded_close_24,
             iconTint = MaterialTheme.colorScheme.error,
-            iconBackground = MaterialTheme.colorScheme.errorContainer
+            iconBackground = MaterialTheme.colorScheme.errorContainer,
         )
 
         // Feature 2: Apps Migrated
@@ -60,7 +60,7 @@ fun WhatsNewCustomContent() {
             desc = stringResource(R.string.whats_new_apps_desc),
             iconRes = R.drawable.rounded_apps_24,
             iconTint = MaterialTheme.colorScheme.primary,
-            iconBackground = MaterialTheme.colorScheme.primaryContainer
+            iconBackground = MaterialTheme.colorScheme.primaryContainer,
         )
     }
 }
@@ -71,34 +71,36 @@ fun WhatsNewItemCard(
     desc: String,
     iconRes: Int,
     iconTint: Color,
-    iconBackground: Color
+    iconBackground: Color,
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surfaceBright,
-        shape = RoundedCornerShape(24.dp)
+        shape = RoundedCornerShape(24.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Surface(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp)),
-                color = iconBackground
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(14.dp)),
+                color = iconBackground,
             ) {
                 Column(
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Icon(
                         painter = painterResource(id = iconRes),
                         contentDescription = null,
                         tint = iconTint,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }
@@ -106,23 +108,24 @@ fun WhatsNewItemCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             ) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontFamily = GoogleSansFlexRounded,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.1.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(
+                            fontFamily = GoogleSansFlexRounded,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.1.sp,
+                        ),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = desc,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 18.sp
+                    lineHeight = 18.sp,
                 )
             }
         }

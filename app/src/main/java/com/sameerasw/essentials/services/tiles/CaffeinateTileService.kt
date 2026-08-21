@@ -17,16 +17,16 @@ import com.sameerasw.essentials.domain.controller.CaffeinateController
 import com.sameerasw.essentials.services.CaffeinateWakeLockService
 
 class CaffeinateTileService : BaseTileService() {
-
     private val handler = android.os.Handler(android.os.Looper.getMainLooper())
-    private val refreshRunnable = object : Runnable {
-        override fun run() {
-            updateTile()
-            if (CaffeinateController.isStarting.value) {
-                handler.postDelayed(this, 1000)
+    private val refreshRunnable =
+        object : Runnable {
+            override fun run() {
+                updateTile()
+                if (CaffeinateController.isStarting.value) {
+                    handler.postDelayed(this, 1000)
+                }
             }
         }
-    }
 
     override fun onStartListening() {
         super.onStartListening()
@@ -55,19 +55,20 @@ class CaffeinateTileService : BaseTileService() {
 
     override fun getTileLabel(): String = "Caffeinate"
 
-    override fun getTileSubtitle(): String {
-        return if (CaffeinateController.isStarting.value) {
-            val timeoutStr = when (CaffeinateController.selectedTimeout.value) {
-                -1 -> "∞"
-                60 -> "1h"
-                else -> "${CaffeinateController.selectedTimeout.value}m"
-            }
+    override fun getTileSubtitle(): String =
+        if (CaffeinateController.isStarting.value) {
+            val timeoutStr =
+                when (CaffeinateController.selectedTimeout.value) {
+                    -1 -> "∞"
+                    60 -> "1h"
+                    else -> "${CaffeinateController.selectedTimeout.value}m"
+                }
             if (CaffeinateController.isActive.value) {
                 "$timeoutStr"
             } else {
                 getString(
                     R.string.caffeinate_starting_in,
-                    CaffeinateController.startingTimeLeft.value
+                    CaffeinateController.startingTimeLeft.value,
                 ) + " ($timeoutStr)"
             }
         } else if (CaffeinateController.isActive.value) {
@@ -76,19 +77,15 @@ class CaffeinateTileService : BaseTileService() {
             val timeout = getScreenOffTimeout()
             if (timeout == -1L) "Never" else "${timeout / 1000}s"
         }
-    }
 
-    override fun hasFeaturePermission(): Boolean {
-        return true
-    }
+    override fun hasFeaturePermission(): Boolean = true
 
-    override fun getTileState(): Int {
-        return if (CaffeinateController.isActive.value || CaffeinateController.isStarting.value) {
+    override fun getTileState(): Int =
+        if (CaffeinateController.isActive.value || CaffeinateController.isStarting.value) {
             Tile.STATE_ACTIVE
         } else {
             Tile.STATE_INACTIVE
         }
-    }
 
     private fun isWakeLockServiceRunning(): Boolean {
         val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
@@ -100,11 +97,10 @@ class CaffeinateTileService : BaseTileService() {
         return false
     }
 
-    private fun getScreenOffTimeout(): Long {
-        return try {
+    private fun getScreenOffTimeout(): Long =
+        try {
             Settings.System.getLong(contentResolver, Settings.System.SCREEN_OFF_TIMEOUT)
         } catch (_: Exception) {
             60000L
         }
-    }
 }

@@ -24,7 +24,9 @@ import kotlinx.coroutines.launch
 
 class GitHubAuthViewModel : ViewModel() {
     private val authRepository = GitHubAuthRepository()
-    private val gitHubRepository = com.sameerasw.essentials.data.repository.GitHubRepository()
+    private val gitHubRepository =
+        com.sameerasw.essentials.data.repository
+            .GitHubRepository()
 
     private val _authState = mutableStateOf<AuthState>(AuthState.Idle)
     val authState: State<AuthState> = _authState
@@ -40,10 +42,11 @@ class GitHubAuthViewModel : ViewModel() {
         viewModelScope.launch {
             val response = authRepository.requestDeviceCode()
             if (response != null) {
-                _authState.value = AuthState.CodeReceived(
-                    userCode = response.userCode,
-                    verificationUri = response.verificationUri
-                )
+                _authState.value =
+                    AuthState.CodeReceived(
+                        userCode = response.userCode,
+                        verificationUri = response.verificationUri,
+                    )
                 startPolling(response.deviceCode, response.interval)
             } else {
                 _authState.value = AuthState.Error("Failed to request device code")
@@ -51,55 +54,65 @@ class GitHubAuthViewModel : ViewModel() {
         }
     }
 
-    private fun startPolling(deviceCode: String, intervalSeconds: Int) {
+    private fun startPolling(
+        deviceCode: String,
+        intervalSeconds: Int,
+    ) {
         pollingJob?.cancel()
-        pollingJob = viewModelScope.launch {
-            var currentInterval = intervalSeconds * 1000L
-            while (isActive) {
-                delay(currentInterval)
-                val tokenResponse = authRepository.pollForToken(deviceCode, intervalSeconds)
+        pollingJob =
+            viewModelScope.launch {
+                var currentInterval = intervalSeconds * 1000L
+                while (isActive) {
+                    delay(currentInterval)
+                    val tokenResponse = authRepository.pollForToken(deviceCode, intervalSeconds)
 
-                if (tokenResponse != null) {
-                    when {
-                        tokenResponse.accessToken != null -> {
-                            _authState.value = AuthState.Authenticated(tokenResponse.accessToken)
-                            pollingJob?.cancel()
-                            return@launch
-                        }
+                    if (tokenResponse != null) {
+                        when {
+                            tokenResponse.accessToken != null -> {
+                                _authState.value = AuthState.Authenticated(tokenResponse.accessToken)
+                                pollingJob?.cancel()
+                                return@launch
+                            }
 
-                        tokenResponse.error == "authorization_pending" -> {
-                            // Continue polling
-                        }
+                            tokenResponse.error == "authorization_pending" -> {
+                                // Continue polling
+                            }
 
-                        tokenResponse.error == "slow_down" -> {
-                            currentInterval += 5000L
-                        }
+                            tokenResponse.error == "slow_down" -> {
+                                currentInterval += 5000L
+                            }
 
-                        tokenResponse.error == "expired_token" -> {
-                            _authState.value = AuthState.Error("Code expired. Please try again.")
-                            pollingJob?.cancel()
-                            return@launch
-                        }
+                            tokenResponse.error == "expired_token" -> {
+                                _authState.value = AuthState.Error("Code expired. Please try again.")
+                                pollingJob?.cancel()
+                                return@launch
+                            }
 
-                        else -> {
-                            // "access_denied" or other errors
-                            _authState.value =
-                                AuthState.Error("Authentication failed: ${tokenResponse.error}")
-                            pollingJob?.cancel()
-                            return@launch
+                            else -> {
+                                // "access_denied" or other errors
+                                _authState.value =
+                                    AuthState.Error("Authentication failed: ${tokenResponse.error}")
+                                pollingJob?.cancel()
+                                return@launch
+                            }
                         }
                     }
                 }
             }
-        }
     }
 
-    fun saveToken(context: Context, token: String) {
+    fun saveToken(
+        context: Context,
+        token: String,
+    ) {
         SettingsRepository(context).saveGitHubToken(token)
         loadUser(token, context)
     }
 
-    fun loadUser(token: String, context: Context) {
+    fun loadUser(
+        token: String,
+        context: Context,
+    ) {
         viewModelScope.launch {
             val user = gitHubRepository.getUserProfile(token)
             if (user != null) {
@@ -131,8 +144,19 @@ class GitHubAuthViewModel : ViewModel() {
 
 sealed class AuthState {
     object Idle : AuthState()
+
     object Loading : AuthState()
-    data class CodeReceived(val userCode: String, val verificationUri: String) : AuthState()
-    data class Authenticated(val token: String) : AuthState()
-    data class Error(val message: String) : AuthState()
+
+    data class CodeReceived(
+        val userCode: String,
+        val verificationUri: String,
+    ) : AuthState()
+
+    data class Authenticated(
+        val token: String,
+    ) : AuthState()
+
+    data class Error(
+        val message: String,
+    ) : AuthState()
 }

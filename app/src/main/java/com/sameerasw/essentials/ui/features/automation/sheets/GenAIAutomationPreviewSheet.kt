@@ -51,82 +51,87 @@ fun GenAIAutomationPreviewSheet(
     suggestion: AutomationSuggestion,
     onConfirm: (AutomationSuggestion) -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val view = LocalView.current
     val context = LocalContext.current
 
     EssentialsBottomSheet(
         onDismissRequest = onDismiss,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp, start = 24.dp, end = 24.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp, start = 24.dp, end = 24.dp),
         ) {
             // Header
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     painter = painterResource(R.drawable.rounded_auto_awesome_24),
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = stringResource(R.string.diy_genai_preview_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
 
             // Preview Container using standard RoundedCardContainer
             RoundedCardContainer {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                 ) {
                     if (!suggestion.explanation.isNullOrEmpty()) {
                         Text(
                             text = suggestion.explanation,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    val triggerOrStateTitle = suggestion.triggerType
-                        ?: suggestion.stateType
-                        ?: suggestion.title.ifEmpty { suggestion.type }
+                    val triggerOrStateTitle =
+                        suggestion.triggerType
+                            ?: suggestion.stateType
+                            ?: suggestion.title.ifEmpty { suggestion.type }
 
-                    val iconRes = when {
-                        suggestion.triggerType != null -> R.drawable.rounded_bolt_24
-                        suggestion.stateType != null -> R.drawable.rounded_toggle_on_24
-                        else -> R.drawable.rounded_apps_24
-                    }
+                    val iconRes =
+                        when {
+                            suggestion.triggerType != null -> R.drawable.rounded_bolt_24
+                            suggestion.stateType != null -> R.drawable.rounded_toggle_on_24
+                            else -> R.drawable.rounded_apps_24
+                        }
 
                     Surface(
                         color = MaterialTheme.colorScheme.secondaryContainer,
                         shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Row(
                             modifier = Modifier.padding(14.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 painter = painterResource(iconRes),
                                 contentDescription = null,
                                 modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
@@ -135,53 +140,55 @@ fun GenAIAutomationPreviewSheet(
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 fontWeight = FontWeight.SemiBold,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
 
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Box(
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                            contentAlignment = Alignment.Center
+                            modifier =
+                                Modifier
+                                    .size(28.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.rounded_arrow_cool_down_24),
                                 contentDescription = null,
                                 modifier = Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
                     }
 
                     Column(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         if (suggestion.actionTypes.isNotEmpty()) {
                             suggestion.actionTypes.forEach { actionName ->
                                 Surface(
                                     color = MaterialTheme.colorScheme.primaryContainer,
                                     shape = RoundedCornerShape(16.dp),
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(14.dp),
-                                        verticalAlignment = Alignment.CenterVertically
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Icon(
                                             painter = painterResource(R.drawable.rounded_play_arrow_24),
                                             contentDescription = null,
                                             modifier = Modifier.size(24.dp),
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                         )
                                         Spacer(modifier = Modifier.width(12.dp))
                                         Text(
@@ -190,7 +197,7 @@ fun GenAIAutomationPreviewSheet(
                                             fontWeight = FontWeight.SemiBold,
                                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                                             maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
+                                            overflow = TextOverflow.Ellipsis,
                                         )
                                     }
                                 }
@@ -199,13 +206,13 @@ fun GenAIAutomationPreviewSheet(
                             Surface(
                                 color = MaterialTheme.colorScheme.primaryContainer,
                                 shape = RoundedCornerShape(16.dp),
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(
                                     text = "No actions defined",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                    modifier = Modifier.padding(14.dp)
+                                    modifier = Modifier.padding(14.dp),
                                 )
                             }
                         }
@@ -220,25 +227,27 @@ fun GenAIAutomationPreviewSheet(
                 text = stringResource(R.string.diy_genai_disclaimer),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 4.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 OutlinedButton(
                     onClick = {
                         HapticUtil.performVirtualKeyHaptic(view)
                         onDismiss()
                     },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp)
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(48.dp),
                 ) {
                     Text(text = stringResource(R.string.action_dismiss))
                 }
@@ -248,9 +257,10 @@ fun GenAIAutomationPreviewSheet(
                         HapticUtil.performVirtualKeyHaptic(view)
                         onConfirm(suggestion)
                     },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp)
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(48.dp),
                 ) {
                     Text(text = stringResource(R.string.action_create))
                 }

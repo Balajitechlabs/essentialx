@@ -51,7 +51,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 @Composable
 fun UserDictionaryBottomSheet(
     viewModel: MainViewModel,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -75,37 +75,38 @@ fun UserDictionaryBottomSheet(
                     onClick = {
                         viewModel.clearUserDictionary(context)
                         showDeleteConfirmation = false
-                    }
+                    },
                 ) {
                     Text("Delete", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 androidx.compose.material3.TextButton(
-                    onClick = { showDeleteConfirmation = false }
+                    onClick = { showDeleteConfirmation = false },
                 ) {
                     Text("Cancel")
                 }
-            }
+            },
         )
     }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "Learned Words",
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             if (words.isEmpty()) {
@@ -113,41 +114,42 @@ fun UserDictionaryBottomSheet(
                     text = "No words learned yet.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 32.dp)
+                    modifier = Modifier.padding(vertical = 32.dp),
                 )
             } else {
                 val view = androidx.compose.ui.platform.LocalView.current
                 LazyColumn {
                     item {
                         RoundedCardContainer(
-                            spacing = 2.dp
+                            spacing = 2.dp,
                         ) {
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.surfaceBright)
-                                    .clickable { showDeleteConfirmation = true }
-                                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.surfaceBright)
+                                        .clickable { showDeleteConfirmation = true }
+                                        .padding(horizontal = 16.dp, vertical = 16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Start
+                                horizontalArrangement = Arrangement.Start,
                             ) {
                                 Icon(
                                     painter = painterResource(R.drawable.rounded_delete_24),
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.error,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(24.dp),
                                 )
                                 Spacer(Modifier.width(16.dp))
                                 Column {
                                     Text(
                                         text = "Reset learned words",
                                         style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onSurface
+                                        color = MaterialTheme.colorScheme.onSurface,
                                     )
                                     Text(
                                         text = "Delete all learned words from dictionary",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
                                 }
                             }
@@ -157,37 +159,40 @@ fun UserDictionaryBottomSheet(
 
                     item {
                         RoundedCardContainer(
-                            spacing = 2.dp
+                            spacing = 2.dp,
                         ) {
-                            words.entries.toList().sortedByDescending { it.value }
+                            words.entries
+                                .toList()
+                                .sortedByDescending { it.value }
                                 .forEach { (word, _) ->
                                     Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .background(MaterialTheme.colorScheme.surfaceBright)
-                                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .background(MaterialTheme.colorScheme.surfaceBright)
+                                                .padding(horizontal = 16.dp, vertical = 12.dp),
                                         verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                                        horizontalArrangement = Arrangement.SpaceBetween,
                                     ) {
                                         Text(
                                             text = word,
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.weight(1f)
+                                            modifier = Modifier.weight(1f),
                                         )
 
                                         IconButton(
                                             onClick = {
                                                 com.sameerasw.essentials.utils.HapticUtil.performVirtualKeyHaptic(
-                                                    view
+                                                    view,
                                                 )
                                                 viewModel.deleteUserWord(word, context)
-                                            }
+                                            },
                                         ) {
                                             Icon(
                                                 painter = painterResource(R.drawable.rounded_delete_24),
                                                 contentDescription = "Delete",
-                                                tint = MaterialTheme.colorScheme.error
+                                                tint = MaterialTheme.colorScheme.error,
                                             )
                                         }
                                     }

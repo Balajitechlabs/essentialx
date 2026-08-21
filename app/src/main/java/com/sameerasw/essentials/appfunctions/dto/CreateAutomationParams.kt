@@ -44,5 +44,5 @@ data class CreateAutomationParams(
     val soundMode: String,
     val dimWallpaperAmount: Float,
     val freezeTagId: String,
-    val freezeMode: String
+    val freezeMode: String,
 )

@@ -20,7 +20,6 @@ import com.sameerasw.essentials.services.BatteryNotificationService
 
 @RequiresApi(Build.VERSION_CODES.N)
 class BatteryNotificationTileService : BaseTileService() {
-
     private val settingsRepository by lazy { SettingsRepository(this) }
 
     override fun onTileClick() {
@@ -41,16 +40,11 @@ class BatteryNotificationTileService : BaseTileService() {
 
     override fun getTileLabel(): String = "Battery Info"
 
-    override fun getTileSubtitle(): String =
-        if (settingsRepository.isBatteryNotificationEnabled()) "On" else "Off"
+    override fun getTileSubtitle(): String = if (settingsRepository.isBatteryNotificationEnabled()) "On" else "Off"
 
     override fun hasFeaturePermission(): Boolean = true
 
-    override fun getTileState(): Int {
-        return if (settingsRepository.isBatteryNotificationEnabled()) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-    }
+    override fun getTileState(): Int = if (settingsRepository.isBatteryNotificationEnabled()) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
 
-    override fun getTileIcon(): Icon {
-        return Icon.createWithResource(this, R.drawable.rounded_battery_android_frame_6_24)
-    }
+    override fun getTileIcon(): Icon = Icon.createWithResource(this, R.drawable.rounded_battery_android_frame_6_24)
 }

@@ -21,20 +21,21 @@ import com.sameerasw.essentials.utils.ShizukuUtils
 
 @RequiresApi(Build.VERSION_CODES.N)
 class RestartSystemUiTileService : BaseTileService() {
-
     override fun onClick() {
         if (!hasFeaturePermission()) {
-            val intent = Intent(this, FeatureSettingsActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                putExtra("feature", "Quick settings tiles")
-            }
+            val intent =
+                Intent(this, FeatureSettingsActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    putExtra("feature", "Quick settings tiles")
+                }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                val pendingIntent = android.app.PendingIntent.getActivity(
-                    this,
-                    0,
-                    intent,
-                    android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
-                )
+                val pendingIntent =
+                    android.app.PendingIntent.getActivity(
+                        this,
+                        0,
+                        intent,
+                        android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE,
+                    )
                 startActivityAndCollapse(pendingIntent)
             } else {
                 @Suppress("DEPRECATION")
@@ -47,13 +48,12 @@ class RestartSystemUiTileService : BaseTileService() {
 
     override fun getTileLabel(): String = getString(R.string.tile_restart_systemui)
 
-    override fun getTileSubtitle(): String {
-        return if (!hasFeaturePermission()) {
+    override fun getTileSubtitle(): String =
+        if (!hasFeaturePermission()) {
             getString(R.string.permission_missing)
         } else {
             getString(R.string.tile_restart_systemui_subtitle_restart)
         }
-    }
 
     override fun hasFeaturePermission(): Boolean {
         val rootOk = RootUtils.isRootAvailable() && RootUtils.isRootPermissionGranted()
@@ -61,9 +61,7 @@ class RestartSystemUiTileService : BaseTileService() {
         return rootOk || shizukuOk
     }
 
-    override fun getTileIcon(): Icon? {
-        return Icon.createWithResource(this, R.drawable.reopen_window_24px)
-    }
+    override fun getTileIcon(): Icon? = Icon.createWithResource(this, R.drawable.reopen_window_24px)
 
     override fun getTileState(): Int {
         // Tile is kept always in inactive (not disabled) state

@@ -65,50 +65,51 @@ fun FavoriteCarousel(
     pinnedKeys: List<String>,
     onFeatureClick: (Feature) -> Unit,
     onFeatureLongClick: (Feature) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (pinnedKeys.isEmpty()) return
 
-    val pinnedFeatures = remember(pinnedKeys) {
-        val featuresMap = FeatureRegistry.ALL_FEATURES.associateBy { it.id }
-        pinnedKeys.mapNotNull { featuresMap[it] }
-    }
+    val pinnedFeatures =
+        remember(pinnedKeys) {
+            val featuresMap = FeatureRegistry.ALL_FEATURES.associateBy { it.id }
+            pinnedKeys.mapNotNull { featuresMap[it] }
+        }
 
     if (pinnedFeatures.isEmpty()) return
 
     val carouselState = rememberCarouselState { pinnedFeatures.size }
 
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                return if (available.x != 0f) {
-                    Offset(x = available.x, y = 0f)
-                } else {
-                    Offset.Zero
-                }
+    val nestedScrollConnection =
+        remember {
+            object : NestedScrollConnection {
+                override fun onPostScroll(
+                    consumed: Offset,
+                    available: Offset,
+                    source: NestedScrollSource,
+                ): Offset =
+                    if (available.x != 0f) {
+                        Offset(x = available.x, y = 0f)
+                    } else {
+                        Offset.Zero
+                    }
             }
         }
-    }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .nestedScroll(nestedScrollConnection)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .nestedScroll(nestedScrollConnection),
     ) {
-
         HorizontalMultiBrowseCarousel(
             state = carouselState,
             preferredItemWidth = 140.dp,
             itemSpacing = 4.dp,
             contentPadding = PaddingValues(horizontal = 18.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(110.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(110.dp),
         ) { index ->
             val feature = pinnedFeatures[index]
             val view = LocalView.current
@@ -135,55 +136,58 @@ fun FavoriteCarousel(
             val blurRadius by animateDpAsState(
                 targetValue = if (isBlurred) 10.dp else 0.dp,
                 animationSpec = tween(durationMillis = 500),
-                label = "blur"
+                label = "blur",
             )
             val alpha by animateFloatAsState(
                 targetValue = if (isBlurred) 0.5f else 1f,
                 animationSpec = tween(durationMillis = 500),
-                label = "alpha"
+                label = "alpha",
             )
 
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(alpha)
-                    .maskClip(MaterialTheme.shapes.large)
-                    .background(MaterialTheme.colorScheme.surfaceBright)
-                    .pointerInput(feature) {
-                        detectTapGestures(
-                            onLongPress = {
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                showMenu = true
-                            },
-                            onTap = {
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                onFeatureClick(feature)
-                            }
-                        )
-                    }
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .alpha(alpha)
+                        .maskClip(MaterialTheme.shapes.large)
+                        .background(MaterialTheme.colorScheme.surfaceBright)
+                        .pointerInput(feature) {
+                            detectTapGestures(
+                                onLongPress = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    showMenu = true
+                                },
+                                onTap = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    onFeatureClick(feature)
+                                },
+                            )
+                        },
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .blur(blurRadius)
-                        .padding(8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .blur(blurRadius)
+                            .padding(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
                 ) {
                     Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(
-                                color = ColorUtil.getPastelColorFor(resolvedTitle),
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
+                        modifier =
+                            Modifier
+                                .size(40.dp)
+                                .background(
+                                    color = ColorUtil.getPastelColorFor(resolvedTitle),
+                                    shape = CircleShape,
+                                ),
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             painter = painterResource(id = feature.iconRes),
                             contentDescription = resolvedTitle,
                             modifier = Modifier.size(24.dp),
-                            tint = ColorUtil.getVibrantColorFor(resolvedTitle)
+                            tint = ColorUtil.getVibrantColorFor(resolvedTitle),
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
@@ -192,15 +196,16 @@ fun FavoriteCarousel(
                         style = MaterialTheme.typography.labelSmall,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .basicMarquee()
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .basicMarquee(),
                     )
                 }
 
                 SegmentedDropdownMenu(
                     expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
+                    onDismissRequest = { showMenu = false },
                 ) {
                     SegmentedDropdownMenuItem(
                         text = { Text(stringResource(R.string.action_unpin)) },
@@ -211,9 +216,9 @@ fun FavoriteCarousel(
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_bookmark_remove_24),
-                                contentDescription = null
+                                contentDescription = null,
                             )
-                        }
+                        },
                     )
                 }
             }

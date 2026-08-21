@@ -22,7 +22,6 @@ import com.sameerasw.essentials.utils.PermissionUtils
 
 @RequiresApi(Build.VERSION_CODES.N)
 class PrivateDnsTileService : BaseTileService() {
-
     companion object {
         private const val PRIVATE_DNS_MODE = "private_dns_mode"
         private const val PRIVATE_DNS_SPECIFIER = "private_dns_specifier"
@@ -34,10 +33,11 @@ class PrivateDnsTileService : BaseTileService() {
 
     override fun onClick() {
         if (!hasFeaturePermission()) {
-            val intent = Intent(this, FeatureSettingsActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-                putExtra("feature", "Quick settings tiles")
-            }
+            val intent =
+                Intent(this, FeatureSettingsActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    putExtra("feature", "Quick settings tiles")
+                }
             startActivityAndCollapse(intent)
             return
         }
@@ -67,21 +67,16 @@ class PrivateDnsTileService : BaseTileService() {
         }
     }
 
-    override fun hasFeaturePermission(): Boolean {
-        return PermissionUtils.canWriteSecureSettings(this)
-    }
+    override fun hasFeaturePermission(): Boolean = PermissionUtils.canWriteSecureSettings(this)
 
-    override fun getTileIcon(): Icon {
-        return when (getPrivateDnsMode()) {
+    override fun getTileIcon(): Icon =
+        when (getPrivateDnsMode()) {
             MODE_AUTO -> Icon.createWithResource(this, R.drawable.router_24px)
             MODE_OFF -> Icon.createWithResource(this, R.drawable.router_off_24px)
             else -> Icon.createWithResource(this, R.drawable.router_24px_filled)
         }
-    }
 
-    override fun getTileState(): Int {
-        return if (getPrivateDnsMode() != MODE_OFF) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-    }
+    override fun getTileState(): Int = if (getPrivateDnsMode() != MODE_OFF) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
 
     override fun onTileClick() {
         val settingsRepository = SettingsRepository(this)
@@ -109,7 +104,7 @@ class PrivateDnsTileService : BaseTileService() {
                     Settings.Global.putString(
                         contentResolver,
                         PRIVATE_DNS_SPECIFIER,
-                        firstPreset.hostname
+                        firstPreset.hostname,
                     )
                     Settings.Global.putString(contentResolver, PRIVATE_DNS_MODE, MODE_HOSTNAME)
                 } catch (e: Exception) {
@@ -132,7 +127,7 @@ class PrivateDnsTileService : BaseTileService() {
                         Settings.Global.putString(
                             contentResolver,
                             PRIVATE_DNS_SPECIFIER,
-                            nextPreset.hostname
+                            nextPreset.hostname,
                         )
                         Settings.Global.putString(contentResolver, PRIVATE_DNS_MODE, MODE_HOSTNAME)
                     } catch (e: Exception) {
@@ -142,30 +137,31 @@ class PrivateDnsTileService : BaseTileService() {
             }
         } else {
             val cycleAuto = settingsRepository.getBoolean("private_dns_cycle_auto", true)
-            val nextMode = if (cycleAuto) {
-                when (currentMode) {
-                    MODE_OFF -> MODE_AUTO
-                    MODE_AUTO -> {
-                        if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
-                    }
+            val nextMode =
+                if (cycleAuto) {
+                    when (currentMode) {
+                        MODE_OFF -> MODE_AUTO
+                        MODE_AUTO -> {
+                            if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
+                        }
 
-                    MODE_HOSTNAME -> MODE_OFF
-                    else -> MODE_OFF
+                        MODE_HOSTNAME -> MODE_OFF
+                        else -> MODE_OFF
+                    }
+                } else {
+                    when (currentMode) {
+                        MODE_OFF -> {
+                            if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
+                        }
+
+                        MODE_AUTO -> {
+                            if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
+                        }
+
+                        MODE_HOSTNAME -> MODE_OFF
+                        else -> MODE_OFF
+                    }
                 }
-            } else {
-                when (currentMode) {
-                    MODE_OFF -> {
-                        if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
-                    }
-
-                    MODE_AUTO -> {
-                        if (getPrivateDnsHostname().isNullOrEmpty()) MODE_OFF else MODE_HOSTNAME
-                    }
-
-                    MODE_HOSTNAME -> MODE_OFF
-                    else -> MODE_OFF
-                }
-            }
 
             try {
                 Settings.Global.putString(contentResolver, PRIVATE_DNS_MODE, nextMode)
@@ -175,11 +171,7 @@ class PrivateDnsTileService : BaseTileService() {
         }
     }
 
-    private fun getPrivateDnsMode(): String {
-        return Settings.Global.getString(contentResolver, PRIVATE_DNS_MODE) ?: MODE_OFF
-    }
+    private fun getPrivateDnsMode(): String = Settings.Global.getString(contentResolver, PRIVATE_DNS_MODE) ?: MODE_OFF
 
-    private fun getPrivateDnsHostname(): String? {
-        return Settings.Global.getString(contentResolver, PRIVATE_DNS_SPECIFIER)
-    }
+    private fun getPrivateDnsHostname(): String? = Settings.Global.getString(contentResolver, PRIVATE_DNS_SPECIFIER)
 }

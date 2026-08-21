@@ -36,15 +36,16 @@ fun RoundedCardLazyContainer(
     actionType: String = Intent.ACTION_SEND,
     togglePin: (String) -> Unit,
     pinnedPackages: Set<String>,
-    demo: Boolean = false
+    demo: Boolean = false,
 ) {
     val context = LocalContext.current
 
     LazyColumn(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(cornerRadius)),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(cornerRadius)),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         items(resolveInfos) { info ->
 
@@ -54,23 +55,23 @@ fun RoundedCardLazyContainer(
                 pinnedPackages = pinnedPackages,
                 demo = demo,
                 onTapAction = {
-                    val intent = if (actionType == Intent.ACTION_VIEW) {
-                        Intent(Intent.ACTION_VIEW, uri)
-                    } else {
-                        Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, uri.toString())
+                    val intent =
+                        if (actionType == Intent.ACTION_VIEW) {
+                            Intent(Intent.ACTION_VIEW, uri)
+                        } else {
+                            Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, uri.toString())
+                            }
                         }
-                    }
                     intent.setClassName(
                         info.resolveInfo.activityInfo.packageName,
-                        info.resolveInfo.activityInfo.name
+                        info.resolveInfo.activityInfo.name,
                     )
                     context.startActivity(intent)
                     onFinish()
-                }
+                },
             )
         }
     }
 }
-

@@ -37,30 +37,36 @@ fun TranslatableText(
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     maxLines: Int = Int.MAX_VALUE,
-    overflow: TextOverflow = TextOverflow.Clip
+    overflow: TextOverflow = TextOverflow.Clip,
 ) {
     val context = LocalContext.current
     val view = LocalView.current
 
-    val keyName = remember(stringResId) {
-        try {
-            context.resources.getResourceEntryName(stringResId)
-        } catch (e: Exception) {
-            "unknown"
+    val keyName =
+        remember(stringResId) {
+            try {
+                context.resources.getResourceEntryName(stringResId)
+            } catch (e: Exception) {
+                "unknown"
+            }
         }
-    }
 
     val defaultText = stringResource(id = stringResId)
-    val currentLocale = remember { context.resources.configuration.locales[0].language }
+    val currentLocale =
+        remember {
+            context.resources.configuration.locales[0]
+                .language
+        }
 
-    val displayText = remember(
-        keyName,
-        currentLocale,
-        defaultText,
-        TranslationManager.liveOverrides[Pair(keyName, currentLocale)]
-    ) {
-        TranslationManager.getOverriddenText(keyName, currentLocale, defaultText)
-    }
+    val displayText =
+        remember(
+            keyName,
+            currentLocale,
+            defaultText,
+            TranslationManager.liveOverrides[Pair(keyName, currentLocale)],
+        ) {
+            TranslationManager.getOverriddenText(keyName, currentLocale, defaultText)
+        }
 
     val isModeEnabled by TranslationManager.isTranslationModeEnabled
 
@@ -69,26 +75,27 @@ fun TranslatableText(
     var initialTargetLocaleForSheet by remember { mutableStateOf<String?>(null) }
 
     Box(
-        modifier = if (isModeEnabled) {
-            modifier.combinedClickable(
-                onClick = {},
-                onLongClick = {
-                    HapticUtil.performHeavyHaptic(view)
-                    TranslationManager.activeTargetKey.value = keyName
-                    TranslationManager.activeTargetText.value = displayText
-                    showMenu = true
-                }
-            )
-        } else {
-            modifier
-        }
+        modifier =
+            if (isModeEnabled) {
+                modifier.combinedClickable(
+                    onClick = {},
+                    onLongClick = {
+                        HapticUtil.performHeavyHaptic(view)
+                        TranslationManager.activeTargetKey.value = keyName
+                        TranslationManager.activeTargetText.value = displayText
+                        showMenu = true
+                    },
+                )
+            } else {
+                modifier
+            },
     ) {
         TranslationFocusOutline(visible = isModeEnabled && showMenu) {
             Text(
                 text = displayText,
                 style = style,
                 maxLines = maxLines,
-                overflow = overflow
+                overflow = overflow,
             )
         }
 
@@ -107,7 +114,7 @@ fun TranslatableText(
                     showMenu = false
                     initialTargetLocaleForSheet = null
                     showBottomSheet = true
-                }
+                },
             )
         }
     }
@@ -116,7 +123,7 @@ fun TranslatableText(
         TranslationBottomSheet(
             stringKey = keyName,
             initialTargetLocale = initialTargetLocaleForSheet,
-            onDismissRequest = { showBottomSheet = false }
+            onDismissRequest = { showBottomSheet = false },
         )
     }
 }

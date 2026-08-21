@@ -38,34 +38,36 @@ import com.sameerasw.essentials.utils.HapticUtil
 fun NotificationLightingStylePicker(
     selectedStyle: NotificationLightingStyle,
     onStyleSelected: (NotificationLightingStyle) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
-    val styles = listOf(
-        NotificationLightingStyle.STROKE,
-        NotificationLightingStyle.GLOW,
-        NotificationLightingStyle.INDICATOR,
-        NotificationLightingStyle.SWEEP,
-        NotificationLightingStyle.SYSTEM
-    )
-    val icons = listOf(
-        R.drawable.rounded_rounded_corner_24,
-        R.drawable.rounded_blur_linear_24,
-        R.drawable.rounded_circles_24,
-        R.drawable.rounded_target_24,
-        R.drawable.rounded_mobile_24
-    )
+    val styles =
+        listOf(
+            NotificationLightingStyle.STROKE,
+            NotificationLightingStyle.GLOW,
+            NotificationLightingStyle.INDICATOR,
+            NotificationLightingStyle.SWEEP,
+            NotificationLightingStyle.SYSTEM,
+        )
+    val icons =
+        listOf(
+            R.drawable.rounded_rounded_corner_24,
+            R.drawable.rounded_blur_linear_24,
+            R.drawable.rounded_circles_24,
+            R.drawable.rounded_target_24,
+            R.drawable.rounded_mobile_24,
+        )
     val view = LocalView.current
 
     val selectedIndex = styles.indexOf(selectedStyle).coerceAtLeast(0)
 
     RoundedCardContainer(modifier = Modifier) {
         Row(
-            modifier = modifier
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceBright,
-                    shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd)
-                )
-                .padding(10.dp),
+            modifier =
+                modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceBright,
+                        shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
+                    ).padding(10.dp),
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
         ) {
             val modifiers = List(styles.size) { Modifier.weight(1f) }
@@ -78,16 +80,17 @@ fun NotificationLightingStylePicker(
                         onStyleSelected(style)
                     },
                     modifier = modifiers[index].semantics { role = Role.RadioButton },
-                    shapes = when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        styles.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    shapes =
+                        when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            styles.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
                 ) {
                     Icon(
                         painter = painterResource(id = icons[index]),
                         contentDescription = style.name,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                 }
             }

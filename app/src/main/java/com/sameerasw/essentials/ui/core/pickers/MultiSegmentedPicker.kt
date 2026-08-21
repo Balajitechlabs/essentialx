@@ -58,7 +58,7 @@ fun <T> MultiSegmentedPicker(
     shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(24.dp),
     allowEmpty: Boolean = true,
     title: Any? = null,
-    description: Any? = null
+    description: Any? = null,
 ) {
     val view = LocalView.current
     val isTranslationModeActive by TranslationManager.isTranslationModeEnabled
@@ -67,10 +67,11 @@ fun <T> MultiSegmentedPicker(
     var translationSheetKey by remember { mutableStateOf<String?>(null) }
 
     Row(
-        modifier = modifier
-            .clip(shape)
-            .background(color = MaterialTheme.colorScheme.surfaceBright)
-            .padding(10.dp),
+        modifier =
+            modifier
+                .clip(shape)
+                .background(color = MaterialTheme.colorScheme.surfaceBright)
+                .padding(10.dp),
         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
     ) {
         val modifiers = List(items.size) { Modifier.weight(1f) }
@@ -79,65 +80,69 @@ fun <T> MultiSegmentedPicker(
             val isSelected = selectedItems.contains(item)
             val label = labelProvider(item)
 
-            val boxModifier = if (isTranslationModeActive) {
-                modifiers[index].pointerInput(Unit) {
-                    awaitEachGesture {
-                        val down = awaitFirstDown(pass = PointerEventPass.Initial)
-                        val downTime = System.currentTimeMillis()
-                        var longPressed = false
-                        while (true) {
-                            val event = awaitPointerEvent(pass = PointerEventPass.Initial)
-                            val change = event.changes.firstOrNull() ?: break
-                            if (!change.pressed) break
-                            if (System.currentTimeMillis() - downTime >= 400L && !longPressed) {
-                                longPressed = true
-                                change.consume()
-                                HapticUtil.performHeavyHaptic(view)
-                                activeMenuIndex = index
+            val boxModifier =
+                if (isTranslationModeActive) {
+                    modifiers[index].pointerInput(Unit) {
+                        awaitEachGesture {
+                            val down = awaitFirstDown(pass = PointerEventPass.Initial)
+                            val downTime = System.currentTimeMillis()
+                            var longPressed = false
+                            while (true) {
+                                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                                val change = event.changes.firstOrNull() ?: break
+                                if (!change.pressed) break
+                                if (System.currentTimeMillis() - downTime >= 400L && !longPressed) {
+                                    longPressed = true
+                                    change.consume()
+                                    HapticUtil.performHeavyHaptic(view)
+                                    activeMenuIndex = index
+                                }
+                            }
+                            if (longPressed) {
+                                currentEvent.changes.forEach { it.consume() }
                             }
                         }
-                        if (longPressed) {
-                            currentEvent.changes.forEach { it.consume() }
-                        }
                     }
+                } else {
+                    modifiers[index]
                 }
-            } else {
-                modifiers[index]
-            }
 
             Box(modifier = boxModifier) {
                 ToggleButton(
                     checked = isSelected,
                     onCheckedChange = { checked ->
                         HapticUtil.performUIHaptic(view)
-                        val newSelection = if (checked) {
-                            selectedItems + item
-                        } else {
-                            if (allowEmpty || selectedItems.size > 1) selectedItems - item else selectedItems
-                        }
+                        val newSelection =
+                            if (checked) {
+                                selectedItems + item
+                            } else {
+                                if (allowEmpty || selectedItems.size > 1) selectedItems - item else selectedItems
+                            }
                         onItemsSelected(newSelection)
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .semantics { role = Role.Checkbox },
-                    shapes = when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        items.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .semantics { role = Role.Checkbox },
+                    shapes =
+                        when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            items.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        },
                 ) {
                     Text(
                         label,
                         fontSize = dimensionResource(R.dimen.font_small).value.sp,
                         modifier = Modifier.basicMarquee(),
-                        maxLines = 1
+                        maxLines = 1,
                     )
                 }
 
                 if (activeMenuIndex == index) {
                     SegmentedDropdownMenu(
                         expanded = activeMenuIndex == index,
-                        onDismissRequest = { activeMenuIndex = null }
+                        onDismissRequest = { activeMenuIndex = null },
                     ) {
                         TranslationMenuItems(
                             title = title ?: label,
@@ -146,7 +151,7 @@ fun <T> MultiSegmentedPicker(
                             onSelectKey = { key ->
                                 activeMenuIndex = null
                                 translationSheetKey = key
-                            }
+                            },
                         )
                     }
                 }
@@ -157,7 +162,7 @@ fun <T> MultiSegmentedPicker(
     if (translationSheetKey != null) {
         TranslationBottomSheet(
             stringKey = translationSheetKey!!,
-            onDismissRequest = { translationSheetKey = null }
+            onDismissRequest = { translationSheetKey = null },
         )
     }
 }

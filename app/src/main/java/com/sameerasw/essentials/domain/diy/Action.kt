@@ -55,7 +55,7 @@ sealed interface Action {
 
     @Keep
     data class DimWallpaper(
-        @SerializedName("dimAmount") val dimAmount: Float = 0f
+        @SerializedName("dimAmount") val dimAmount: Float = 0f,
     ) : Action {
         override val title: Int get() = R.string.diy_action_dim_wallpaper
         override val icon: Int get() = R.drawable.rounded_mobile_screensaver_24
@@ -69,7 +69,7 @@ sealed interface Action {
         @SerializedName("grayscale") val grayscale: Boolean = false,
         @SerializedName("suppressAmbient") val suppressAmbient: Boolean = false,
         @SerializedName("dimWallpaper") val dimWallpaper: Boolean = false,
-        @SerializedName("nightMode") val nightMode: Boolean = false
+        @SerializedName("nightMode") val nightMode: Boolean = false,
     ) : Action {
         override val title: Int get() = R.string.diy_action_device_effects
         override val icon: Int get() = R.drawable.rounded_bed_24
@@ -86,20 +86,21 @@ sealed interface Action {
         VIBRATE,
 
         @SerializedName("SILENT")
-        SILENT
+        SILENT,
     }
 
     @Keep
     data class SoundMode(
-        @SerializedName("mode") val mode: SoundModeType = SoundModeType.SOUND
+        @SerializedName("mode") val mode: SoundModeType = SoundModeType.SOUND,
     ) : Action {
         override val title: Int get() = R.string.diy_action_sound_mode
         override val icon: Int
-            get() = when (mode) {
-                SoundModeType.SOUND -> R.drawable.rounded_volume_up_24
-                SoundModeType.VIBRATE -> R.drawable.rounded_mobile_vibrate_24
-                SoundModeType.SILENT -> R.drawable.rounded_volume_off_24
-            }
+            get() =
+                when (mode) {
+                    SoundModeType.SOUND -> R.drawable.rounded_volume_up_24
+                    SoundModeType.VIBRATE -> R.drawable.rounded_mobile_vibrate_24
+                    SoundModeType.SILENT -> R.drawable.rounded_volume_off_24
+                }
         override val permissions: List<String> = listOf("NOTIFICATION_POLICY")
         override val isConfigurable: Boolean = true
     }
@@ -119,7 +120,7 @@ sealed interface Action {
     @Keep
     data class ScreenOff(
         @SerializedName("method") val method: ScreenOffMethod = ScreenOffMethod.ACCESSIBILITY,
-        @SerializedName("haptic") val haptic: HapticFeedbackType = HapticFeedbackType.NONE
+        @SerializedName("haptic") val haptic: HapticFeedbackType = HapticFeedbackType.NONE,
     ) : Action {
         override val title: Int get() = R.string.diy_action_screen_off
         override val icon: Int get() = R.drawable.rounded_mobile_off_24
@@ -210,24 +211,25 @@ sealed interface Action {
         NOTIFICATION,
 
         @SerializedName("SYSTEM")
-        SYSTEM
+        SYSTEM,
     }
 
     @Keep
     data class SetVolume(
         @SerializedName("channel") val channel: VolumeChannel = VolumeChannel.MUSIC,
-        @SerializedName("level") val level: Int = 50
+        @SerializedName("level") val level: Int = 50,
     ) : Action {
         override val title: Int get() = R.string.diy_action_set_volume
         override val icon: Int
-            get() = when (channel) {
-                VolumeChannel.MUSIC -> R.drawable.rounded_music_note_24
-                VolumeChannel.RING -> R.drawable.rounded_ring_volume_24
-                VolumeChannel.ALARM -> R.drawable.rounded_alarm_24
-                VolumeChannel.CALL -> R.drawable.rounded_call_24
-                VolumeChannel.NOTIFICATION -> R.drawable.rounded_notifications_unread_24
-                VolumeChannel.SYSTEM -> R.drawable.rounded_android_24
-            }
+            get() =
+                when (channel) {
+                    VolumeChannel.MUSIC -> R.drawable.rounded_music_note_24
+                    VolumeChannel.RING -> R.drawable.rounded_ring_volume_24
+                    VolumeChannel.ALARM -> R.drawable.rounded_alarm_24
+                    VolumeChannel.CALL -> R.drawable.rounded_call_24
+                    VolumeChannel.NOTIFICATION -> R.drawable.rounded_notifications_unread_24
+                    VolumeChannel.SYSTEM -> R.drawable.rounded_android_24
+                }
         override val isConfigurable: Boolean = true
     }
 
@@ -264,7 +266,7 @@ sealed interface Action {
         @SerializedName("changeSyncSoundModeWatch") val changeSyncSoundModeWatch: Boolean = false,
         @SerializedName("syncSoundModeWatchEnabled") val syncSoundModeWatchEnabled: Boolean = true,
         @SerializedName("changeSmartPixels") val changeSmartPixels: Boolean = false,
-        @SerializedName("smartPixelsEnabled") val smartPixelsEnabled: Boolean = true
+        @SerializedName("smartPixelsEnabled") val smartPixelsEnabled: Boolean = true,
     ) : Action {
         override val title: Int get() = R.string.diy_action_sometimes_essentials
         override val icon: Int get() = R.drawable.rounded_settings_24
@@ -272,7 +274,12 @@ sealed interface Action {
         override val permissions: List<String>
             get() {
                 val perms = mutableListOf<String>()
-                if (changeNotificationLighting || changeEssentialsOnDisplay || changeAlwaysOnDisplay || changeLockScreenClock || changeGloveMode) {
+                if (changeNotificationLighting ||
+                    changeEssentialsOnDisplay ||
+                    changeAlwaysOnDisplay ||
+                    changeLockScreenClock ||
+                    changeGloveMode
+                ) {
                     perms.add("write_secure_settings")
                 }
                 if (changeSmartPixels) {
@@ -284,7 +291,7 @@ sealed interface Action {
 
     @Keep
     data class OpenApp(
-        @SerializedName("packageName") val packageName: String = ""
+        @SerializedName("packageName") val packageName: String = "",
     ) : Action {
         override val title: Int get() = R.string.diy_action_open_app
         override val icon: Int get() = R.drawable.rounded_open_in_new_24
@@ -315,7 +322,7 @@ sealed interface Action {
     @Keep
     data class FreezeTag(
         @SerializedName("mode") val mode: String = "Freeze", // "Freeze", "Unfreeze"
-        @SerializedName("tagIds") val tagIds: List<String> = emptyList()
+        @SerializedName("tagIds") val tagIds: List<String> = emptyList(),
     ) : Action {
         override val title: Int get() = R.string.diy_action_freeze_tag
         override val icon: Int get() = R.drawable.rounded_mode_cool_24
@@ -367,7 +374,7 @@ sealed interface Action {
 
     @Keep
     data class FreezeApps(
-        @SerializedName("packageNames") val packageNames: List<String> = emptyList()
+        @SerializedName("packageNames") val packageNames: List<String> = emptyList(),
     ) : Action {
         override val title: Int get() = R.string.diy_action_freeze_apps
         override val icon: Int get() = R.drawable.rounded_mode_cool_24
@@ -377,7 +384,7 @@ sealed interface Action {
 
     @Keep
     data class UnfreezeApps(
-        @SerializedName("packageNames") val packageNames: List<String> = emptyList()
+        @SerializedName("packageNames") val packageNames: List<String> = emptyList(),
     ) : Action {
         override val title: Int get() = R.string.diy_action_unfreeze_apps
         override val icon: Int get() = R.drawable.rounded_mode_cool_off_24
@@ -387,7 +394,7 @@ sealed interface Action {
 
     @Keep
     data class Keyboard(
-        @SerializedName("inputMethodId") val inputMethodId: String? = null
+        @SerializedName("inputMethodId") val inputMethodId: String? = null,
     ) : Action {
         override val title: Int = R.string.diy_set_keyboard_title
         override val icon: Int = R.drawable.rounded_keyboard_24
@@ -404,19 +411,19 @@ sealed interface Action {
         SECURE,
 
         @SerializedName("GLOBAL")
-        GLOBAL
+        GLOBAL,
     }
 
     @Keep
     data class SettingsEntry(
         @SerializedName("table") val table: SettingsTable = SettingsTable.SYSTEM,
         @SerializedName("key") val key: String = "",
-        @SerializedName("value") val value: String = ""
+        @SerializedName("value") val value: String = "",
     )
 
     @Keep
     data class CustomSettings(
-        @SerializedName("entries") val entries: List<SettingsEntry> = emptyList()
+        @SerializedName("entries") val entries: List<SettingsEntry> = emptyList(),
     ) : Action {
         override val title: Int get() = R.string.diy_action_custom_settings
         override val icon: Int get() = R.drawable.rounded_settings_24
@@ -435,5 +442,3 @@ sealed interface Action {
             }
     }
 }
-
-

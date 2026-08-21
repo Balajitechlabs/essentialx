@@ -12,7 +12,6 @@ package com.sameerasw.essentials.utils
 import com.sameerasw.essentials.R
 
 object DeviceImageMapper {
-
     /**
      * Maps the Android version to a specific logo.
      */

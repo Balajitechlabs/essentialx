@@ -16,7 +16,10 @@ import java.util.Locale
 import java.util.TimeZone
 
 object TimeUtil {
-    fun formatRelativeDate(githubDate: String, context: Context): String {
+    fun formatRelativeDate(
+        githubDate: String,
+        context: Context,
+    ): String {
         return try {
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -27,7 +30,10 @@ object TimeUtil {
         }
     }
 
-    fun formatRelativeDate(timestamp: Long, context: Context): String {
+    fun formatRelativeDate(
+        timestamp: Long,
+        context: Context,
+    ): String {
         val now = System.currentTimeMillis()
         val diff = now - timestamp
 
@@ -43,10 +49,14 @@ object TimeUtil {
                 }
             }
 
-            days == 1L || (days == 0L && !isSameDay(
-                now,
-                timestamp
-            )) -> context.getString(R.string.yesterday)
+            days == 1L ||
+                (
+                    days == 0L &&
+                        !isSameDay(
+                            now,
+                            timestamp,
+                        )
+                ) -> context.getString(R.string.yesterday)
 
             days < 7L -> context.getString(R.string.time_days_ago, days.toInt())
             days < 30L -> context.getString(R.string.time_weeks_ago, (days / 7).toInt())
@@ -55,10 +65,19 @@ object TimeUtil {
         }
     }
 
-    private fun isSameDay(t1: Long, t2: Long): Boolean {
-        val cal1 = java.util.Calendar.getInstance().apply { timeInMillis = t1 }
-        val cal2 = java.util.Calendar.getInstance().apply { timeInMillis = t2 }
+    private fun isSameDay(
+        t1: Long,
+        t2: Long,
+    ): Boolean {
+        val cal1 =
+            java.util.Calendar
+                .getInstance()
+                .apply { timeInMillis = t1 }
+        val cal2 =
+            java.util.Calendar
+                .getInstance()
+                .apply { timeInMillis = t2 }
         return cal1.get(java.util.Calendar.YEAR) == cal2.get(java.util.Calendar.YEAR) &&
-                cal1.get(java.util.Calendar.DAY_OF_YEAR) == cal2.get(java.util.Calendar.DAY_OF_YEAR)
+            cal1.get(java.util.Calendar.DAY_OF_YEAR) == cal2.get(java.util.Calendar.DAY_OF_YEAR)
     }
 }

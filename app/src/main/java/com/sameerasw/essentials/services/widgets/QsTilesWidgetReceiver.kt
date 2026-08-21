@@ -18,7 +18,10 @@ import kotlinx.coroutines.launch
 class QsTilesWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = QsTilesWidget()
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         super.onReceive(context, intent)
 
         val action = intent.action
@@ -39,10 +42,11 @@ class QsTilesWidgetReceiver : GlanceAppWidgetReceiver() {
                     glanceIds.forEach { glanceId ->
                         androidx.glance.appwidget.state.updateAppWidgetState(
                             context,
-                            glanceId
+                            glanceId,
                         ) { prefs ->
                             val KEY_UPDATE =
-                                androidx.datastore.preferences.core.longPreferencesKey("qs_widget_last_update")
+                                androidx.datastore.preferences.core
+                                    .longPreferencesKey("qs_widget_last_update")
                             prefs[KEY_UPDATE] = timestamp
                         }
                         glanceAppWidget.update(context, glanceId)
@@ -55,10 +59,11 @@ class QsTilesWidgetReceiver : GlanceAppWidgetReceiver() {
                     updatedGlanceIds.forEach { glanceId ->
                         androidx.glance.appwidget.state.updateAppWidgetState(
                             context,
-                            glanceId
+                            glanceId,
                         ) { prefs ->
                             val KEY_UPDATE =
-                                androidx.datastore.preferences.core.longPreferencesKey("qs_widget_last_update")
+                                androidx.datastore.preferences.core
+                                    .longPreferencesKey("qs_widget_last_update")
                             prefs[KEY_UPDATE] = newTimestamp
                         }
                         glanceAppWidget.update(context, glanceId)
@@ -67,7 +72,7 @@ class QsTilesWidgetReceiver : GlanceAppWidgetReceiver() {
                     android.util.Log.e(
                         "QsTilesWidgetReceiver",
                         "Error updating QS tiles widget on broadcast",
-                        e
+                        e,
                     )
                 }
             }

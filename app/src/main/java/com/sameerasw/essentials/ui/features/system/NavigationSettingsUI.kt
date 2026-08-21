@@ -45,7 +45,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun NavigationSettingsUI(
     viewModel: MainViewModel,
     modifier: Modifier = Modifier,
-    highlightSetting: String? = null
+    highlightSetting: String? = null,
 ) {
     val context = LocalContext.current
     var requestingPermissionFor by remember { mutableStateOf(PermissionModule.NONE) }
@@ -61,82 +61,97 @@ fun NavigationSettingsUI(
         val isUsageStatsGranted = viewModel.isUsageStatsPermissionGranted.value
         val useUsageAccess = viewModel.isUseUsageAccess.value
 
-        val shizukuPermission = PermissionItem(
-            iconRes = R.drawable.rounded_adb_24,
-            title = if (!isShizukuAvailable) R.string.perm_shizuku_title else R.string.perm_shizuku_grant_title,
-            description = if (!isShizukuAvailable) R.string.perm_shizuku_desc else R.string.perm_shizuku_grant_desc,
-            dependentFeatures = listOf(
-                R.string.feat_hide_gesture_bar_title,
-                R.string.feat_hide_gesture_bar_on_launcher_title,
-                R.string.feat_circle_to_search_gesture_title,
-                R.string.feat_transparent_navigation_bar_title
-            ),
-            actionLabel = if (!isShizukuAvailable) R.string.perm_shizuku_install_action else if (isShellGranted) R.string.perm_action_granted else R.string.perm_action_grant,
-            action = {
-                if (!isShizukuAvailable) {
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api")
-                    )
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    context.startActivity(intent)
-                } else {
-                    viewModel.requestShizukuPermission()
+        val shizukuPermission =
+            PermissionItem(
+                iconRes = R.drawable.rounded_adb_24,
+                title = if (!isShizukuAvailable) R.string.perm_shizuku_title else R.string.perm_shizuku_grant_title,
+                description = if (!isShizukuAvailable) R.string.perm_shizuku_desc else R.string.perm_shizuku_grant_desc,
+                dependentFeatures =
+                    listOf(
+                        R.string.feat_hide_gesture_bar_title,
+                        R.string.feat_hide_gesture_bar_on_launcher_title,
+                        R.string.feat_circle_to_search_gesture_title,
+                        R.string.feat_transparent_navigation_bar_title,
+                    ),
+                actionLabel =
+                    if (!isShizukuAvailable) {
+                        R.string.perm_shizuku_install_action
+                    } else if (isShellGranted) {
+                        R.string.perm_action_granted
+                    } else {
+                        R.string.perm_action_grant
+                    },
+                action = {
+                    if (!isShizukuAvailable) {
+                        val intent =
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("https://play.google.com/store/apps/details?id=moe.shizuku.privileged.api"),
+                            )
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        context.startActivity(intent)
+                    } else {
+                        viewModel.requestShizukuPermission()
+                    }
+                },
+                isGranted = isShellGranted,
+            )
+
+        val accessibilityPermission =
+            PermissionItem(
+                iconRes = R.drawable.rounded_accessibility_new_24,
+                title = R.string.perm_accessibility_title,
+                description = R.string.perm_accessibility_desc_common,
+                dependentFeatures =
+                    listOf(
+                        R.string.feat_hide_gesture_bar_on_launcher_title,
+                        R.string.feat_circle_to_search_gesture_title,
+                    ),
+                actionLabel = if (isAccessibilityEnabled) R.string.label_enabled else R.string.perm_action_enable,
+                action = {
+                    PermissionUtils.openAccessibilitySettings(context)
+                },
+                isGranted = isAccessibilityEnabled,
+            )
+
+        val usageStatsPermission =
+            PermissionItem(
+                iconRes = R.drawable.rounded_data_usage_24,
+                title = R.string.perm_usage_stats_title,
+                description = R.string.perm_usage_stats_desc_app_lock,
+                dependentFeatures = listOf(R.string.feat_hide_gesture_bar_on_launcher_title),
+                actionLabel = if (isUsageStatsGranted) R.string.perm_action_granted else R.string.perm_action_enable,
+                action = { PermissionUtils.openUsageStatsSettings(context) },
+                isGranted = isUsageStatsGranted,
+            )
+
+        val permissionsToShow =
+            when (requestingPermissionFor) {
+                PermissionModule.HIDE_GESTURE_BAR -> listOf(shizukuPermission)
+                PermissionModule.SHOW_ON_LAUNCHER -> {
+                    val appDetectionPermission =
+                        if (useUsageAccess) usageStatsPermission else accessibilityPermission
+                    listOf(shizukuPermission, appDetectionPermission)
                 }
-            },
-            isGranted = isShellGranted
-        )
 
-        val accessibilityPermission = PermissionItem(
-            iconRes = R.drawable.rounded_accessibility_new_24,
-            title = R.string.perm_accessibility_title,
-            description = R.string.perm_accessibility_desc_common,
-            dependentFeatures = listOf(
-                R.string.feat_hide_gesture_bar_on_launcher_title,
-                R.string.feat_circle_to_search_gesture_title
-            ),
-            actionLabel = if (isAccessibilityEnabled) R.string.label_enabled else R.string.perm_action_enable,
-            action = {
-                PermissionUtils.openAccessibilitySettings(context)
-            },
-            isGranted = isAccessibilityEnabled
-        )
-
-        val usageStatsPermission = PermissionItem(
-            iconRes = R.drawable.rounded_data_usage_24,
-            title = R.string.perm_usage_stats_title,
-            description = R.string.perm_usage_stats_desc_app_lock,
-            dependentFeatures = listOf(R.string.feat_hide_gesture_bar_on_launcher_title),
-            actionLabel = if (isUsageStatsGranted) R.string.perm_action_granted else R.string.perm_action_enable,
-            action = { PermissionUtils.openUsageStatsSettings(context) },
-            isGranted = isUsageStatsGranted
-        )
-
-        val permissionsToShow = when (requestingPermissionFor) {
-            PermissionModule.HIDE_GESTURE_BAR -> listOf(shizukuPermission)
-            PermissionModule.SHOW_ON_LAUNCHER -> {
-                val appDetectionPermission =
-                    if (useUsageAccess) usageStatsPermission else accessibilityPermission
-                listOf(shizukuPermission, appDetectionPermission)
+                PermissionModule.CIRCLE_TO_SEARCH -> listOf(shizukuPermission, accessibilityPermission)
+                PermissionModule.TRANSPARENT_NAVIGATION_BAR -> listOf(shizukuPermission)
+                else -> emptyList()
             }
-
-            PermissionModule.CIRCLE_TO_SEARCH -> listOf(shizukuPermission, accessibilityPermission)
-            PermissionModule.TRANSPARENT_NAVIGATION_BAR -> listOf(shizukuPermission)
-            else -> emptyList()
-        }
 
         PermissionsBottomSheet(
             onDismissRequest = { requestingPermissionFor = PermissionModule.NONE },
             featureTitle = R.string.cat_navigation,
-            permissions = permissionsToShow
+            permissions = permissionsToShow,
         )
     }
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         val isShizukuGranted =
             viewModel.isShizukuAvailable.value && viewModel.isShizukuPermissionGranted.value
@@ -151,18 +166,19 @@ fun NavigationSettingsUI(
         RoundedCardContainer(
             modifier = Modifier,
             spacing = 2.dp,
-            cornerRadius = 24.dp
+            cornerRadius = 24.dp,
         ) {
             val lifecycleOwner = LocalLifecycleOwner.current
             DisposableEffect(lifecycleOwner, viewModel.isCircleToSearchGestureEnabled.value) {
-                val observer = LifecycleEventObserver { _, event ->
-                    if (event == Lifecycle.Event.ON_RESUME) {
-                        viewModel.setCircleToSearchPreviewEnabled(viewModel.isCircleToSearchGestureEnabled.value)
-                        viewModel.refreshTransparentNavigationBarState(context)
-                    } else if (event == Lifecycle.Event.ON_PAUSE) {
-                        viewModel.setCircleToSearchPreviewEnabled(false)
+                val observer =
+                    LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) {
+                            viewModel.setCircleToSearchPreviewEnabled(viewModel.isCircleToSearchGestureEnabled.value)
+                            viewModel.refreshTransparentNavigationBarState(context)
+                        } else if (event == Lifecycle.Event.ON_PAUSE) {
+                            viewModel.setCircleToSearchPreviewEnabled(false)
+                        }
                     }
-                }
                 lifecycleOwner.lifecycle.addObserver(observer)
                 onDispose {
                     lifecycleOwner.lifecycle.removeObserver(observer)
@@ -188,7 +204,7 @@ fun NavigationSettingsUI(
                     }
                 },
                 iconRes = R.drawable.rounded_home_24,
-                modifier = Modifier.highlight(highlightSetting == "hide_gesture_bar_toggle")
+                modifier = Modifier.highlight(highlightSetting == "hide_gesture_bar_toggle"),
             )
 
             IconToggleItem(
@@ -209,7 +225,7 @@ fun NavigationSettingsUI(
                     }
                 },
                 iconRes = R.drawable.rounded_home_health_24,
-                modifier = Modifier.highlight(highlightSetting == "hide_gesture_bar_launcher_toggle")
+                modifier = Modifier.highlight(highlightSetting == "hide_gesture_bar_launcher_toggle"),
             )
 
             IconToggleItem(
@@ -230,7 +246,7 @@ fun NavigationSettingsUI(
                     }
                 },
                 iconRes = R.drawable.rounded_touch_app_24,
-                modifier = Modifier.highlight(highlightSetting == "circle_to_search_gesture_toggle")
+                modifier = Modifier.highlight(highlightSetting == "circle_to_search_gesture_toggle"),
             )
 
             IconToggleItem(
@@ -251,13 +267,13 @@ fun NavigationSettingsUI(
                     }
                 },
                 iconRes = R.drawable.rounded_bottom_navigation_24,
-                modifier = Modifier.highlight(highlightSetting == "transparent_navigation_bar_toggle")
+                modifier = Modifier.highlight(highlightSetting == "transparent_navigation_bar_toggle"),
             )
 
             AnimatedVisibility(
                 visible = viewModel.isCircleToSearchGestureEnabled.value,
                 enter = expandVertically(),
-                exit = shrinkVertically()
+                exit = shrinkVertically(),
             ) {
                 ConfigSliderItem(
                     title = stringResource(R.string.feat_circle_to_search_gesture_height_title),
@@ -267,14 +283,14 @@ fun NavigationSettingsUI(
                     increment = 4f,
                     iconRes = R.drawable.rounded_border_bottom_24,
                     description = stringResource(R.string.feat_circle_to_search_gesture_height_desc),
-                    valueFormatter = { "${it.toInt()} dp" }
+                    valueFormatter = { "${it.toInt()} dp" },
                 )
             }
 
             AnimatedVisibility(
                 visible = viewModel.isCircleToSearchGestureEnabled.value,
                 enter = expandVertically(),
-                exit = shrinkVertically()
+                exit = shrinkVertically(),
             ) {
                 ConfigSliderItem(
                     title = stringResource(R.string.feat_circle_to_search_gesture_width_title),
@@ -284,7 +300,7 @@ fun NavigationSettingsUI(
                     increment = 4f,
                     iconRes = R.drawable.rounded_border_bottom_24,
                     description = stringResource(R.string.feat_circle_to_search_gesture_width_desc),
-                    valueFormatter = { "${it.toInt()} dp" }
+                    valueFormatter = { "${it.toInt()} dp" },
                 )
             }
         }

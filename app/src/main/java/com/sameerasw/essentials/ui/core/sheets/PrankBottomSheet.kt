@@ -46,7 +46,7 @@ import com.sameerasw.essentials.viewmodels.MainViewModel
 fun PrankBottomSheet(
     viewModel: MainViewModel,
     sheetState: SheetState,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
 ) {
     var isRevealed by remember { mutableStateOf(false) }
     val view = LocalView.current
@@ -57,20 +57,21 @@ fun PrankBottomSheet(
                 onDismissRequest()
             }
         },
-        sheetState = sheetState
+        sheetState = sheetState,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // App Logo
             AsyncImage(
                 model = R.mipmap.ic_launcher_round,
                 contentDescription = null,
-                modifier = Modifier.size(80.dp)
+                modifier = Modifier.size(80.dp),
             )
 
             if (!isRevealed) {
@@ -79,14 +80,14 @@ fun PrankBottomSheet(
                     text = stringResource(R.string.prank_trial_expired_title),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 Text(
                     text = stringResource(R.string.prank_trial_expired_desc),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -96,7 +97,7 @@ fun PrankBottomSheet(
                         HapticUtil.performHeavyHaptic(view)
                         isRevealed = true
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     Text(text = stringResource(R.string.prank_button_premium))
                 }
@@ -107,13 +108,13 @@ fun PrankBottomSheet(
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
 
                 Text(
                     text = stringResource(R.string.prank_reveal_desc),
                     style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -122,29 +123,31 @@ fun PrankBottomSheet(
                     onClick = {
                         onDismissRequest()
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onLongPress = {
-                                    // Debug reset
-                                    viewModel.settingsRepository.putBoolean(
-                                        SettingsRepository.KEY_APRIL_FOOLS_SHOWN,
-                                        false
-                                    )
-                                    HapticUtil.performHeavyHaptic(view)
-                                    android.widget.Toast.makeText(
-                                        view.context,
-                                        "Prank reset for testing",
-                                        android.widget.Toast.LENGTH_SHORT
-                                    ).show()
-                                },
-                                onTap = {
-                                    HapticUtil.performUIHaptic(view)
-                                    onDismissRequest()
-                                }
-                            )
-                        }
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onLongPress = {
+                                        // Debug reset
+                                        viewModel.settingsRepository.putBoolean(
+                                            SettingsRepository.KEY_APRIL_FOOLS_SHOWN,
+                                            false,
+                                        )
+                                        HapticUtil.performHeavyHaptic(view)
+                                        android.widget.Toast
+                                            .makeText(
+                                                view.context,
+                                                "Prank reset for testing",
+                                                android.widget.Toast.LENGTH_SHORT,
+                                            ).show()
+                                    },
+                                    onTap = {
+                                        HapticUtil.performUIHaptic(view)
+                                        onDismissRequest()
+                                    },
+                                )
+                            },
                 ) {
                     Text(text = stringResource(R.string.action_continue))
                 }

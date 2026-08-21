@@ -26,7 +26,9 @@ import android.view.ViewConfiguration
 import android.view.WindowManager
 import com.sameerasw.essentials.utils.OmniTriggerUtil
 
-class OmniGestureOverlayHandler(private val service: AccessibilityService) {
+class OmniGestureOverlayHandler(
+    private val service: AccessibilityService,
+) {
     private val windowManager = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private val vibrator = getVibratorInstance()
 
@@ -38,54 +40,68 @@ class OmniGestureOverlayHandler(private val service: AccessibilityService) {
     private var startY = 0f
     private var isLongPressActive = false
 
-    private val longPressRunnable = Runnable {
-        isLongPressActive = false
-        OmniTriggerUtil.trigger(service)
-        triggerFinalTick()
-    }
+    private val longPressRunnable =
+        Runnable {
+            isLongPressActive = false
+            OmniTriggerUtil.trigger(service)
+            triggerFinalTick()
+        }
 
     private val fallbackEffect: VibrationEffect? by lazy {
         val segments = 25
         val timings = LongArray(segments) { 20L }
-        val amplitudes = IntArray(segments) { i ->
-            val progress = (i + 1).toFloat() / segments
-            val curve = progress * progress
-            (3 + (57 * curve)).toInt().coerceAtMost(60)
-        }
+        val amplitudes =
+            IntArray(segments) { i ->
+                val progress = (i + 1).toFloat() / segments
+                val curve = progress * progress
+                (3 + (57 * curve)).toInt().coerceAtMost(60)
+            }
         runCatching { VibrationEffect.createWaveform(timings, amplitudes, -1) }.getOrNull()
     }
 
-    fun updateOverlay(enabled: Boolean, heightDp: Float = 48f, widthDp: Float = 240f, isPreview: Boolean = false) {
+    fun updateOverlay(
+        enabled: Boolean,
+        heightDp: Float = 48f,
+        widthDp: Float = 240f,
+        isPreview: Boolean = false,
+    ) {
         handler.post {
             if (enabled) showOverlay(heightDp, widthDp, isPreview) else removeOverlay()
         }
     }
 
-    private fun showOverlay(heightDp: Float, widthDp: Float, isPreview: Boolean) {
-        val params = WindowManager.LayoutParams(
-            dpToPx(widthDp),
-            dpToPx(heightDp),
-            WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-            PixelFormat.TRANSLUCENT
-        ).apply {
-            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                layoutInDisplayCutoutMode =
-                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-            }
-        }
+    private fun showOverlay(
+        heightDp: Float,
+        widthDp: Float,
+        isPreview: Boolean,
+    ) {
+        val params =
+            WindowManager
+                .LayoutParams(
+                    dpToPx(widthDp),
+                    dpToPx(heightDp),
+                    WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
+                    WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+                        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                    PixelFormat.TRANSLUCENT,
+                ).apply {
+                    gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        layoutInDisplayCutoutMode =
+                            WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                    }
+                }
 
         if (overlayView == null) {
-            overlayView = View(service).apply {
-                setBackgroundColor(if (isPreview) Color.parseColor("#406200EE") else Color.TRANSPARENT)
-                setOnTouchListener { _, event ->
-                    handleTouch(event)
-                    true
+            overlayView =
+                View(service).apply {
+                    setBackgroundColor(if (isPreview) Color.parseColor("#406200EE") else Color.TRANSPARENT)
+                    setOnTouchListener { _, event ->
+                        handleTouch(event)
+                        true
+                    }
                 }
-            }
             runCatching { windowManager.addView(overlayView, params) }
         } else {
             overlayView?.apply {
@@ -134,9 +150,11 @@ class OmniGestureOverlayHandler(private val service: AccessibilityService) {
         val v = vibrator ?: return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             runCatching {
-                val effect = VibrationEffect.startComposition()
-                    .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.6f)
-                    .compose()
+                val effect =
+                    VibrationEffect
+                        .startComposition()
+                        .addPrimitive(VibrationEffect.Composition.PRIMITIVE_SLOW_RISE, 0.6f)
+                        .compose()
                 v.vibrate(effect)
             }.onFailure { fallbackRampingWaveform(v) }
         } else {
@@ -150,8 +168,8 @@ class OmniGestureOverlayHandler(private val service: AccessibilityService) {
         } ?: v.vibrate(
             VibrationEffect.createOneShot(
                 LONG_PRESS_TIMEOUT,
-                VibrationEffect.DEFAULT_AMPLITUDE
-            )
+                VibrationEffect.DEFAULT_AMPLITUDE,
+            ),
         )
     }
 
@@ -166,14 +184,13 @@ class OmniGestureOverlayHandler(private val service: AccessibilityService) {
         }
     }
 
-    private fun getVibratorInstance(): Vibrator? {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    private fun getVibratorInstance(): Vibrator? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             service.getSystemService(VibratorManager::class.java)?.defaultVibrator
         } else {
             @Suppress("DEPRECATION")
             service.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
         }
-    }
 
     private fun dpToPx(dp: Float) = (dp * service.resources.displayMetrics.density).toInt()
 

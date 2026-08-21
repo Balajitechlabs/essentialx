@@ -26,24 +26,27 @@ class LinkPickerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val locationViewModel =
-            com.sameerasw.essentials.viewmodels.LocationReachedViewModel(application)
+            com.sameerasw.essentials.viewmodels
+                .LocationReachedViewModel(application)
         if (locationViewModel.handleIntent(intent)) {
-            val settingsIntent = Intent(this, FeatureSettingsActivity::class.java).apply {
-                putExtra("feature", "Location reached")
-            }
+            val settingsIntent =
+                Intent(this, FeatureSettingsActivity::class.java).apply {
+                    putExtra("feature", "Location reached")
+                }
             startActivity(settingsIntent)
             finish()
             return
         }
 
-        val uri = when (intent.action) {
-            Intent.ACTION_SEND -> {
-                val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
-                extractUrl(text)?.let { Uri.parse(it) }
-            }
+        val uri =
+            when (intent.action) {
+                Intent.ACTION_SEND -> {
+                    val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
+                    extractUrl(text)?.let { Uri.parse(it) }
+                }
 
-            else -> intent.data
-        }
+                else -> intent.data
+            }
 
         if (uri == null) {
             finish()
@@ -54,7 +57,8 @@ class LinkPickerActivity : AppCompatActivity() {
 
         setContent {
             val viewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-                androidx.lifecycle.viewmodel.compose.viewModel()
+                androidx.lifecycle.viewmodel.compose
+                    .viewModel()
             val context = androidx.compose.ui.platform.LocalContext.current
             androidx.compose.runtime.LaunchedEffect(Unit) {
                 viewModel.check(context)
@@ -64,7 +68,7 @@ class LinkPickerActivity : AppCompatActivity() {
                 LinkPickerScreen(
                     uri = uri,
                     onFinish = { finish() },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }

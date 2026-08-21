@@ -34,7 +34,8 @@ class ActionShortcutActivity : ComponentActivity() {
                 finish()
             }
         } else {
-            Toast.makeText(this, "No customized action shortcut configured", Toast.LENGTH_SHORT)
+            Toast
+                .makeText(this, "No customized action shortcut configured", Toast.LENGTH_SHORT)
                 .show()
             finish()
         }

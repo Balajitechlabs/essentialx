@@ -31,22 +31,23 @@ fun ExifSettingsSheet(
     options: WatermarkOptions,
     onDismissRequest: () -> Unit,
     onShowExifChange: (Boolean) -> Unit,
-    onExifSettingsChange: (focal: Boolean, aperture: Boolean, iso: Boolean, shutter: Boolean, date: Boolean) -> Unit
+    onExifSettingsChange: (focal: Boolean, aperture: Boolean, iso: Boolean, shutter: Boolean, date: Boolean) -> Unit,
 ) {
     EssentialsBottomSheet(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(
                 text = stringResource(R.string.watermark_exif_settings),
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp),
             )
 
             RoundedCardContainer {
@@ -54,7 +55,7 @@ fun ExifSettingsSheet(
                     iconRes = R.drawable.rounded_image_search_24,
                     title = stringResource(R.string.watermark_show_exif),
                     isChecked = options.showExif,
-                    onCheckedChange = onShowExifChange
+                    onCheckedChange = onShowExifChange,
                 )
             }
 
@@ -75,9 +76,9 @@ fun ExifSettingsSheet(
                                 options.showAperture,
                                 options.showIso,
                                 options.showShutterSpeed,
-                                options.showDate
+                                options.showDate,
                             )
-                        }
+                        },
                     )
 
                     IconToggleItem(
@@ -90,9 +91,9 @@ fun ExifSettingsSheet(
                                 it,
                                 options.showIso,
                                 options.showShutterSpeed,
-                                options.showDate
+                                options.showDate,
                             )
-                        }
+                        },
                     )
 
                     IconToggleItem(
@@ -105,9 +106,9 @@ fun ExifSettingsSheet(
                                 options.showAperture,
                                 it,
                                 options.showShutterSpeed,
-                                options.showDate
+                                options.showDate,
                             )
-                        }
+                        },
                     )
 
                     IconToggleItem(
@@ -120,9 +121,9 @@ fun ExifSettingsSheet(
                                 options.showAperture,
                                 options.showIso,
                                 it,
-                                options.showDate
+                                options.showDate,
                             )
-                        }
+                        },
                     )
 
                     IconToggleItem(
@@ -135,9 +136,9 @@ fun ExifSettingsSheet(
                                 options.showAperture,
                                 options.showIso,
                                 options.showShutterSpeed,
-                                it
+                                it,
                             )
-                        }
+                        },
                     )
                 }
             }

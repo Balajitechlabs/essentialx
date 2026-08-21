@@ -16,5 +16,5 @@ data class ShutUpAppConfig(
     val disableUsbDebugging: Boolean = true,
     val disableWirelessDebugging: Boolean = true,
     val disableAccessibility: Boolean = false,
-    val autoArchive: Boolean = false
+    val autoArchive: Boolean = false,
 )

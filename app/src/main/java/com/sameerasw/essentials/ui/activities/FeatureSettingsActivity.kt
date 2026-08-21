@@ -114,19 +114,20 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 class FeatureSettingsActivity : AppCompatActivity() {
-
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(
-                android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT
-            ),
-            navigationBarStyle = SystemBarStyle.auto(
-                android.graphics.Color.TRANSPARENT,
-                android.graphics.Color.TRANSPARENT
-            )
+            statusBarStyle =
+                SystemBarStyle.auto(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT,
+                ),
+            navigationBarStyle =
+                SystemBarStyle.auto(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT,
+                ),
         )
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
@@ -134,7 +135,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
         val isDarkMode =
             (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-                    android.content.res.Configuration.UI_MODE_NIGHT_YES
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
         window.setBackgroundDrawableResource(if (isDarkMode) android.R.color.black else R.color.app_window_background)
         val featureId = intent.getStringExtra("feature") ?: ""
         val featureObj = FeatureRegistry.ALL_FEATURES.find { it.id == featureId }
@@ -153,7 +154,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                         uri = "https://sameerasw.com".toUri(),
                         onFinish = { finish() },
                         modifier = Modifier.fillMaxSize(),
-                        demo = true
+                        demo = true,
                     )
                 }
             }
@@ -170,20 +171,21 @@ class FeatureSettingsActivity : AppCompatActivity() {
             // Automatic refresh on resume
             val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
             DisposableEffect(lifecycleOwner) {
-                val observer = LifecycleEventObserver { _, event ->
-                    if (event == Lifecycle.Event.ON_RESUME) {
-                        viewModel.check(context)
-                        if (featureId == "Statusbar icons") {
-                            statusBarViewModel.check(context)
-                        }
-                        if (featureId == "Caffeinate") {
-                            caffeinateViewModel.check(context)
-                        }
-                        if (featureId == "Watch") {
-                            watchViewModel.check(context)
+                val observer =
+                    LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_RESUME) {
+                            viewModel.check(context)
+                            if (featureId == "Statusbar icons") {
+                                statusBarViewModel.check(context)
+                            }
+                            if (featureId == "Caffeinate") {
+                                caffeinateViewModel.check(context)
+                            }
+                            if (featureId == "Watch") {
+                                watchViewModel.check(context)
+                            }
                         }
                     }
-                }
                 lifecycleOwner.lifecycle.addObserver(observer)
                 onDispose {
                     lifecycleOwner.lifecycle.removeObserver(observer)
@@ -199,17 +201,22 @@ class FeatureSettingsActivity : AppCompatActivity() {
 
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 androidx.compose.runtime.CompositionLocalProvider(
-                    com.sameerasw.essentials.ui.state.LocalMenuStateManager provides remember { com.sameerasw.essentials.ui.state.MenuStateManager() }
+                    com.sameerasw.essentials.ui.state.LocalMenuStateManager provides
+                        remember {
+                            com.sameerasw.essentials.ui.state
+                                .MenuStateManager()
+                        },
                 ) {
                     LocalView.current
                     val prefs = context.getSharedPreferences("essentials_prefs", MODE_PRIVATE)
 
-                    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        context.getSystemService(VibratorManager::class.java)?.defaultVibrator
-                    } else {
-                        @Suppress("DEPRECATION")
-                        context.getSystemService(VIBRATOR_SERVICE) as? Vibrator
-                    }
+                    val vibrator =
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            context.getSystemService(VibratorManager::class.java)?.defaultVibrator
+                        } else {
+                            @Suppress("DEPRECATION")
+                            context.getSystemService(VIBRATOR_SERVICE) as? Vibrator
+                        }
 
                     var selectedHaptic by remember {
                         val name =
@@ -217,9 +224,11 @@ class FeatureSettingsActivity : AppCompatActivity() {
                         mutableStateOf(
                             try {
                                 HapticFeedbackType.valueOf(name ?: HapticFeedbackType.NONE.name)
-                            } catch (@Suppress("UNUSED_PARAMETER") e: Exception) {
+                            } catch (
+                                @Suppress("UNUSED_PARAMETER") e: Exception,
+                            ) {
                                 HapticFeedbackType.NONE
-                            }
+                            },
                         )
                     }
 
@@ -247,8 +256,8 @@ class FeatureSettingsActivity : AppCompatActivity() {
                         mutableStateOf(
                             prefs.getBoolean(
                                 "watch_sync_location_reached_enabled",
-                                true
-                            )
+                                true,
+                            ),
                         )
                     }
                     androidx.compose.runtime.DisposableEffect(prefs) {
@@ -278,15 +287,17 @@ class FeatureSettingsActivity : AppCompatActivity() {
                         }
                         if (featureId == "Watch") {
                             val messageClient =
-                                com.google.android.gms.wearable.Wearable.getMessageClient(context)
+                                com.google.android.gms.wearable.Wearable
+                                    .getMessageClient(context)
                             val nodeClient =
-                                com.google.android.gms.wearable.Wearable.getNodeClient(context)
+                                com.google.android.gms.wearable.Wearable
+                                    .getNodeClient(context)
                             nodeClient.connectedNodes.addOnSuccessListener { nodes ->
                                 for (node in nodes) {
                                     messageClient.sendMessage(
                                         node.id,
                                         "/request_watch_status",
-                                        byteArrayOf()
+                                        byteArrayOf(),
                                     )
                                 }
                             }
@@ -299,10 +310,9 @@ class FeatureSettingsActivity : AppCompatActivity() {
                     var showWatchInstallHelpSheet by remember { mutableStateOf(false) }
                     var selectedHelpFeature by remember {
                         mutableStateOf<com.sameerasw.essentials.domain.model.Feature?>(
-                            null
+                            null,
                         )
                     }
-
 
                     // Show permission sheet if feature has missing permissions
                     LaunchedEffect(
@@ -313,72 +323,94 @@ class FeatureSettingsActivity : AppCompatActivity() {
                         isNotificationLightingAccessibilityEnabled,
                         isNotificationListenerEnabled,
                         isReadPhoneStateEnabled,
-                        isShizukuPermissionGranted
+                        isShizukuPermissionGranted,
                     ) {
-                        val hasMissingPermissions = when (featureId) {
-                            "Screen off widget" -> !isAccessibilityEnabled
-                            "Statusbar icons" -> !isWriteSecureSettingsEnabled
-                            "Notification lighting" -> !isOverlayPermissionGranted || !isNotificationLightingAccessibilityEnabled || !isNotificationListenerEnabled
-                            "Button remap" -> !isAccessibilityEnabled
-                            "Pocket mode" -> !isAccessibilityEnabled
-                            "Dynamic night light" -> (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) || !isWriteSecureSettingsEnabled
-                            "Snooze system notifications" -> !isNotificationListenerEnabled
-                            "Screen locked security" -> !isAccessibilityEnabled || !isWriteSecureSettingsEnabled || !viewModel.isDeviceAdminEnabled.value
-                            "App lock" -> !isAccessibilityEnabled || (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else false)
-                            "Freeze" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                context
-                            )
+                        val hasMissingPermissions =
+                            when (featureId) {
+                                "Screen off widget" -> !isAccessibilityEnabled
+                                "Statusbar icons" -> !isWriteSecureSettingsEnabled
+                                "Notification lighting" ->
+                                    !isOverlayPermissionGranted ||
+                                        !isNotificationLightingAccessibilityEnabled ||
+                                        !isNotificationListenerEnabled
+                                "Button remap" -> !isAccessibilityEnabled
+                                "Pocket mode" -> !isAccessibilityEnabled
+                                "Dynamic night light" ->
+                                    (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) ||
+                                        !isWriteSecureSettingsEnabled
+                                "Snooze system notifications" -> !isNotificationListenerEnabled
+                                "Screen locked security" ->
+                                    !isAccessibilityEnabled ||
+                                        !isWriteSecureSettingsEnabled ||
+                                        !viewModel.isDeviceAdminEnabled.value
+                                "App lock" ->
+                                    !isAccessibilityEnabled ||
+                                        (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else false)
+                                "Freeze" ->
+                                    !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                        context,
+                                    )
 
-                            "Location reached" -> !viewModel.isLocationPermissionGranted.value || !viewModel.isBackgroundLocationPermissionGranted.value
-                            "Quick settings tiles" -> !viewModel.isWriteSettingsEnabled.value
-                            "Screen refresh rate" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                context
-                            )
-                            // Top level checks for other features (rarely hit if they are children, but safe to add)
-                            "Essentials On Display" -> !isAccessibilityEnabled || !isNotificationListenerEnabled
-                            "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
-                            "Maps power saving mode" -> !isNotificationListenerEnabled || !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                context
-                            )
+                                "Location reached" ->
+                                    !viewModel.isLocationPermissionGranted.value ||
+                                        !viewModel.isBackgroundLocationPermissionGranted.value
+                                "Quick settings tiles" -> !viewModel.isWriteSettingsEnabled.value
+                                "Screen refresh rate" ->
+                                    !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                        context,
+                                    )
+                                // Top level checks for other features (rarely hit if they are children, but safe to add)
+                                "Essentials On Display" -> !isAccessibilityEnabled || !isNotificationListenerEnabled
+                                "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
+                                "Maps power saving mode" ->
+                                    !isNotificationListenerEnabled ||
+                                        !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                            context,
+                                        )
 
-                            "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
-                            "Battery notification" -> !viewModel.isPostNotificationsEnabled.value || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !viewModel.isBluetoothPermissionGranted.value)
-                            "Text and animations" -> !viewModel.isWriteSettingsEnabled.value || !isWriteSecureSettingsEnabled
-                            "Always on Display" -> !isWriteSecureSettingsEnabled
-                            "Lock screen clock" -> !isWriteSecureSettingsEnabled
-                            "Other customizations" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                context
-                            )
+                                "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
+                                "Battery notification" ->
+                                    !viewModel.isPostNotificationsEnabled.value ||
+                                        (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !viewModel.isBluetoothPermissionGranted.value)
+                                "Text and animations" -> !viewModel.isWriteSettingsEnabled.value || !isWriteSecureSettingsEnabled
+                                "Always on Display" -> !isWriteSecureSettingsEnabled
+                                "Lock screen clock" -> !isWriteSecureSettingsEnabled
+                                "Other customizations" ->
+                                    !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                        context,
+                                    )
 
-                            "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
-                            "Power and Battery" -> !isWriteSecureSettingsEnabled
-                            "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                context
-                            )
+                                "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
+                                "Power and Battery" -> !isWriteSecureSettingsEnabled
+                                "Networks" ->
+                                    !isWriteSecureSettingsEnabled &&
+                                        !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                            context,
+                                        )
 
-                            else -> false
-                        }
+                                else -> false
+                            }
                         if (hasMissingPermissions) {
                             showPermissionSheet = true
                         }
                     }
-
 
                     if (showPermissionSheet) {
                         val featureIdForPermissions = childFeatureForPermissions ?: featureId
                         val featureObjForPermissions =
                             FeatureRegistry.ALL_FEATURES.find { it.id == featureIdForPermissions }
 
-                        val permissionItems = if (featureObjForPermissions != null) {
-                            com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItems(
-                                featureObjForPermissions.permissionKeys,
-                                context,
-                                viewModel,
-                                this@FeatureSettingsActivity
-                            )
-                        } else {
-                            emptyList()
-                        }
+                        val permissionItems =
+                            if (featureObjForPermissions != null) {
+                                com.sameerasw.essentials.utils.PermissionUIHelper.getPermissionItems(
+                                    featureObjForPermissions.permissionKeys,
+                                    context,
+                                    viewModel,
+                                    this@FeatureSettingsActivity,
+                                )
+                            } else {
+                                emptyList()
+                            }
 
                         if (permissionItems.isNotEmpty()) {
                             PermissionsBottomSheet(
@@ -386,10 +418,15 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                     showPermissionSheet = false
                                     childFeatureForPermissions = null
                                 },
-                                featureTitle = if (featureObjForPermissions != null && childFeatureForPermissions == null) stringResource(
-                                    featureObjForPermissions.title
-                                ) else featureIdForPermissions,
-                                permissions = permissionItems
+                                featureTitle =
+                                    if (featureObjForPermissions != null && childFeatureForPermissions == null) {
+                                        stringResource(
+                                            featureObjForPermissions.title,
+                                        )
+                                    } else {
+                                        featureIdForPermissions
+                                    },
+                                permissions = permissionItems,
                             )
                         }
                     }
@@ -400,19 +437,19 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 showHelpSheet = false
                                 selectedHelpFeature = null
                             },
-                            feature = selectedHelpFeature!!
+                            feature = selectedHelpFeature!!,
                         )
                     }
 
                     if (showInstructionsSheet) {
                         com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet(
-                            onDismissRequest = { showInstructionsSheet = false }
+                            onDismissRequest = { showInstructionsSheet = false },
                         )
                     }
 
                     if (showWatchInstallHelpSheet) {
                         com.sameerasw.essentials.ui.features.watch.sheets.WatchInstallHelpBottomSheet(
-                            onDismissRequest = { showWatchInstallHelpSheet = false }
+                            onDismissRequest = { showWatchInstallHelpSheet = false },
                         )
                     }
 
@@ -426,86 +463,102 @@ class FeatureSettingsActivity : AppCompatActivity() {
                     val maxHeaderHeight = 400.dp
                     var headerHeight by remember { mutableStateOf(minHeaderHeight) }
 
-                    val nestedScrollConnection = remember {
-                        object : NestedScrollConnection {
-                            override fun onPreScroll(
-                                available: Offset,
-                                source: NestedScrollSource
-                            ): Offset {
-                                val delta = available.y
-                                if (delta < 0 && headerHeight > minHeaderHeight) {
-                                    val oldHeight = headerHeight
-                                    headerHeight = with(density) {
-                                        (oldHeight.toPx() + delta).toDp()
-                                    }.coerceAtLeast(minHeaderHeight)
-                                    val consumed = oldHeight - headerHeight
-                                    return Offset(0f, with(density) { -consumed.toPx() })
-                                }
-                                return Offset.Zero
-                            }
-
-                            override fun onPostScroll(
-                                consumed: Offset,
-                                available: Offset,
-                                source: NestedScrollSource
-                            ): Offset {
-                                val delta = available.y
-                                if (delta > 0) {
-                                    val oldHeight = headerHeight
-                                    headerHeight = with(density) {
-                                        (oldHeight.toPx() + delta).toDp()
-                                    }.coerceAtMost(maxHeaderHeight)
-
-                                    if (headerHeight == maxHeaderHeight && oldHeight < maxHeaderHeight) {
-                                        HapticUtil.performLightHaptic(view)
+                    val nestedScrollConnection =
+                        remember {
+                            object : NestedScrollConnection {
+                                override fun onPreScroll(
+                                    available: Offset,
+                                    source: NestedScrollSource,
+                                ): Offset {
+                                    val delta = available.y
+                                    if (delta < 0 && headerHeight > minHeaderHeight) {
+                                        val oldHeight = headerHeight
+                                        headerHeight =
+                                            with(density) {
+                                                (oldHeight.toPx() + delta).toDp()
+                                            }.coerceAtLeast(minHeaderHeight)
+                                        val consumed = oldHeight - headerHeight
+                                        return Offset(0f, with(density) { -consumed.toPx() })
                                     }
-
-                                    val produced = headerHeight - oldHeight
-                                    return Offset(0f, with(density) { produced.toPx() })
+                                    return Offset.Zero
                                 }
-                                return Offset.Zero
+
+                                override fun onPostScroll(
+                                    consumed: Offset,
+                                    available: Offset,
+                                    source: NestedScrollSource,
+                                ): Offset {
+                                    val delta = available.y
+                                    if (delta > 0) {
+                                        val oldHeight = headerHeight
+                                        headerHeight =
+                                            with(density) {
+                                                (oldHeight.toPx() + delta).toDp()
+                                            }.coerceAtMost(maxHeaderHeight)
+
+                                        if (headerHeight == maxHeaderHeight && oldHeight < maxHeaderHeight) {
+                                            HapticUtil.performLightHaptic(view)
+                                        }
+
+                                        val produced = headerHeight - oldHeight
+                                        return Offset(0f, with(density) { produced.toPx() })
+                                    }
+                                    return Offset.Zero
+                                }
                             }
                         }
-                    }
 
-                    val statusBarHeightPx = with(LocalDensity.current) {
-                        WindowInsets.statusBars.asPaddingValues().calculateTopPadding().toPx()
-                    }
+                    val statusBarHeightPx =
+                        with(LocalDensity.current) {
+                            WindowInsets.statusBars
+                                .asPaddingValues()
+                                .calculateTopPadding()
+                                .toPx()
+                        }
                     val statusBarHeight =
                         WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
-                            .progressiveBlur(
-                                blurRadius = if (isBlurEnabled) 40f else 0f,
-                                height = statusBarHeightPx * 1.15f,
-                                direction = BlurDirection.TOP
-                            )
-                    ) {
-                        val hasScroll =
-                            featureId != "Sound mode tile" && featureId != "Quick settings tiles" && featureId != "Location reached" && featureId != "Watch Controls"
-                        Column(
-                            modifier = Modifier
+                        modifier =
+                            Modifier
                                 .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.surfaceContainer)
                                 .progressiveBlur(
                                     blurRadius = if (isBlurEnabled) 40f else 0f,
-                                    height = with(LocalDensity.current) { 150.dp.toPx() },
-                                    direction = BlurDirection.BOTTOM
-                                )
-                                .then(
-                                    if (hasScroll) Modifier
-                                        .nestedScroll(nestedScrollConnection)
-                                        .verticalScroll(rememberScrollState()) else Modifier
-                                )
+                                    height = statusBarHeightPx * 1.15f,
+                                    direction = BlurDirection.TOP,
+                                ),
+                    ) {
+                        val hasScroll =
+                            featureId != "Sound mode tile" &&
+                                featureId != "Quick settings tiles" &&
+                                featureId != "Location reached" &&
+                                featureId != "Watch Controls"
+                        Column(
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .progressiveBlur(
+                                        blurRadius = if (isBlurEnabled) 40f else 0f,
+                                        height = with(LocalDensity.current) { 150.dp.toPx() },
+                                        direction = BlurDirection.BOTTOM,
+                                    ).then(
+                                        if (hasScroll) {
+                                            Modifier
+                                                .nestedScroll(nestedScrollConnection)
+                                                .verticalScroll(rememberScrollState())
+                                        } else {
+                                            Modifier
+                                        },
+                                    ),
                         ) {
                             // Top padding for status bar
                             if (featureId != "Quick settings tiles" && featureId != "Location reached") {
                                 androidx.compose.foundation.layout.Spacer(
-                                    modifier = Modifier.height(
-                                        statusBarHeight
-                                    )
+                                    modifier =
+                                        Modifier.height(
+                                            statusBarHeight,
+                                        ),
                                 )
                             }
 
@@ -513,7 +566,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 LottieFeatureAnimation(
                                     resId = featureObj.animationRes,
                                     height = headerHeight,
-                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                    modifier = Modifier.padding(horizontal = 16.dp),
                                 )
                             }
 
@@ -524,185 +577,238 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 }
                                 WatchSettingsUI(
                                     viewModel = watchViewModel,
-                                    modifier = Modifier.padding(top = 16.dp)
+                                    modifier = Modifier.padding(top = 16.dp),
                                 )
                             }
 
-                            val children = FeatureRegistry.getFilteredFeatures(
-                                context,
-                                viewModel.isEnableUnsupportedFeatures.value
-                            ).filter { it.parentFeatureId == featureId }
+                            val children =
+                                FeatureRegistry
+                                    .getFilteredFeatures(
+                                        context,
+                                        viewModel.isEnableUnsupportedFeatures.value,
+                                    ).filter { it.parentFeatureId == featureId }
                             if (children.isNotEmpty() && featureId != "Networks") {
-                                val sectionChildLists = run {
-                                    val childMap = children.associateBy { it.id }
-                                    val definedSections = when (featureId) {
-                                        "Display" -> listOf(
-                                            listOf(
-                                                "Essentials On Display",
-                                                "Always on Display",
-                                                "Statusbar icons",
-                                                "Maps power saving mode",
-                                                "Lock screen clock"
-                                            ),
-                                            listOf(
-                                                "Text and animations",
-                                                "Screen refresh rate",
-                                                "Navigation"
-                                            ),
-                                            listOf(
-                                                "Caffeinate",
-                                                "Dynamic night light",
-                                                "Smart pixels"
-                                            ),
-                                            listOf(
-                                                "Other customizations"
-                                            )
-                                        )
+                                val sectionChildLists =
+                                    run {
+                                        val childMap = children.associateBy { it.id }
+                                        val definedSections =
+                                            when (featureId) {
+                                                "Display" ->
+                                                    listOf(
+                                                        listOf(
+                                                            "Essentials On Display",
+                                                            "Always on Display",
+                                                            "Statusbar icons",
+                                                            "Maps power saving mode",
+                                                            "Lock screen clock",
+                                                        ),
+                                                        listOf(
+                                                            "Text and animations",
+                                                            "Screen refresh rate",
+                                                            "Navigation",
+                                                        ),
+                                                        listOf(
+                                                            "Caffeinate",
+                                                            "Dynamic night light",
+                                                            "Smart pixels",
+                                                        ),
+                                                        listOf(
+                                                            "Other customizations",
+                                                        ),
+                                                    )
 
-                                        "Notifications" -> listOf(
-                                            listOf(
-                                                "Notification lighting",
-                                                "Flashlight pulse"
-                                            ),
-                                            listOf(
-                                                "Notification snoozing",
-                                                "Snooze system notifications"
-                                            )
-                                        )
+                                                "Notifications" ->
+                                                    listOf(
+                                                        listOf(
+                                                            "Notification lighting",
+                                                            "Flashlight pulse",
+                                                        ),
+                                                        listOf(
+                                                            "Notification snoozing",
+                                                            "Snooze system notifications",
+                                                        ),
+                                                    )
 
-                                        "Widgets" -> listOf(
-                                            listOf(
-                                                "Pixel Searchbar"
-                                            ),
-                                            listOf(
-                                                "Screen off widget",
-                                                "Batteries"
-                                            )
-                                        )
+                                                "Widgets" ->
+                                                    listOf(
+                                                        listOf(
+                                                            "Pixel Searchbar",
+                                                        ),
+                                                        listOf(
+                                                            "Screen off widget",
+                                                            "Batteries",
+                                                        ),
+                                                    )
 
-                                        "Input" -> listOf(
-                                            listOf(
-                                                "Button remap",
-                                                "Flashlight"
-                                            ),
-                                            listOf(
-                                                "Link actions",
-                                                "System Keyboard"
-                                            )
-                                        )
+                                                "Input" ->
+                                                    listOf(
+                                                        listOf(
+                                                            "Button remap",
+                                                            "Flashlight",
+                                                        ),
+                                                        listOf(
+                                                            "Link actions",
+                                                            "System Keyboard",
+                                                        ),
+                                                    )
 
-                                        "Power and battery" -> listOf(
-                                            listOf(
-                                                "Power and Battery",
-                                                "Standby apps"
-                                            ),
-                                            listOf(
-                                                "Battery notification"
-                                            )
-                                        )
+                                                "Power and battery" ->
+                                                    listOf(
+                                                        listOf(
+                                                            "Power and Battery",
+                                                            "Standby apps",
+                                                        ),
+                                                        listOf(
+                                                            "Battery notification",
+                                                        ),
+                                                    )
 
-                                        "Watch" -> listOf(
-                                            listOf(
-                                                "Notification Sync",
-                                                "Call Sync",
-                                                "Watch Controls",
-                                                "Lock from Watch"
-                                            ),
-                                            listOf(
-                                                "Calendar Sync",
-                                                "Sync sound mode",
-                                                "Sync location reached status"
-                                            ),
-                                            listOf(
-                                                "Watch Wireless Debugging"
-                                            )
-                                        )
+                                                "Watch" ->
+                                                    listOf(
+                                                        listOf(
+                                                            "Notification Sync",
+                                                            "Call Sync",
+                                                            "Watch Controls",
+                                                            "Lock from Watch",
+                                                        ),
+                                                        listOf(
+                                                            "Calendar Sync",
+                                                            "Sync sound mode",
+                                                            "Sync location reached status",
+                                                        ),
+                                                        listOf(
+                                                            "Watch Wireless Debugging",
+                                                        ),
+                                                    )
 
-                                        "Security" -> listOf(
-                                            listOf(
-                                                "Screen locked security",
-                                                "App lock",
-                                                "Shut-Up!"
-                                            ),
-                                            listOf(
-                                                "Lockdown mode"
-                                            )
-                                        )
+                                                "Security" ->
+                                                    listOf(
+                                                        listOf(
+                                                            "Screen locked security",
+                                                            "App lock",
+                                                            "Shut-Up!",
+                                                        ),
+                                                        listOf(
+                                                            "Lockdown mode",
+                                                        ),
+                                                    )
 
-                                        else -> null
+                                                else -> null
+                                            }
+
+                                        if (definedSections != null) {
+                                            val assignedIds = definedSections.flatten().toSet()
+                                            val unassigned = children.filter { it.id !in assignedIds }
+                                            definedSections
+                                                .map { ids -> ids.mapNotNull { childMap[it] } }
+                                                .filter { it.isNotEmpty() } +
+                                                if (unassigned.isNotEmpty()) {
+                                                    listOf(
+                                                        unassigned,
+                                                    )
+                                                } else {
+                                                    emptyList()
+                                                }
+                                        } else {
+                                            listOf(children)
+                                        }
                                     }
-
-                                    if (definedSections != null) {
-                                        val assignedIds = definedSections.flatten().toSet()
-                                        val unassigned = children.filter { it.id !in assignedIds }
-                                        definedSections.map { ids -> ids.mapNotNull { childMap[it] } }
-                                            .filter { it.isNotEmpty() } + if (unassigned.isNotEmpty()) listOf(
-                                            unassigned
-                                        ) else emptyList()
-                                    } else {
-                                        listOf(children)
-                                    }
-                                }
 
                                 sectionChildLists.forEach { sectionChildren ->
                                     RoundedCardContainer(
-                                        modifier = Modifier
-                                            .padding(horizontal = 16.dp)
-                                            .padding(top = 16.dp)
+                                        modifier =
+                                            Modifier
+                                                .padding(horizontal = 16.dp)
+                                                .padding(top = 16.dp),
                                     ) {
                                         sectionChildren.forEach { child ->
                                             val permissionAwareToggle: (Boolean) -> Unit =
                                                 { enabled ->
-                                                    val missingPermission = when (child.id) {
-                                                        "Screen off widget" -> !isAccessibilityEnabled
-                                                        "Statusbar icons" -> !isWriteSecureSettingsEnabled
-                                                        "Notification lighting" -> !isOverlayPermissionGranted || !isNotificationLightingAccessibilityEnabled || !isNotificationListenerEnabled
-                                                        "Button remap" -> !isAccessibilityEnabled
-                                                        "Dynamic night light" -> (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) || !isWriteSecureSettingsEnabled
-                                                        "Snooze system notifications" -> !isNotificationListenerEnabled
-                                                        "Screen locked security" -> !isAccessibilityEnabled || !isWriteSecureSettingsEnabled || !viewModel.isDeviceAdminEnabled.value
-                                                        "App lock" -> !isAccessibilityEnabled || (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else false)
-                                                        "Freeze" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                            context
-                                                        )
+                                                    val missingPermission =
+                                                        when (child.id) {
+                                                            "Screen off widget" -> !isAccessibilityEnabled
+                                                            "Statusbar icons" -> !isWriteSecureSettingsEnabled
+                                                            "Notification lighting" ->
+                                                                !isOverlayPermissionGranted ||
+                                                                    !isNotificationLightingAccessibilityEnabled ||
+                                                                    !isNotificationListenerEnabled
+                                                            "Button remap" -> !isAccessibilityEnabled
+                                                            "Dynamic night light" ->
+                                                                (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else !isAccessibilityEnabled) ||
+                                                                    !isWriteSecureSettingsEnabled
+                                                            "Snooze system notifications" -> !isNotificationListenerEnabled
+                                                            "Screen locked security" ->
+                                                                !isAccessibilityEnabled ||
+                                                                    !isWriteSecureSettingsEnabled ||
+                                                                    !viewModel.isDeviceAdminEnabled.value
+                                                            "App lock" ->
+                                                                !isAccessibilityEnabled ||
+                                                                    (if (viewModel.isUseUsageAccess.value) !viewModel.isUsageStatsPermissionGranted.value else false)
+                                                            "Freeze" ->
+                                                                !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                                    context,
+                                                                )
 
-                                                        "Essentials On Display" -> !isAccessibilityEnabled || !isNotificationListenerEnabled
-                                                        "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
-                                                        "Calendar Sync" -> androidx.core.content.ContextCompat.checkSelfPermission(
-                                                            context,
-                                                            android.Manifest.permission.READ_CALENDAR
-                                                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                                                            "Essentials On Display" ->
+                                                                !isAccessibilityEnabled ||
+                                                                    !isNotificationListenerEnabled
+                                                            "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
+                                                            "Calendar Sync" ->
+                                                                androidx.core.content.ContextCompat.checkSelfPermission(
+                                                                    context,
+                                                                    android.Manifest.permission.READ_CALENDAR,
+                                                                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
 
-                                                        "Batteries" -> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && androidx.core.content.ContextCompat.checkSelfPermission(
-                                                            context,
-                                                            android.Manifest.permission.BLUETOOTH_CONNECT
-                                                        ) != android.content.pm.PackageManager.PERMISSION_GRANTED)
+                                                            "Batteries" -> (
+                                                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                                                                    androidx.core.content.ContextCompat.checkSelfPermission(
+                                                                        context,
+                                                                        android.Manifest.permission.BLUETOOTH_CONNECT,
+                                                                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                                                            )
 
-                                                        "Maps power saving mode" -> !isNotificationListenerEnabled || !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                            context
-                                                        )
+                                                            "Maps power saving mode" ->
+                                                                !isNotificationListenerEnabled ||
+                                                                    !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                                        context,
+                                                                    )
 
-                                                        "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
-                                                        "Battery notification" -> !viewModel.isPostNotificationsEnabled.value || (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !viewModel.isBluetoothPermissionGranted.value)
-                                                        "Text and animations" -> !viewModel.isWriteSettingsEnabled.value || !isWriteSecureSettingsEnabled
-                                                        "Lock screen clock" -> !isWriteSecureSettingsEnabled
-                                                        "Screen refresh rate" -> !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                            context
-                                                        )
+                                                            "Caffeinate" -> !viewModel.isPostNotificationsEnabled.value
+                                                            "Battery notification" ->
+                                                                !viewModel.isPostNotificationsEnabled.value ||
+                                                                    (
+                                                                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                                                                            !viewModel.isBluetoothPermissionGranted.value
+                                                                    )
+                                                            "Text and animations" ->
+                                                                !viewModel.isWriteSettingsEnabled.value ||
+                                                                    !isWriteSecureSettingsEnabled
+                                                            "Lock screen clock" -> !isWriteSecureSettingsEnabled
+                                                            "Screen refresh rate" ->
+                                                                !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                                    context,
+                                                                )
 
-                                                        "Shut-Up!" -> !isWriteSecureSettingsEnabled || !viewModel.isUsageStatsPermissionGranted.value
-                                                        "Power and Battery" -> !isWriteSecureSettingsEnabled
-                                                        "Networks" -> !isWriteSecureSettingsEnabled && !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
-                                                            context
-                                                        )
+                                                            "Shut-Up!" ->
+                                                                !isWriteSecureSettingsEnabled ||
+                                                                    !viewModel.isUsageStatsPermissionGranted.value
+                                                            "Power and Battery" -> !isWriteSecureSettingsEnabled
+                                                            "Networks" ->
+                                                                !isWriteSecureSettingsEnabled &&
+                                                                    !com.sameerasw.essentials.utils.ShellUtils.hasPermission(
+                                                                        context,
+                                                                    )
 
-                                                        "Call Sync" -> !com.sameerasw.essentials.utils.PermissionUtils.hasCallPermissions(context)
-                                                        "Notification Sync" -> !viewModel.isNotificationListenerEnabled.value
+                                                            "Call Sync" ->
+                                                                !com.sameerasw.essentials.utils.PermissionUtils.hasCallPermissions(
+                                                                    context,
+                                                                )
+                                                            "Notification Sync" -> !viewModel.isNotificationListenerEnabled.value
 
-                                                        "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
-                                                        "Notification snoozing" -> !isWriteSecureSettingsEnabled
-                                                        else -> false
-                                                    }
+                                                            "Disable safe volume warning" -> !isWriteSecureSettingsEnabled
+                                                            "Notification snoozing" -> !isWriteSecureSettingsEnabled
+                                                            else -> false
+                                                        }
 
                                                     if (missingPermission) {
                                                         childFeatureForPermissions = child.id
@@ -716,9 +822,9 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                                 child.onToggle(
                                                                     viewModel,
                                                                     context,
-                                                                    enabled
+                                                                    enabled,
                                                                 )
-                                                            }
+                                                            },
                                                         )
                                                     }
                                                 }
@@ -728,16 +834,18 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                 title = child.title,
                                                 description = child.description,
                                                 iconRes = child.iconRes,
-                                                isEnabled = when (child.id) {
-                                                    "Watch Wireless Debugging" -> watchAdbWifiEnabled
-                                                    "Sync sound mode" -> watchSyncSoundModeEnabled
-                                                    "Sync location reached status" -> watchSyncLocationReachedEnabled
-                                                    else -> child.isEnabled(viewModel)
-                                                },
-                                                isToggleEnabled = child.isToggleEnabled(
-                                                    viewModel,
-                                                    context
-                                                ),
+                                                isEnabled =
+                                                    when (child.id) {
+                                                        "Watch Wireless Debugging" -> watchAdbWifiEnabled
+                                                        "Sync sound mode" -> watchSyncSoundModeEnabled
+                                                        "Sync location reached status" -> watchSyncLocationReachedEnabled
+                                                        else -> child.isEnabled(viewModel)
+                                                    },
+                                                isToggleEnabled =
+                                                    child.isToggleEnabled(
+                                                        viewModel,
+                                                        context,
+                                                    ),
                                                 showToggle = child.showToggle,
                                                 onDisabledToggleClick = { permissionAwareToggle(true) },
                                                 hasMoreSettings = child.hasMoreSettings,
@@ -750,18 +858,21 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             feature = child,
                                                             action = {
                                                                 child.onClick(context, viewModel)
-                                                            }
+                                                            },
                                                         )
                                                     }
                                                 },
                                                 isPinned = pinnedFeatureKeys.contains(child.id),
                                                 onPinToggle = { viewModel.togglePinFeature(child.id) },
-                                                onHelpClick = if (child.aboutDescription != null) {
-                                                    {
-                                                        selectedHelpFeature = child
-                                                        showHelpSheet = true
-                                                    }
-                                                } else null
+                                                onHelpClick =
+                                                    if (child.aboutDescription != null) {
+                                                        {
+                                                            selectedHelpFeature = child
+                                                            showHelpSheet = true
+                                                        }
+                                                    } else {
+                                                        null
+                                                    },
                                             )
                                         }
                                     }
@@ -780,7 +891,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             onShowPermissionSheet = { showPermissionSheet = it },
                                             onSetChildFeatureForPermissions = {
                                                 childFeatureForPermissions = it
-                                            }
+                                            },
                                         )
                                     }
 
@@ -789,7 +900,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             viewModel = statusBarViewModel,
                                             mainViewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -797,7 +908,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         CaffeinateSettingsUI(
                                             viewModel = caffeinateViewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -805,14 +916,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         NotificationLightingSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
                                     "Sound mode tile" -> {
                                         SoundModeTileSettingsUI(
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -820,7 +931,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         ButtonRemapSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -828,7 +939,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         FlashlightSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -836,7 +947,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         DynamicNightLightSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -844,7 +955,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         com.sameerasw.essentials.ui.features.system.SmartPixelsSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -852,7 +963,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         SnoozeNotificationsSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -860,7 +971,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         NotificationSnoozingSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -868,7 +979,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         ScreenLockedSecuritySettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -876,14 +987,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         PocketModeSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
                                     "App lock" -> {
                                         AppLockSettingsUI(
                                             viewModel = viewModel,
-                                            highlightKey = highlightSetting
+                                            highlightKey = highlightSetting,
                                         )
                                     }
 
@@ -891,7 +1002,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         FreezeSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightKey = highlightSetting
+                                            highlightKey = highlightSetting,
                                         )
                                     }
 
@@ -899,10 +1010,11 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         QuickSettingsTilesSettingsUI(
                                             modifier = Modifier.fillMaxSize(),
                                             highlightSetting = highlightSetting,
-                                            contentPadding = PaddingValues(
-                                                top = statusBarHeight,
-                                                bottom = 150.dp
-                                            )
+                                            contentPadding =
+                                                PaddingValues(
+                                                    top = statusBarHeight,
+                                                    bottom = 150.dp,
+                                                ),
                                         )
                                     }
 
@@ -910,7 +1022,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         LocationReachedSettingsUI(
                                             mainViewModel = viewModel,
                                             modifier = Modifier.fillMaxSize(),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -918,14 +1030,14 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         KeyboardSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
                                     "Batteries" -> {
                                         BatteriesSettingsUI(
                                             viewModel = viewModel,
-                                            modifier = Modifier.padding(top = 16.dp)
+                                            modifier = Modifier.padding(top = 16.dp),
                                         )
                                     }
 
@@ -933,7 +1045,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         BatteryNotificationSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightKey = highlightSetting
+                                            highlightKey = highlightSetting,
                                         )
                                     }
 
@@ -941,7 +1053,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         EssentialsOnDisplaySettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -949,20 +1061,20 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         CalendarSyncSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightKey = highlightSetting
+                                            highlightKey = highlightSetting,
                                         )
                                     }
 
                                     "Notification Sync" -> {
                                         WatchNotificationSettingsUI(
-                                            modifier = Modifier.padding(top = 16.dp)
+                                            modifier = Modifier.padding(top = 16.dp),
                                         )
                                     }
 
                                     "Watch Controls" -> {
                                         WatchControlsSettingsUI(
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -971,7 +1083,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             mainViewModel = viewModel,
                                             watchViewModel = watchViewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -979,7 +1091,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         MapsPowerSavingSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -987,7 +1099,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         FlashlightPulseSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -995,7 +1107,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         TextAnimationsSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1003,7 +1115,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         RefreshRateSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1011,7 +1123,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         AlwaysOnDisplaySettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1019,7 +1131,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         LiveWallpaperSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1027,7 +1139,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         NavigationSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1035,7 +1147,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         OtherCustomizationsSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1043,7 +1155,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         LockScreenClockSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1051,7 +1163,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         ShutUpSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightKey = highlightSetting
+                                            highlightKey = highlightSetting,
                                         )
                                     }
 
@@ -1059,7 +1171,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         PowerAndBatterySettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1067,7 +1179,7 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                         NetworksSettingsUI(
                                             viewModel = viewModel,
                                             modifier = Modifier.padding(top = 16.dp),
-                                            highlightSetting = highlightSetting
+                                            highlightSetting = highlightSetting,
                                         )
                                     }
 
@@ -1078,18 +1190,18 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                             selectedPackages = standbyAppsSelectedPackages,
                                             onSelectionChange = { standbyAppsSelectedPackages = it },
                                             showMoveSheet = isStandbyMoveSheetVisible,
-                                            onShowMoveSheetChange = { isStandbyMoveSheetVisible = it }
+                                            onShowMoveSheetChange = { isStandbyMoveSheetVisible = it },
                                         )
                                     }
                                 }
-
                             }
                             // Bottom padding for toolbar
                             if (featureId != "Quick settings tiles" && featureId != "Location reached") {
                                 androidx.compose.foundation.layout.Spacer(
-                                    modifier = Modifier.height(
-                                        150.dp
-                                    )
+                                    modifier =
+                                        Modifier.height(
+                                            150.dp,
+                                        ),
                                 )
                             }
                         }
@@ -1097,11 +1209,12 @@ class FeatureSettingsActivity : AppCompatActivity() {
                         val isStandbyMultiSelecting = featureId == "Standby apps" && standbyAppsSelectedPackages.isNotEmpty()
 
                         EssentialsFloatingToolbar(
-                            title = if (isStandbyMultiSelecting) {
-                                stringResource(R.string.standby_apps_selected_count, standbyAppsSelectedPackages.size)
-                            } else {
-                                pageTitle
-                            },
+                            title =
+                                if (isStandbyMultiSelecting) {
+                                    stringResource(R.string.standby_apps_selected_count, standbyAppsSelectedPackages.size)
+                                } else {
+                                    pageTitle
+                                },
                             isBeta = if (isStandbyMultiSelecting) false else (featureObj?.isBeta ?: false),
                             onBackClick = {
                                 if (isStandbyMultiSelecting) {
@@ -1111,25 +1224,32 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                 }
                             },
                             fabIconRes = if (isStandbyMultiSelecting) R.drawable.rounded_mobiledata_arrows_24 else null,
-                            fabAction = if (isStandbyMultiSelecting) {
-                                { isStandbyMoveSheetVisible = true }
-                            } else null,
+                            fabAction =
+                                if (isStandbyMultiSelecting) {
+                                    { isStandbyMoveSheetVisible = true }
+                                } else {
+                                    null
+                                },
                             fabContentDescription = if (isStandbyMultiSelecting) stringResource(R.string.action_move_bucket) else null,
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .zIndex(1f),
-                            onHelpClick = if (isStandbyMultiSelecting) null else {
-                                {
-                                    if (featureId == "Watch") {
-                                        showWatchInstallHelpSheet = true
-                                    } else if (hasMenu) {
-                                        selectedHelpFeature = featureObj
-                                        showHelpSheet = true
-                                    } else {
-                                        showInstructionsSheet = true
+                            modifier =
+                                Modifier
+                                    .align(Alignment.BottomCenter)
+                                    .zIndex(1f),
+                            onHelpClick =
+                                if (isStandbyMultiSelecting) {
+                                    null
+                                } else {
+                                    {
+                                        if (featureId == "Watch") {
+                                            showWatchInstallHelpSheet = true
+                                        } else if (hasMenu) {
+                                            selectedHelpFeature = featureObj
+                                            showHelpSheet = true
+                                        } else {
+                                            showInstructionsSheet = true
+                                        }
                                     }
-                                }
-                            }
+                                },
                         )
                     }
                 }
