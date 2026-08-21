@@ -19,10 +19,12 @@ import android.os.Build
 import android.provider.Settings
 import android.view.KeyEvent
 import android.widget.Toast
+import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.diy.Action
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
 import com.sameerasw.essentials.utils.DeviceLockUtils
+import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.ShellUtils
 import com.sameerasw.essentials.utils.performHapticFeedback
 import rikka.shizuku.ShizukuBinderWrapper
@@ -652,6 +654,19 @@ object CombinedActionExecutor {
                         com.sameerasw.essentials.utils.FreezeManager.unfreezeApp(context, pkg)
                     }
                 }
+
+                is Action.Keyboard -> {
+                    try {
+                        if (PermissionUtils.canWriteSecureSettings(context)) {
+                            Settings.Secure.putString(context.contentResolver, Settings.Secure.DEFAULT_INPUT_METHOD, action.inputMethodId)
+                            return@withContext
+                        }
+                        Toast.makeText(context, R.string.diy_set_keyboard_permission_required, Toast.LENGTH_SHORT).show()
+                    } catch (e: Exception) {
+                        Toast.makeText(context, "Keyboard Switching Failed: ${e.message ?: ""}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
                 is Action.CustomSettings -> {
                     val resolver = context.contentResolver
                     for (entry in action.entries) {

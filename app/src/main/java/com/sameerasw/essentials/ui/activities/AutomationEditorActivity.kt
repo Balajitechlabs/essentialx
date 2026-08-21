@@ -12,6 +12,7 @@ package com.sameerasw.essentials.ui.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.inputmethod.InputMethodInfo
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -102,6 +103,7 @@ import com.sameerasw.essentials.ui.core.sheets.ScreenOffSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.SingleAppSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.SoundModeSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.WifiNetworkSelectionSheet
+import com.sameerasw.essentials.ui.features.apps.sheets.KeyboardSelectionSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
@@ -266,6 +268,8 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showTimeSettings by remember { mutableStateOf(false) }
                 var showBluetoothSettings by remember { mutableStateOf(false) }
                 var showWifiSettings by remember { mutableStateOf(false) }
+                var showSetKeyboardSheet by remember { mutableStateOf(false) }
+                var selectedIme by remember { mutableStateOf<String?>(null) }
                 var showCustomSettingsSettings by remember { mutableStateOf(false) }
                 var configAction by remember { mutableStateOf<Action?>(null) } // Generic config action
 
@@ -298,6 +302,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 fun isActionConfigured(action: Action?): Boolean = when (action) {
                     is Action.OpenApp -> action.packageName.isNotBlank()
                     is Action.CustomSettings -> action.entries.isNotEmpty()
+                    is Action.Keyboard -> !action.inputMethodId.isNullOrEmpty()
                     else -> true
                 }
 
@@ -905,7 +910,8 @@ class AutomationEditorActivity : ComponentActivity() {
                                                 Action.FreezeApps(),
                                                 Action.UnfreezeApps(),
                                                 Action.FreezeTag(),
-                                                Action.PinApp
+                                                Action.PinApp,
+                                                Action.Keyboard()
                                             )
                                             val systemActions = listOf(
                                                 Action.TurnOnFlashlight,
@@ -961,6 +967,13 @@ class AutomationEditorActivity : ComponentActivity() {
                                             ) {
                                                 actions.forEach { action ->
                                                     val resolvedAction = if (currentSelection != null && currentSelection::class == action::class) currentSelection else action
+                                                    val missing = getMissingPermissionsHelper(resolvedAction)
+                                                    fun showPermissionSheet() {
+                                                        permissionKeysToShow = missing
+                                                        permissionFeatureTitle = resolvedAction.title
+                                                        showPermissionSheet = true
+                                                    }
+
                                                     EditorActionItem(
                                                         title = stringResource(resolvedAction.title),
                                                         iconRes = resolvedAction.icon,
@@ -975,14 +988,14 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                     else selectedOutAction = resolvedAction
                                                                 }
                                                             }
-                                                            val missing = getMissingPermissionsHelper(resolvedAction)
-                                                            if (missing.isNotEmpty()) {
-                                                                permissionKeysToShow = missing
-                                                                permissionFeatureTitle = resolvedAction.title
-                                                                showPermissionSheet = true
-                                                            }
+                                                            if(missing.isNotEmpty()) showPermissionSheet()
                                                         },
                                                         onSettingsClick = {
+                                                            if(missing.isNotEmpty()) {
+                                                                showPermissionSheet()
+                                                                return@EditorActionItem
+                                                            }
+
                                                             configAction = resolvedAction
                                                             when (resolvedAction) {
                                                                 is Action.DimWallpaper -> showDimSettings = true
@@ -999,6 +1012,10 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                 is Action.UnfreezeApps -> {
                                                                     temporarySelectedAppsForAction = resolvedAction.packageNames
                                                                     showFreezeAppsSettings = true
+                                                                }
+                                                                is Action.Keyboard -> {
+                                                                    showSetKeyboardSheet = true
+                                                                    selectedIme = resolvedAction.inputMethodId
                                                                 }
                                                                 is Action.CustomSettings -> showCustomSettingsSettings = true
                                                                 else -> {}
@@ -1282,6 +1299,26 @@ class AutomationEditorActivity : ComponentActivity() {
                                     temporarySelectedAppsForAction = selections.filter { it.isEnabled }.map { it.packageName }
                                 },
                                 excludePackages = if (automationType == Automation.Type.APP) selectedApps else emptyList()
+                            )
+                        }
+
+                        if (showSetKeyboardSheet && configAction is Action.Keyboard) {
+                            KeyboardSelectionSheet(
+                                onDismissRequest = { newIme ->
+                                    showSetKeyboardSheet = false
+                                    when (automationType) {
+                                        Automation.Type.TRIGGER -> selectedAction = Action.Keyboard(newIme)
+                                        Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction =
+                                            Action.Keyboard(newIme)
+
+                                        Automation.Type.STATE, Automation.Type.APP -> {
+                                            if (selectedActionTab == 0) selectedInAction = Action.Keyboard(newIme)
+                                            else selectedOutAction = Action.Keyboard(newIme)
+                                        }
+                                    }
+                                    configAction = null
+                                },
+                                selectedIme = (configAction as? Action.Keyboard)?.inputMethodId
                             )
                         }
 
