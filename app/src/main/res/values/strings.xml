@@ -1001,6 +1001,14 @@
     <string name="diy_action_ai_assistant">AI Assistant</string>
     <string name="diy_action_take_screenshot">Take Screenshot</string>
     <string name="diy_action_toggle_media_volume">Toggle Media Volume</string>
+    <string name="diy_action_set_volume">Set Volume</string>
+    <string name="diy_set_volume_level_label">Volume Level</string>
+    <string name="diy_volume_channel_music">Music</string>
+    <string name="diy_volume_channel_ring">Ring</string>
+    <string name="diy_volume_channel_alarm">Alarm</string>
+    <string name="diy_volume_channel_call">Call</string>
+    <string name="diy_volume_channel_notification">Notification</string>
+    <string name="diy_volume_channel_system">System</string>
     <string name="diy_action_cycle_sound_modes">Cycle Sound Modes</string>
     <string name="diy_action_toggle_mute">Toggle Mute</string>
     <string name="diy_action_toggle_vibrate">Toggle Vibrate</string>

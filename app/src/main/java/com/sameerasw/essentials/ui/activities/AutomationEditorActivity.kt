@@ -104,6 +104,7 @@ import com.sameerasw.essentials.ui.core.sheets.ScreenOffSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.SingleAppSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.SoundModeSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.WifiNetworkSelectionSheet
+import com.sameerasw.essentials.ui.features.audio.sheets.SetVolumeSettingsSheet
 import com.sameerasw.essentials.ui.features.apps.sheets.KeyboardSelectionSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.AppUtil
@@ -271,6 +272,7 @@ class AutomationEditorActivity : ComponentActivity() {
                 var showWifiSettings by remember { mutableStateOf(false) }
                 var showSetKeyboardSheet by remember { mutableStateOf(false) }
                 var showCustomSettingsSettings by remember { mutableStateOf(false) }
+                var showSetVolumeSettings by remember { mutableStateOf(false) }
                 var configAction by remember { mutableStateOf<Action?>(null) } // Generic config action
 
                 val isTriggerConfigured = when (val trigger = selectedTrigger) {
@@ -956,6 +958,7 @@ class AutomationEditorActivity : ComponentActivity() {
                                                                 is Action.Keyboard -> {
                                                                     showSetKeyboardSheet = true
                                                                 }
+                                                                is Action.SetVolume -> showSetVolumeSettings = true
                                                                 is Action.CustomSettings -> showCustomSettingsSettings = true
                                                                 else -> {}
                                                             }
@@ -1143,6 +1146,27 @@ class AutomationEditorActivity : ComponentActivity() {
                                 }
                             )
                         }
+                        if (showSetVolumeSettings && configAction is Action.SetVolume) {
+                            SetVolumeSettingsSheet(
+                                initialAction = configAction as Action.SetVolume,
+                                onDismiss = { showSetVolumeSettings = false },
+                                onSave = { newAction ->
+                                    showSetVolumeSettings = false
+                                    when (automationType) {
+                                        Automation.Type.TRIGGER -> selectedAction = newAction
+                                        Automation.Type.ACTION_SHORTCUT, Automation.Type.PIXEL_SEARCHBAR -> selectedAction =
+                                            newAction
+
+                                        Automation.Type.STATE, Automation.Type.APP -> {
+                                            if (selectedActionTab == 0) selectedInAction = newAction
+                                            else selectedOutAction = newAction
+                                        }
+                                    }
+                                    configAction = null
+                                }
+                            )
+                        }
+
                         if (showSometimesEssentialsSettings && configAction is Action.SometimesEssentials) {
                             com.sameerasw.essentials.ui.core.sheets.SometimesEssentialsSettingsSheet(
                                 initialAction = configAction as Action.SometimesEssentials,

@@ -324,6 +324,21 @@ object CombinedActionExecutor {
                     }
                 }
 
+                is Action.SetVolume -> {
+                    val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    val streamType = when (action.channel) {
+                        Action.VolumeChannel.MUSIC -> AudioManager.STREAM_MUSIC
+                        Action.VolumeChannel.RING -> AudioManager.STREAM_RING
+                        Action.VolumeChannel.ALARM -> AudioManager.STREAM_ALARM
+                        Action.VolumeChannel.CALL -> AudioManager.STREAM_VOICE_CALL
+                        Action.VolumeChannel.NOTIFICATION -> AudioManager.STREAM_NOTIFICATION
+                        Action.VolumeChannel.SYSTEM -> AudioManager.STREAM_SYSTEM
+                    }
+                    val max = am.getStreamMaxVolume(streamType)
+                    val target = (action.level / 100f * max).toInt().coerceIn(0, max)
+                    am.setStreamVolume(streamType, target, AudioManager.FLAG_SHOW_UI)
+                }
+
                 is Action.CycleSoundModes -> {
                     com.sameerasw.essentials.services.handlers.SoundModeHandler(context).cycleNextMode()
                 }

@@ -67,6 +67,7 @@ import com.sameerasw.essentials.ui.core.sheets.ScreenOffSettingsSheet
 import com.sameerasw.essentials.ui.core.sheets.SingleAppSelectionSheet
 import com.sameerasw.essentials.ui.core.sheets.SoundModeSettingsSheet
 import com.sameerasw.essentials.ui.features.apps.sheets.KeyboardSelectionSheet
+import com.sameerasw.essentials.ui.features.audio.sheets.SetVolumeSettingsSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -97,6 +98,7 @@ fun ButtonRemapSettingsUI(
     var temporarySelectedAppsForAction by remember { mutableStateOf<List<String>>(emptyList()) }
     var showSetKeyboardSheet by remember { mutableStateOf(false) }
     var showCustomSettingsSettings by remember { mutableStateOf(false) }
+    var showSetVolumeSettings by remember { mutableStateOf(false) }
     var configAction by remember { mutableStateOf<Action?>(null) }
 
     // Missing permission handling sheet
@@ -451,6 +453,7 @@ fun ButtonRemapSettingsUI(
                                             showFreezeAppsSettings = true
                                         }
                                         is Action.Keyboard -> showSetKeyboardSheet = true
+                                        is Action.SetVolume -> showSetVolumeSettings = true
                                         is Action.CustomSettings -> showCustomSettingsSettings = true
                                         else -> {}
                                     }
@@ -580,6 +583,18 @@ fun ButtonRemapSettingsUI(
             onDismiss = { showSoundModeSettings = false },
             onSave = { newAction ->
                 showSoundModeSettings = false
+                onActionSelected(newAction)
+                configAction = null
+            }
+        )
+    }
+
+    if (showSetVolumeSettings && configAction is Action.SetVolume) {
+        SetVolumeSettingsSheet(
+            initialAction = configAction as Action.SetVolume,
+            onDismiss = { showSetVolumeSettings = false },
+            onSave = { newAction ->
+                showSetVolumeSettings = false
                 onActionSelected(newAction)
                 configAction = null
             }

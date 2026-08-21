@@ -133,14 +133,18 @@ fun <T> SegmentedPicker(
                     ) {
                         if (iconProvider != null) {
                             iconProvider(item)
-                            Spacer(Modifier.padding(end = 8.dp))
                         }
-                        Text(
-                            label,
-                            fontSize = dimensionResource(R.dimen.font_small).value.sp,
-                            modifier = Modifier.basicMarquee(),
-                            maxLines = 1
-                        )
+                        if (label.isNotEmpty()) {
+                            if (iconProvider != null) {
+                                Spacer(Modifier.padding(end = 8.dp))
+                            }
+                            Text(
+                                label,
+                                fontSize = dimensionResource(R.dimen.font_small).value.sp,
+                                modifier = Modifier.basicMarquee(),
+                                maxLines = 1
+                            )
+                        }
                     }
                 }
 

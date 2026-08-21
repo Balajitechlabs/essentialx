@@ -79,6 +79,7 @@ object ActionRegistry {
             Action.ToggleVibrate,
             Action.HapticVibration,
             Action.ToggleMediaVolume,
+            Action.SetVolume(),
             Action.MediaPlayPause,
             Action.MediaNext,
             Action.MediaPrevious,

@@ -193,6 +193,45 @@ sealed interface Action {
     }
 
     @Keep
+    enum class VolumeChannel {
+        @SerializedName("MUSIC")
+        MUSIC,
+
+        @SerializedName("RING")
+        RING,
+
+        @SerializedName("ALARM")
+        ALARM,
+
+        @SerializedName("CALL")
+        CALL,
+
+        @SerializedName("NOTIFICATION")
+        NOTIFICATION,
+
+        @SerializedName("SYSTEM")
+        SYSTEM
+    }
+
+    @Keep
+    data class SetVolume(
+        @SerializedName("channel") val channel: VolumeChannel = VolumeChannel.MUSIC,
+        @SerializedName("level") val level: Int = 50
+    ) : Action {
+        override val title: Int get() = R.string.diy_action_set_volume
+        override val icon: Int
+            get() = when (channel) {
+                VolumeChannel.MUSIC -> R.drawable.rounded_music_note_24
+                VolumeChannel.RING -> R.drawable.rounded_ring_volume_24
+                VolumeChannel.ALARM -> R.drawable.rounded_alarm_24
+                VolumeChannel.CALL -> R.drawable.rounded_call_24
+                VolumeChannel.NOTIFICATION -> R.drawable.rounded_notifications_unread_24
+                VolumeChannel.SYSTEM -> R.drawable.rounded_android_24
+            }
+        override val isConfigurable: Boolean = true
+    }
+
+    @Keep
     data object CircleToSearch : Action {
         override val title: Int = R.string.diy_action_circle_to_search
         override val icon: Int = R.drawable.rounded_search_24
