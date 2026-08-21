@@ -110,6 +110,7 @@ class SettingsRepository(private val context: Context) {
         const val PREFS_NAME = "essentials_prefs"
 
         // Keys
+        const val KEY_DEBUGGING_TILE_TAP_ACTION = "debugging_tile_tap_action"
         const val KEY_GENAI_AUTOMATION_ENABLED = "genai_automation_enabled"
         const val KEY_SMART_PIXELS_ENABLED = "smart_pixels_enabled"
         const val KEY_SMART_PIXELS_INTENSITY = "smart_pixels_intensity"

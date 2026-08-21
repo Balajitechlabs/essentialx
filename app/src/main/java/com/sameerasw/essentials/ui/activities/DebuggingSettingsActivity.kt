@@ -53,8 +53,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -208,6 +210,50 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
                         HapticUtil.performUIHaptic(view)
                         isWifiEnabled = enabled
                         setWifiDebuggingEnabled(enabled)
+                    }
+                )
+            }
+
+            val settingsRepository = remember {
+                SettingsRepository(context)
+            }
+            var tapAction by remember {
+                mutableStateOf(
+                    settingsRepository.getString(
+                        SettingsRepository.KEY_DEBUGGING_TILE_TAP_ACTION,
+                        "both"
+                    ) ?: "both"
+                )
+            }
+
+            val tapActionOptions = listOf(
+                "both" to R.string.debugging_tap_action_both,
+                "usb" to R.string.debugging_tap_action_usb,
+                "wireless" to R.string.debugging_tap_action_wireless
+            )
+
+            Text(
+                text = stringResource(R.string.debugging_default_tap_action_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 4.dp)
+            )
+
+            RoundedCardContainer(spacing = 0.dp) {
+                SegmentedPicker(
+                    items = tapActionOptions.map { it.first },
+                    selectedItem = tapAction,
+                    onItemSelected = { selected ->
+                        tapAction = selected
+                        settingsRepository.putString(
+                            SettingsRepository.KEY_DEBUGGING_TILE_TAP_ACTION,
+                            selected
+                        )
+                    },
+                    labelProvider = { optionKey ->
+                        val stringRes = tapActionOptions.firstOrNull { it.first == optionKey }?.second
+                            ?: R.string.debugging_tap_action_both
+                        context.getString(stringRes)
                     }
                 )
             }
