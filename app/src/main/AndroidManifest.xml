@@ -388,6 +388,14 @@
             android:theme="@style/Theme.Essentials.Translucent" />
 
         <activity
+            android:name=".ui.activities.DebuggingSettingsActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.Essentials.Translucent" />
+
+        <activity
             android:name=".ui.activities.BatteryDetailsActivity"
             android:excludeFromRecents="true"
             android:exported="true"
