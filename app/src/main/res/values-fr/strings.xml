@@ -719,7 +719,11 @@
     <string name="about_desc_essentials_on_display">Essentials On Display shows a Now Playing overlay on your lock screen when music is playing and playback changes. \n\nIf your device does not support overlays over AOD, you can opt for the Ambience screensaver added in your Android settings as an alternative while charging.</string>
     <string name="about_desc_notification_lighting">La fonctionnalité Notifications lumineuses ajoute un bel effet d\'éclairage des coins de l\'écran quand vous recevez une notification.\n\nYou pouvez personnaliser le style de l\'animation, les couleurs et le comportement. Cela marche même quand l\'écran est éteint (en fonction du constructeur de votre appareil) ou par dessus les applications actives. Choisissez des applis, des priorités de notifications, ou quoi que ce soit qui devrait la déclencher depuis les contrôles donnés. Si votre constructeur ne supporte pas les superpositions sur le mode Always-On, activez l\'option d\'éclairage ambiant trouvable ci-dessous.</string>
     <string name="about_desc_screen_off_widget">Éteignez facilement l\'écran avec un appui sur un widget transparent redimensionnable qui n\'ajoute aucune icône ou indice sur votre écran d\'accueil. </string>
-    <string name="about_desc_statusbar_icons">Prenez les pleins pouvoirs sur vos icônes de la barre d\'état.\n\nCachez des icônes spécifiques comme le Wi-Fi, le Bluetooth, ou les données mobiles pour garder votre barre d\'état épurée. Vous pouvez aussi personnaliser le format de l\'horloge et l\'indicateur de batterie avec des contrôles intelligents également. Ceci sont la liste des contrôles disponibles dans AOSP donc le système d\'exploitation de votre appareil peut ne pas respecter tous ces contrôles.</string>
+    <string name="about_desc_statusbar_icons">Prenez les pleins pouvoirs sur vos icônes de la barre d\'état.
+
+Cachez des icônes spécifiques comme le Wi-Fi, le Bluetooth, ou les données mobiles pour garder votre barre d\'état épurée. Vous pouvez aussi personnaliser le format de l\'horloge et l\'indicateur de batterie avec des contrôles intelligents également. Ceci sont la liste des contrôles disponibles dans AOSP donc le système d\'exploitation de votre appareil peut ne pas respecter tous ces contrôles.
+
+Option nativement disponible sur les appareils Samsung (appli QuickStar)</string>
     <string name="about_desc_caffeinate">Caffeinate empêche votre écran de s\'éteindre automatiquement.\n\nGardez votre écran actif pour une durée spécifiée ou indéfiniment. Cela peut être utile quand vous lisez de longs articles ou suivez une recette.</string>
     <string name="about_desc_maps_power_saving">Obtenez le mode économie d\'énergie de Google Maps exclusif aux Pixels 10 avec le fond noir minimaliste s\'affichant par-dessus votre écran de verrouillage sur n\'importe quel appareil Android. Démarrez une session de navigation puis éteignez l\'écran et rallumez-le à nouveau.</string>
     <string name="about_desc_flashlight_pulse">Faites clignoter la lampe torche quand vous recevez une notification.\n\nAvec les appareils qui supportent le changement d\'intensité de la lampe torche, le clignotement sera animé de manière fluide.</string>
@@ -1488,4 +1492,31 @@
     <string name="feat_sync_sound_mode_desc">Synchroniser automatiquement avec la montre</string>
     <string name="tile_lockdown_mode">Verrouillage</string>
     <string name="tile_lockdown_mode_desc">Raccourci de verrouillage dans les paramètres rapides</string>
+    <string name="setting_location_reached_full_screen_alarm_title">Alarme en plein écran</string>
+    <string name="setting_location_reached_full_screen_alarm_desc">Fait sonner l\'appareil et montre une alerte en plein écran à l\'arrivée</string>
+    <string name="label_device_battery">Batterie</string>
+    <string name="label_low_power_trigger_level">Seuil d\'activation personnalisé</string>
+    <string name="desc_low_power_trigger_level">du mode économiseur d\'énergie</string>
+    <string name="label_advertise_is_enabled">Divulgation du status</string>
+    <string name="desc_advertise_is_enabled">Faire part de l\'activation du mode aux autres applications</string>
+    <string name="label_enable_firewall">Activation d\'un pare-feu</string>
+    <string name="desc_enable_firewall">Active un pare-feu pour restreindre l\'utilisation du réseau en arrière-plan</string>
+    <string name="label_disable_optional_sensors">Désactiver les capteurs optionnels</string>
+    <string name="desc_disable_optional_sensors">Désactive les capteurs gourmands en énergie tels que le gyroscope, le capteur de proximité etc...</string>
+    <string name="desc_enable_datasaver">Active le mode d\'économie des données pour restreindre l\'utilisation de données en arrière-plan</string>
+    <string name="label_disable_vibration">Désactiver les vibrations</string>
+    <string name="desc_disable_vibration">Désactive les retours haptiques et les vibrations</string>
+    <string name="label_location_mode">Mode d\'utilisation du GPS/Position</string>
+    <string name="desc_location_mode">Restreindre l\'accès à la position de l\'appareil si l\'économiseur d\'énergie est activé</string>
+    <string name="label_disable_aod">Désactive Always-on Display</string>
+    <string name="desc_disable_aod">Désactive la fonction Always-on Display/Toujours Allumé</string>
+    <string name="label_enable_night_mode">Thème Sombre</string>
+    <string name="desc_enable_night_mode">Active le thème sombre/mode sombre si l\'économiseur d\'énergie est activé</string>
+    <string name="label_disable_launch_boost">Réduction du boost CPU</string>
+    <string name="desc_disable_launch_boost">Réduit la fréquence de boost du CPU au lancement des applications pour économiser de l\'énergie</string>
+    <string name="label_adjust_brightness_factor">Ajustement de la luminosité</string>
+    <string name="label_disable_animation">Désactiver les animations</string>
+    <string name="desc_disable_animation">Désactive les animations du système et des applications</string>
+    <string name="label_force_background_check">Limites des tâches en arrière-plan</string>
+    <string name="desc_force_background_check">Applique des limites strictes pour les applications en arrière-plan</string>
 </resources>
