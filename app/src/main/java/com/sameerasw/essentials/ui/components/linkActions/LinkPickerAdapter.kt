@@ -19,39 +19,45 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -59,27 +65,89 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
-import com.sameerasw.essentials.ui.components.ToolbarItem
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
+import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
+import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.Collator
 import java.util.Locale
 
 private const val TAG = "LinkPickerScreen"
+
+private val TRACKING_PARAMS =
+    setOf(
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_term",
+        "utm_content",
+        "utm_id",
+        "fbclid",
+        "gclid",
+        "igsh",
+        "si",
+        "ref",
+        "ref_src",
+        "source",
+        "feature",
+        "tracking_id",
+    )
+
+private fun hasTrackingParameters(uri: Uri): Boolean {
+    return try {
+        uri.queryParameterNames.any { it.lowercase(Locale.getDefault()) in TRACKING_PARAMS }
+    } catch (_: Exception) {
+        false
+    }
+}
+
+private fun cleanTrackingParams(uri: Uri): Uri {
+    return try {
+        val queryParamNames = uri.queryParameterNames
+        if (queryParamNames.none { it.lowercase(Locale.getDefault()) in TRACKING_PARAMS }) return uri
+
+        val builder = uri.buildUpon().clearQuery()
+        for (key in queryParamNames) {
+            if (key.lowercase(Locale.getDefault()) !in TRACKING_PARAMS) {
+                val values = uri.getQueryParameters(key)
+                for (v in values) {
+                    builder.appendQueryParameter(key, v)
+                }
+            }
+        }
+        builder.build()
+    } catch (_: Exception) {
+        uri
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,30 +159,40 @@ fun LinkPickerScreen(
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
+    val view = LocalView.current
 
     // Mutable state for the current URI
     var currentUri by remember { mutableStateOf(uri) }
     var showEditSheet by remember { mutableStateOf(false) }
     var editingText by remember { mutableStateOf(currentUri.toString()) }
 
-    // Search state
+    // Search & tab state
     var searchQuery by remember { mutableStateOf("") }
+    var selectedTab by remember { mutableIntStateOf(0) }
+
+    // Preview image state
+    var previewImageUrl by remember { mutableStateOf<String?>(null) }
 
     // App lists
     var baseOpenWithApps by remember { mutableStateOf<List<ResolvedAppInfo>>(emptyList()) }
     var baseShareWithApps by remember { mutableStateOf<List<ResolvedAppInfo>>(emptyList()) }
     var isLoadingApps by remember { mutableStateOf(true) }
 
-    Log.d(TAG, "LinkPickerScreen called with demo = $demo")
-    Log.d(TAG, "LinkPickerScreen created with URI: $currentUri")
+    Log.d(TAG, "LinkPickerScreen called with demo = $demo, URI = $currentUri")
 
-    // Query apps whenever currentUri changes
     LaunchedEffect(currentUri) {
         isLoadingApps = true
         withContext(Dispatchers.IO) {
-            val open = queryOpenWithApps(context, currentUri)
-            val share = queryShareWithApps(context, currentUri)
+            val previewDeferred = async { fetchPreviewImageUrl(currentUri) }
+            val openDeferred = async { queryOpenWithApps(context, currentUri) }
+            val shareDeferred = async { queryShareWithApps(context, currentUri) }
+
+            val preview = previewDeferred.await()
+            val open = openDeferred.await()
+            val share = shareDeferred.await()
+
             withContext(Dispatchers.Main) {
+                previewImageUrl = preview
                 baseOpenWithApps = open
                 baseShareWithApps = share
                 isLoadingApps = false
@@ -140,7 +218,7 @@ fun LinkPickerScreen(
                 .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
         }
 
-    // toggle pin
+    // Toggle pin
     val togglePin: (String) -> Unit = { packageName ->
         val current = pinnedPackages.value.toMutableSet()
         if (current.contains(packageName)) {
@@ -153,268 +231,361 @@ fun LinkPickerScreen(
         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
     }
 
-    // Pager state for swiping between tabs
-    val pagerState = rememberPagerState(pageCount = { 2 })
-    val scope = rememberCoroutineScope()
-
-    val mainViewModel: com.sameerasw.essentials.viewmodels.MainViewModel =
-        androidx.lifecycle.viewmodel.compose
-            .viewModel()
-    val isBlurEnabled by mainViewModel.isBlurEnabled
-
-    val statusBarHeight = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    @Suppress("DEPRECATION")
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val density = LocalDensity.current
+    val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val configuration = LocalConfiguration.current
+    val screenHeightDp = configuration.screenHeightDp.dp
+    val imeBottom = WindowInsets.ime.asPaddingValues(density).calculateBottomPadding()
 
-    var cardHeightPx by androidx.compose.runtime.remember {
-        androidx.compose.runtime.mutableStateOf(
-            0,
-        )
+    LaunchedEffect(imeBottom) {
+        if (imeBottom > 0.dp) {
+            sheetState.expand()
+        }
     }
-    val listTopPadding = with(density) { statusBarHeight + 16.dp + cardHeightPx.toDp() + 16.dp }
-    val topBlurHeightPx = with(density) { (statusBarHeight * 1.15f).toPx() }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-    ) {
-        Box(
+    var lastSheetHapticBucket by remember { mutableIntStateOf(0) }
+    LaunchedEffect(sheetState) {
+        snapshotFlow {
+            try {
+                sheetState.requireOffset()
+            } catch (_: Exception) {
+                null
+            }
+        }.collect { offset ->
+            if (offset != null) {
+                val bucket = (offset / with(density) { 32.dp.toPx() }).toInt()
+                if (bucket != lastSheetHapticBucket) {
+                    HapticUtil.performSliderHaptic(view)
+                    lastSheetHapticBucket = bucket
+                }
+            }
+        }
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        val sheetOffset =
+            try {
+                sheetState.requireOffset()
+            } catch (_: Exception) {
+                null
+            }
+
+        val topAreaHeight =
+            if (sheetOffset != null) {
+                with(density) { sheetOffset.coerceAtLeast(0f).toDp() } + statusBarTop + 28.dp
+            } else {
+                screenHeightDp * 0.45f + statusBarTop + 28.dp
+            }
+
+        val isDarkTheme = isSystemInDarkTheme()
+
+        val animatedAlpha by animateFloatAsState(
+            targetValue = if (previewImageUrl != null) 1f else 0f,
+            animationSpec = tween(durationMillis = 650),
+            label = "PreviewAlpha",
+        )
+
+        Crossfade(
+            targetState = previewImageUrl,
+            animationSpec = tween(durationMillis = 600),
+            label = "LinkPreviewCrossfade",
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                    .progressiveBlur(
-                        blurRadius = if (isBlurEnabled) 40f else 0f,
-                        height = with(density) { topBlurHeightPx },
-                        direction = BlurDirection.TOP,
-                    ),
-        ) {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .progressiveBlur(
-                            blurRadius = if (isBlurEnabled) 80f else 0f,
-                            height = with(LocalDensity.current) { 350.dp.toPx() },
-                            direction = BlurDirection.BOTTOM,
-                        ),
-            ) {
-                LaunchedEffect(pagerState.currentPage) {
-                    snapshotFlow { pagerState.currentPage }.collect { _ ->
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    }
-                }
+                    .fillMaxWidth()
+                    .height(topAreaHeight)
+                    .align(Alignment.TopCenter),
+        ) { url ->
+            if (url != null) {
+                val topBlurHeightPx = with(density) { (statusBarTop * 1.5f + 48.dp).toPx() }
+                val bottomBlurHeightPx = with(density) { 120.dp.toPx() }
 
-                if (isLoadingApps) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        androidx.compose.material3.CircularProgressIndicator()
-                    }
-                } else {
-                    HorizontalPager(
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .alpha(animatedAlpha)
+                            .progressiveBlur(
+                                blurRadius = 40f,
+                                height = topBlurHeightPx,
+                                direction = BlurDirection.TOP,
+                                showGradientOverlay = true,
+                            ).progressiveBlur(
+                                blurRadius = 40f,
+                                height = bottomBlurHeightPx,
+                                direction = BlurDirection.BOTTOM,
+                                showGradientOverlay = true,
+                            ),
+                ) {
+                    AsyncImage(
+                        model =
+                            ImageRequest.Builder(context)
+                                .data(url)
+                                .crossfade(true)
+                                .build(),
+                        contentDescription = "Link Preview",
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize(),
-                        state = pagerState,
-                        verticalAlignment = Alignment.Top,
-                    ) { page ->
-                        when (page) {
-                            0 -> {
-                                OpenWithContent(
-                                    openWithApps,
-                                    currentUri,
-                                    onFinish,
-                                    Modifier.fillMaxSize(),
-                                    togglePin,
-                                    pinnedPackages.value,
-                                    demo,
-                                )
-                            }
-
-                            1 -> {
-                                ShareWithContent(
-                                    shareWithApps,
-                                    currentUri,
-                                    onFinish,
-                                    Modifier.fillMaxSize(),
-                                    togglePin,
-                                    pinnedPackages.value,
-                                    demo,
-                                )
-                            }
-                        }
-                    }
+                    )
                 }
             }
         }
 
-        // bottom card
-        Card(
-            modifier =
-                Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(
-                        bottom =
-                            WindowInsets.navigationBars
-                                .asPaddingValues()
-                                .calculateBottomPadding() + 84.dp,
-                        start = 16.dp,
-                        end = 16.dp,
-                    ).onGloballyPositioned { coordinates ->
-                        cardHeightPx = coordinates.size.height
-                    },
-            shape = RoundedCornerShape(24.dp),
-            colors =
-                CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceTint,
-                ),
+        val dynamicScrimColor =
+            if (previewImageUrl != null) {
+                Color.Transparent
+            } else if (isDarkTheme) {
+                BottomSheetDefaults.ScrimColor
+            } else {
+                MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f)
+            }
+
+        EssentialsBottomSheet(
+            onDismissRequest = onFinish,
+            sheetState = sheetState,
+            scrimColor = dynamicScrimColor,
+            modifier = Modifier.fillMaxSize(),
         ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .imePadding()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Row(
+            // Tab Selector (Open With / Share With)
+            RoundedCardContainer(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                SegmentedPicker(
+                    items = listOf(0, 1),
+                    selectedItem = selectedTab,
+                    onItemSelected = {
+                        selectedTab = it
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    },
+                    labelProvider = {
+                        when (it) {
+                            0 -> context.getString(R.string.label_open_with)
+                            else -> context.getString(R.string.label_share_with)
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                )
+            }
+
+            // Link Preview Card
+            val domain = currentUri.host ?: currentUri.scheme ?: "Link"
+            val hasTrackingParams = hasTrackingParameters(currentUri)
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    ),
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    Card(
-                        modifier =
-                            Modifier
-                                .weight(1f)
-                                .clickable {
-                                    val clipboard =
-                                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    clipboard.setPrimaryClip(
-                                        ClipData.newPlainText(
-                                            "Link",
-                                            currentUri.toString(),
-                                        ),
-                                    )
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            "Link copied to clipboard",
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                },
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            ),
-                        shape = RoundedCornerShape(16.dp),
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
+                        Box(
+                            modifier =
+                                Modifier
+                                    .size(40.dp)
+                                    .background(
+                                        MaterialTheme.colorScheme.primaryContainer,
+                                        RoundedCornerShape(12.dp),
+                                    ),
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_link_24),
                                 contentDescription = "Link Icon",
-                                modifier = Modifier.size(24.dp),
-                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(22.dp),
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
+                        }
 
+                        Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text =
-                                    if (demo) {
-                                        "Long press an app to pin/ unpin"
-                                    } else {
-                                        currentUri.toString()
-                                    },
-                                style = MaterialTheme.typography.bodyMedium,
+                                text = domain,
+                                style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            Text(
+                                text = currentUri.toString(),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
 
-                    Card(
-                        modifier =
-                            Modifier
-                                .size(48.dp)
-                                .clickable {
-                                    editingText = currentUri.toString()
-                                    showEditSheet = true
-                                },
-                        colors =
-                            CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                            ),
-                        shape = RoundedCornerShape(16.dp),
+                    // Action buttons (Copy, Clean, Edit)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center,
+                        // Copy Link Button
+                        FilledTonalButton(
+                            onClick = {
+                                val clipboard =
+                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                clipboard.setPrimaryClip(
+                                    ClipData.newPlainText(
+                                        "Link",
+                                        currentUri.toString(),
+                                    ),
+                                )
+                                Toast
+                                    .makeText(
+                                        context,
+                                        "Link copied to clipboard",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.rounded_content_copy_24),
+                                contentDescription = "Copy",
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(Modifier.size(6.dp))
+                            Text("Copy", maxLines = 1)
+                        }
+
+                        // Clean Tracker Button (if tracking params exist)
+                        if (hasTrackingParams) {
+                            FilledTonalButton(
+                                onClick = {
+                                    val cleaned = cleanTrackingParams(currentUri)
+                                    currentUri = cleaned
+                                    editingText = cleaned.toString()
+                                    Toast
+                                        .makeText(
+                                            context,
+                                            "Tracking parameters removed",
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_auto_awesome_24),
+                                    contentDescription = "Clean",
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Spacer(Modifier.size(6.dp))
+                                Text("Clean", maxLines = 1)
+                            }
+                        }
+
+                        // Edit Button
+                        FilledTonalButton(
+                            onClick = {
+                                editingText = currentUri.toString()
+                                showEditSheet = true
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_edit_24),
-                                contentDescription = "Edit Link",
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.primary,
+                                contentDescription = "Edit",
+                                modifier = Modifier.size(18.dp),
                             )
+                            Spacer(Modifier.size(6.dp))
+                            Text("Edit", maxLines = 1)
                         }
                     }
                 }
+            }
 
-                TextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search apps") },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_search_24),
-                            contentDescription = "Search",
-                        )
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp),
-                )
+            // Search Bar
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text("Search apps") },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_search_24),
+                        contentDescription = "Search",
+                    )
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(16.dp),
+            )
+
+            // Apps List
+            if (isLoadingApps) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(32.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    LoadingIndicator()
+                }
+            } else {
+                if (selectedTab == 0) {
+                    OpenWithContent(
+                        resolveInfos = openWithApps,
+                        uri = currentUri,
+                        onFinish = onFinish,
+                        modifier = Modifier.fillMaxWidth(),
+                        togglePin = togglePin,
+                        pinnedPackages = pinnedPackages.value,
+                        demo = demo,
+                    )
+                } else {
+                    ShareWithContent(
+                        resolveInfos = shareWithApps,
+                        uri = currentUri,
+                        onFinish = onFinish,
+                        modifier = Modifier.fillMaxWidth(),
+                        togglePin = togglePin,
+                        pinnedPackages = pinnedPackages.value,
+                        demo = demo,
+                    )
+                }
             }
         }
-
-        // toolbar
-        val toolbarItems =
-            remember {
-                listOf(
-                    ToolbarItem(
-                        iconRes = R.drawable.rounded_open_in_browser_24,
-                        labelRes = R.string.label_open_with,
-                        onClick = {
-                            scope.launch { pagerState.animateScrollToPage(0) }
-                        },
-                    ),
-                    ToolbarItem(
-                        iconRes = R.drawable.rounded_share_24,
-                        labelRes = R.string.label_share_with,
-                        onClick = {
-                            scope.launch { pagerState.animateScrollToPage(1) }
-                        },
-                    ),
-                )
-            }
-
-        EssentialsFloatingToolbar(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            selectedIndex = pagerState.currentPage,
-            items = toolbarItems,
-            fabAction = { onFinish() },
-            fabIconRes = R.drawable.rounded_arrow_back_24,
-            fabContentDescription = "Back",
-        )
     }
+}
 
     if (showEditSheet) {
         val focusRequester = remember { FocusRequester() }
 
         LaunchedEffect(Unit) {
-            delay(300) // Wait for sheet animation
+            delay(300)
             focusRequester.requestFocus()
         }
 
+        @Suppress("DEPRECATION")
+        val editSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         ModalBottomSheet(
             onDismissRequest = { showEditSheet = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            sheetState = editSheetState,
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ) {
             Column(
@@ -450,14 +621,12 @@ fun LinkPickerScreen(
                             }
 
                             if (text.isNotEmpty()) {
-                                // Add https if no scheme is present
                                 if (!text.contains("://")) {
                                     text = "https://$text"
                                 }
 
                                 try {
                                     val newUri = Uri.parse(text)
-                                    // Validate scheme
                                     if (newUri.scheme.isNullOrBlank()) {
                                         Toast
                                             .makeText(
@@ -639,4 +808,73 @@ private fun setPinnedPackages(
 ) {
     val prefs: SharedPreferences = context.getSharedPreferences("link_prefs", Context.MODE_PRIVATE)
     prefs.edit { putStringSet("pinned_packages", packages) }
+}
+
+private fun fetchPreviewImageUrl(uri: Uri): String? {
+    val urlString = uri.toString()
+    val lower = urlString.lowercase(Locale.getDefault())
+
+    // Direct image extensions
+    if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") ||
+        lower.endsWith(".webp") || lower.endsWith(".gif") || lower.endsWith(".svg")
+    ) {
+        return urlString
+    }
+
+    if (uri.scheme != "http" && uri.scheme != "https") return null
+
+    return try {
+        val url = URL(urlString)
+        val connection = (url.openConnection() as HttpURLConnection).apply {
+            connectTimeout = 3000
+            readTimeout = 3000
+            instanceFollowRedirects = true
+            setRequestProperty(
+                "User-Agent",
+                "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+            )
+        }
+
+        val contentType = connection.contentType ?: ""
+        if (contentType.startsWith("image/")) {
+            return urlString
+        }
+
+        val reader = BufferedReader(InputStreamReader(connection.inputStream))
+        val sb = StringBuilder()
+        var line: String?
+        var lineCount = 0
+        while (reader.readLine().also { line = it } != null && lineCount < 200) {
+            sb.append(line).append("\n")
+            lineCount++
+            if (line?.contains("</head>", ignoreCase = true) == true) break
+        }
+        reader.close()
+        val html = sb.toString()
+
+        // Match og:image or twitter:image
+        val ogRegex = Regex("""<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+        val ogMatch = ogRegex.find(html)?.groupValues?.get(1)
+        if (!ogMatch.isNullOrBlank()) {
+            return resolveRelativeUrl(urlString, ogMatch)
+        }
+
+        val ogRegexReversed = Regex("""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|twitter:image)["']""", RegexOption.IGNORE_CASE)
+        val ogMatchReversed = ogRegexReversed.find(html)?.groupValues?.get(1)
+        if (!ogMatchReversed.isNullOrBlank()) {
+            return resolveRelativeUrl(urlString, ogMatchReversed)
+        }
+
+        null
+    } catch (_: Exception) {
+        null
+    }
+}
+
+private fun resolveRelativeUrl(baseUrl: String, relativeUrl: String): String {
+    return try {
+        URL(URL(baseUrl), relativeUrl).toString()
+    } catch (_: Exception) {
+        relativeUrl
+    }
 }
