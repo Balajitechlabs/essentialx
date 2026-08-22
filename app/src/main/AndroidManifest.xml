@@ -279,7 +279,8 @@
             android:launchMode="singleInstance"
             android:noHistory="true"
             android:taskAffinity=""
-            android:theme="@style/Theme.Essentials.Translucent">
+            android:theme="@style/Theme.Essentials.Translucent"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />

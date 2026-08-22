@@ -30,6 +30,8 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -231,6 +233,13 @@ fun LinkPickerScreen(
     val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val configuration = LocalConfiguration.current
     val screenHeightDp = configuration.screenHeightDp.dp
+    val imeBottom = WindowInsets.ime.asPaddingValues(density).calculateBottomPadding()
+
+    LaunchedEffect(imeBottom) {
+        if (imeBottom > 0.dp) {
+            sheetState.expand()
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
         val sheetOffset =
@@ -319,6 +328,7 @@ fun LinkPickerScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
+                        .imePadding()
                         .padding(16.dp)
                         .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
