@@ -34,6 +34,7 @@ fun EssentialsBottomSheet(
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    scrimColor: Color = BottomSheetDefaults.ScrimColor,
     dragHandle: @Composable (() -> Unit)? = { BottomSheetDefaults.DragHandle() },
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -41,6 +42,7 @@ fun EssentialsBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         containerColor = containerColor,
+        scrimColor = scrimColor,
         dragHandle = dragHandle,
         contentWindowInsets = { WindowInsets(0, 0, 0, 0) },
         modifier = modifier.statusBarsPadding(),

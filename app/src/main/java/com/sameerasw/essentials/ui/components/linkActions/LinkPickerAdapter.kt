@@ -19,6 +19,7 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,9 +29,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -59,21 +62,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.Collator
 import java.util.Locale
-import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 
 private const val TAG = "LinkPickerScreen"
 
@@ -144,6 +165,9 @@ fun LinkPickerScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedTab by remember { mutableIntStateOf(0) }
 
+    // Preview image state
+    var previewImageUrl by remember { mutableStateOf<String?>(null) }
+
     // App lists
     var baseOpenWithApps by remember { mutableStateOf<List<ResolvedAppInfo>>(emptyList()) }
     var baseShareWithApps by remember { mutableStateOf<List<ResolvedAppInfo>>(emptyList()) }
@@ -151,13 +175,19 @@ fun LinkPickerScreen(
 
     Log.d(TAG, "LinkPickerScreen called with demo = $demo, URI = $currentUri")
 
-    // Query apps whenever currentUri changes
     LaunchedEffect(currentUri) {
         isLoadingApps = true
         withContext(Dispatchers.IO) {
-            val open = queryOpenWithApps(context, currentUri)
-            val share = queryShareWithApps(context, currentUri)
+            val previewDeferred = async { fetchPreviewImageUrl(currentUri) }
+            val openDeferred = async { queryOpenWithApps(context, currentUri) }
+            val shareDeferred = async { queryShareWithApps(context, currentUri) }
+
+            val preview = previewDeferred.await()
+            val open = openDeferred.await()
+            val share = shareDeferred.await()
+
             withContext(Dispatchers.Main) {
+                previewImageUrl = preview
                 baseOpenWithApps = open
                 baseShareWithApps = share
                 isLoadingApps = false
@@ -198,20 +228,121 @@ fun LinkPickerScreen(
 
     @Suppress("DEPRECATION")
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val density = LocalDensity.current
+    val statusBarTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val configuration = LocalConfiguration.current
+    val screenHeightDp = configuration.screenHeightDp.dp
 
-    EssentialsBottomSheet(
-        onDismissRequest = onFinish,
-        sheetState = sheetState,
-        modifier = modifier,
-    ) {
-        Column(
+    Box(modifier = modifier.fillMaxSize()) {
+        val sheetOffset =
+            try {
+                sheetState.requireOffset()
+            } catch (_: Exception) {
+                null
+            }
+
+        val topAreaHeight =
+            if (sheetOffset != null) {
+                with(density) { sheetOffset.coerceAtLeast(0f).toDp() } + statusBarTop + 28.dp
+            } else {
+                screenHeightDp * 0.45f + statusBarTop + 28.dp
+            }
+
+        val isDarkTheme = isSystemInDarkTheme()
+
+        // Fade in & unblur animation for when preview image arrives
+        val animatedAlpha by animateFloatAsState(
+            targetValue = if (previewImageUrl != null) 1f else 0f,
+            animationSpec = tween(durationMillis = 650),
+            label = "PreviewAlpha",
+        )
+        val animatedBlur by animateDpAsState(
+            targetValue = if (previewImageUrl != null) 8.dp else 24.dp,
+            animationSpec = tween(durationMillis = 650),
+            label = "PreviewBlur",
+        )
+
+        Crossfade(
+            targetState = previewImageUrl,
+            animationSpec = tween(durationMillis = 600),
+            label = "LinkPreviewCrossfade",
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                    .height(topAreaHeight)
+                    .align(Alignment.TopCenter),
+        ) { url ->
+            if (url != null) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .alpha(animatedAlpha),
+                ) {
+                    AsyncImage(
+                        model =
+                            ImageRequest.Builder(context)
+                                .data(url)
+                                .crossfade(true)
+                                .build(),
+                        contentDescription = "Link Preview",
+                        contentScale = ContentScale.Crop,
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .blur(animatedBlur),
+                    )
+
+                    val topOverlayColor =
+                        if (isDarkTheme) {
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.25f)
+                        } else {
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.35f)
+                        }
+                    val bottomOverlayColor =
+                        if (isDarkTheme) {
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.55f)
+                        } else {
+                            MaterialTheme.colorScheme.surface.copy(alpha = 0.65f)
+                        }
+
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors = listOf(topOverlayColor, bottomOverlayColor),
+                                    ),
+                                ),
+                    )
+                }
+            }
+        }
+
+        val dynamicScrimColor =
+            if (previewImageUrl != null) {
+                Color.Transparent
+            } else if (isDarkTheme) {
+                BottomSheetDefaults.ScrimColor
+            } else {
+                MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f)
+            }
+
+        EssentialsBottomSheet(
+            onDismissRequest = onFinish,
+            sheetState = sheetState,
+            scrimColor = dynamicScrimColor,
+            modifier = Modifier.fillMaxSize(),
         ) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
             // Tab Selector (Open With / Share With)
             RoundedCardContainer(
                 modifier = Modifier.fillMaxWidth(),
@@ -427,6 +558,7 @@ fun LinkPickerScreen(
             }
         }
     }
+}
 
     if (showEditSheet) {
         val focusRequester = remember { FocusRequester() }
@@ -663,4 +795,73 @@ private fun setPinnedPackages(
 ) {
     val prefs: SharedPreferences = context.getSharedPreferences("link_prefs", Context.MODE_PRIVATE)
     prefs.edit { putStringSet("pinned_packages", packages) }
+}
+
+private fun fetchPreviewImageUrl(uri: Uri): String? {
+    val urlString = uri.toString()
+    val lower = urlString.lowercase(Locale.getDefault())
+
+    // Direct image extensions
+    if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") ||
+        lower.endsWith(".webp") || lower.endsWith(".gif") || lower.endsWith(".svg")
+    ) {
+        return urlString
+    }
+
+    if (uri.scheme != "http" && uri.scheme != "https") return null
+
+    return try {
+        val url = URL(urlString)
+        val connection = (url.openConnection() as HttpURLConnection).apply {
+            connectTimeout = 3000
+            readTimeout = 3000
+            instanceFollowRedirects = true
+            setRequestProperty(
+                "User-Agent",
+                "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+            )
+        }
+
+        val contentType = connection.contentType ?: ""
+        if (contentType.startsWith("image/")) {
+            return urlString
+        }
+
+        val reader = BufferedReader(InputStreamReader(connection.inputStream))
+        val sb = StringBuilder()
+        var line: String?
+        var lineCount = 0
+        while (reader.readLine().also { line = it } != null && lineCount < 200) {
+            sb.append(line).append("\n")
+            lineCount++
+            if (line?.contains("</head>", ignoreCase = true) == true) break
+        }
+        reader.close()
+        val html = sb.toString()
+
+        // Match og:image or twitter:image
+        val ogRegex = Regex("""<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+        val ogMatch = ogRegex.find(html)?.groupValues?.get(1)
+        if (!ogMatch.isNullOrBlank()) {
+            return resolveRelativeUrl(urlString, ogMatch)
+        }
+
+        val ogRegexReversed = Regex("""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|twitter:image)["']""", RegexOption.IGNORE_CASE)
+        val ogMatchReversed = ogRegexReversed.find(html)?.groupValues?.get(1)
+        if (!ogMatchReversed.isNullOrBlank()) {
+            return resolveRelativeUrl(urlString, ogMatchReversed)
+        }
+
+        null
+    } catch (_: Exception) {
+        null
+    }
+}
+
+private fun resolveRelativeUrl(baseUrl: String, relativeUrl: String): String {
+    return try {
+        URL(URL(baseUrl), relativeUrl).toString()
+    } catch (_: Exception) {
+        relativeUrl
+    }
 }
