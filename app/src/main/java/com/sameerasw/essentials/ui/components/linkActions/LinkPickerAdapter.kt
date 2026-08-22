@@ -157,6 +157,8 @@ fun LinkPickerScreen(
     onFinish: () -> Unit,
     modifier: Modifier = Modifier,
     demo: Boolean = false,
+    initialTab: Int = 0,
+    initialOpenShorten: Boolean = false,
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
@@ -169,8 +171,8 @@ fun LinkPickerScreen(
 
     // Search & tab state
     var searchQuery by remember { mutableStateOf("") }
-    var selectedTab by remember { mutableIntStateOf(0) }
-    var autoOpenShortenInTools by remember { mutableStateOf(false) }
+    var selectedTab by remember { mutableIntStateOf(if (initialOpenShorten) 2 else initialTab) }
+    var autoOpenShortenInTools by remember { mutableStateOf(initialOpenShorten) }
 
     // Preview image state
     var previewImageUrl by remember { mutableStateOf<String?>(null) }
