@@ -71,17 +71,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.modifiers.BlurDirection
+import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
@@ -250,16 +249,10 @@ fun LinkPickerScreen(
 
         val isDarkTheme = isSystemInDarkTheme()
 
-        // Fade in & unblur animation for when preview image arrives
         val animatedAlpha by animateFloatAsState(
             targetValue = if (previewImageUrl != null) 1f else 0f,
             animationSpec = tween(durationMillis = 650),
             label = "PreviewAlpha",
-        )
-        val animatedBlur by animateDpAsState(
-            targetValue = if (previewImageUrl != null) 8.dp else 24.dp,
-            animationSpec = tween(durationMillis = 650),
-            label = "PreviewBlur",
         )
 
         Crossfade(
@@ -273,11 +266,25 @@ fun LinkPickerScreen(
                     .align(Alignment.TopCenter),
         ) { url ->
             if (url != null) {
+                val topBlurHeightPx = with(density) { (statusBarTop * 1.5f + 48.dp).toPx() }
+                val bottomBlurHeightPx = with(density) { 120.dp.toPx() }
+
                 Box(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .alpha(animatedAlpha),
+                            .alpha(animatedAlpha)
+                            .progressiveBlur(
+                                blurRadius = 40f,
+                                height = topBlurHeightPx,
+                                direction = BlurDirection.TOP,
+                                showGradientOverlay = true,
+                            ).progressiveBlur(
+                                blurRadius = 40f,
+                                height = bottomBlurHeightPx,
+                                direction = BlurDirection.BOTTOM,
+                                showGradientOverlay = true,
+                            ),
                 ) {
                     AsyncImage(
                         model =
@@ -287,34 +294,7 @@ fun LinkPickerScreen(
                                 .build(),
                         contentDescription = "Link Preview",
                         contentScale = ContentScale.Crop,
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .blur(animatedBlur),
-                    )
-
-                    val topOverlayColor =
-                        if (isDarkTheme) {
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.25f)
-                        } else {
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.35f)
-                        }
-                    val bottomOverlayColor =
-                        if (isDarkTheme) {
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.55f)
-                        } else {
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.65f)
-                        }
-
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .background(
-                                    Brush.verticalGradient(
-                                        colors = listOf(topOverlayColor, bottomOverlayColor),
-                                    ),
-                                ),
+                        modifier = Modifier.fillMaxSize(),
                     )
                 }
             }
