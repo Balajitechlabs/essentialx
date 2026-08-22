@@ -13,12 +13,10 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import android.provider.Settings
 import android.service.quicksettings.Tile
-import android.util.Log
-import android.widget.Toast
 import com.sameerasw.essentials.FeatureSettingsActivity
 import com.sameerasw.essentials.R
-import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.utils.PermissionUtils
+import com.sameerasw.essentials.utils.ShizukuUtils.toggleShizuku
 
 class UsbDebuggingTileService : BaseTileService() {
     override fun onClick() {
@@ -116,13 +114,13 @@ class UsbDebuggingTileService : BaseTileService() {
 
     private fun setUsbDebuggingEnabled(enabled: Boolean) {
         try {
-            if(!enabled) toggleShizuku(false)
+            if(!enabled) toggleShizuku(this, false)
             Settings.Global.putInt(
                 contentResolver,
                 Settings.Global.ADB_ENABLED,
                 if (enabled) 1 else 0
             )
-            if(enabled) toggleShizuku(true)
+            if(enabled) toggleShizuku(this, true)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -140,31 +138,6 @@ class UsbDebuggingTileService : BaseTileService() {
             Settings.Global.putInt(contentResolver, "adb_wifi_enabled", if (enabled) 1 else 0)
         } catch (e: Exception) {
             e.printStackTrace()
-        }
-    }
-
-    private fun toggleShizuku(enabled: Boolean) {
-        val token = SettingsRepository(this).getShizukuAuthToken()
-        val action =
-            if (enabled) "moe.shizuku.privileged.api.START" else "moe.shizuku.privileged.api.STOP"
-
-        if (token.isEmpty()) {
-            Toast.makeText(
-                this,
-                this.getString(R.string.toast_enter_shizuku_token),
-                Toast.LENGTH_LONG
-            ).show()
-        } else {
-            try {
-                val shizukuIntent = Intent(action).apply {
-                    `package` = "moe.shizuku.privileged.api"
-                    putExtra("auth", token)
-                    addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-                }
-                this.sendBroadcast(shizukuIntent)
-            } catch (e: Exception) {
-                Log.e("ShizukuActionReceiver", "Failed to toggle Shizuku", e)
-            }
         }
     }
 }

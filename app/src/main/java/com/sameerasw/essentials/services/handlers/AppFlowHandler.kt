@@ -29,6 +29,7 @@ import com.sameerasw.essentials.domain.diy.DIYRepository
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.services.automation.executors.CombinedActionExecutor
 import com.sameerasw.essentials.utils.FreezeManager
+import com.sameerasw.essentials.utils.ShizukuUtils.toggleShizuku
 import com.sameerasw.essentials.utils.StatusBarManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +37,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 class AppFlowHandler(
     private val context: Context,
@@ -476,7 +478,7 @@ class AppFlowHandler(
                 for (i in 10 downTo 1) {
                     Log.d("AppFlowHandler", "Countdown for $packageName: $i")
                     showCountdownNotification(packageName, appName, i)
-                    delay(1000)
+                    delay(1000.milliseconds)
                 }
                 // countdown finished
                 Log.d("AppFlowHandler", "Countdown finished for $packageName, freezing...")
@@ -807,7 +809,7 @@ class AppFlowHandler(
         if (mode == "Notify" && !forceRestore) {
             scope.launch {
                 val delaySeconds = repository.getShutUpRestoreDelay()
-                delay(delaySeconds * 1000L)
+                delay((delaySeconds * 1000L).milliseconds)
                 showRestoreNotification(wasShutUpConfig, autoArchivePackage)
             }
             return
@@ -817,7 +819,7 @@ class AppFlowHandler(
             if (!forceRestore) {
                 // Delay to ensure the app has fully settled before restoring system settings
                 val delaySeconds = repository.getShutUpRestoreDelay()
-                delay(delaySeconds * 1000L)
+                delay((delaySeconds * 1000L).milliseconds)
             }
 
             val canWriteSecure =
@@ -862,8 +864,8 @@ class AppFlowHandler(
 
             // Wait a bit and Restart Shizuku as ADB might have been toggled back on
             if (wasShutUpConfig != null && wasShutUpConfig.disableWirelessDebugging && repository.isShutUpAttemptShizukuRestartEnabled()) {
-                delay(1000)
-                restartShizuku()
+                delay(1000.milliseconds)
+                toggleShizuku(context, false)
             }
 
             android.widget.Toast
@@ -877,28 +879,6 @@ class AppFlowHandler(
             if (autoArchivePackage != null) {
                 startAutoArchiveCountdown(autoArchivePackage)
             }
-        }
-    }
-
-    private fun restartShizuku() {
-        val settingsRepository =
-            com.sameerasw.essentials.data.repository
-                .SettingsRepository(context)
-        val token = settingsRepository.getShizukuAuthToken()
-        if (token.isEmpty()) {
-            Log.w("AppFlowHandler", "Shizuku auth token is missing, cannot restart Shizuku")
-            return
-        }
-        try {
-            val intent =
-                Intent("moe.shizuku.privileged.api.START").apply {
-                    `package` = "moe.shizuku.privileged.api"
-                    putExtra("auth", token)
-                    addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
-                }
-            context.sendBroadcast(intent)
-        } catch (e: Exception) {
-            Log.e("AppFlowHandler", "Failed to restart Shizuku", e)
         }
     }
 
