@@ -150,11 +150,11 @@ object QrCodeGenerator {
         return try {
             val cachePath = File(context.cacheDir, "shared_qr")
             cachePath.mkdirs()
-            val file = File(cachePath, "link_qr_code.png")
-            val stream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            stream.flush()
-            stream.close()
+            val file = File(cachePath, "qr_${System.currentTimeMillis()}.png")
+            FileOutputStream(file).use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                stream.flush()
+            }
             FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
@@ -164,4 +164,38 @@ object QrCodeGenerator {
             null
         }
     }
+
+    /**
+     * Saves the QR Bitmap into the system's Pictures/Essentials directory.
+     */
+    fun saveQrImage(context: Context, bitmap: Bitmap): Boolean {
+        return try {
+            val fileName = "QRCode_${System.currentTimeMillis()}.png"
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                val values = android.content.ContentValues().apply {
+                    put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, fileName)
+                    put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "image/png")
+                    put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_PICTURES + "/Essentials")
+                }
+                val uri = context.contentResolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values) ?: return false
+                context.contentResolver.openOutputStream(uri)?.use { stream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    stream.flush()
+                }
+                true
+            } else {
+                val dir = File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES), "Essentials")
+                dir.mkdirs()
+                val file = File(dir, fileName)
+                FileOutputStream(file).use { stream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                    stream.flush()
+                }
+                true
+            }
+        } catch (_: Exception) {
+            false
+        }
+    }
 }
+

@@ -1254,6 +1254,24 @@
                 android:value="android.service.quicksettings.CATEGORY_UTILITIES" />
         </service>
 
+        <service
+            android:name=".services.tiles.UrlShortenerTileService"
+            android:exported="true"
+            android:icon="@drawable/rounded_link_24"
+            android:label="@string/tile_url_shortener"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.quicksettings.ACTION_QS_TILE_PREFERENCES"
+                android:value="com.sameerasw.essentials.ui.activities.QSPreferencesActivity" />
+            <meta-data
+                android:name="android.service.quicksettings.TILE_CATEGORY"
+                android:value="android.service.quicksettings.CATEGORY_UTILITIES" />
+        </service>
+
         <provider
             android:name=".external.ExternalControlProvider"
             android:authorities="${applicationId}.external"
@@ -1277,6 +1295,10 @@
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".receivers.UrlShortenerActionReceiver"
+            android:exported="false" />
 
         <service
             android:name=".appfunctions.EssentialsAppFunctionService"

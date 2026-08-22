@@ -71,6 +71,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
@@ -169,6 +170,7 @@ fun LinkPickerScreen(
     // Search & tab state
     var searchQuery by remember { mutableStateOf("") }
     var selectedTab by remember { mutableIntStateOf(0) }
+    var autoOpenShortenInTools by remember { mutableStateOf(false) }
 
     // Preview image state
     var previewImageUrl by remember { mutableStateOf<String?>(null) }
@@ -520,6 +522,25 @@ fun LinkPickerScreen(
                             Spacer(Modifier.size(6.dp))
                             Text("Edit", maxLines = 1)
                         }
+
+                        // Shorten Link Button
+                        FilledTonalButton(
+                            onClick = {
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                autoOpenShortenInTools = true
+                                selectedTab = 2
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.rounded_link_24),
+                                contentDescription = "Shorten",
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(Modifier.size(6.dp))
+                            Text(stringResource(R.string.shorten_root_button), maxLines = 1)
+                        }
                     }
                 }
             }
@@ -584,6 +605,7 @@ fun LinkPickerScreen(
                                 onSelectTab = { selectedTab = it },
                                 onFinish = onFinish,
                                 modifier = Modifier.fillMaxWidth(),
+                                openShortenInitially = autoOpenShortenInTools,
                             )
                         } else {
                             OpenWithContent(
