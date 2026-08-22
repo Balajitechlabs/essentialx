@@ -59,6 +59,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -68,6 +69,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -86,6 +88,7 @@ import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
+import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -156,6 +159,7 @@ fun LinkPickerScreen(
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
+    val view = LocalView.current
 
     // Mutable state for the current URI
     var currentUri by remember { mutableStateOf(uri) }
@@ -238,6 +242,25 @@ fun LinkPickerScreen(
     LaunchedEffect(imeBottom) {
         if (imeBottom > 0.dp) {
             sheetState.expand()
+        }
+    }
+
+    var lastSheetHapticBucket by remember { mutableIntStateOf(0) }
+    LaunchedEffect(sheetState) {
+        snapshotFlow {
+            try {
+                sheetState.requireOffset()
+            } catch (_: Exception) {
+                null
+            }
+        }.collect { offset ->
+            if (offset != null) {
+                val bucket = (offset / with(density) { 32.dp.toPx() }).toInt()
+                if (bucket != lastSheetHapticBucket) {
+                    HapticUtil.performSliderHaptic(view)
+                    lastSheetHapticBucket = bucket
+                }
+            }
         }
     }
 
