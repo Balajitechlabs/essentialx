@@ -238,4 +238,7 @@ dependencies {
     // AppFunctions API
     implementation(libs.androidx.appfunctions)
     ksp(libs.androidx.appfunctions.compiler)
+
+    // QR Code Engine
+    implementation(libs.zxing.core)
 }

@@ -36,7 +36,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -200,7 +199,6 @@ fun FloatingWithContent(
 
     // Replaced ModalBottomSheet with EssentialsBottomSheet core component
     if (showQrSheet) {
-        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
         val appLogo = remember { QrCodeGenerator.getAppLogoBitmap(context) }
         val qrBitmap = remember(uri, appLogo) {
             QrCodeGenerator.generateQrBitmap(
@@ -214,7 +212,6 @@ fun FloatingWithContent(
 
         EssentialsBottomSheet(
             onDismissRequest = { showQrSheet = false },
-            sheetState = sheetState,
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ) {
             Column(
