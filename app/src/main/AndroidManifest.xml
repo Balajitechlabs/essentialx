@@ -204,6 +204,14 @@
 
 
         <activity
+            android:name=".ui.activities.BubbleWebActivity"
+            android:allowEmbedded="true"
+            android:documentLaunchMode="always"
+            android:exported="true"
+            android:resizeableActivity="true"
+            android:theme="@style/Theme.Essentials" />
+
+        <activity
             android:name=".ui.activities.AutomationEditorActivity"
             android:exported="false"
             android:label="@string/diy_editor_new_title"
@@ -445,15 +453,6 @@
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
-        </service>
-
-        <service
-            android:name=".services.FloatingWebWindowService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="Floating web browser overlay window" />
         </service>
 
         <provider

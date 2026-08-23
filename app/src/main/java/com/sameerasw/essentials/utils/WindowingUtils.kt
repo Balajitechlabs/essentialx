@@ -2,33 +2,45 @@
  * Copyright (c) 2026 sameerasw.com
  * License: MIT License
  *
- * Feature Module: Utilities - Windowing & Multi-Window
+ * Feature Module: Utilities - Windowing & Native Bubbles
  * File: WindowingUtils.kt
- * Description: Clean helper utility for launching standard and private floating web overlay windows.
+ * Description: Helper utility for launching private and standard web previews using native Android Bubbles API.
  */
 
 package com.sameerasw.essentials.utils
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ShortcutInfo
+import android.content.pm.ShortcutManager
+import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import android.util.Log
-import com.sameerasw.essentials.services.FloatingWebWindowService
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.IconCompat
+import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.activities.BubbleWebActivity
 
 object WindowingUtils {
     private const val TAG = "WindowingUtils"
+    private const val BUBBLE_CHANNEL_ID = "bubble_web_preview_channel"
+    private const val NOTIFICATION_ID = 90210
 
     /**
-     * Checks if floating overlay window mode is supported on this device.
+     * Checks if native Android Bubbles / floating mode is supported on this device.
      */
     fun isFloatingModeSupported(context: Context): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return false
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return false
         val pm = context.packageManager
-        val isWatch = pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_WATCH)
-        val isTv = pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_LEANBACK)
-        val isAutomotive = pm.hasSystemFeature(android.content.pm.PackageManager.FEATURE_AUTOMOTIVE)
+        val isWatch = pm.hasSystemFeature(PackageManager.FEATURE_WATCH)
+        val isTv = pm.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
+        val isAutomotive = pm.hasSystemFeature(PackageManager.FEATURE_AUTOMOTIVE)
         if (isWatch || isTv || isAutomotive) return false
 
         val am = context.getSystemService(Context.ACTIVITY_SERVICE) as? android.app.ActivityManager
@@ -38,26 +50,138 @@ object WindowingUtils {
     }
 
     /**
-     * Launches the built-in Interactive Floating Web Window Overlay with optional Private Incognito mode.
+     * Launches the native Android Bubble for the given URL with optional Private Incognito mode.
      */
     fun launchOverlayWindow(context: Context, uri: Uri, isPrivate: Boolean = false): Boolean {
         return try {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context)) {
-                FloatingWebWindowService.start(context, uri.toString(), isPrivate)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && isFloatingModeSupported(context)) {
+                launchNativeBubble(context, uri, isPrivate)
                 true
             } else {
-                val intent = Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:${context.packageName}"),
-                ).apply {
+                // Fallback to standard browser intent for older API levels
+                val intent = Intent(Intent.ACTION_VIEW, uri).apply {
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 context.startActivity(intent)
-                false
+                true
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to launch overlay window", e)
+            Log.e(TAG, "Failed to launch native bubble window", e)
             false
         }
     }
+
+    private fun launchNativeBubble(context: Context, uri: Uri, isPrivate: Boolean) {
+        val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                BUBBLE_CHANNEL_ID,
+                context.getString(R.string.preview_web_title),
+                NotificationManager.IMPORTANCE_HIGH,
+            ).apply {
+                description = context.getString(R.string.preview_web_desc)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    setAllowBubbles(true)
+                }
+            }
+            nm.createNotificationChannel(channel)
+        }
+
+        val targetUrl = uri.toString()
+        val bubbleIntent = Intent(context, BubbleWebActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = uri
+            putExtra(BubbleWebActivity.EXTRA_URL, targetUrl)
+            putExtra(BubbleWebActivity.EXTRA_PRIVATE_MODE, isPrivate)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+        val bubblePendingIntent = PendingIntent.getActivity(
+            context,
+            NOTIFICATION_ID,
+            bubbleIntent,
+            flags,
+        )
+
+        val iconRes = R.drawable.rounded_globe_24
+        val bubbleIcon = IconCompat.createWithResource(context, iconRes)
+
+        val host = uri.host ?: targetUrl
+        val title = context.getString(R.string.preview_web_title)
+        val shortcutId = "bubble_web_preview_${host.hashCode()}"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val shortcut = ShortcutInfo.Builder(context, shortcutId)
+                .setCategories(setOf("android.shortcut.conversation"))
+                .setShortLabel(host)
+                .setLongLabel(title)
+                .setIcon(Icon.createWithResource(context, iconRes))
+                .setIntent(bubbleIntent)
+                .setLongLived(true)
+                .setPerson(
+                    android.app.Person.Builder()
+                        .setName(host)
+                        .setIcon(Icon.createWithResource(context, iconRes))
+                        .setImportant(true)
+                        .build()
+                )
+                .build()
+
+            val sm = context.getSystemService(ShortcutManager::class.java)
+            sm?.pushDynamicShortcut(shortcut)
+        }
+
+        val displayMetrics = context.resources.displayMetrics
+        val screenHeightDp = (displayMetrics.heightPixels / displayMetrics.density).toInt()
+
+        val bubbleMetadata = NotificationCompat.BubbleMetadata.Builder(bubblePendingIntent, bubbleIcon)
+            .setDesiredHeight(screenHeightDp)
+            .setAutoExpandBubble(true)
+            .setSuppressNotification(true)
+            .build()
+
+        val person = androidx.core.app.Person.Builder()
+            .setName(host)
+            .setIcon(bubbleIcon)
+            .setImportant(true)
+            .build()
+
+        val messagingStyle = NotificationCompat.MessagingStyle(person)
+            .addMessage(
+                NotificationCompat.MessagingStyle.Message(
+                    title,
+                    System.currentTimeMillis(),
+                    person,
+                )
+            )
+
+        val builder = NotificationCompat.Builder(context, BUBBLE_CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(host)
+            .setSmallIcon(iconRes)
+            .setStyle(messagingStyle)
+            .setBubbleMetadata(bubbleMetadata)
+            .setShortcutId(shortcutId)
+            .setAutoCancel(true)
+            .setSilent(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_MESSAGE)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
+        ) {
+            nm.notify(NOTIFICATION_ID, builder.build())
+        } else {
+            // If notification permission is denied on Android 13+, launch activity directly
+            context.startActivity(bubbleIntent)
+        }
+    }
 }
+
