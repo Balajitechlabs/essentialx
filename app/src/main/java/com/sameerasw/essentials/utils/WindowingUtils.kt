@@ -20,6 +20,7 @@ import android.content.pm.ShortcutManager
 import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
@@ -50,11 +51,41 @@ object WindowingUtils {
     }
 
     /**
+     * Checks if notification bubbles are enabled globally in system settings.
+     */
+    fun areNotificationBubblesEnabled(context: Context): Boolean {
+        return try {
+            Settings.Global.getInt(context.contentResolver, "notification_bubbles", 1) == 1
+        } catch (_: Exception) {
+            true
+        }
+    }
+
+    /**
+     * Enables notification bubbles globally via WRITE_SECURE_SETTINGS.
+     */
+    fun enableNotificationBubbles(context: Context): Boolean {
+        return try {
+            if (PermissionUtils.canWriteSecureSettings(context)) {
+                Settings.Global.putInt(context.contentResolver, "notification_bubbles", 1)
+                true
+            } else {
+                false
+            }
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    /**
      * Launches the native Android Bubble for the given URL with optional Private Incognito mode.
      */
     fun launchOverlayWindow(context: Context, uri: Uri, isPrivate: Boolean = false): Boolean {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && isFloatingModeSupported(context)) {
+                if (!areNotificationBubblesEnabled(context) && PermissionUtils.canWriteSecureSettings(context)) {
+                    enableNotificationBubbles(context)
+                }
                 launchNativeBubble(context, uri, isPrivate)
                 true
             } else {

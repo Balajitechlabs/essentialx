@@ -89,6 +89,7 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.QrCodeGenerator
 import com.sameerasw.essentials.utils.UrlShortener
 import com.sameerasw.essentials.utils.WindowingUtils
@@ -157,11 +158,28 @@ fun FloatingWithContent(
         ) {
             // 1. Preview Web (Only shown when floating mode is supported)
             if (isFloatingSupported) {
+                val bubblesEnabled = WindowingUtils.areNotificationBubblesEnabled(context)
+                val canWriteSecure = PermissionUtils.canWriteSecureSettings(context)
+                val previewEnabled = bubblesEnabled || canWriteSecure
+                val previewDescription = when {
+                    bubblesEnabled -> stringResource(R.string.preview_web_desc)
+                    canWriteSecure -> stringResource(R.string.preview_web_desc_enable_bubbles)
+                    else -> stringResource(R.string.preview_web_desc_disabled)
+                }
+
                 IconToggleItem(
                     title = stringResource(R.string.preview_web_title),
-                    description = stringResource(R.string.preview_web_desc),
+                    description = previewDescription,
                     iconRes = R.drawable.rounded_open_in_browser_24,
                     showToggle = false,
+                    enabled = previewEnabled,
+                    onDisabledClick = {
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.preview_web_desc_disabled),
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    },
                     onClick = {
                         WindowingUtils.launchOverlayWindow(context, uri, isPrivate = true)
                         onFinish()
