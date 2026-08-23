@@ -371,8 +371,13 @@
     <string name="private_dns_mode_toggle">Toggle</string>
     <string name="private_dns_mode_cycle">Cycle</string>
     <string name="tile_usb_debugging">Debugging</string>
+    <string name="usb">USB</string>
+    <string name="wifi">Wifi</string>
+    <string name="usb_and_wifi">USB &amp; Wifi</string>
+    <string name="usb_debugging_title_short">USB Adb</string>
     <string name="usb_debugging_title">USB Debugging</string>
     <string name="usb_debugging_desc">Enable Android Debug Bridge (ADB) over USB</string>
+    <string name="wireless_debugging_title_short">Wifi Adb</string>
     <string name="wireless_debugging_title">Wireless Debugging</string>
     <string name="wireless_debugging_desc">Enable Android Debug Bridge (ADB) over Wi-Fi</string>
     <string name="debugging_default_tap_action_title">Default tap action</string>

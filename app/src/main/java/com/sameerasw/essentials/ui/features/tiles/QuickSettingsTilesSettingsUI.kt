@@ -594,12 +594,23 @@ fun QuickSettingsTilesSettingsUI(
                                             context.mainExecutor,
                                         ) { result ->
                                             if (result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED) {
+                                                context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                                                    .edit()
+                                                    .putBoolean("${tile.serviceClass.name}_is_added", true)
+                                                    .apply()
+                                                viewModel.addedQSTiles.value = viewModel.addedQSTiles.value + tile.serviceClass.name
                                                 Toast
                                                     .makeText(
                                                         context,
                                                         resources.getString(R.string.qs_tile_already_added),
                                                         Toast.LENGTH_SHORT,
                                                     ).show()
+                                            } else if (result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED) {
+                                                context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                                                    .edit()
+                                                    .putBoolean("${tile.serviceClass.name}_is_added", true)
+                                                    .apply()
+                                                viewModel.addedQSTiles.value = viewModel.addedQSTiles.value + tile.serviceClass.name
                                             }
                                         }
                                     } else {
