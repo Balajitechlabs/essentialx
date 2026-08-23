@@ -53,4 +53,16 @@ Anda dapat menyesuaikan gaya animasi, warna, dan perilakunya. Fitur ini berfungs
     <string name="cat_accessibility">Aksesibilitas</string>
     <string name="feat_auto_accessibility_title">Aksesibilitas otomatis </string>
     <string name="feat_auto_accessibility_desc">Secara otomatis memberikan izin aksesibilitas saat aplikasi diluncurkan jika izin tersebut hilang menggunakan WRITE_SECURE_SETTINGS.</string>
+    <string name="label_device_battery">Baterai </string>
+    <string name="label_device_ram">RAM</string>
+    <string name="feat_networks_title">Jaringan</string>
+    <string name="feat_networks_desc">Kontrol radio dan jaringan </string>
+    <string name="feat_network_download_rate_limit_title">Batas kecepatan unduhan jaringan</string>
+    <string name="feat_network_download_rate_limit_desc">Batasi kecepatan unduhan di seluruh sistem.</string>
+    <string name="feat_mobile_data_always_on_title">Selalu hidupkan data seluler </string>
+    <string name="feat_mobile_data_always_on_desc">Biarkan data seluler tetap aktif meskipun Wi-Fi terhubung.</string>
+    <string name="feat_wireless_display_certification_title">Sertifikasi tampilan nirkabel</string>
+    <string name="feat_wireless_display_certification_desc">Tampilkan opsi untuk sertifikasi tampilan nirkabel</string>
+    <string name="feat_sim_names_title">Nama SIM</string>
+    <string name="feat_sim_names_desc">Ubah nama tampilan operator untuk kartu SIM aktif.</string>
 </resources>
