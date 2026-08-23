@@ -131,7 +131,21 @@ class AppUpdatesViewModel : ViewModel() {
     fun loadTrackedRepos(context: Context) {
         _isLoading.value = true
         viewModelScope.launch {
-            _trackedRepos.value = SettingsRepository(context).getTrackedRepos()
+            val savedRepos = SettingsRepository(context).getTrackedRepos()
+            val updatedRepos = savedRepos.map { repo ->
+                if (repo.mappedPackageName != null) {
+                    val installedVersion = AppUtil.getAppVersion(context, repo.mappedPackageName)
+                    val isUpdateAvailable = if (installedVersion != null && repo.latestTagName.isNotBlank()) {
+                        AppUtil.compareSemanticVersions(repo.latestTagName, installedVersion) > 0
+                    } else {
+                        repo.isUpdateAvailable
+                    }
+                    repo.copy(isUpdateAvailable = isUpdateAvailable)
+                } else {
+                    repo
+                }
+            }
+            _trackedRepos.value = updatedRepos
             _isLoading.value = false
         }
     }

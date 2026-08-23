@@ -227,6 +227,20 @@ class YourAndroidActivity : ComponentActivity() {
                 mainViewModel.check(context)
             }
 
+            val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+            androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+                val observer =
+                    androidx.lifecycle.LifecycleEventObserver { _, event ->
+                        if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                            updatesViewModel.loadTrackedRepos(context)
+                        }
+                    }
+                lifecycleOwner.lifecycle.addObserver(observer)
+                onDispose {
+                    lifecycleOwner.lifecycle.removeObserver(observer)
+                }
+            }
+
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 val statusBarHeightPx =
                     with(LocalDensity.current) {
@@ -264,7 +278,6 @@ class YourAndroidActivity : ComponentActivity() {
                         title = stringResource(R.string.tab_your_android),
                         onBackClick = {
                             finish()
-                            overridePendingTransition(R.anim.anim_stay, R.anim.anim_slide_out_top)
                         },
                         floatingActionButton = {
                             Box {
@@ -377,6 +390,25 @@ class YourAndroidActivity : ComponentActivity() {
                             trackedRepos.find { it.fullName == repoToShowReleaseNotesFullName }
                         if (repo != null) {
                             val isNotesLoading = repo.latestReleaseBody.isNullOrBlank()
+                            val isUpdateAvailable =
+                                if (repo.mappedPackageName != null) {
+                                    val installedVersion =
+                                        com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                                            this@YourAndroidActivity,
+                                            repo.mappedPackageName,
+                                        )
+                                    if (installedVersion != null && repo.latestTagName.isNotBlank()) {
+                                        com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(
+                                            repo.latestTagName,
+                                            installedVersion,
+                                        ) > 0
+                                    } else {
+                                        repo.isUpdateAvailable
+                                    }
+                                } else {
+                                    repo.isUpdateAvailable
+                                }
+
                             UpdateBottomSheet(
                                 updateInfo =
                                     com.sameerasw.essentials.domain.model.UpdateInfo(
@@ -384,7 +416,7 @@ class YourAndroidActivity : ComponentActivity() {
                                         releaseNotes = repo.latestReleaseBody ?: "",
                                         downloadUrl = repo.downloadUrl ?: "",
                                         releaseUrl = repo.latestReleaseUrl ?: "",
-                                        isUpdateAvailable = repo.isUpdateAvailable,
+                                        isUpdateAvailable = isUpdateAvailable,
                                     ),
                                 isChecking = isNotesLoading,
                                 onDismissRequest = { repoToShowReleaseNotesFullName = null },
@@ -406,9 +438,18 @@ class YourAndroidActivity : ComponentActivity() {
         }
     }
 
+    @Suppress("DEPRECATION")
     override fun finish() {
         super.finish()
-        overridePendingTransition(R.anim.anim_stay, R.anim.anim_slide_out_top)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            overrideActivityTransition(
+                OVERRIDE_TRANSITION_CLOSE,
+                R.anim.anim_stay,
+                R.anim.anim_slide_out_top,
+            )
+        } else {
+            overridePendingTransition(R.anim.anim_stay, R.anim.anim_slide_out_top)
+        }
     }
 }
 

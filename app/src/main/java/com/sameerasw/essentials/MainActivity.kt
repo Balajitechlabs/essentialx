@@ -410,6 +410,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     val isAprilFoolsSheetVisible by viewModel.isAprilFoolsSheetVisible
+                    @Suppress("DEPRECATION")
                     val prankSheetState =
                         androidx.compose.material3.rememberModalBottomSheetState(
                             skipPartiallyExpanded = true,
@@ -495,6 +496,25 @@ class MainActivity : AppCompatActivity() {
                             trackedRepos.find { it.fullName == repoToShowReleaseNotesFullName }
                         if (repo != null) {
                             val isNotesLoading = repo.latestReleaseBody.isNullOrBlank()
+                            val isUpdateAvailable =
+                                if (repo.mappedPackageName != null) {
+                                    val installedVersion =
+                                        com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                                            this@MainActivity,
+                                            repo.mappedPackageName,
+                                        )
+                                    if (installedVersion != null && repo.latestTagName.isNotBlank()) {
+                                        com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(
+                                            repo.latestTagName,
+                                            installedVersion,
+                                        ) > 0
+                                    } else {
+                                        repo.isUpdateAvailable
+                                    }
+                                } else {
+                                    repo.isUpdateAvailable
+                                }
+
                             UpdateBottomSheet(
                                 updateInfo =
                                     com.sameerasw.essentials.domain.model.UpdateInfo(
@@ -502,7 +522,7 @@ class MainActivity : AppCompatActivity() {
                                         releaseNotes = repo.latestReleaseBody ?: "",
                                         downloadUrl = repo.downloadUrl ?: "",
                                         releaseUrl = repo.latestReleaseUrl ?: "",
-                                        isUpdateAvailable = repo.isUpdateAvailable,
+                                        isUpdateAvailable = isUpdateAvailable,
                                     ),
                                 isChecking = isNotesLoading,
                                 onDismissRequest = { repoToShowReleaseNotesFullName = null },
