@@ -42,11 +42,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
@@ -94,6 +96,7 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.WindowingUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -233,10 +236,11 @@ fun LinkPickerScreen(
                 .filter { searchQuery.isEmpty() || it.label.contains(searchQuery, ignoreCase = true) }
                 .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
         }
-    val isToolsSupported = remember { WindowingUtils.isFloatingModeSupported(context) }
-    val tabItems = remember(isToolsSupported) {
-        if (isToolsSupported) listOf(0, 1, 2) else listOf(0, 1)
-    }
+    val tabItems = remember { listOf(0, 1) }
+
+    val isFloatingSupported = remember { WindowingUtils.isFloatingModeSupported(context) }
+    var showQrSheet by remember { mutableStateOf(false) }
+    var showShortenSheet by remember { mutableStateOf(initialOpenShorten) }
 
     // Toggle pin
     val togglePin: (String) -> Unit = { packageName ->
@@ -354,7 +358,7 @@ fun LinkPickerScreen(
         val pagerScope = rememberCoroutineScope()
         val pagerState =
             rememberPagerState(
-                initialPage = (if (initialOpenShorten) 2 else initialTab).coerceIn(0, tabItems.lastIndex),
+                initialPage = initialTab.coerceIn(0, tabItems.lastIndex),
                 pageCount = { tabItems.size },
             )
 
@@ -380,7 +384,6 @@ fun LinkPickerScreen(
                         .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // 1. Link Preview Card (Above the tabs)
                 val domain = currentUri.host ?: currentUri.scheme ?: "Link"
                 val hasTrackingParams = hasTrackingParameters(currentUri)
 
@@ -437,13 +440,11 @@ fun LinkPickerScreen(
                             }
                         }
 
-                        // Action buttons (Copy, Clean, Edit, Shorten)
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                         ) {
-                            // Copy Link Button
-                            FilledTonalButton(
+                            FilledIconButton(
                                 onClick = {
                                     val clipboard =
                                         context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -461,90 +462,99 @@ fun LinkPickerScreen(
                                         ).show()
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 },
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = ButtonGroupDefaults.connectedLeadingButtonShapes().shape,
                             ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_content_copy_24),
                                     contentDescription = "Copy",
-                                    modifier = Modifier.size(18.dp),
+                                    modifier = Modifier.size(20.dp),
                                 )
-                                Spacer(Modifier.size(6.dp))
-                                Text("Copy", maxLines = 1)
                             }
 
-                            // Clean Tracker Button (if tracking params exist)
-                            if (hasTrackingParams) {
-                                FilledTonalButton(
-                                    onClick = {
-                                        val cleaned = cleanTrackingParams(currentUri)
-                                        currentUri = cleaned
-                                        editingText = cleaned.toString()
-                                        Toast
-                                            .makeText(
+                            FilledIconButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    if (isFloatingSupported) {
+                                        val bubblesEnabled = WindowingUtils.areNotificationBubblesEnabled(context)
+                                        val canWriteSecure = PermissionUtils.canWriteSecureSettings(context)
+                                        if (bubblesEnabled || canWriteSecure) {
+                                            WindowingUtils.launchOverlayWindow(context, currentUri, isPrivate = true)
+                                            onFinish()
+                                        } else {
+                                            Toast.makeText(
                                                 context,
-                                                "Tracking parameters removed",
+                                                context.getString(R.string.preview_web_desc_disabled),
                                                 Toast.LENGTH_SHORT,
                                             ).show()
-                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    shape = RoundedCornerShape(12.dp),
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.rounded_auto_awesome_24),
-                                        contentDescription = "Clean",
-                                        modifier = Modifier.size(18.dp),
-                                    )
-                                    Spacer(Modifier.size(6.dp))
-                                    Text("Clean", maxLines = 1)
-                                }
+                                        }
+                                    } else {
+                                        Toast.makeText(
+                                            context,
+                                            context.getString(R.string.preview_web_desc_disabled),
+                                            Toast.LENGTH_SHORT,
+                                        ).show()
+                                    }
+                                },
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_open_in_browser_24),
+                                    contentDescription = stringResource(R.string.preview_web_title),
+                                    modifier = Modifier.size(20.dp),
+                                )
                             }
 
-                            // Edit Button
-                            FilledTonalButton(
+                            FilledIconButton(
                                 onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    showQrSheet = true
+                                },
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_qr_code_24),
+                                    contentDescription = stringResource(R.string.qr_code_title),
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
+
+                            FilledIconButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    showShortenSheet = true
+                                },
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_smart_button_24),
+                                    contentDescription = stringResource(R.string.shorten_root_button),
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            }
+
+                            FilledIconButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     editingText = currentUri.toString()
                                     showEditSheet = true
                                 },
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.weight(1f).height(44.dp),
+                                shape = ButtonGroupDefaults.connectedTrailingButtonShapes().shape,
                             ) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.rounded_edit_24),
                                     contentDescription = stringResource(R.string.action_edit),
-                                    modifier = Modifier.size(18.dp),
+                                    modifier = Modifier.size(20.dp),
                                 )
-                                Spacer(Modifier.size(6.dp))
-                                Text(stringResource(R.string.action_edit), maxLines = 1)
-                            }
-
-                            // Shorten Link Button
-                            FilledTonalButton(
-                                onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    autoOpenShortenInTools = true
-                                    selectedTab = 2
-                                    pagerScope.launch {
-                                        pagerState.animateScrollToPage(2)
-                                    }
-                                },
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_link_24),
-                                    contentDescription = stringResource(R.string.shorten_root_button),
-                                    modifier = Modifier.size(18.dp),
-                                )
-                                Spacer(Modifier.size(6.dp))
-                                Text(stringResource(R.string.shorten_root_button), maxLines = 1)
                             }
                         }
                     }
                 }
 
-                // 2. Tab Selector (Open With / Share With / Tools)
                 RoundedCardContainer(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -561,34 +571,30 @@ fun LinkPickerScreen(
                         labelProvider = {
                             when (it) {
                                 0 -> context.getString(R.string.label_open_with)
-                                1 -> context.getString(R.string.label_share_with)
-                                else -> context.getString(R.string.label_tools)
+                                else -> context.getString(R.string.label_share_with)
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
 
-                // 3. Search Bar (Only shown for Open and Share tabs)
-                if (selectedTab != 2) {
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text(stringResource(R.string.search_apps_placeholder)) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_search_24),
-                                contentDescription = stringResource(R.string.search_apps_placeholder),
-                            )
-                        },
-                        singleLine = true,
-                        shape = RoundedCornerShape(16.dp),
-                    )
-                }
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text(stringResource(R.string.search_apps_placeholder)) },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_search_24),
+                            contentDescription = stringResource(R.string.search_apps_placeholder),
+                        )
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(16.dp),
+                )
 
                 // 4. Swipeable Tab Content via HorizontalPager (Clipped with 24.dp corners)
-                if (isLoadingApps && selectedTab != 2) {
+                if (isLoadingApps) {
                     Box(
                         modifier =
                             Modifier
@@ -620,7 +626,7 @@ fun LinkPickerScreen(
                                         demo = demo,
                                     )
                                 }
-                                1 -> {
+                                else -> {
                                     ShareWithContent(
                                         resolveInfos = shareWithApps,
                                         uri = currentUri,
@@ -631,38 +637,26 @@ fun LinkPickerScreen(
                                         demo = demo,
                                     )
                                 }
-                                else -> {
-                                    if (isToolsSupported) {
-                                        FloatingWithContent(
-                                            uri = currentUri,
-                                            onSelectTab = { targetTab ->
-                                                selectedTab = targetTab
-                                                pagerScope.launch {
-                                                    pagerState.animateScrollToPage(targetTab)
-                                                }
-                                            },
-                                            onFinish = onFinish,
-                                            modifier = Modifier.fillMaxWidth(),
-                                            openShortenInitially = autoOpenShortenInTools,
-                                        )
-                                    } else {
-                                        OpenWithContent(
-                                            resolveInfos = openWithApps,
-                                            uri = currentUri,
-                                            onFinish = onFinish,
-                                            modifier = Modifier.fillMaxWidth(),
-                                            togglePin = togglePin,
-                                            pinnedPackages = pinnedPackages.value,
-                                            demo = demo,
-                                        )
-                                    }
-                                }
                             }
                         }
                     }
                 }
             }
         }
+    }
+
+    if (showShortenSheet) {
+        ShortenUrlSheet(
+            uri = currentUri,
+            onDismiss = { showShortenSheet = false },
+        )
+    }
+
+    if (showQrSheet) {
+        QrCodeSheet(
+            contentUri = currentUri.toString(),
+            onDismiss = { showQrSheet = false },
+        )
     }
 
     if (showEditSheet) {

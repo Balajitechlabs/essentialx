@@ -115,51 +115,11 @@ fun FloatingWithContent(
     openShortenInitially: Boolean = false,
 ) {
     val context = LocalContext.current
-    val view = LocalView.current
-    val haptic = LocalHapticFeedback.current
-    val scope = rememberCoroutineScope()
     var showQrSheet by remember { mutableStateOf(false) }
     var qrContentUri by remember { mutableStateOf(uri.toString()) }
-
     var showShortenSheet by remember { mutableStateOf(openShortenInitially) }
-    var showSettingsSheet by remember { mutableStateOf(false) }
-    var selectedShortenTab by remember { mutableIntStateOf(0) } // 0 = Shorten, 1 = History
-    var urlToShortenInput by remember { mutableStateOf(uri.toString()) }
-    var selectedExpiration by remember { mutableStateOf(UrlShortener.getDefaultExpiration(context)) }
-    var customAliasInput by remember { mutableStateOf("") }
-    var isCustomAliasExpanded by remember { mutableStateOf(false) }
-    var passcodeProtectionInput by remember { mutableStateOf("") }
-    var isPasscodeProtectionExpanded by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var shortenedUrlResult by remember { mutableStateOf<String?>(null) }
-    var isShortening by remember { mutableStateOf(false) }
-    var historyList by remember { mutableStateOf<List<UrlShortener.ShortLinkHistoryItem>>(emptyList()) }
-
-    var customDomainInput by remember { mutableStateOf(UrlShortener.getCustomDomain(context)) }
-    var autoCopySetting by remember { mutableStateOf(UrlShortener.isAutoCopyEnabled(context)) }
-    var autoStripSetting by remember { mutableStateOf(UrlShortener.isAutoStripTrackingEnabled(context)) }
-    var notificationSetting by remember { mutableStateOf(UrlShortener.isNotificationEnabled(context)) }
-    var currentTimeMs by remember { mutableStateOf(System.currentTimeMillis()) }
 
     val isFloatingSupported = remember { WindowingUtils.isFloatingModeSupported(context) }
-
-    LaunchedEffect(showShortenSheet) {
-        if (showShortenSheet) {
-            historyList = UrlShortener.getHistory(context)
-            selectedExpiration = UrlShortener.getDefaultExpiration(context)
-            urlToShortenInput = uri.toString()
-        }
-    }
-
-    // Live 1-second ticker for real-time seconds countdown in History sub-tab
-    LaunchedEffect(showShortenSheet, selectedShortenTab) {
-        if (showShortenSheet && selectedShortenTab == 1) {
-            while (true) {
-                currentTimeMs = System.currentTimeMillis()
-                kotlinx.coroutines.delay(1000L)
-            }
-        }
-    }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -214,35 +174,94 @@ fun FloatingWithContent(
             IconToggleItem(
                 title = stringResource(R.string.shorten_url_title),
                 description = stringResource(R.string.shorten_url_desc),
-                iconRes = R.drawable.rounded_link_24,
+                iconRes = R.drawable.rounded_smart_button_24,
                 showToggle = false,
                 onClick = {
-                    shortenedUrlResult = null
-                    selectedShortenTab = 0
                     showShortenSheet = true
                 },
             )
         }
     }
 
-    // Shorten URL Bottom Sheet (with Sub-Tabs: Shorten & History)
     if (showShortenSheet) {
-        val shortenScrollState = rememberScrollState()
-        EssentialsBottomSheet(
-            onDismissRequest = { showShortenSheet = false },
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+        ShortenUrlSheet(
+            uri = uri,
+            onDismiss = { showShortenSheet = false },
+        )
+    }
+
+    if (showQrSheet) {
+        QrCodeSheet(
+            contentUri = qrContentUri,
+            onDismiss = { showQrSheet = false },
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun ShortenUrlSheet(
+    uri: Uri,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val view = LocalView.current
+    val haptic = LocalHapticFeedback.current
+    val scope = rememberCoroutineScope()
+
+    var showSettingsSheet by remember { mutableStateOf(false) }
+    var selectedShortenTab by remember { mutableIntStateOf(0) }
+    var urlToShortenInput by remember { mutableStateOf(uri.toString()) }
+    var selectedExpiration by remember { mutableStateOf(UrlShortener.getDefaultExpiration(context)) }
+    var customAliasInput by remember { mutableStateOf("") }
+    var isCustomAliasExpanded by remember { mutableStateOf(false) }
+    var passcodeProtectionInput by remember { mutableStateOf("") }
+    var isPasscodeProtectionExpanded by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var shortenedUrlResult by remember { mutableStateOf<String?>(null) }
+    var isShortening by remember { mutableStateOf(false) }
+    var historyList by remember { mutableStateOf<List<UrlShortener.ShortLinkHistoryItem>>(emptyList()) }
+
+    var customDomainInput by remember { mutableStateOf(UrlShortener.getCustomDomain(context)) }
+    var autoCopySetting by remember { mutableStateOf(UrlShortener.isAutoCopyEnabled(context)) }
+    var autoStripSetting by remember { mutableStateOf(UrlShortener.isAutoStripTrackingEnabled(context)) }
+    var notificationSetting by remember { mutableStateOf(UrlShortener.isNotificationEnabled(context)) }
+    var currentTimeMs by remember { mutableStateOf(System.currentTimeMillis()) }
+    val isFloatingSupported = remember { WindowingUtils.isFloatingModeSupported(context) }
+    var qrContentUri by remember { mutableStateOf(uri.toString()) }
+    var showQrSheet by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        historyList = UrlShortener.getHistory(context)
+        selectedExpiration = UrlShortener.getDefaultExpiration(context)
+        urlToShortenInput = uri.toString()
+    }
+
+    LaunchedEffect(selectedShortenTab) {
+        if (selectedShortenTab == 1) {
+            while (true) {
+                currentTimeMs = System.currentTimeMillis()
+                kotlinx.coroutines.delay(1000L)
+            }
+        }
+    }
+
+    val shortenScrollState = rememberScrollState()
+    EssentialsBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .imePadding()
+                    .verticalScroll(shortenScrollState)
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .imePadding()
-                        .verticalScroll(shortenScrollState)
-                        .padding(horizontal = 20.dp, vertical = 12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-            ) {
-                Row(
+            Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -698,7 +717,6 @@ fun FloatingWithContent(
                                             onClick = {
                                                 HapticUtil.performVirtualKeyHaptic(view)
                                                 qrContentUri = shortUrl
-                                                showShortenSheet = false
                                                 showQrSheet = true
                                             },
                                             modifier = Modifier.weight(1f).height(44.dp),
@@ -970,7 +988,6 @@ fun FloatingWithContent(
                                             onClick = {
                                                 HapticUtil.performVirtualKeyHaptic(view)
                                                 qrContentUri = item.shortUrl
-                                                showShortenSheet = false
                                                 showQrSheet = true
                                             },
                                             modifier = Modifier.weight(1f).height(36.dp),
@@ -1025,7 +1042,6 @@ fun FloatingWithContent(
                 }
             }
         }
-    }
 
     // Shortener Settings Bottom Sheet (Structured as standard Essentials IconToggleItems in RoundedCardContainer)
     if (showSettingsSheet) {
@@ -1121,179 +1137,179 @@ fun FloatingWithContent(
             }
         }
     }
+}
 
-    // QR Code Bottom Sheet
-    if (showQrSheet) {
-        val appLogo = remember { QrCodeGenerator.getAppLogoBitmap(context) }
-        val qrForegroundColor = MaterialTheme.colorScheme.onSurface.toArgb()
-        val qrBackgroundColor = MaterialTheme.colorScheme.surfaceBright.toArgb()
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun QrCodeSheet(
+    contentUri: String,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
+    val appLogo = remember { QrCodeGenerator.getAppLogoBitmap(context) }
+    val qrForegroundColor = MaterialTheme.colorScheme.onSurface.toArgb()
+    val qrBackgroundColor = MaterialTheme.colorScheme.surfaceBright.toArgb()
 
-        val qrBitmap = remember(qrContentUri, appLogo, qrForegroundColor, qrBackgroundColor) {
-            QrCodeGenerator.generateQrBitmap(
-                content = qrContentUri,
-                size = 800,
-                foregroundColor = qrForegroundColor,
-                backgroundColor = qrBackgroundColor,
-                logo = appLogo,
-            )
-        }
+    val qrBitmap = remember(contentUri, appLogo, qrForegroundColor, qrBackgroundColor) {
+        QrCodeGenerator.generateQrBitmap(
+            content = contentUri,
+            size = 800,
+            foregroundColor = qrForegroundColor,
+            backgroundColor = qrBackgroundColor,
+            logo = appLogo,
+        )
+    }
 
-        EssentialsBottomSheet(
-            onDismissRequest = { showQrSheet = false },
-            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    EssentialsBottomSheet(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surfaceContainer,
+    ) {
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            Column(
+            Text(
+                text = Uri.parse(contentUri).host ?: contentUri,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+            )
+
+            Surface(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(20.dp),
+                        .fillMaxWidth(0.94f)
+                        .aspectRatio(1f),
+                shape = RoundedCornerShape(28.dp),
+                color = MaterialTheme.colorScheme.surfaceBright,
             ) {
-                // Host / URI Subtitle
-                Text(
-                    text = Uri.parse(qrContentUri).host ?: qrContentUri,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    textAlign = TextAlign.Center,
-                )
-
-                // High-Contrast Rounded QR Code Display with Material 3 Expressive Container (Full Width Fit)
-                Surface(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth(0.94f)
-                            .aspectRatio(1f),
-                    shape = RoundedCornerShape(28.dp),
-                    color = MaterialTheme.colorScheme.surfaceBright,
+                Box(
+                    modifier = Modifier.padding(18.dp),
+                    contentAlignment = Alignment.Center,
                 ) {
-                    Box(
-                        modifier = Modifier.padding(18.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Image(
-                            bitmap = qrBitmap.asImageBitmap(),
-                            contentDescription = stringResource(R.string.qr_code_title),
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
+                    Image(
+                        bitmap = qrBitmap.asImageBitmap(),
+                        contentDescription = stringResource(R.string.qr_code_title),
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
+            }
+
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth(0.94f)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(MaterialTheme.colorScheme.surfaceBright)
+                        .padding(6.dp),
+                horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+            ) {
+                FilledIconButton(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        try {
+                            val qrUri = QrCodeGenerator.getShareableQrUri(context, qrBitmap)
+                            if (qrUri != null) {
+                                val sendIntent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_STREAM, qrUri)
+                                    putExtra(Intent.EXTRA_TEXT, contentUri)
+                                    type = "image/png"
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                val chooser = Intent.createChooser(sendIntent, context.getString(R.string.qr_share_image)).apply {
+                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                }
+                                context.startActivity(chooser)
+                            } else {
+                                val sendIntent = Intent().apply {
+                                    action = Intent.ACTION_SEND
+                                    putExtra(Intent.EXTRA_TEXT, contentUri)
+                                    type = "text/plain"
+                                }
+                                context.startActivity(Intent.createChooser(sendIntent, null))
+                            }
+                        } catch (_: Exception) {
+                            Toast.makeText(context, context.getString(R.string.error_share_qr_image), Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.weight(1f).height(48.dp),
+                    shape = ButtonGroupDefaults.connectedLeadingButtonShapes().shape,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_share_24),
+                        contentDescription = stringResource(R.string.qr_share_image),
+                        modifier = Modifier.size(20.dp),
+                    )
                 }
 
-                // Split Connected Action Buttons Row (Share, Copy, Download) with Primary Styling
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth(0.94f)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(MaterialTheme.colorScheme.surfaceBright)
-                            .padding(6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-                ) {
-                    // 1. Share QR Image (with Link Caption)
-                    FilledIconButton(
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            try {
-                                val qrUri = QrCodeGenerator.getShareableQrUri(context, qrBitmap)
-                                if (qrUri != null) {
-                                    val sendIntent = Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        putExtra(Intent.EXTRA_STREAM, qrUri)
-                                        putExtra(Intent.EXTRA_TEXT, qrContentUri)
-                                        type = "image/png"
-                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    }
-                                    val chooser = Intent.createChooser(sendIntent, context.getString(R.string.qr_share_image)).apply {
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(chooser)
-                                } else {
-                                    val sendIntent = Intent().apply {
-                                        action = Intent.ACTION_SEND
-                                        putExtra(Intent.EXTRA_TEXT, qrContentUri)
-                                        type = "text/plain"
-                                    }
-                                    context.startActivity(Intent.createChooser(sendIntent, null))
-                                }
-                            } catch (_: Exception) {
-                                Toast.makeText(context, context.getString(R.string.error_share_qr_image), Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        shape = ButtonGroupDefaults.connectedLeadingButtonShapes().shape,
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                        ),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_share_24),
-                            contentDescription = stringResource(R.string.qr_share_image),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-
-                    // 2. Copy QR Image
-                    FilledIconButton(
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            try {
-                                val qrUri = QrCodeGenerator.getShareableQrUri(context, qrBitmap)
-                                if (qrUri != null) {
-                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    val clip = ClipData.newUri(context.contentResolver, "QR Code Image", qrUri)
-                                    clipboard.setPrimaryClip(clip)
-                                    Toast.makeText(context, context.getString(R.string.qr_copied_success), Toast.LENGTH_SHORT).show()
-                                } else {
-                                    Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
-                                }
-                            } catch (_: Exception) {
+                FilledIconButton(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        try {
+                            val qrUri = QrCodeGenerator.getShareableQrUri(context, qrBitmap)
+                            if (qrUri != null) {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                val clip = ClipData.newUri(context.contentResolver, "QR Code Image", qrUri)
+                                clipboard.setPrimaryClip(clip)
+                                Toast.makeText(context, context.getString(R.string.qr_copied_success), Toast.LENGTH_SHORT).show()
+                            } else {
                                 Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
                             }
-                        },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                        ),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_content_copy_24),
-                            contentDescription = stringResource(R.string.qr_copy_image),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-
-                    // 3. Save QR Image
-                    FilledIconButton(
-                        onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            val success = QrCodeGenerator.saveQrImage(context, qrBitmap)
-                            if (success) {
-                                Toast.makeText(context, context.getString(R.string.qr_saved_success), Toast.LENGTH_SHORT).show()
-                            } else {
-                                Toast.makeText(context, context.getString(R.string.error_save_qr_image), Toast.LENGTH_SHORT).show()
-                            }
-                        },
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        shape = ButtonGroupDefaults.connectedTrailingButtonShapes().shape,
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary,
-                        ),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_download_24),
-                            contentDescription = stringResource(R.string.qr_save_image),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
+                        } catch (_: Exception) {
+                            Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.weight(1f).height(48.dp),
+                    shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_content_copy_24),
+                        contentDescription = stringResource(R.string.qr_copy_image),
+                        modifier = Modifier.size(20.dp),
+                    )
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+
+                FilledIconButton(
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        val success = QrCodeGenerator.saveQrImage(context, qrBitmap)
+                        if (success) {
+                            Toast.makeText(context, context.getString(R.string.qr_saved_success), Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, context.getString(R.string.error_save_qr_image), Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    modifier = Modifier.weight(1f).height(48.dp),
+                    shape = ButtonGroupDefaults.connectedTrailingButtonShapes().shape,
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.rounded_download_24),
+                        contentDescription = stringResource(R.string.qr_save_image),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
             }
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
