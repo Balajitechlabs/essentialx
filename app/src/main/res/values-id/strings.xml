@@ -17,7 +17,7 @@ Sebuah ikon praktis untuk mengubah mode dering tanpa menggunakan tombol volume a
     <string name="about_desc_notification_lighting">Notification Lighting menambahkan efek pencahayaan tepi yang indah saat Anda menerima notifikasi.
 
 Anda dapat menyesuaikan gaya animasi, warna, dan perilakunya. Fitur ini berfungsi bahkan saat layar mati (tergantung OEM) atau berada di atas aplikasi yang sedang Anda gunakan. Pilih aplikasi, prioritas notifikasi, atau perilaku apa yang seharusnya dipicu dari kontrol yang tersedia. Jika OEM Anda tidak mendukung overlay di atas AOD, gunakan opsi Tampilan Ambient yang terdapat di bawah ini.</string>
-    <string name="feat_safe_volume_title">Nonaktifkan peringatan volume aman</string>
+    <string name="feat_safe_volume_title">Matikan peringatan volume aman</string>
     <string name="feat_safe_volume_desc">Redam dialog dengan volume keras.</string>
     <string name="feat_screen_locked_security_title">Keamanan layar terkunci</string>
     <string name="screen_locked_security_desc">Nonaktifkan ubin pengaturan cepat saat perangkat terkunci.</string>
@@ -28,10 +28,10 @@ Anda dapat menyesuaikan gaya animasi, warna, dan perilakunya. Fitur ini berfungs
     <string name="feat_notification_lighting_desc">Lampu indikator menyala untuk notifikasi.</string>
     <string name="flashlight_pulse_title">Denyut cahaya senter</string>
     <string name="feat_flashlight_pulse_desc">Nyalakan senter sebentar untuk menerima notifikasi.</string>
-    <string name="feat_snooze_notifications_title">Tunda notifikasi sistem</string>
+    <string name="feat_snooze_notifications_title">Tunda notifikasi sistem </string>
     <string name="feat_snooze_notifications_desc">Tunda notifikasi tetap</string>
     <string name="perm_notif_listener_title">Pendengar Notifikasi</string>
-    <string name="feat_notification_snoozing_title">Penunda notifikasi </string>
+    <string name="feat_notification_snoozing_title">Penundaan notifikasi </string>
     <string name="feat_notification_snoozing_desc">Jadwalkan ulang notifikasi </string>
     <string name="feat_battery_notification_title">Pemberitahuan baterai</string>
     <string name="feat_battery_notification_desc">Notifikasi status baterai yang terus-menerus</string>
@@ -81,4 +81,16 @@ Anda dapat menyesuaikan gaya animasi, warna, dan perilakunya. Fitur ini berfungs
     <string name="stb_privacy_chip">Penggunaan chip kamera dan mikrofon</string>
     <string name="hide_clock_desc">Hapus sepenuhnya jam dari bilah status.</string>
     <string name="hide_notification_icons_desc">Sembunyikan semua ikon notifikasi masuk</string>
+    <string name="notification_lighting_h_pos_title">Posisi horizontal </string>
+    <string name="notification_lighting_v_pos_title">Posisi vertikal</string>
+    <string name="notification_lighting_scale_title">Skala</string>
+    <string name="notification_lighting_duration_title">Durasi</string>
+    <string name="ambient_display_desc">Bangunkan layar dan munculkan cahaya</string>
+    <string name="ambient_show_lock_screen_desc">Bukan layar hitam</string>
+    <string name="feat_screen_off_widget_title">Widget layar mati</string>
+    <string name="feat_screen_off_widget_desc">Widget tak terlihat untuk mematikan layar</string>
+    <string name="feat_pixel_searchbar_desc">Atur Essentials sebagai penyedia pencarian default untuk bilah pencarian layar beranda di Pixel Launcher.</string>
+    <string name="show_bluetooth_devices">Perlihatkan perangkat bluetooth</string>
+    <string name="show_bluetooth_devices_summary">Menampilkan level baterai perangkat Bluetooth yang terhubung.</string>
+    <string name="widget_background_summary">Tampilkan latar belakang widget</string>
 </resources>
