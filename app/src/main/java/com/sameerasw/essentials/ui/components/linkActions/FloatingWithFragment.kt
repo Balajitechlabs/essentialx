@@ -1148,10 +1148,10 @@ fun QrCodeSheet(
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     val appLogo = remember { QrCodeGenerator.getAppLogoBitmap(context) }
-    val qrForegroundColor = MaterialTheme.colorScheme.onSurface.toArgb()
-    val qrBackgroundColor = MaterialTheme.colorScheme.surfaceBright.toArgb()
+    val qrForegroundColor = android.graphics.Color.BLACK
+    val qrBackgroundColor = android.graphics.Color.WHITE
 
-    val qrBitmap = remember(contentUri, appLogo, qrForegroundColor, qrBackgroundColor) {
+    val qrBitmap = remember(contentUri, appLogo) {
         QrCodeGenerator.generateQrBitmap(
             content = contentUri,
             size = 800,
@@ -1188,7 +1188,7 @@ fun QrCodeSheet(
                         .fillMaxWidth(0.94f)
                         .aspectRatio(1f),
                 shape = RoundedCornerShape(28.dp),
-                color = MaterialTheme.colorScheme.surfaceBright,
+                color = androidx.compose.ui.graphics.Color.White,
             ) {
                 Box(
                     modifier = Modifier.padding(18.dp),
