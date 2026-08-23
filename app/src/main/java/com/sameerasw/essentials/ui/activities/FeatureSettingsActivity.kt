@@ -650,7 +650,6 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                             "Flashlight",
                                                         ),
                                                         listOf(
-                                                            "URL Shortener",
                                                             "Link actions",
                                                             "System Keyboard",
                                                         ),

@@ -36,6 +36,8 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -58,6 +60,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -79,6 +82,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
@@ -94,6 +98,7 @@ import com.sameerasw.essentials.utils.WindowingUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -346,6 +351,19 @@ fun LinkPickerScreen(
                 MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f)
             }
 
+        val pagerScope = rememberCoroutineScope()
+        val pagerState =
+            rememberPagerState(
+                initialPage = (if (initialOpenShorten) 2 else initialTab).coerceIn(0, tabItems.lastIndex),
+                pageCount = { tabItems.size },
+            )
+
+        LaunchedEffect(pagerState.currentPage) {
+            if (selectedTab != pagerState.currentPage) {
+                selectedTab = pagerState.currentPage
+            }
+        }
+
         EssentialsBottomSheet(
             onDismissRequest = onFinish,
             sheetState = sheetState,
@@ -357,136 +375,88 @@ fun LinkPickerScreen(
                     Modifier
                         .fillMaxWidth()
                         .imePadding()
-                        .padding(16.dp)
-                        .verticalScroll(rememberScrollState()),
+                        .clip(RoundedCornerShape(24.dp))
+                        .verticalScroll(rememberScrollState())
+                        .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-            // Tab Selector (Open With / Share With)
-            RoundedCardContainer(
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                SegmentedPicker(
-                    items = tabItems,
-                    selectedItem = selectedTab,
-                    onItemSelected = {
-                        selectedTab = it
-                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    },
-                    labelProvider = {
-                        when (it) {
-                            0 -> context.getString(R.string.label_open_with)
-                            1 -> context.getString(R.string.label_share_with)
-                            else -> context.getString(R.string.label_tools)
-                        }
-                    },
+                // 1. Link Preview Card (Above the tabs)
+                val domain = currentUri.host ?: currentUri.scheme ?: "Link"
+                val hasTrackingParams = hasTrackingParameters(currentUri)
+
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                )
-            }
-
-            // Link Preview Card
-            val domain = currentUri.host ?: currentUri.scheme ?: "Link"
-            val hasTrackingParams = hasTrackingParameters(currentUri)
-
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors =
-                    CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                    ),
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                        ),
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        Box(
-                            modifier =
-                                Modifier
-                                    .size(40.dp)
-                                    .background(
-                                        MaterialTheme.colorScheme.primaryContainer,
-                                        RoundedCornerShape(12.dp),
-                                    ),
-                            contentAlignment = Alignment.Center,
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_link_24),
-                                contentDescription = "Link Icon",
-                                modifier = Modifier.size(22.dp),
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            )
-                        }
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = domain,
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(
-                                text = currentUri.toString(),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                    }
-
-                    // Action buttons (Copy, Clean, Edit)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        // Copy Link Button
-                        FilledTonalButton(
-                            onClick = {
-                                val clipboard =
-                                    context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                clipboard.setPrimaryClip(
-                                    ClipData.newPlainText(
-                                        "Link",
-                                        currentUri.toString(),
-                                    ),
+                            Box(
+                                modifier =
+                                    Modifier
+                                        .size(40.dp)
+                                        .background(
+                                            MaterialTheme.colorScheme.primaryContainer,
+                                            RoundedCornerShape(12.dp),
+                                        ),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_link_24),
+                                    contentDescription = "Link Icon",
+                                    modifier = Modifier.size(22.dp),
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 )
-                                Toast
-                                    .makeText(
-                                        context,
-                                        "Link copied to clipboard",
-                                        Toast.LENGTH_SHORT,
-                                    ).show()
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_content_copy_24),
-                                contentDescription = "Copy",
-                                modifier = Modifier.size(18.dp),
-                            )
-                            Spacer(Modifier.size(6.dp))
-                            Text("Copy", maxLines = 1)
+                            }
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = domain,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(
+                                    text = currentUri.toString(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
                         }
 
-                        // Clean Tracker Button (if tracking params exist)
-                        if (hasTrackingParams) {
+                        // Action buttons (Copy, Clean, Edit, Shorten)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            // Copy Link Button
                             FilledTonalButton(
                                 onClick = {
-                                    val cleaned = cleanTrackingParams(currentUri)
-                                    currentUri = cleaned
-                                    editingText = cleaned.toString()
+                                    val clipboard =
+                                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    clipboard.setPrimaryClip(
+                                        ClipData.newPlainText(
+                                            "Link",
+                                            currentUri.toString(),
+                                        ),
+                                    )
                                     Toast
                                         .makeText(
                                             context,
-                                            "Tracking parameters removed",
+                                            "Link copied to clipboard",
                                             Toast.LENGTH_SHORT,
                                         ).show()
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -495,134 +465,205 @@ fun LinkPickerScreen(
                                 shape = RoundedCornerShape(12.dp),
                             ) {
                                 Icon(
-                                    painter = painterResource(id = R.drawable.rounded_auto_awesome_24),
-                                    contentDescription = "Clean",
+                                    painter = painterResource(id = R.drawable.rounded_content_copy_24),
+                                    contentDescription = "Copy",
                                     modifier = Modifier.size(18.dp),
                                 )
                                 Spacer(Modifier.size(6.dp))
-                                Text("Clean", maxLines = 1)
+                                Text("Copy", maxLines = 1)
+                            }
+
+                            // Clean Tracker Button (if tracking params exist)
+                            if (hasTrackingParams) {
+                                FilledTonalButton(
+                                    onClick = {
+                                        val cleaned = cleanTrackingParams(currentUri)
+                                        currentUri = cleaned
+                                        editingText = cleaned.toString()
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "Tracking parameters removed",
+                                                Toast.LENGTH_SHORT,
+                                            ).show()
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    shape = RoundedCornerShape(12.dp),
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.rounded_auto_awesome_24),
+                                        contentDescription = "Clean",
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                    Spacer(Modifier.size(6.dp))
+                                    Text("Clean", maxLines = 1)
+                                }
+                            }
+
+                            // Edit Button
+                            FilledTonalButton(
+                                onClick = {
+                                    editingText = currentUri.toString()
+                                    showEditSheet = true
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_edit_24),
+                                    contentDescription = stringResource(R.string.action_edit),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Spacer(Modifier.size(6.dp))
+                                Text(stringResource(R.string.action_edit), maxLines = 1)
+                            }
+
+                            // Shorten Link Button
+                            FilledTonalButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    autoOpenShortenInTools = true
+                                    selectedTab = 2
+                                    pagerScope.launch {
+                                        pagerState.animateScrollToPage(2)
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_link_24),
+                                    contentDescription = stringResource(R.string.shorten_root_button),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Spacer(Modifier.size(6.dp))
+                                Text(stringResource(R.string.shorten_root_button), maxLines = 1)
                             }
                         }
-
-                        // Edit Button
-                        FilledTonalButton(
-                            onClick = {
-                                editingText = currentUri.toString()
-                                showEditSheet = true
-                            },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_edit_24),
-                                contentDescription = stringResource(R.string.action_edit),
-                                modifier = Modifier.size(18.dp),
-                            )
-                            Spacer(Modifier.size(6.dp))
-                            Text(stringResource(R.string.action_edit), maxLines = 1)
-                        }
-
-                        // Shorten Link Button
-                        FilledTonalButton(
-                            onClick = {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                autoOpenShortenInTools = true
-                                selectedTab = 2
-                            },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_link_24),
-                                contentDescription = stringResource(R.string.shorten_root_button),
-                                modifier = Modifier.size(18.dp),
-                            )
-                            Spacer(Modifier.size(6.dp))
-                            Text(stringResource(R.string.shorten_root_button), maxLines = 1)
-                        }
                     }
                 }
-            }
 
-            // Search Bar (Only shown for Open and Share tabs)
-            if (selectedTab != 2) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
+                // 2. Tab Selector (Open With / Share With / Tools)
+                RoundedCardContainer(
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(stringResource(R.string.search_apps_placeholder)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_search_24),
-                            contentDescription = stringResource(R.string.search_apps_placeholder),
-                        )
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp),
-                )
-            }
-
-            // Apps / Actions List
-            if (isLoadingApps && selectedTab != 2) {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp),
-                    contentAlignment = Alignment.Center,
                 ) {
-                    LoadingIndicator()
+                    SegmentedPicker(
+                        items = tabItems,
+                        selectedItem = selectedTab,
+                        onItemSelected = { targetPage ->
+                            selectedTab = targetPage
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            pagerScope.launch {
+                                pagerState.animateScrollToPage(targetPage)
+                            }
+                        },
+                        labelProvider = {
+                            when (it) {
+                                0 -> context.getString(R.string.label_open_with)
+                                1 -> context.getString(R.string.label_share_with)
+                                else -> context.getString(R.string.label_tools)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                 }
-            } else {
-                when (selectedTab) {
-                    0 -> {
-                        OpenWithContent(
-                            resolveInfos = openWithApps,
-                            uri = currentUri,
-                            onFinish = onFinish,
-                            modifier = Modifier.fillMaxWidth(),
-                            togglePin = togglePin,
-                            pinnedPackages = pinnedPackages.value,
-                            demo = demo,
-                        )
-                    }
-                    1 -> {
-                        ShareWithContent(
-                            resolveInfos = shareWithApps,
-                            uri = currentUri,
-                            onFinish = onFinish,
-                            modifier = Modifier.fillMaxWidth(),
-                            togglePin = togglePin,
-                            pinnedPackages = pinnedPackages.value,
-                            demo = demo,
-                        )
-                    }
-                    else -> {
-                        if (isToolsSupported) {
-                            FloatingWithContent(
-                                uri = currentUri,
-                                onSelectTab = { selectedTab = it },
-                                onFinish = onFinish,
-                                modifier = Modifier.fillMaxWidth(),
-                                openShortenInitially = autoOpenShortenInTools,
+
+                // 3. Search Bar (Only shown for Open and Share tabs)
+                if (selectedTab != 2) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = { Text(stringResource(R.string.search_apps_placeholder)) },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.rounded_search_24),
+                                contentDescription = stringResource(R.string.search_apps_placeholder),
                             )
-                        } else {
-                            OpenWithContent(
-                                resolveInfos = openWithApps,
-                                uri = currentUri,
-                                onFinish = onFinish,
-                                modifier = Modifier.fillMaxWidth(),
-                                togglePin = togglePin,
-                                pinnedPackages = pinnedPackages.value,
-                                demo = demo,
-                            )
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(16.dp),
+                    )
+                }
+
+                // 4. Swipeable Tab Content via HorizontalPager (Clipped with 24.dp corners)
+                if (isLoadingApps && selectedTab != 2) {
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(32.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        LoadingIndicator()
+                    }
+                } else {
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(24.dp)),
+                        verticalAlignment = Alignment.Top,
+                    ) { page ->
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            when (page) {
+                                0 -> {
+                                    OpenWithContent(
+                                        resolveInfos = openWithApps,
+                                        uri = currentUri,
+                                        onFinish = onFinish,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        togglePin = togglePin,
+                                        pinnedPackages = pinnedPackages.value,
+                                        demo = demo,
+                                    )
+                                }
+                                1 -> {
+                                    ShareWithContent(
+                                        resolveInfos = shareWithApps,
+                                        uri = currentUri,
+                                        onFinish = onFinish,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        togglePin = togglePin,
+                                        pinnedPackages = pinnedPackages.value,
+                                        demo = demo,
+                                    )
+                                }
+                                else -> {
+                                    if (isToolsSupported) {
+                                        FloatingWithContent(
+                                            uri = currentUri,
+                                            onSelectTab = { targetTab ->
+                                                selectedTab = targetTab
+                                                pagerScope.launch {
+                                                    pagerState.animateScrollToPage(targetTab)
+                                                }
+                                            },
+                                            onFinish = onFinish,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            openShortenInitially = autoOpenShortenInTools,
+                                        )
+                                    } else {
+                                        OpenWithContent(
+                                            resolveInfos = openWithApps,
+                                            uri = currentUri,
+                                            onFinish = onFinish,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            togglePin = togglePin,
+                                            pinnedPackages = pinnedPackages.value,
+                                            demo = demo,
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
         }
     }
-}
 
     if (showEditSheet) {
         val focusRequester = remember { FocusRequester() }

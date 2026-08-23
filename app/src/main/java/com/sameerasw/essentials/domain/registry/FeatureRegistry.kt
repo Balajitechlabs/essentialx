@@ -822,38 +822,6 @@ object FeatureRegistry {
                 ) {}
             },
             object : Feature(
-                id = "URL Shortener",
-                title = R.string.tile_url_shortener,
-                iconRes = R.drawable.rounded_link_24,
-                category = R.string.cat_interaction,
-                description = R.string.tile_url_shortener_subtitle,
-                showToggle = false,
-                parentFeatureId = "Input",
-                hasMoreSettings = true,
-            ) {
-                override fun isEnabled(viewModel: MainViewModel) = true
-
-                override fun onToggle(
-                    viewModel: MainViewModel,
-                    context: Context,
-                    enabled: Boolean,
-                ) {}
-
-                override fun onClick(
-                    context: Context,
-                    viewModel: MainViewModel,
-                ) {
-                    val intent =
-                        Intent(
-                            context,
-                            FeatureSettingsActivity::class.java,
-                        ).apply {
-                            putExtra("feature", "URL Shortener")
-                        }
-                    context.startActivity(intent)
-                }
-            },
-            object : Feature(
                 id = "Power and Battery",
                 title = R.string.feat_power_saving_title,
                 iconRes = R.drawable.rounded_battery_charging_60_24,
