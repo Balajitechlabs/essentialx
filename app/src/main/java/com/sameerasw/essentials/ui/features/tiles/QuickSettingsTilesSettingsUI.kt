@@ -85,6 +85,7 @@ import com.sameerasw.essentials.services.tiles.SoundModeTileService
 import com.sameerasw.essentials.services.tiles.StayAwakeTileService
 import com.sameerasw.essentials.services.tiles.TapToWakeTileService
 import com.sameerasw.essentials.services.tiles.UiBlurTileService
+import com.sameerasw.essentials.services.tiles.UrlShortenerTileService
 import com.sameerasw.essentials.services.tiles.UsbDebuggingTileService
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
@@ -403,6 +404,14 @@ fun QuickSettingsTilesSettingsUI(
                 listOf("ACCESSIBILITY", "NOTIFICATION_LISTENER"),
                 R.string.feat_essentials_on_display_desc,
                 R.string.cat_visuals,
+            ),
+            QSTileInfo(
+                R.string.tile_url_shortener,
+                R.drawable.rounded_link_24,
+                UrlShortenerTileService::class.java,
+                emptyList(),
+                R.string.tile_url_shortener_subtitle,
+                R.string.cat_utils,
             ),
         )
 
