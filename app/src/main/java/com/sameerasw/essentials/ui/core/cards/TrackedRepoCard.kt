@@ -182,6 +182,16 @@ fun TrackedRepoCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     val isInstalled = repo.mappedPackageName != null
+                    val installedVersion =
+                        if (isInstalled) {
+                            com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                                context,
+                                repo.mappedPackageName,
+                            )
+                        } else {
+                            null
+                        }
+
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = if (isInstalled) repo.mappedAppName ?: repo.name else repo.name,
@@ -191,7 +201,14 @@ fun TrackedRepoCard(
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false),
                         )
-                        if (isInstalled) {
+                        if (isInstalled && installedVersion != null) {
+                            Text(
+                                text = " v$installedVersion",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                modifier = Modifier.padding(start = 4.dp),
+                            )
+                        } else if (repo.latestTagName.isNotBlank()) {
                             val cleanVersion =
                                 repo.latestTagName.removePrefix("v").removePrefix("V")
                             Text(
@@ -234,7 +251,7 @@ fun TrackedRepoCard(
                             modifier = Modifier.size(24.dp),
                         )
                     }
-                } else if (repo.isUpdateAvailable || repo.mappedPackageName == null) {
+                } else if (repo.isUpdateAvailable || (repo.mappedPackageName == null && repo.downloadUrl != null)) {
                     IconButton(
                         onClick = {
                             HapticUtil.performMediumHaptic(view)

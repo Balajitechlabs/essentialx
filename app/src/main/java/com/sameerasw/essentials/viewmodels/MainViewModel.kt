@@ -1138,8 +1138,22 @@ class MainViewModel : ViewModel() {
         isShizukuAvailable.value = ShizukuUtils.isShizukuAvailable()
         isShizukuPermissionGranted.value = ShizukuUtils.hasPermission()
         if (cachedIsUpdateAvailable) {
-            isUpdateAvailable.value = true
-            updateInfo.value = cachedUpdateInfo
+            val currentVersion =
+                try {
+                    context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                } catch (e: Exception) {
+                    "0.0"
+                } ?: "0.0"
+            val info = cachedUpdateInfo
+            if (info != null && com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(info.versionName, currentVersion) > 0) {
+                isUpdateAvailable.value = true
+                updateInfo.value = cachedUpdateInfo
+            } else {
+                cachedIsUpdateAvailable = false
+                cachedUpdateInfo = null
+                isUpdateAvailable.value = false
+                updateInfo.value = null
+            }
         }
         isAutoAccessibilityEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_AUTO_ACCESSIBILITY_ENABLED)
@@ -2482,10 +2496,8 @@ class MainViewModel : ViewModel() {
                 if (updateInfoResult != null) {
                     updateInfo.value = updateInfoResult
                     isUpdateAvailable.value = updateInfoResult.isUpdateAvailable
-                    if (updateInfoResult.isUpdateAvailable) {
-                        cachedIsUpdateAvailable = true
-                        cachedUpdateInfo = updateInfoResult
-                    }
+                    cachedIsUpdateAvailable = updateInfoResult.isUpdateAvailable
+                    cachedUpdateInfo = if (updateInfoResult.isUpdateAvailable) updateInfoResult else null
 
                     if (updateInfoResult.isUpdateAvailable && updateInfoResult.downloadUrl.isNotEmpty()) {
                         if (isUpdateNotificationEnabled.value) {

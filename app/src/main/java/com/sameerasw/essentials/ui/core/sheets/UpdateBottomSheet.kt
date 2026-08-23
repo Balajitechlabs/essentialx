@@ -72,6 +72,7 @@ fun UpdateBottomSheet(
     isChecking: Boolean,
     onDismissRequest: () -> Unit,
 ) {
+    @Suppress("DEPRECATION")
     val sheetState = rememberModalBottomSheetState()
     val context = LocalContext.current
     val view = LocalView.current
@@ -119,6 +120,26 @@ fun UpdateBottomSheet(
                     LoadingIndicator()
                 }
             } else {
+                val isActuallyAvailable =
+                    remember(updateInfo, context) {
+                        if (!updateInfo.isUpdateAvailable) return@remember false
+                        val currentAppVersion =
+                            com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                                context,
+                                context.packageName,
+                            ) ?: "0.0.0"
+                        if (updateInfo.versionName.isNotEmpty() &&
+                            (updateInfo.releaseUrl.contains("sameerasw/essentials") || updateInfo.releaseUrl.contains("essentials-update"))
+                        ) {
+                            com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(
+                                updateInfo.versionName,
+                                currentAppVersion,
+                            ) > 0
+                        } else {
+                            updateInfo.isUpdateAvailable
+                        }
+                    }
+
                 Column(
                     modifier =
                         Modifier
@@ -131,16 +152,16 @@ fun UpdateBottomSheet(
                     Icon(
                         painter =
                             painterResource(
-                                id = if (updateInfo.isUpdateAvailable) R.drawable.rounded_mobile_arrow_down_24 else R.drawable.rounded_mobile_check_24,
+                                id = if (isActuallyAvailable) R.drawable.rounded_mobile_arrow_down_24 else R.drawable.rounded_mobile_check_24,
                             ),
                         contentDescription = null,
                         modifier = Modifier.size(24.dp),
-                        tint = if (updateInfo.isUpdateAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
+                        tint = if (isActuallyAvailable) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                     )
 
                     Text(
                         text =
-                            if (updateInfo.isUpdateAvailable) {
+                            if (isActuallyAvailable) {
                                 stringResource(R.string.update_available_title)
                             } else {
                                 stringResource(
@@ -150,6 +171,28 @@ fun UpdateBottomSheet(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold,
                     )
+
+                    val currentAppVersion =
+                        remember(context) {
+                            com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                                context,
+                                context.packageName,
+                            ) ?: ""
+                        }
+
+                    if (isActuallyAvailable && currentAppVersion.isNotEmpty()) {
+                        Text(
+                            text = "v$currentAppVersion → ${updateInfo.versionName}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    } else if (updateInfo.versionName.isNotEmpty()) {
+                        Text(
+                            text = "Version ${updateInfo.versionName}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        )
+                    }
 
                     val isPreRelease =
                         remember(updateInfo.versionName) {
@@ -263,7 +306,7 @@ fun UpdateBottomSheet(
                         }
                     }
 
-                    if (updateInfo.isUpdateAvailable && updateInfo.downloadUrl.isNotEmpty()) {
+                    if (isActuallyAvailable && updateInfo.downloadUrl.isNotEmpty()) {
                         if (isDownloading) {
                             Column(
                                 modifier = Modifier.fillMaxWidth(),

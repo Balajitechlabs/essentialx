@@ -355,8 +355,16 @@ object AppUtil {
         v1: String,
         v2: String,
     ): Int {
-        val cleanV1 = v1.replace(Regex("[^0-9.]"), "").split(".")
-        val cleanV2 = v2.replace(Regex("[^0-9.]"), "").split(".")
+        val s1 = v1.trim()
+        val s2 = v2.trim()
+        if (s1.equals(s2, ignoreCase = true)) return 0
+
+        val cleanV1 = s1.replace(Regex("[^0-9.]"), "").trim('.').split(".").filter { it.isNotEmpty() }
+        val cleanV2 = s2.replace(Regex("[^0-9.]"), "").trim('.').split(".").filter { it.isNotEmpty() }
+
+        if (cleanV1.isEmpty() && cleanV2.isEmpty()) return 0
+        if (cleanV1.isEmpty()) return -1
+        if (cleanV2.isEmpty()) return 1
 
         val length = maxOf(cleanV1.size, cleanV2.size)
 
