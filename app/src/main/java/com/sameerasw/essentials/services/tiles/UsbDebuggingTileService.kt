@@ -17,6 +17,8 @@ import com.sameerasw.essentials.FeatureSettingsActivity
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.utils.PermissionUtils
 import com.sameerasw.essentials.utils.ShizukuUtils.toggleShizuku
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class UsbDebuggingTileService : BaseTileService() {
     override fun onClick() {
@@ -114,13 +116,18 @@ class UsbDebuggingTileService : BaseTileService() {
 
     private fun setUsbDebuggingEnabled(enabled: Boolean) {
         try {
-            if(!enabled) toggleShizuku(this, false)
+            if (!enabled) toggleShizuku(this, false)
             Settings.Global.putInt(
                 contentResolver,
                 Settings.Global.ADB_ENABLED,
-                if (enabled) 1 else 0
+                if (enabled) 1 else 0,
             )
-            if(enabled) toggleShizuku(this, true)
+            if (enabled) {
+                serviceScope.launch {
+                    kotlinx.coroutines.delay(1000)
+                    toggleShizuku(this@UsbDebuggingTileService, true)
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }

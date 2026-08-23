@@ -242,6 +242,11 @@
     <string name="tile_private_dns_auto">Auto</string>
     <string name="tile_private_dns_off">Off</string>
     <string name="tile_usb_debugging">Debugging</string>
+    <string name="usb">USB</string>
+    <string name="wifi">Wifi</string>
+    <string name="usb_and_wifi">USB &amp; Wifi</string>
+    <string name="usb_debugging_title_short">USB Adb</string>
+    <string name="wireless_debugging_title_short">Wifi Adb</string>
     <string name="tile_color_picker">Color Picker</string>
     <string name="toast_eyedropper_failed">Are you sure you\'re on Androdi 17? (╯°_°）╯</string>
     <string name="subtitle_eye_dropper">Eye Dropper</string>

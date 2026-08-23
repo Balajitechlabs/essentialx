@@ -865,7 +865,7 @@ class AppFlowHandler(
             // Wait a bit and Restart Shizuku as ADB might have been toggled back on
             if (wasShutUpConfig != null && wasShutUpConfig.disableWirelessDebugging && repository.isShutUpAttemptShizukuRestartEnabled()) {
                 delay(1000.milliseconds)
-                toggleShizuku(context, false)
+                toggleShizuku(context, true)
             }
 
             android.widget.Toast

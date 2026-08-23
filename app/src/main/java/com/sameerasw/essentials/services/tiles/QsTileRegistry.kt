@@ -137,7 +137,6 @@ object QsTileRegistry {
                 LockdownTileService::class.java,
             ),
             QsTileEntry(
-                R.string.tile_url_shortener,
                 R.drawable.rounded_link_24,
                 UrlShortenerTileService::class.java,
             ),
