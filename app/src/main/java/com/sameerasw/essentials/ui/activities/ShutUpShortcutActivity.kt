@@ -31,10 +31,12 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.model.ShutUpAppConfig
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.utils.PermissionUtils
+import com.sameerasw.essentials.utils.ShizukuUtils.toggleShizuku
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.Duration.Companion.milliseconds
 
 class ShutUpShortcutActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -81,7 +83,7 @@ class ShutUpShortcutActivity : ComponentActivity() {
                     this@ShutUpShortcutActivity,
                     packageName,
                 )
-                delay(200) // Small extra delay for system to register unfreeze
+                delay(200.milliseconds) // Small extra delay for system to register unfreeze
             }
 
             if (config != null && config.isEnabled) {
@@ -99,7 +101,7 @@ class ShutUpShortcutActivity : ComponentActivity() {
             }
 
             // Delay to ensure system registers the settings changes
-            delay(800)
+            delay(800.milliseconds)
 
             launchApp(packageName)
             finish()
@@ -174,8 +176,7 @@ class ShutUpShortcutActivity : ComponentActivity() {
             }
 
             if (config.disableUsbDebugging || config.disableWirelessDebugging) {
-                com.sameerasw.essentials.utils.ShizukuUtils
-                    .stopShizuku(this@ShutUpShortcutActivity)
+                toggleShizuku(this@ShutUpShortcutActivity, false)
             }
 
             // Always explicitly disable USB debugging if requested, even if dev options were already disabled

@@ -193,7 +193,7 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
 
             RoundedCardContainer(spacing = 2.dp) {
                 IconToggleItem(
-                    iconRes = R.drawable.rounded_adb_24,
+                    iconRes = R.drawable.usb_debugging_24,
                     title = stringResource(R.string.usb_debugging_title),
                     description = stringResource(R.string.usb_debugging_desc),
                     isChecked = isUsbEnabled,
@@ -205,7 +205,7 @@ fun DebuggingSettingsOverlay(onDismiss: () -> Unit) {
                 )
 
                 IconToggleItem(
-                    iconRes = R.drawable.rounded_android_wifi_4_bar_plus_24,
+                    iconRes = R.drawable.wireless_debugging_24,
                     title = stringResource(R.string.wireless_debugging_title),
                     description = stringResource(R.string.wireless_debugging_desc),
                     isChecked = isWifiEnabled,

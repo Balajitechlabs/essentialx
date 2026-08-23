@@ -152,6 +152,7 @@ class QSPreferencesActivity : ComponentActivity() {
                     "com.sameerasw.essentials.services.tiles.ChargeQuickTileService" -> "Battery notification"
                     "com.sameerasw.essentials.services.tiles.AlwaysOnDisplayTileService" -> "Always on Display"
                     "com.sameerasw.essentials.services.tiles.LocationReachedTileService" -> "Location reached"
+                    "com.sameerasw.essentials.services.tiles.UrlShortenerTileService" -> "URL Shortener"
                     else -> null
                 }
 

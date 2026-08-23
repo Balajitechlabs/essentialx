@@ -85,6 +85,7 @@ import com.sameerasw.essentials.services.tiles.SoundModeTileService
 import com.sameerasw.essentials.services.tiles.StayAwakeTileService
 import com.sameerasw.essentials.services.tiles.TapToWakeTileService
 import com.sameerasw.essentials.services.tiles.UiBlurTileService
+import com.sameerasw.essentials.services.tiles.UrlShortenerTileService
 import com.sameerasw.essentials.services.tiles.UsbDebuggingTileService
 import com.sameerasw.essentials.ui.core.sheets.PermissionsBottomSheet
 import com.sameerasw.essentials.ui.modifiers.highlight
@@ -404,6 +405,14 @@ fun QuickSettingsTilesSettingsUI(
                 R.string.feat_essentials_on_display_desc,
                 R.string.cat_visuals,
             ),
+            QSTileInfo(
+                R.string.tile_url_shortener,
+                R.drawable.rounded_link_24,
+                UrlShortenerTileService::class.java,
+                emptyList(),
+                R.string.tile_url_shortener_subtitle,
+                R.string.cat_utils,
+            ),
         )
 
     val tiles = allTiles.filter { tile -> tile.isSupported(context) || includeUnsupportedFeatures }
@@ -585,12 +594,23 @@ fun QuickSettingsTilesSettingsUI(
                                             context.mainExecutor,
                                         ) { result ->
                                             if (result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ALREADY_ADDED) {
+                                                context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                                                    .edit()
+                                                    .putBoolean("${tile.serviceClass.name}_is_added", true)
+                                                    .apply()
+                                                viewModel.addedQSTiles.value = viewModel.addedQSTiles.value + tile.serviceClass.name
                                                 Toast
                                                     .makeText(
                                                         context,
                                                         resources.getString(R.string.qs_tile_already_added),
                                                         Toast.LENGTH_SHORT,
                                                     ).show()
+                                            } else if (result == StatusBarManager.TILE_ADD_REQUEST_RESULT_TILE_ADDED) {
+                                                context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+                                                    .edit()
+                                                    .putBoolean("${tile.serviceClass.name}_is_added", true)
+                                                    .apply()
+                                                viewModel.addedQSTiles.value = viewModel.addedQSTiles.value + tile.serviceClass.name
                                             }
                                         }
                                     } else {
