@@ -161,6 +161,11 @@ object QsTileRegistry {
                 R.drawable.rounded_live_tv_24,
                 EssentialsOnDisplayTileService::class.java,
             ),
+            QsTileEntry(
+                R.string.tile_url_shortener,
+                R.drawable.rounded_link_24,
+                UrlShortenerTileService::class.java,
+            ),
         )
 
     private val tilesMapByClassName: Map<String, QsTileEntry> by lazy {
