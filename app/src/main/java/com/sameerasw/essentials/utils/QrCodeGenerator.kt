@@ -60,16 +60,7 @@ object QrCodeGenerator {
             style = Paint.Style.FILL
         }
 
-        val cornerRadius = moduleSize * 0.35f
         val rect = RectF()
-
-        // Helper to identify finder pattern regions (top-left, top-right, bottom-left 7x7 eyes)
-        fun isFinderPattern(x: Int, y: Int): Boolean {
-            if (x in 0..6 && y in 0..6) return true
-            if (x in (moduleCount - 7) until moduleCount && y in 0..6) return true
-            if (x in 0..6 && y in (moduleCount - 7) until moduleCount) return true
-            return false
-        }
 
         for (y in 0 until moduleCount) {
             for (x in 0 until moduleCount) {
@@ -79,14 +70,7 @@ object QrCodeGenerator {
                     val right = left + moduleSize
                     val bottom = top + moduleSize
                     rect.set(left, top, right, bottom)
-
-                    if (isFinderPattern(x, y)) {
-                        // Sharp precision finder modules for instant scanner edge detection
-                        canvas.drawRoundRect(rect, moduleSize * 0.15f, moduleSize * 0.15f, paint)
-                    } else {
-                        // Unique Material 3 rounded modules
-                        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, paint)
-                    }
+                    canvas.drawRect(rect, paint)
                 }
             }
         }
@@ -106,11 +90,10 @@ object QrCodeGenerator {
                 style = Paint.Style.STROKE
                 strokeWidth = 3f
             }
-            val badgeRadius = logoSize * 0.26f
-            canvas.drawRoundRect(badgeRect, badgeRadius, badgeRadius, badgeBgPaint)
-            canvas.drawRoundRect(badgeRect, badgeRadius, badgeRadius, badgeStrokePaint)
+            canvas.drawOval(badgeRect, badgeBgPaint)
+            canvas.drawOval(badgeRect, badgeStrokePaint)
 
-            val innerPadding = logoSize * 0.12f
+            val innerPadding = logoSize * 0.14f
             val innerRect = RectF(
                 badgeRect.left + innerPadding,
                 badgeRect.top + innerPadding,

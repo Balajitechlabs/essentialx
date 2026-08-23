@@ -46,6 +46,8 @@
     <string name="qr_code_title">QR Code</string>
     <string name="qr_code_desc">Scan to open on PC, Mac, or tablet</string>
     <string name="qr_share_image">Share QR Image</string>
+    <string name="qr_copy_image">Copy QR Image</string>
+    <string name="qr_copied_success">QR image copied to clipboard</string>
     <string name="qr_save_image">Save Image</string>
     <string name="qr_saved_success">QR image saved to Pictures</string>
     <string name="shorten_url_title">Shorten Link</string>

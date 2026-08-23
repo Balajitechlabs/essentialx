@@ -32,6 +32,8 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -43,8 +45,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
@@ -64,6 +68,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -73,6 +78,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -1157,12 +1163,15 @@ fun FloatingWithContent(
     // QR Code Bottom Sheet
     if (showQrSheet) {
         val appLogo = remember { QrCodeGenerator.getAppLogoBitmap(context) }
-        val qrBitmap = remember(qrContentUri, appLogo) {
+        val qrForegroundColor = MaterialTheme.colorScheme.onSurface.toArgb()
+        val qrBackgroundColor = MaterialTheme.colorScheme.surfaceBright.toArgb()
+
+        val qrBitmap = remember(qrContentUri, appLogo, qrForegroundColor, qrBackgroundColor) {
             QrCodeGenerator.generateQrBitmap(
                 content = qrContentUri,
-                size = 600,
-                foregroundColor = android.graphics.Color.BLACK,
-                backgroundColor = android.graphics.Color.WHITE,
+                size = 800,
+                foregroundColor = qrForegroundColor,
+                backgroundColor = qrBackgroundColor,
                 logo = appLogo,
             )
         }
@@ -1177,119 +1186,127 @@ fun FloatingWithContent(
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
-                Text(
-                    text = stringResource(R.string.qr_code_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-
+                // Host / URI Subtitle
                 Text(
                     text = Uri.parse(qrContentUri).host ?: qrContentUri,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
                 )
 
-                // High-Contrast Rounded QR Code Display with Center App Logo
+                // High-Contrast Rounded QR Code Display with Material 3 Expressive Container (Full Width Fit)
                 Surface(
-                    modifier = Modifier.size(240.dp),
-                    shape = RoundedCornerShape(24.dp),
-                    color = Color.White,
-                    tonalElevation = 6.dp,
-                    shadowElevation = 8.dp,
+                    modifier =
+                        Modifier
+                            .fillMaxWidth(0.94f)
+                            .aspectRatio(1f),
+                    shape = RoundedCornerShape(28.dp),
+                    color = MaterialTheme.colorScheme.surfaceBright,
                 ) {
                     Box(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(18.dp),
                         contentAlignment = Alignment.Center,
                     ) {
                         Image(
                             bitmap = qrBitmap.asImageBitmap(),
-                            contentDescription = "QR Code",
-                            modifier = Modifier.size(208.dp),
+                            contentDescription = stringResource(R.string.qr_code_title),
+                            modifier = Modifier.fillMaxSize(),
                         )
                     }
                 }
 
-                // Primary Action Button: Share QR Image (PNG)
-                ElevatedButton(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        try {
-                            val qrUri = QrCodeGenerator.getShareableQrUri(context, qrBitmap)
-                            if (qrUri != null) {
-                                val sendIntent = Intent().apply {
-                                    action = Intent.ACTION_SEND
-                                    putExtra(Intent.EXTRA_STREAM, qrUri)
-                                    putExtra(Intent.EXTRA_TEXT, qrContentUri)
-                                    type = "image/png"
-                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                }
-                                val chooser = Intent.createChooser(sendIntent, "Share QR Code").apply {
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                }
-                                context.startActivity(chooser)
-                            } else {
-                                val sendIntent = Intent().apply {
-                                    action = Intent.ACTION_SEND
-                                    putExtra(Intent.EXTRA_TEXT, qrContentUri)
-                                    type = "text/plain"
-                                }
-                                context.startActivity(Intent.createChooser(sendIntent, null))
-                            }
-                        } catch (_: Exception) {
-                            Toast.makeText(context, context.getString(R.string.error_share_qr_image), Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
-                    ),
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.rounded_share_24),
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.qr_share_image),
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-
-                // Secondary Action Buttons: Copy Link & Save QR Image
+                // Split Connected Action Buttons Row (Share, Copy, Download) with Primary Styling
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth(0.94f)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(MaterialTheme.colorScheme.surfaceBright)
+                            .padding(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                 ) {
-                    FilledTonalButton(
+                    // 1. Share QR Image (with Link Caption)
+                    FilledIconButton(
                         onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             try {
-                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                val clip = ClipData.newPlainText("URL", qrContentUri)
-                                clipboard.setPrimaryClip(clip)
-                                Toast.makeText(context, context.getString(R.string.action_copy_clipboard), Toast.LENGTH_SHORT).show()
+                                val qrUri = QrCodeGenerator.getShareableQrUri(context, qrBitmap)
+                                if (qrUri != null) {
+                                    val sendIntent = Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        putExtra(Intent.EXTRA_STREAM, qrUri)
+                                        putExtra(Intent.EXTRA_TEXT, qrContentUri)
+                                        type = "image/png"
+                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                    }
+                                    val chooser = Intent.createChooser(sendIntent, context.getString(R.string.qr_share_image)).apply {
+                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                    }
+                                    context.startActivity(chooser)
+                                } else {
+                                    val sendIntent = Intent().apply {
+                                        action = Intent.ACTION_SEND
+                                        putExtra(Intent.EXTRA_TEXT, qrContentUri)
+                                        type = "text/plain"
+                                    }
+                                    context.startActivity(Intent.createChooser(sendIntent, null))
+                                }
+                            } catch (_: Exception) {
+                                Toast.makeText(context, context.getString(R.string.error_share_qr_image), Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = ButtonGroupDefaults.connectedLeadingButtonShapes().shape,
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_share_24),
+                            contentDescription = stringResource(R.string.qr_share_image),
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+
+                    // 2. Copy QR Image
+                    FilledIconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            try {
+                                val qrUri = QrCodeGenerator.getShareableQrUri(context, qrBitmap)
+                                if (qrUri != null) {
+                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    val clip = ClipData.newUri(context.contentResolver, "QR Code Image", qrUri)
+                                    clipboard.setPrimaryClip(clip)
+                                    Toast.makeText(context, context.getString(R.string.qr_copied_success), Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
+                                }
                             } catch (_: Exception) {
                                 Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
                             }
                         },
-                        modifier = Modifier.weight(1f).height(44.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                     ) {
-                        Text(
-                            text = stringResource(R.string.shorten_copy_link),
-                            style = MaterialTheme.typography.labelMedium,
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_content_copy_24),
+                            contentDescription = stringResource(R.string.qr_copy_image),
+                            modifier = Modifier.size(20.dp),
                         )
                     }
 
-                    FilledTonalButton(
+                    // 3. Save QR Image
+                    FilledIconButton(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                             val success = QrCodeGenerator.saveQrImage(context, qrBitmap)
@@ -1299,21 +1316,21 @@ fun FloatingWithContent(
                                 Toast.makeText(context, context.getString(R.string.error_save_qr_image), Toast.LENGTH_SHORT).show()
                             }
                         },
-                        modifier = Modifier.weight(1f).height(44.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.weight(1f).height(48.dp),
+                        shape = ButtonGroupDefaults.connectedTrailingButtonShapes().shape,
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                        ),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_download_24),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = stringResource(R.string.qr_save_image),
-                            style = MaterialTheme.typography.labelMedium,
+                            contentDescription = stringResource(R.string.qr_save_image),
+                            modifier = Modifier.size(20.dp),
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
