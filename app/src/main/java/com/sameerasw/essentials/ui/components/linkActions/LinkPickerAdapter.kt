@@ -186,20 +186,26 @@ fun LinkPickerScreen(
 
     LaunchedEffect(currentUri) {
         isLoadingApps = true
+        previewImageUrl = null
+
         withContext(Dispatchers.IO) {
-            val previewDeferred = async { fetchPreviewImageUrl(currentUri) }
+            // Load apps immediately so UI is ready without waiting for web scraping
             val openDeferred = async { queryOpenWithApps(context, currentUri) }
             val shareDeferred = async { queryShareWithApps(context, currentUri) }
 
-            val preview = previewDeferred.await()
             val open = openDeferred.await()
             val share = shareDeferred.await()
 
             withContext(Dispatchers.Main) {
-                previewImageUrl = preview
                 baseOpenWithApps = open
                 baseShareWithApps = share
                 isLoadingApps = false
+            }
+
+            // Fetch preview image asynchronously and smoothly update when ready
+            val preview = fetchPreviewImageUrl(currentUri)
+            withContext(Dispatchers.Main) {
+                previewImageUrl = preview
             }
         }
     }
@@ -291,59 +297,49 @@ fun LinkPickerScreen(
 
         val animatedAlpha by animateFloatAsState(
             targetValue = if (previewImageUrl != null) 1f else 0f,
-            animationSpec = tween(durationMillis = 650),
+            animationSpec = tween(durationMillis = 800),
             label = "PreviewAlpha",
         )
 
-        Crossfade(
-            targetState = previewImageUrl,
-            animationSpec = tween(durationMillis = 600),
-            label = "LinkPreviewCrossfade",
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .height(topAreaHeight)
-                    .align(Alignment.TopCenter),
-        ) { url ->
-            if (url != null) {
-                val topBlurHeightPx = with(density) { (statusBarTop * 1.5f + 48.dp).toPx() }
-                val bottomBlurHeightPx = with(density) { 120.dp.toPx() }
+        // Background layer: Preview image with progressive blur that fades in seamlessly without jumping scrim
+        if (previewImageUrl != null || animatedAlpha > 0f) {
+            val topBlurHeightPx = with(density) { (statusBarTop * 1.5f + 48.dp).toPx() }
+            val bottomBlurHeightPx = with(density) { 120.dp.toPx() }
 
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .alpha(animatedAlpha)
-                            .progressiveBlur(
-                                blurRadius = 40f,
-                                height = topBlurHeightPx,
-                                direction = BlurDirection.TOP,
-                                showGradientOverlay = true,
-                            ).progressiveBlur(
-                                blurRadius = 40f,
-                                height = bottomBlurHeightPx,
-                                direction = BlurDirection.BOTTOM,
-                                showGradientOverlay = true,
-                            ),
-                ) {
-                    AsyncImage(
-                        model =
-                            ImageRequest.Builder(context)
-                                .data(url)
-                                .crossfade(true)
-                                .build(),
-                        contentDescription = "Link Preview",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(topAreaHeight)
+                        .align(Alignment.TopCenter)
+                        .alpha(animatedAlpha)
+                        .progressiveBlur(
+                            blurRadius = 40f,
+                            height = topBlurHeightPx,
+                            direction = BlurDirection.TOP,
+                            showGradientOverlay = true,
+                        ).progressiveBlur(
+                            blurRadius = 40f,
+                            height = bottomBlurHeightPx,
+                            direction = BlurDirection.BOTTOM,
+                            showGradientOverlay = true,
+                        ),
+            ) {
+                AsyncImage(
+                    model =
+                        ImageRequest.Builder(context)
+                            .data(previewImageUrl)
+                            .crossfade(true)
+                            .build(),
+                    contentDescription = "Link Preview",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                )
             }
         }
 
         val dynamicScrimColor =
-            if (previewImageUrl != null) {
-                Color.Transparent
-            } else if (isDarkTheme) {
+            if (isDarkTheme) {
                 BottomSheetDefaults.ScrimColor
             } else {
                 MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f)
@@ -868,25 +864,44 @@ private fun fetchPreviewImageUrl(uri: Uri): String? {
     val urlString = uri.toString()
     val lower = urlString.lowercase(Locale.getDefault())
 
-    // Direct image extensions
+    // 1. Direct image links
     if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") ||
-        lower.endsWith(".webp") || lower.endsWith(".gif") || lower.endsWith(".svg")
+        lower.endsWith(".webp") || lower.endsWith(".gif") || lower.endsWith(".svg") ||
+        lower.endsWith(".bmp") || lower.endsWith(".ico")
     ) {
         return urlString
     }
 
     if (uri.scheme != "http" && uri.scheme != "https") return null
 
+    val host = uri.host?.lowercase(Locale.getDefault()) ?: ""
+
+    // 2. Fast service-specific thumbnail extraction (YouTube, etc.)
+    if (host.contains("youtube.com") || host.contains("youtu.be")) {
+        val videoId =
+            if (host.contains("youtu.be")) {
+                uri.lastPathSegment
+            } else {
+                uri.getQueryParameter("v") ?: if (uri.pathSegments.contains("shorts") || uri.pathSegments.contains("live") || uri.pathSegments.contains("embed")) {
+                    uri.lastPathSegment
+                } else null
+            }
+        if (!videoId.isNullOrBlank()) {
+            return "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
+        }
+    }
+
     return try {
         val url = URL(urlString)
         val connection = (url.openConnection() as HttpURLConnection).apply {
-            connectTimeout = 3000
-            readTimeout = 3000
+            connectTimeout = 4000
+            readTimeout = 4000
             instanceFollowRedirects = true
             setRequestProperty(
                 "User-Agent",
-                "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
+                "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
             )
+            setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/*,*/*;q=0.8")
         }
 
         val contentType = connection.contentType ?: ""
@@ -898,7 +913,7 @@ private fun fetchPreviewImageUrl(uri: Uri): String? {
         val sb = StringBuilder()
         var line: String?
         var lineCount = 0
-        while (reader.readLine().also { line = it } != null && lineCount < 200) {
+        while (reader.readLine().also { line = it } != null && lineCount < 300) {
             sb.append(line).append("\n")
             lineCount++
             if (line?.contains("</head>", ignoreCase = true) == true) break
@@ -906,22 +921,45 @@ private fun fetchPreviewImageUrl(uri: Uri): String? {
         reader.close()
         val html = sb.toString()
 
-        // Match og:image or twitter:image
-        val ogRegex = Regex("""<meta[^>]+(?:property|name)=["'](?:og:image|twitter:image)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+        // 3. OpenGraph / Twitter Card / Schema image
+        val ogRegex = Regex("""<meta[^>]+(?:property|name|itemprop)=["'](?:og:image|og:image:secure_url|twitter:image|twitter:image:src|image)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
         val ogMatch = ogRegex.find(html)?.groupValues?.get(1)
         if (!ogMatch.isNullOrBlank()) {
             return resolveRelativeUrl(urlString, ogMatch)
         }
 
-        val ogRegexReversed = Regex("""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:image|twitter:image)["']""", RegexOption.IGNORE_CASE)
+        val ogRegexReversed = Regex("""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name|itemprop)=["'](?:og:image|og:image:secure_url|twitter:image|twitter:image:src|image)["']""", RegexOption.IGNORE_CASE)
         val ogMatchReversed = ogRegexReversed.find(html)?.groupValues?.get(1)
         if (!ogMatchReversed.isNullOrBlank()) {
             return resolveRelativeUrl(urlString, ogMatchReversed)
         }
 
-        null
+        // 4. Apple Touch Icon / Large icon from HTML
+        val touchIconRegex = Regex("""<link[^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["'][^>]+href=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+        val touchIconMatch = touchIconRegex.find(html)?.groupValues?.get(1)
+        if (!touchIconMatch.isNullOrBlank()) {
+            return resolveRelativeUrl(urlString, touchIconMatch)
+        }
+
+        val touchIconReversed = Regex("""<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["']""", RegexOption.IGNORE_CASE)
+        val touchIconReversedMatch = touchIconReversed.find(html)?.groupValues?.get(1)
+        if (!touchIconReversedMatch.isNullOrBlank()) {
+            return resolveRelativeUrl(urlString, touchIconReversedMatch)
+        }
+
+        // 5. Fallback for any website: High-resolution domain icon via Google favicon service (128px)
+        if (host.isNotBlank()) {
+            "https://www.google.com/s2/favicons?domain=$host&sz=128"
+        } else {
+            null
+        }
     } catch (_: Exception) {
-        null
+        // Fallback on network/parse failure to domain icon
+        if (host.isNotBlank()) {
+            "https://www.google.com/s2/favicons?domain=$host&sz=128"
+        } else {
+            null
+        }
     }
 }
 
