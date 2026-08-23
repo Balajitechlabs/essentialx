@@ -1331,6 +1331,7 @@ class SettingsRepository(
     ): Boolean {
         return try {
             val json = inputStream.bufferedReader().use { it.readText() }
+            @Suppress("UNCHECKED_CAST")
             val allConfigs: Map<String, Map<String, Map<String, Any>>> =
                 gson.fromJson(json, Map::class.java) as Map<String, Map<String, Map<String, Any>>>
 

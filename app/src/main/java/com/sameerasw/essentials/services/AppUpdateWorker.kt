@@ -13,63 +13,150 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.sameerasw.essentials.data.repository.GitHubRepository
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.data.repository.UpdateRepository
+import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.UpdateNotificationHelper
+
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 class AppUpdateWorker(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): Result = coroutineScope {
         Log.d("AppUpdateWorker", "Executing periodic update check")
         val context = applicationContext
         val settingsRepository = SettingsRepository(context)
         val updateRepository = UpdateRepository()
+        val gitHubRepository = GitHubRepository()
 
-        return try {
+        try {
             val isAutoUpdateEnabled =
                 settingsRepository.getBoolean(
                     SettingsRepository.KEY_AUTO_UPDATE_ENABLED,
                     true,
                 )
-            if (!isAutoUpdateEnabled) {
-                return Result.success()
+
+            // 1. Essentials App Update Check
+            if (isAutoUpdateEnabled) {
+                val currentVersion =
+                    try {
+                        context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                    } catch (e: Exception) {
+                        "0.0"
+                    } ?: "0.0"
+
+                val isPreReleaseEnabled =
+                    settingsRepository.getBoolean(
+                        SettingsRepository.KEY_CHECK_PRE_RELEASES_ENABLED,
+                        false,
+                    )
+
+                val updateInfo =
+                    updateRepository.checkForUpdates(context, isPreReleaseEnabled, currentVersion)
+
+                if (updateInfo != null && updateInfo.isUpdateAvailable) {
+                    com.sameerasw.essentials.viewmodels.MainViewModel.cachedIsUpdateAvailable = true
+                    com.sameerasw.essentials.viewmodels.MainViewModel.cachedUpdateInfo = updateInfo
+
+                    if (updateInfo.downloadUrl.isNotEmpty()) {
+                        val isNotifEnabled =
+                            settingsRepository.getBoolean(
+                                SettingsRepository.KEY_UPDATE_NOTIFICATION_ENABLED,
+                                true,
+                            )
+                        if (isNotifEnabled) {
+                            UpdateNotificationHelper.showUpdateNotification(
+                                context,
+                                updateInfo.versionName,
+                                updateInfo.downloadUrl,
+                            )
+                        }
+                    }
+                }
             }
 
-            val currentVersion =
-                try {
-                    context.packageManager.getPackageInfo(context.packageName, 0).versionName
-                } catch (e: Exception) {
-                    "0.0"
-                } ?: "0.0"
+            // 2. Tracked GitHub Repositories Update Check in Parallel
+            val trackedRepos = settingsRepository.getTrackedRepos()
+            if (trackedRepos.isNotEmpty()) {
+                val token = settingsRepository.getGitHubToken()
 
-            val isPreReleaseEnabled =
-                settingsRepository.getBoolean(
-                    SettingsRepository.KEY_CHECK_PRE_RELEASES_ENABLED,
-                    false,
-                )
+                val deferredResults = trackedRepos.map { repo ->
+                    async {
+                        try {
+                            val fetchResult =
+                                if (repo.allowPreReleases) {
+                                    gitHubRepository.getReleasesWithETag(repo.owner, repo.name, token, repo.lastETag)
+                                } else {
+                                    gitHubRepository.getLatestReleaseWithETag(repo.owner, repo.name, token, repo.lastETag)
+                                }
 
-            val updateInfo =
-                updateRepository.checkForUpdates(context, isPreReleaseEnabled, currentVersion)
+                            if (fetchResult.isNotModified) {
+                                // 304 Not Modified - zero bandwidth consumed!
+                                repo
+                            } else {
+                                val release = fetchResult.release
+                                if (release != null) {
+                                    var isUpdateAvailable = false
+                                    if (repo.mappedPackageName != null) {
+                                        val installedVersion =
+                                            AppUtil.getAppVersion(context, repo.mappedPackageName)
+                                        if (installedVersion != null) {
+                                            isUpdateAvailable =
+                                                AppUtil.compareSemanticVersions(
+                                                    release.tagName,
+                                                    installedVersion,
+                                                ) > 0
+                                        }
+                                    }
 
-            if (updateInfo != null && updateInfo.isUpdateAvailable) {
-                com.sameerasw.essentials.viewmodels.MainViewModel.cachedIsUpdateAvailable = true
-                com.sameerasw.essentials.viewmodels.MainViewModel.cachedUpdateInfo = updateInfo
+                                    val downloadUrl =
+                                        release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
+                                            ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl
+                                            ?: ""
 
-                if (updateInfo.downloadUrl.isNotEmpty()) {
-                    val isNotifEnabled =
-                        settingsRepository.getBoolean(
-                            SettingsRepository.KEY_UPDATE_NOTIFICATION_ENABLED,
-                            true,
-                        )
-                    if (isNotifEnabled) {
-                        UpdateNotificationHelper.showUpdateNotification(
-                            context,
-                            updateInfo.versionName,
-                            updateInfo.downloadUrl,
-                        )
+                                    val hasNewRelease = repo.latestTagName.isNotBlank() && repo.latestTagName != release.tagName
+
+                                    if ((isUpdateAvailable || hasNewRelease) && repo.notificationsEnabled) {
+                                        val appName = repo.mappedAppName ?: repo.name
+                                        UpdateNotificationHelper.showTrackedRepoUpdateNotification(
+                                            context = context,
+                                            repoName = appName,
+                                            repoFullName = repo.fullName,
+                                            version = release.tagName,
+                                            downloadUrl = downloadUrl,
+                                            releaseNotes = release.body,
+                                        )
+                                    }
+
+                                    repo.copy(
+                                        latestTagName = release.tagName,
+                                        latestReleaseName = release.name,
+                                        latestReleaseBody = release.body,
+                                        latestReleaseUrl = release.htmlUrl,
+                                        downloadUrl = downloadUrl,
+                                        publishedAt = release.publishedAt,
+                                        isUpdateAvailable = isUpdateAvailable,
+                                        lastETag = fetchResult.etag ?: repo.lastETag,
+                                    )
+                                } else {
+                                    repo
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("AppUpdateWorker", "Error checking update for repo ${repo.fullName}", e)
+                            repo
+                        }
                     }
+                }
+
+                val updatedRepos = deferredResults.awaitAll()
+                if (updatedRepos != trackedRepos) {
+                    settingsRepository.saveTrackedRepos(updatedRepos)
                 }
             }
 

@@ -78,6 +78,7 @@ class UpdateRepository {
 
                 val releaseData = connection.inputStream.bufferedReader().readText()
 
+                @Suppress("UNCHECKED_CAST")
                 val release: Map<String, Any>? =
                     if (isPreReleaseCheckEnabled) {
                         val releases =

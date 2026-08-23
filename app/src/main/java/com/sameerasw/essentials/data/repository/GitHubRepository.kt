@@ -19,8 +19,17 @@ import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection
 import java.net.URL
 
+data class GitHubReleaseFetchResult(
+    val release: GitHubRelease? = null,
+    val releases: List<GitHubRelease> = emptyList(),
+    val isNotModified: Boolean = false,
+    val etag: String? = null,
+)
+
 class GitHubRepository {
     private val gson = Gson()
+    private val connectTimeoutMs = 10_000
+    private val readTimeoutMs = 15_000
 
     suspend fun getRepoInfo(
         owner: String,
@@ -30,7 +39,10 @@ class GitHubRepository {
         withContext(Dispatchers.IO) {
             try {
                 val url = URL("https://api.github.com/repos/$owner/$repo")
-                val connection = url.openConnection() as HttpURLConnection
+                val connection = (url.openConnection() as HttpURLConnection).apply {
+                    connectTimeout = connectTimeoutMs
+                    readTimeout = readTimeoutMs
+                }
                 if (token != null) {
                     connection.setRequestProperty("Authorization", "Bearer $token")
                 }
@@ -53,26 +65,42 @@ class GitHubRepository {
         owner: String,
         repo: String,
         token: String? = null,
-    ): GitHubRelease? =
+    ): GitHubRelease? = getLatestReleaseWithETag(owner, repo, token).release
+
+    suspend fun getLatestReleaseWithETag(
+        owner: String,
+        repo: String,
+        token: String? = null,
+        etag: String? = null,
+    ): GitHubReleaseFetchResult =
         withContext(Dispatchers.IO) {
             try {
                 val url = URL("https://api.github.com/repos/$owner/$repo/releases/latest")
-                val connection = url.openConnection() as HttpURLConnection
+                val connection = (url.openConnection() as HttpURLConnection).apply {
+                    connectTimeout = connectTimeoutMs
+                    readTimeout = readTimeoutMs
+                }
                 if (token != null) {
                     connection.setRequestProperty("Authorization", "Bearer $token")
                 }
-                if (connection.responseCode == 200) {
-                    val data = connection.inputStream.bufferedReader().readText()
-                    gson.fromJson(data, GitHubRelease::class.java)
-                } else if (connection.responseCode == 403 || connection.responseCode == 429) {
-                    throw Exception("RATE_LIMIT")
-                } else {
-                    null
+                if (!etag.isNullOrBlank()) {
+                    connection.setRequestProperty("If-None-Match", etag)
+                }
+                when (connection.responseCode) {
+                    304 -> GitHubReleaseFetchResult(isNotModified = true, etag = etag)
+                    200 -> {
+                        val newETag = connection.getHeaderField("ETag")
+                        val data = connection.inputStream.bufferedReader().readText()
+                        val release = gson.fromJson(data, GitHubRelease::class.java)
+                        GitHubReleaseFetchResult(release = release, etag = newETag)
+                    }
+                    403, 429 -> throw Exception("RATE_LIMIT")
+                    else -> GitHubReleaseFetchResult()
                 }
             } catch (e: Exception) {
                 if (e.message == "RATE_LIMIT") throw e
                 e.printStackTrace()
-                null
+                GitHubReleaseFetchResult()
             }
         }
 
@@ -80,26 +108,42 @@ class GitHubRepository {
         owner: String,
         repo: String,
         token: String? = null,
-    ): List<GitHubRelease> =
+    ): List<GitHubRelease> = getReleasesWithETag(owner, repo, token).releases
+
+    suspend fun getReleasesWithETag(
+        owner: String,
+        repo: String,
+        token: String? = null,
+        etag: String? = null,
+    ): GitHubReleaseFetchResult =
         withContext(Dispatchers.IO) {
             try {
                 val url = URL("https://api.github.com/repos/$owner/$repo/releases")
-                val connection = url.openConnection() as HttpURLConnection
+                val connection = (url.openConnection() as HttpURLConnection).apply {
+                    connectTimeout = connectTimeoutMs
+                    readTimeout = readTimeoutMs
+                }
                 if (token != null) {
                     connection.setRequestProperty("Authorization", "Bearer $token")
                 }
-                if (connection.responseCode == 200) {
-                    val data = connection.inputStream.bufferedReader().readText()
-                    gson.fromJson(data, Array<GitHubRelease>::class.java).toList()
-                } else if (connection.responseCode == 403 || connection.responseCode == 429) {
-                    throw Exception("RATE_LIMIT")
-                } else {
-                    emptyList()
+                if (!etag.isNullOrBlank()) {
+                    connection.setRequestProperty("If-None-Match", etag)
+                }
+                when (connection.responseCode) {
+                    304 -> GitHubReleaseFetchResult(isNotModified = true, etag = etag)
+                    200 -> {
+                        val newETag = connection.getHeaderField("ETag")
+                        val data = connection.inputStream.bufferedReader().readText()
+                        val releases = gson.fromJson(data, Array<GitHubRelease>::class.java).toList()
+                        GitHubReleaseFetchResult(release = releases.firstOrNull(), releases = releases, etag = newETag)
+                    }
+                    403, 429 -> throw Exception("RATE_LIMIT")
+                    else -> GitHubReleaseFetchResult()
                 }
             } catch (e: Exception) {
                 if (e.message == "RATE_LIMIT") throw e
                 e.printStackTrace()
-                emptyList()
+                GitHubReleaseFetchResult()
             }
         }
 

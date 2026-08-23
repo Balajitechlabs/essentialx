@@ -131,7 +131,6 @@ object CombinedActionExecutor {
 
                                     val effects = effectsBuilder.build()
 
-                                    "essentials_focus_mode"
                                     val existingRule =
                                         nm.automaticZenRules.values.find { it.name == "Essentials Focus" }
                                     val ruleKey =

@@ -27,27 +27,32 @@ class DownloadUpdateReceiver : BroadcastReceiver() {
             val downloadUrl = intent.getStringExtra("download_url") ?: return
             val version = intent.getStringExtra("version") ?: ""
 
+            val apkNameExtra = intent.getStringExtra("apk_name")
+            val notifId = intent.getIntExtra("notification_id", 1001)
+
             val pendingResult = goAsync()
             val helper = AutoUpdateManagerHelper(context)
             val cleanVersion = version.replace(Regex("[^a-zA-Z0-9]"), "_")
+            val targetApkName = apkNameExtra ?: "Essentials_$cleanVersion"
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     helper.downloadAndInstallApk(
                         apkUrl = downloadUrl,
-                        apkName = "Essentials_$cleanVersion",
+                        apkName = targetApkName,
                         onProgressUpdate = { progress ->
                             UpdateNotificationHelper.showDownloadProgressNotification(
-                                context,
-                                version,
-                                progress,
+                                context = context,
+                                version = version,
+                                progress = progress,
+                                notificationId = notifId,
                             )
                         },
                     )
                 } catch (e: Exception) {
                     e.printStackTrace()
                 } finally {
-                    UpdateNotificationHelper.cancelNotification(context)
+                    UpdateNotificationHelper.cancelNotification(context, notifId)
                     pendingResult.finish()
                 }
             }

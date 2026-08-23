@@ -9,6 +9,7 @@
 
 package com.sameerasw.essentials.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -96,10 +97,16 @@ class YourAndroidViewModel : ViewModel() {
 }
 
 class YourAndroidActivity : ComponentActivity() {
+    private val selectedRepoFromIntent = mutableStateOf<String?>(null)
+
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        intent?.getStringExtra("repo_full_name")?.let {
+            selectedRepoFromIntent.value = it
+        }
 
         val isDarkMode =
             (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
@@ -136,6 +143,13 @@ class YourAndroidActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 gitHubAuthViewModel.loadCachedUser(context)
                 updatesViewModel.loadTrackedRepos(context)
+            }
+
+            LaunchedEffect(selectedRepoFromIntent.value) {
+                selectedRepoFromIntent.value?.let { targetRepo ->
+                    repoToShowReleaseNotesFullName = targetRepo
+                    selectedRepoFromIntent.value = null
+                }
             }
 
             LaunchedEffect(gitHubToken) {
@@ -381,6 +395,14 @@ class YourAndroidActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        intent.getStringExtra("repo_full_name")?.let {
+            selectedRepoFromIntent.value = it
         }
     }
 

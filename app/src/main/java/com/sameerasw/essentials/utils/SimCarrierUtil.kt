@@ -76,7 +76,7 @@ object SimCarrierUtil {
 
             val currentCarrierName =
                 if (isOverridden) {
-                    bundle?.getString(CarrierConfigManager.KEY_CARRIER_NAME_STRING, defaultCarrierName)
+                    bundle.getString(CarrierConfigManager.KEY_CARRIER_NAME_STRING, defaultCarrierName)
                         ?: defaultCarrierName
                 } else {
                     defaultCarrierName

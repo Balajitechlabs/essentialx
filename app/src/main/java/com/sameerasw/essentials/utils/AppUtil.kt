@@ -346,4 +346,27 @@ object AppUtil {
 
         return false
     }
+
+    /**
+     * Compares two semantic version strings safely.
+     * Returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal.
+     */
+    fun compareSemanticVersions(
+        v1: String,
+        v2: String,
+    ): Int {
+        val cleanV1 = v1.replace(Regex("[^0-9.]"), "").split(".")
+        val cleanV2 = v2.replace(Regex("[^0-9.]"), "").split(".")
+
+        val length = maxOf(cleanV1.size, cleanV2.size)
+
+        for (i in 0 until length) {
+            val num1 = cleanV1.getOrNull(i)?.toIntOrNull() ?: 0
+            val num2 = cleanV2.getOrNull(i)?.toIntOrNull() ?: 0
+
+            if (num1 > num2) return 1
+            if (num1 < num2) return -1
+        }
+        return 0
+    }
 }

@@ -24,6 +24,16 @@ object UpdateNotificationHelper {
     private const val CHANNEL_ID = "app_updates"
     private const val NOTIFICATION_ID = 1001
 
+    fun hasNotificationPermission(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            return androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS,
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        }
+        return androidx.core.app.NotificationManagerCompat.from(context).areNotificationsEnabled()
+    }
+
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name = context.getString(R.string.update_channel_name)
@@ -44,6 +54,7 @@ object UpdateNotificationHelper {
         version: String,
         downloadUrl: String,
     ) {
+        if (!hasNotificationPermission(context)) return
         createNotificationChannel(context)
 
         val mainIntent =
@@ -94,13 +105,93 @@ object UpdateNotificationHelper {
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
 
+    private const val GROUP_REPO_UPDATES = "com.sameerasw.essentials.TRACKED_REPO_UPDATES"
+
+    fun showTrackedRepoUpdateNotification(
+        context: Context,
+        repoName: String,
+        repoFullName: String,
+        version: String,
+        downloadUrl: String,
+        releaseNotes: String? = null,
+    ) {
+        if (!hasNotificationPermission(context)) return
+        createNotificationChannel(context)
+
+        val notifId = (repoFullName.hashCode() and 0x7FFFFFFF)
+        val mainIntent =
+            Intent(context, com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                putExtra("repo_full_name", repoFullName)
+            }
+        val contentPendingIntent =
+            PendingIntent.getActivity(
+                context,
+                notifId,
+                mainIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+
+        val subtext = context.getString(R.string.notification_tracked_repo_update_subtext, version)
+        val builder =
+            NotificationCompat
+                .Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_stat_name)
+                .setContentTitle(context.getString(R.string.notification_tracked_repo_update_title, repoName))
+                .setContentText(subtext)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setContentIntent(contentPendingIntent)
+                .setAutoCancel(true)
+                .setGroup(GROUP_REPO_UPDATES)
+
+        if (!releaseNotes.isNullOrBlank()) {
+            val preview = releaseNotes.take(300).trim()
+            builder.setStyle(
+                NotificationCompat.BigTextStyle()
+                    .setBigContentTitle(context.getString(R.string.notification_tracked_repo_update_title, repoName))
+                    .setSummaryText(version)
+                    .bigText(preview),
+            )
+        }
+
+        if (downloadUrl.isNotEmpty()) {
+            val downloadIntent =
+                Intent(context, DownloadUpdateReceiver::class.java).apply {
+                    action = "com.sameerasw.essentials.ACTION_DOWNLOAD_UPDATE"
+                    putExtra("download_url", downloadUrl)
+                    putExtra("version", version)
+                    putExtra("apk_name", "${repoName}_$version")
+                    putExtra("notification_id", notifId)
+                }
+            val downloadPendingIntent =
+                PendingIntent.getBroadcast(
+                    context,
+                    notifId + 1,
+                    downloadIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                )
+            builder.addAction(
+                R.drawable.rounded_mobile_arrow_down_24,
+                context.getString(R.string.action_download),
+                downloadPendingIntent,
+            )
+        }
+
+        val notificationManager: NotificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(notifId, builder.build())
+    }
+
     fun showDownloadProgressNotification(
         context: Context,
         version: String,
         progress: Int,
+        notificationId: Int = NOTIFICATION_ID,
+        title: String = context.getString(R.string.notification_update_available),
     ) {
         if (progress >= 100) {
-            cancelNotification(context)
+            cancelNotification(context, notificationId)
             return
         }
         createNotificationChannel(context)
@@ -112,7 +203,7 @@ object UpdateNotificationHelper {
         val contentPendingIntent =
             PendingIntent.getActivity(
                 context,
-                0,
+                notificationId,
                 mainIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
@@ -121,7 +212,7 @@ object UpdateNotificationHelper {
             NotificationCompat
                 .Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_name)
-                .setContentTitle(context.getString(R.string.notification_update_available))
+                .setContentTitle(title)
                 .setContentText(context.getString(R.string.downloading_update_progress, progress))
                 .setProgress(100, progress, false)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -131,12 +222,15 @@ object UpdateNotificationHelper {
 
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, builder.build())
+        notificationManager.notify(notificationId, builder.build())
     }
 
-    fun cancelNotification(context: Context) {
+    fun cancelNotification(
+        context: Context,
+        notificationId: Int = NOTIFICATION_ID,
+    ) {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(NOTIFICATION_ID)
+        notificationManager.cancel(notificationId)
     }
 }

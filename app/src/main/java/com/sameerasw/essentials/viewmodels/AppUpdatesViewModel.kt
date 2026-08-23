@@ -28,6 +28,7 @@ import com.sameerasw.essentials.domain.model.github.GitHubOwner
 import com.sameerasw.essentials.domain.model.github.GitHubRelease
 import com.sameerasw.essentials.domain.model.github.GitHubRepo
 import com.sameerasw.essentials.utils.AppUtil
+import com.sameerasw.essentials.utils.UpdateNotificationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -223,6 +224,18 @@ class AppUpdatesViewModel : ViewModel() {
         val release = _latestRelease.value ?: return
         val app = _selectedApp.value
 
+        var isUpdateAvailable = false
+        if (app?.packageName != null) {
+            val installedVersion = AppUtil.getAppVersion(context, app.packageName)
+            if (installedVersion != null) {
+                isUpdateAvailable = AppUtil.compareSemanticVersions(release.tagName, installedVersion) > 0
+            }
+        }
+
+        val downloadUrl =
+            release.assets.find { it.name == selectedApk }?.downloadUrl
+                ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl
+
         val trackedRepo =
             TrackedRepo(
                 owner = repo.owner.login,
@@ -235,18 +248,28 @@ class AppUpdatesViewModel : ViewModel() {
                 latestReleaseName = release.name,
                 latestReleaseBody = release.body,
                 latestReleaseUrl = release.htmlUrl,
-                downloadUrl =
-                    release.assets.find { it.name == selectedApk }?.downloadUrl
-                        ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl,
+                downloadUrl = downloadUrl,
                 publishedAt = release.publishedAt,
                 selectedApkName = selectedApk,
                 mappedPackageName = app?.packageName,
                 mappedAppName = app?.appName,
+                isUpdateAvailable = isUpdateAvailable,
                 allowPreReleases = _allowPreReleases.value,
                 notificationsEnabled = _notificationsEnabled.value,
             )
 
         SettingsRepository(context).addOrUpdateTrackedRepo(trackedRepo)
+
+        if (isUpdateAvailable && _notificationsEnabled.value) {
+            UpdateNotificationHelper.showTrackedRepoUpdateNotification(
+                context = context,
+                repoName = app?.appName ?: repo.name,
+                repoFullName = repo.fullName,
+                version = release.tagName,
+                downloadUrl = downloadUrl ?: "",
+            )
+        }
+
         loadTrackedRepos(context)
         clearSearch()
     }
@@ -522,46 +545,64 @@ class AppUpdatesViewModel : ViewModel() {
             for (i in updatedRepos.indices) {
                 val repo = updatedRepos[i]
                 try {
-                    val release =
+                    val fetchResult =
                         if (repo.allowPreReleases) {
-                            val releases =
-                                gitHubRepository.getReleases(repo.owner, repo.name, token)
-                            releases.firstOrNull()
+                            gitHubRepository.getReleasesWithETag(repo.owner, repo.name, token, repo.lastETag)
                         } else {
-                            gitHubRepository.getLatestRelease(repo.owner, repo.name, token)
+                            gitHubRepository.getLatestReleaseWithETag(repo.owner, repo.name, token, repo.lastETag)
                         }
 
-                    if (release != null) {
-                        var isUpdateAvailable = false
+                    if (!fetchResult.isNotModified) {
+                        val release = fetchResult.release
+                        if (release != null) {
+                            var isUpdateAvailable = false
 
-                        if (repo.mappedPackageName != null) {
-                            val installedVersion =
-                                AppUtil.getAppVersion(context, repo.mappedPackageName)
-                            if (installedVersion != null) {
-                                isUpdateAvailable = compareVersions(
-                                    release.tagName,
-                                    installedVersion,
-                                ) > 0
+                            if (repo.mappedPackageName != null) {
+                                val installedVersion =
+                                    AppUtil.getAppVersion(context, repo.mappedPackageName)
+                                if (installedVersion != null) {
+                                    isUpdateAvailable =
+                                        AppUtil.compareSemanticVersions(
+                                            release.tagName,
+                                            installedVersion,
+                                        ) > 0
+                                }
                             }
-                        }
 
-                        val newRepo =
-                            repo.copy(
-                                latestTagName = release.tagName,
-                                latestReleaseName = release.name,
-                                latestReleaseBody = release.body,
-                                latestReleaseUrl = release.htmlUrl,
-                                downloadUrl =
-                                    release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
-                                        ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl,
-                                publishedAt = release.publishedAt,
-                                isUpdateAvailable = isUpdateAvailable,
-                                lastETag = null,
-                            )
+                            val downloadUrl =
+                                release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
+                                    ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl
 
-                        if (newRepo != repo) {
-                            updatedRepos[i] = newRepo
-                            changesMade = true
+                            val hasNewRelease = repo.latestTagName.isNotBlank() && repo.latestTagName != release.tagName
+
+                            if ((isUpdateAvailable || hasNewRelease) && repo.notificationsEnabled) {
+                                val appName = repo.mappedAppName ?: repo.name
+                                UpdateNotificationHelper.showTrackedRepoUpdateNotification(
+                                    context = context,
+                                    repoName = appName,
+                                    repoFullName = repo.fullName,
+                                    version = release.tagName,
+                                    downloadUrl = downloadUrl ?: "",
+                                    releaseNotes = release.body,
+                                )
+                            }
+
+                            val newRepo =
+                                repo.copy(
+                                    latestTagName = release.tagName,
+                                    latestReleaseName = release.name,
+                                    latestReleaseBody = release.body,
+                                    latestReleaseUrl = release.htmlUrl,
+                                    downloadUrl = downloadUrl,
+                                    publishedAt = release.publishedAt,
+                                    isUpdateAvailable = isUpdateAvailable,
+                                    lastETag = fetchResult.etag ?: repo.lastETag,
+                                )
+
+                            if (newRepo != repo) {
+                                updatedRepos[i] = newRepo
+                                changesMade = true
+                            }
                         }
                     }
                 } catch (e: Exception) {
@@ -582,25 +623,6 @@ class AppUpdatesViewModel : ViewModel() {
                 _trackedRepos.value = updatedRepos
             }
         }
-    }
-
-    private fun compareVersions(
-        v1: String,
-        v2: String,
-    ): Int {
-        val cleanV1 = v1.replace(Regex("[^0-9.]"), "").split(".")
-        val cleanV2 = v2.replace(Regex("[^0-9.]"), "").split(".")
-
-        val length = maxOf(cleanV1.size, cleanV2.size)
-
-        for (i in 0 until length) {
-            val num1 = cleanV1.getOrNull(i)?.toIntOrNull() ?: 0
-            val num2 = cleanV2.getOrNull(i)?.toIntOrNull() ?: 0
-
-            if (num1 > num2) return 1
-            if (num1 < num2) return -1
-        }
-        return 0
     }
 
     /**

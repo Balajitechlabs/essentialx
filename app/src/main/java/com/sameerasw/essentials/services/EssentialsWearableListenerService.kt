@@ -184,7 +184,7 @@ class EssentialsWearableListenerService : WearableListenerService() {
 
             "/watch_status_update" -> {
                 val data = messageEvent.data
-                if (data != null && data.size >= 2) {
+                if (data.size >= 2) {
                     val adbWifiEnabled = data[0].toInt() == 1
                     val secureSettingsGranted = data[1].toInt() == 1
                     val version = if (data.size >= 3) data[2].toInt() else 0
@@ -201,7 +201,7 @@ class EssentialsWearableListenerService : WearableListenerService() {
 
             "/set_sync_sound_mode" -> {
                 val data = messageEvent.data
-                if (data != null && data.isNotEmpty()) {
+                if (data.isNotEmpty()) {
                     val enabled = data[0].toInt() == 1
                     val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
                     prefs.edit(commit = true) {
@@ -216,7 +216,7 @@ class EssentialsWearableListenerService : WearableListenerService() {
                 val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
                 val isSyncEnabled = prefs.getBoolean("watch_sync_sound_mode_enabled", false)
                 if (isSyncEnabled) {
-                    val ringerMode = messageEvent.data?.firstOrNull()?.toInt() ?: 2
+                    val ringerMode = messageEvent.data.firstOrNull()?.toInt() ?: 2
                     val audioManager =
                         getSystemService(Context.AUDIO_SERVICE) as? android.media.AudioManager
                     try {
@@ -227,7 +227,7 @@ class EssentialsWearableListenerService : WearableListenerService() {
                 }
             }
             "/dismiss_phone_notification" -> {
-                val key = String(messageEvent.data ?: byteArrayOf())
+                val key = String(messageEvent.data)
                 if (key.isNotBlank()) {
                     try {
                         val instance = NotificationListener.instance
@@ -244,13 +244,13 @@ class EssentialsWearableListenerService : WearableListenerService() {
                 }
             }
             "/reply_phone_notification" -> {
-                val jsonStr = String(messageEvent.data ?: byteArrayOf())
+                val jsonStr = String(messageEvent.data)
                 if (jsonStr.isNotBlank()) {
                     WatchNotificationSyncManager.handleReplyFromWatch(this, jsonStr)
                 }
             }
             WatchCallSyncManager.PATH_WATCH_CALL_ACTION -> {
-                val action = String(messageEvent.data ?: byteArrayOf())
+                val action = String(messageEvent.data)
                 if (action.isNotBlank()) {
                     WatchCallSyncManager.handleCallAction(this, action)
                 }

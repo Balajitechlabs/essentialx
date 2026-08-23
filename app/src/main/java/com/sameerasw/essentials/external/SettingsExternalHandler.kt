@@ -50,14 +50,28 @@ class SettingsExternalHandler : ExternalHandler {
 
         return try {
             when (currentValue) {
-                is Boolean -> repository.putBoolean(key, value?.toBoolean() ?: false)
-                is String -> repository.putString(key, value)
-                is Int -> repository.putInt(key, value?.toInt() ?: 0)
-                is Float -> repository.putFloat(key, value?.toFloat() ?: 0f)
-                is Long -> repository.putLong(key, value?.toLong() ?: 0L)
+                is Boolean -> {
+                    repository.putBoolean(key, value?.toBoolean() ?: false)
+                    true
+                }
+                is String -> {
+                    repository.putString(key, value)
+                    true
+                }
+                is Int -> {
+                    repository.putInt(key, value?.toInt() ?: 0)
+                    true
+                }
+                is Float -> {
+                    repository.putFloat(key, value?.toFloat() ?: 0f)
+                    true
+                }
+                is Long -> {
+                    repository.putLong(key, value?.toLong() ?: 0L)
+                    true
+                }
                 else -> false
             }
-            true
         } catch (e: Exception) {
             false
         }

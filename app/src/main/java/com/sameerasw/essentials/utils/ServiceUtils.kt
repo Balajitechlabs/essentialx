@@ -37,6 +37,7 @@ object ServiceUtils {
         startAppDetectionServiceIfNeeded(context, settingsRepository)
         startBatteryNotificationServiceIfNeeded(context, settingsRepository)
         schedulePeriodicAppUpdateCheck(context, settingsRepository)
+        triggerImmediateAppUpdateCheck(context, settingsRepository)
     }
 
     private fun startAppDetectionServiceIfNeeded(
@@ -114,18 +115,49 @@ object ServiceUtils {
                 Constraints
                     .Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiresBatteryNotLow(true)
                     .build()
 
             val workRequest =
                 PeriodicWorkRequestBuilder<AppUpdateWorker>(
-                    12,
-                    TimeUnit.HOURS,
+                    15,
+                    TimeUnit.MINUTES,
                 ).setConstraints(constraints).build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 "app_update_check_work",
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 workRequest,
+            )
+        }
+    }
+
+    fun triggerImmediateAppUpdateCheck(
+        context: Context,
+        settingsRepository: SettingsRepository? = null,
+    ) {
+        val repo = settingsRepository ?: SettingsRepository(context)
+        val isAutoUpdateEnabled =
+            repo.getBoolean(
+                SettingsRepository.KEY_AUTO_UPDATE_ENABLED,
+                true,
+            )
+        if (isAutoUpdateEnabled) {
+            val constraints =
+                Constraints
+                    .Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+
+            val oneTimeRequest =
+                androidx.work.OneTimeWorkRequestBuilder<AppUpdateWorker>()
+                    .setConstraints(constraints)
+                    .build()
+
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                "immediate_app_update_check_work",
+                androidx.work.ExistingWorkPolicy.KEEP,
+                oneTimeRequest,
             )
         }
     }

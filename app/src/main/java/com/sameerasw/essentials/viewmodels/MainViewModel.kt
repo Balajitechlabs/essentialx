@@ -3501,7 +3501,7 @@ class MainViewModel : ViewModel() {
             val sessions = manager.getActiveSessions(componentName)
             val activeSession =
                 sessions
-                    ?.sortedWith(
+                    .sortedWith(
                         compareByDescending<android.media.session.MediaController> {
                             val state = it.playbackState?.state
                             state == android.media.session.PlaybackState.STATE_PLAYING ||
@@ -3510,7 +3510,7 @@ class MainViewModel : ViewModel() {
                             val state = it.playbackState?.state
                             state == android.media.session.PlaybackState.STATE_PAUSED
                         },
-                    )?.firstOrNull()
+                    ).firstOrNull()
 
             if (activeSession != null) {
                 val metadata = activeSession.metadata
@@ -5092,10 +5092,19 @@ class MainViewModel : ViewModel() {
 
         val windowManager =
             context.getSystemService(Context.WINDOW_SERVICE) as android.view.WindowManager
-        val metrics = android.util.DisplayMetrics()
-        windowManager.defaultDisplay.getRealMetrics(metrics)
-        val centerX = metrics.widthPixels / 2
-        val centerY = metrics.heightPixels / 2
+        val (screenWidth, screenHeight) =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                val bounds = windowManager.currentWindowMetrics.bounds
+                Pair(bounds.width(), bounds.height())
+            } else {
+                @Suppress("DEPRECATION")
+                val metrics = android.util.DisplayMetrics().also {
+                    windowManager.defaultDisplay.getRealMetrics(it)
+                }
+                Pair(metrics.widthPixels, metrics.heightPixels)
+            }
+        val centerX = screenWidth / 2
+        val centerY = screenHeight / 2
 
         val command =
             if (notificationLightingSystemMode.intValue == 0) {
@@ -5103,8 +5112,8 @@ class MainViewModel : ViewModel() {
             } else if (notificationLightingSystemMode.intValue == 1) {
                 "cmd statusbar auth-ripple custom $centerX $centerY"
             } else {
-                val posX = (notificationLightingIndicatorX.value / 100f * metrics.widthPixels).toInt()
-                val posY = (notificationLightingIndicatorY.value / 100f * metrics.heightPixels).toInt()
+                val posX = (notificationLightingIndicatorX.value / 100f * screenWidth).toInt()
+                val posY = (notificationLightingIndicatorY.value / 100f * screenHeight).toInt()
                 "cmd statusbar auth-ripple custom $posX $posY"
             }
 
@@ -5738,6 +5747,7 @@ class MainViewModel : ViewModel() {
         isCaffeinateActive.value = false
     }
 
+    @Suppress("DEPRECATION")
     private fun isCaffeinateServiceRunning(context: Context): Boolean {
         val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (service in manager.getRunningServices(Int.MAX_VALUE)) {
@@ -6716,9 +6726,9 @@ class MainViewModel : ViewModel() {
             } else {
                 val backupData = gson.fromJson(json, FreezeBackupData::class.java)
                 if (backupData != null) {
-                    importedApps = backupData.apps ?: emptyList()
-                    importedTags = backupData.tags ?: emptyList()
-                    importedMap = backupData.appTagMap ?: emptyMap()
+                    importedApps = backupData.apps
+                    importedTags = backupData.tags
+                    importedMap = backupData.appTagMap
                 }
             }
 
@@ -7255,19 +7265,20 @@ class MainViewModel : ViewModel() {
             androidx.work.Constraints
                 .Builder()
                 .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                .setRequiresBatteryNotLow(true)
                 .build()
 
         val workRequest =
             androidx.work
                 .PeriodicWorkRequestBuilder<AppUpdateWorker>(
-                    12,
-                    java.util.concurrent.TimeUnit.HOURS,
+                    15,
+                    java.util.concurrent.TimeUnit.MINUTES,
                 ).setConstraints(constraints)
                 .build()
 
         androidx.work.WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "app_update_check_work",
-            androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+            androidx.work.ExistingPeriodicWorkPolicy.UPDATE,
             workRequest,
         )
     }

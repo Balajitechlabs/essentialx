@@ -1170,6 +1170,8 @@
     <string name="update_channel_desc">Notifications for new app updates</string>
     <string name="notification_update_available">Update Available!</string>
     <string name="notification_update_subtext">Check out what\'s new in Essentials v%1$s</string>
+    <string name="notification_tracked_repo_update_title">%1$s update available</string>
+    <string name="notification_tracked_repo_update_subtext">New version %1$s is available for download.</string>
     <string name="action_update_to_version">Update to Essentials v%1$s</string>
     <string name="action_check_for_updates">Check for updates</string>
     <string name="battery_notification_no_devices">No devices connected</string>

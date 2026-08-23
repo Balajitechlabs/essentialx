@@ -46,7 +46,7 @@ class MusicBroadcastReceiver : BroadcastReceiver() {
             val sessions = manager.getActiveSessions(componentName)
             val activeSession =
                 sessions
-                    ?.sortedWith(
+                    .sortedWith(
                         compareByDescending<MediaController> {
                             val state = it.playbackState?.state
                             state == PlaybackState.STATE_PLAYING || state == PlaybackState.STATE_BUFFERING
@@ -54,7 +54,7 @@ class MusicBroadcastReceiver : BroadcastReceiver() {
                             val state = it.playbackState?.state
                             state == PlaybackState.STATE_PAUSED
                         },
-                    )?.firstOrNull()
+                    ).firstOrNull()
 
             if (activeSession != null) {
                 val metadata = activeSession.metadata
