@@ -44,7 +44,7 @@
     <string name="preview_web_desc_enable_bubbles">This will enable notification bubbles</string>
     <string name="preview_web_desc_disabled">Notification bubbles disabled</string>
     <string name="qr_code_title">QR Code</string>
-    <string name="qr_code_desc">Scan to open on PC, Mac, or tablet</string>
+    <string name="qr_code_desc">Scan to open</string>
     <string name="qr_share_image">Share QR Image</string>
     <string name="qr_copy_image">Copy QR Image</string>
     <string name="qr_copied_success">QR image copied to clipboard</string>

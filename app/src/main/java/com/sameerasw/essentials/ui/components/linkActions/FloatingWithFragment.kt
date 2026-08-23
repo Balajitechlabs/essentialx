@@ -37,11 +37,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
@@ -82,6 +85,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -111,6 +115,7 @@ fun FloatingWithContent(
     openShortenInitially: Boolean = false,
 ) {
     val context = LocalContext.current
+    val view = LocalView.current
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
     var showQrSheet by remember { mutableStateOf(false) }
@@ -197,7 +202,7 @@ fun FloatingWithContent(
             IconToggleItem(
                 title = stringResource(R.string.qr_code_title),
                 description = stringResource(R.string.qr_code_desc),
-                iconRes = R.drawable.rounded_devices_24,
+                iconRes = R.drawable.rounded_qr_code_24,
                 showToggle = false,
                 onClick = {
                     qrContentUri = uri.toString()
@@ -222,6 +227,7 @@ fun FloatingWithContent(
 
     // Shorten URL Bottom Sheet (with Sub-Tabs: Shorten & History)
     if (showShortenSheet) {
+        val shortenScrollState = rememberScrollState()
         EssentialsBottomSheet(
             onDismissRequest = { showShortenSheet = false },
             containerColor = MaterialTheme.colorScheme.surfaceContainer,
@@ -230,11 +236,12 @@ fun FloatingWithContent(
                 modifier =
                     Modifier
                         .fillMaxWidth()
+                        .imePadding()
+                        .verticalScroll(shortenScrollState)
                         .padding(horizontal = 20.dp, vertical = 12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
             ) {
-                // Top Header Row with Segmented Sub-Tabs and Settings Gear (Matches LinkPicker Tab 1/2/3 design)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -248,7 +255,7 @@ fun FloatingWithContent(
                             selectedItem = selectedShortenTab,
                             onItemSelected = {
                                 selectedShortenTab = it
-                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                HapticUtil.performVirtualKeyHaptic(view)
                             },
                             labelProvider = {
                                 when (it) {
@@ -260,104 +267,40 @@ fun FloatingWithContent(
                         )
                     }
 
-                    // Settings Button
-                    FilledTonalIconButton(
+                    FilledIconButton(
                         onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            HapticUtil.performVirtualKeyHaptic(view)
                             showSettingsSheet = true
                         },
-                        modifier = Modifier.size(44.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.size(56.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceBright,
+                            contentColor = MaterialTheme.colorScheme.onSurface,
+                        ),
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_settings_24),
-                            contentDescription = "Settings",
-                            modifier = Modifier.size(20.dp),
+                            contentDescription = stringResource(R.string.shorten_settings_title),
+                            modifier = Modifier.size(22.dp),
                         )
                     }
                 }
 
                 // Sub-Tab 0: Create Short Link
                 if (selectedShortenTab == 0) {
-                    // Target URL Input Card with 📋 Paste & Clear buttons
-                    RoundedCardContainer(modifier = Modifier.fillMaxWidth().animateContentSize()) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(14.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                    RoundedCardContainer(
+                        modifier = Modifier.fillMaxWidth(),
+                        spacing = 2.dp,
+                    ) {
+                        Box(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.extraSmall)
+                                    .background(MaterialTheme.colorScheme.surfaceBright)
+                                    .padding(14.dp),
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.rounded_link_24),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                        tint = MaterialTheme.colorScheme.primary,
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.shorten_target_url_label),
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                    )
-                                }
-
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    if (urlToShortenInput.isNotBlank()) {
-                                        FilledTonalIconButton(
-                                            onClick = {
-                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                urlToShortenInput = ""
-                                            },
-                                            modifier = Modifier.size(28.dp),
-                                        ) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.rounded_cancel_24),
-                                                contentDescription = "Clear",
-                                                modifier = Modifier.size(14.dp),
-                                            )
-                                        }
-                                    }
-
-                                    FilledTonalButton(
-                                        onClick = {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                            try {
-                                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                                val clip = clipboard.primaryClip?.getItemAt(0)?.text?.toString()?.trim()
-                                                if (!clip.isNullOrBlank()) {
-                                                    urlToShortenInput = clip
-                                                } else {
-                                                    Toast.makeText(context, context.getString(R.string.shorten_qs_no_url_clipboard), Toast.LENGTH_SHORT).show()
-                                                }
-                                            } catch (_: Exception) {}
-                                        },
-                                        modifier = Modifier.height(28.dp),
-                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-                                        shape = RoundedCornerShape(8.dp),
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.rounded_content_paste_24),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(12.dp),
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Text(
-                                            text = stringResource(R.string.shorten_paste_button),
-                                            style = MaterialTheme.typography.labelSmall,
-                                        )
-                                    }
-                                }
-                            }
-
                             OutlinedTextField(
                                 value = urlToShortenInput,
                                 onValueChange = { input ->
@@ -367,83 +310,80 @@ fun FloatingWithContent(
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
                                 placeholder = { Text("https://example.com/long-url...") },
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(14.dp),
                             )
                         }
-                    }
 
-                    // Expiration selector chips inside RoundedCardContainer
-                    RoundedCardContainer(modifier = Modifier.fillMaxWidth().animateContentSize()) {
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(14.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.extraSmall)
+                                    .background(MaterialTheme.colorScheme.surfaceBright)
+                                    .padding(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             Text(
                                 text = stringResource(R.string.shorten_expiry_label),
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.primary,
                             )
 
                             FlowRow(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
                             ) {
                                 UrlShortener.Expiration.entries.forEach { exp ->
                                     FilterChip(
                                         selected = selectedExpiration == exp,
                                         onClick = {
-                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            HapticUtil.performVirtualKeyHaptic(view)
                                             selectedExpiration = exp
                                         },
                                         label = { Text(exp.label) },
+                                        shape = RoundedCornerShape(12.dp),
                                         colors = FilterChipDefaults.filterChipColors(
-                                            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                            labelColor = MaterialTheme.colorScheme.onSurface,
                                         ),
                                     )
                                 }
                             }
                         }
-                    }
 
-                    // Custom Alias Field (Expandable & Animated)
-                    RoundedCardContainer(modifier = Modifier.fillMaxWidth().animateContentSize()) {
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(14.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.extraSmall)
+                                    .background(MaterialTheme.colorScheme.surfaceBright)
+                                    .clickable {
+                                        HapticUtil.performVirtualKeyHaptic(view)
+                                        isCustomAliasExpanded = !isCustomAliasExpanded
+                                    }
+                                    .padding(14.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().clickable {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    isCustomAliasExpanded = !isCustomAliasExpanded
-                                },
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.rounded_edit_24),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp),
-                                        tint = MaterialTheme.colorScheme.primary,
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.shorten_custom_alias_label),
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                    )
-                                }
+                                Text(
+                                    text = stringResource(R.string.shorten_custom_alias_label),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
                                 Icon(
                                     painter = painterResource(
                                         id = if (isCustomAliasExpanded) R.drawable.rounded_cancel_24 else R.drawable.rounded_edit_24
                                     ),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(16.dp),
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp),
                                 )
                             }
 
@@ -452,82 +392,68 @@ fun FloatingWithContent(
                                 enter = expandVertically() + fadeIn(),
                                 exit = shrinkVertically() + fadeOut(),
                             ) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                                ) {
-                                    OutlinedTextField(
-                                        value = customAliasInput,
-                                        onValueChange = { input ->
-                                            errorMessage = null
-                                            if (input.length <= 32) {
-                                                customAliasInput = input.filter { it.isLetterOrDigit() || it == '-' || it == '_' }
-                                            }
-                                        },
-                                        singleLine = true,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        placeholder = { Text(stringResource(R.string.shorten_custom_alias_hint)) },
-                                        supportingText = {
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.End,
-                                            ) {
-                                                Text(
-                                                    text = "${customAliasInput.length} / 32",
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            }
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                    )
-                                }
+                                OutlinedTextField(
+                                    value = customAliasInput,
+                                    onValueChange = { input ->
+                                        errorMessage = null
+                                        if (input.length <= 32) {
+                                            customAliasInput = input.filter { it.isLetterOrDigit() || it == '-' || it == '_' }
+                                        }
+                                    },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    placeholder = { Text(stringResource(R.string.shorten_custom_alias_hint)) },
+                                    supportingText = {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End,
+                                        ) {
+                                            Text(
+                                                text = "${customAliasInput.length} / 32",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    },
+                                    shape = RoundedCornerShape(14.dp),
+                                )
                             }
                         }
-                    }
 
-                    // Optional Passcode / PIN Protection Card
-                    RoundedCardContainer(
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clip(MaterialTheme.shapes.extraSmall)
+                                    .background(MaterialTheme.colorScheme.surfaceBright)
+                                    .clickable {
+                                        HapticUtil.performVirtualKeyHaptic(view)
+                                        isPasscodeProtectionExpanded = !isPasscodeProtectionExpanded
+                                        if (!isPasscodeProtectionExpanded) {
+                                            passcodeProtectionInput = ""
+                                        }
+                                    }
+                                    .padding(14.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Row(
-                                modifier = Modifier.fillMaxWidth().clickable {
-                                    isPasscodeProtectionExpanded = !isPasscodeProtectionExpanded
-                                    if (!isPasscodeProtectionExpanded) {
-                                        passcodeProtectionInput = ""
-                                    }
-                                },
+                                modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.rounded_lock_24),
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(16.dp),
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.shorten_passcode_label),
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                    )
-                                }
+                                Text(
+                                    text = stringResource(R.string.shorten_passcode_label),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
                                 Icon(
                                     painter = painterResource(
                                         id = if (isPasscodeProtectionExpanded) R.drawable.rounded_cancel_24 else R.drawable.rounded_edit_24
                                     ),
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(16.dp),
-                                    )
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp),
+                                )
                             }
 
                             AnimatedVisibility(
@@ -535,36 +461,31 @@ fun FloatingWithContent(
                                 enter = expandVertically() + fadeIn(),
                                 exit = shrinkVertically() + fadeOut(),
                             ) {
-                                Column(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
-                                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                                ) {
-                                    OutlinedTextField(
-                                        value = passcodeProtectionInput,
-                                        onValueChange = { input ->
-                                            errorMessage = null
-                                            if (input.length <= 16) {
-                                                passcodeProtectionInput = input
-                                            }
-                                        },
-                                        singleLine = true,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        placeholder = { Text(stringResource(R.string.shorten_passcode_hint)) },
-                                        supportingText = {
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.End,
-                                            ) {
-                                                Text(
-                                                    text = "${passcodeProtectionInput.length} / 16",
-                                                    style = MaterialTheme.typography.labelSmall,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                                )
-                                            }
-                                        },
-                                        shape = RoundedCornerShape(12.dp),
-                                    )
-                                }
+                                OutlinedTextField(
+                                    value = passcodeProtectionInput,
+                                    onValueChange = { input ->
+                                        errorMessage = null
+                                        if (input.length <= 16) {
+                                            passcodeProtectionInput = input
+                                        }
+                                    },
+                                    singleLine = true,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    placeholder = { Text(stringResource(R.string.shorten_passcode_hint)) },
+                                    supportingText = {
+                                        Row(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            horizontalArrangement = Arrangement.End,
+                                        ) {
+                                            Text(
+                                                text = "${passcodeProtectionInput.length} / 16",
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    },
+                                    shape = RoundedCornerShape(14.dp),
+                                )
                             }
                         }
                     }
@@ -577,7 +498,7 @@ fun FloatingWithContent(
                     ) {
                         errorMessage?.let { error ->
                             Surface(
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(16.dp),
                                 color = MaterialTheme.colorScheme.errorContainer,
                                 modifier = Modifier.fillMaxWidth(),
                             ) {
@@ -585,17 +506,17 @@ fun FloatingWithContent(
                                     text = error,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onErrorContainer,
-                                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                                     textAlign = TextAlign.Center,
                                 )
                             }
                         }
                     }
 
-                    // Shorten Action Button with M3 Loading Indicator
-                    ElevatedButton(
+                    // Primary Shorten Action Button
+                    FilledIconButton(
                         onClick = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            HapticUtil.performVirtualKeyHaptic(view)
                             isShortening = true
                             errorMessage = null
                             scope.launch {
@@ -616,30 +537,28 @@ fun FloatingWithContent(
                                             val clip = ClipData.newPlainText("Shortened Link", result)
                                             clipboard.setPrimaryClip(clip)
                                             Toast.makeText(context, context.getString(R.string.action_copy_clipboard), Toast.LENGTH_SHORT).show()
-                                        } catch (_: Exception) {
-                                            // Ignore background clipboard exceptions on Android 10+
-                                        }
+                                        } catch (_: Exception) {}
                                     }
                                 } catch (e: UrlShortener.ShortenException.LockdownException) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.Reject)
+                                    HapticUtil.performVirtualKeyHaptic(view)
                                     errorMessage = context.getString(R.string.shorten_error_lockdown)
                                 } catch (e: UrlShortener.ShortenException.ReservedAliasException) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.Reject)
+                                    HapticUtil.performVirtualKeyHaptic(view)
                                     errorMessage = context.getString(R.string.shorten_error_reserved_alias)
                                 } catch (e: UrlShortener.ShortenException.SlugConflictException) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.Reject)
+                                    HapticUtil.performVirtualKeyHaptic(view)
                                     errorMessage = context.getString(R.string.shorten_error_slug_conflict)
                                 } catch (e: UrlShortener.ShortenException.InvalidUrlException) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.Reject)
+                                    HapticUtil.performVirtualKeyHaptic(view)
                                     errorMessage = context.getString(R.string.shorten_error_invalid_url)
                                 } catch (e: UrlShortener.ShortenException.InvalidAliasException) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.Reject)
+                                    HapticUtil.performVirtualKeyHaptic(view)
                                     errorMessage = context.getString(R.string.shorten_error_invalid_alias)
                                 } catch (e: UrlShortener.ShortenException.NetworkException) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.Reject)
+                                    HapticUtil.performVirtualKeyHaptic(view)
                                     errorMessage = context.getString(R.string.shorten_error_network)
                                 } catch (e: Exception) {
-                                    haptic.performHapticFeedback(HapticFeedbackType.Reject)
+                                    HapticUtil.performVirtualKeyHaptic(view)
                                     errorMessage = e.message ?: context.getString(R.string.shorten_error_generic)
                                 } finally {
                                     isShortening = false
@@ -649,7 +568,7 @@ fun FloatingWithContent(
                         enabled = !isShortening,
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.elevatedButtonColors(
+                        colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary,
                         ),
@@ -659,33 +578,36 @@ fun FloatingWithContent(
                                 modifier = Modifier.size(22.dp),
                                 color = MaterialTheme.colorScheme.onPrimary,
                             )
-                            Spacer(modifier = Modifier.width(10.dp))
-                            Text(
-                                text = stringResource(R.string.shorten_generating),
-                                fontWeight = FontWeight.SemiBold,
-                            )
                         } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.rounded_link_24),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = stringResource(R.string.shorten_url_title),
-                                fontWeight = FontWeight.SemiBold,
-                            )
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_link_24),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                                Text(
+                                    text = stringResource(R.string.shorten_url_title),
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            }
                         }
                     }
 
-                    // Shortened URL Result Card
+                    // Shortened URL Result Card with Split Action Row
                     AnimatedVisibility(
                         visible = shortenedUrlResult != null,
                         enter = expandVertically() + fadeIn(),
                         exit = shrinkVertically() + fadeOut(),
                     ) {
                         shortenedUrlResult?.let { shortUrl ->
-                            RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                            RoundedCardContainer(
+                                modifier = Modifier.fillMaxWidth(),
+                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                            ) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                                     verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -698,19 +620,27 @@ fun FloatingWithContent(
 
                                     Text(
                                         text = shortUrl,
-                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                        style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.Bold,
                                             fontFamily = FontFamily.Monospace,
                                         ),
                                         color = MaterialTheme.colorScheme.primary,
                                     )
 
+                                    // Split Connected Actions: Copy, Share, QR Code, Inspect
                                     Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(16.dp))
+                                                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                                                .padding(4.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                                     ) {
-                                        FilledTonalButton(
+                                        // 1. Copy
+                                        FilledIconButton(
                                             onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
                                                 try {
                                                     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                                                     val clip = ClipData.newPlainText("Shortened Link", shortUrl)
@@ -720,14 +650,24 @@ fun FloatingWithContent(
                                                     Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
                                                 }
                                             },
-                                            modifier = Modifier.weight(1f).height(36.dp),
-                                            shape = RoundedCornerShape(10.dp),
+                                            modifier = Modifier.weight(1f).height(44.dp),
+                                            shape = ButtonGroupDefaults.connectedLeadingButtonShapes().shape,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
                                         ) {
-                                            Text(stringResource(R.string.shorten_copy_link), style = MaterialTheme.typography.labelSmall)
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.rounded_content_copy_24),
+                                                contentDescription = stringResource(R.string.shorten_copy_link),
+                                                modifier = Modifier.size(18.dp),
+                                            )
                                         }
 
-                                        FilledTonalButton(
+                                        // 2. Share
+                                        FilledIconButton(
                                             onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
                                                 try {
                                                     val sendIntent = Intent().apply {
                                                         action = Intent.ACTION_SEND
@@ -739,26 +679,46 @@ fun FloatingWithContent(
                                                     Toast.makeText(context, context.getString(R.string.error_no_share_app), Toast.LENGTH_SHORT).show()
                                                 }
                                             },
-                                            modifier = Modifier.weight(1f).height(36.dp),
-                                            shape = RoundedCornerShape(10.dp),
+                                            modifier = Modifier.weight(1f).height(44.dp),
+                                            shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
                                         ) {
-                                            Text(stringResource(R.string.shorten_share_link), style = MaterialTheme.typography.labelSmall)
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.rounded_share_24),
+                                                contentDescription = stringResource(R.string.shorten_share_link),
+                                                modifier = Modifier.size(18.dp),
+                                            )
                                         }
 
-                                        FilledTonalButton(
+                                        // 3. QR Code
+                                        FilledIconButton(
                                             onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
                                                 qrContentUri = shortUrl
                                                 showShortenSheet = false
                                                 showQrSheet = true
                                             },
-                                            modifier = Modifier.weight(1f).height(36.dp),
-                                            shape = RoundedCornerShape(10.dp),
+                                            modifier = Modifier.weight(1f).height(44.dp),
+                                            shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
                                         ) {
-                                            Text(stringResource(R.string.shorten_qr_link), style = MaterialTheme.typography.labelSmall)
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.rounded_qr_code_24),
+                                                contentDescription = stringResource(R.string.shorten_qr_link),
+                                                modifier = Modifier.size(18.dp),
+                                            )
                                         }
 
-                                        FilledTonalButton(
+                                        // 4. Inspect / Preview
+                                        FilledIconButton(
                                             onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
                                                 try {
                                                     val inspectUrl = "$shortUrl+"
                                                     if (isFloatingSupported) {
@@ -773,13 +733,17 @@ fun FloatingWithContent(
                                                     Toast.makeText(context, context.getString(R.string.error_open_link_inspector), Toast.LENGTH_SHORT).show()
                                                 }
                                             },
-                                            modifier = Modifier.weight(1f).height(36.dp),
-                                            shape = RoundedCornerShape(10.dp),
+                                            modifier = Modifier.weight(1f).height(44.dp),
+                                            shape = ButtonGroupDefaults.connectedTrailingButtonShapes().shape,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
                                         ) {
                                             Icon(
                                                 painter = painterResource(id = R.drawable.rounded_visibility_24),
-                                                contentDescription = null,
-                                                modifier = Modifier.size(14.dp),
+                                                contentDescription = stringResource(R.string.shorten_inspect_link),
+                                                modifier = Modifier.size(18.dp),
                                             )
                                         }
                                     }
@@ -835,6 +799,7 @@ fun FloatingWithContent(
 
                             TextButton(
                                 onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
                                     UrlShortener.clearHistory(context)
                                     historyList = emptyList()
                                 },
@@ -849,169 +814,208 @@ fun FloatingWithContent(
                             }
                         }
 
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth().heightIn(max = 340.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp),
+                        RoundedCardContainer(
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            items(historyList, key = { it.id }) { item ->
-                                RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
-                                    Column(
-                                        modifier = Modifier.fillMaxWidth().padding(12.dp),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                            historyList.forEach { item ->
+                                Column(
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .clip(MaterialTheme.shapes.extraSmall)
+                                            .background(MaterialTheme.colorScheme.surfaceBright)
+                                            .padding(14.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(6.dp),
                                         ) {
-                                            Row(
-                                                verticalAlignment = Alignment.CenterVertically,
-                                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                            ) {
-                                                // Status Badge
-                                                val isExpired = item.isExpired(currentTimeMs)
-                                                val remainingLabel = item.getRemainingTimeLabel(currentTimeMs)
+                                            val isExpired = item.isExpired(currentTimeMs)
+                                            val remainingLabel = item.getRemainingTimeLabel(currentTimeMs)
 
+                                            Surface(
+                                                shape = MaterialTheme.shapes.extraSmall,
+                                                color = if (isExpired) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
+                                            ) {
+                                                Text(
+                                                    text = remainingLabel,
+                                                    style = MaterialTheme.typography.labelSmall,
+                                                    color = if (isExpired) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+                                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                                )
+                                            }
+
+                                            if (item.isPasswordProtected) {
                                                 Surface(
-                                                    shape = RoundedCornerShape(6.dp),
-                                                    color = if (isExpired) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
+                                                    shape = MaterialTheme.shapes.extraSmall,
+                                                    color = MaterialTheme.colorScheme.secondaryContainer,
                                                 ) {
                                                     Text(
-                                                        text = remainingLabel,
+                                                        text = "PIN",
                                                         style = MaterialTheme.typography.labelSmall,
-                                                        color = if (isExpired) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onPrimaryContainer,
+                                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
                                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                                     )
                                                 }
-
-                                                if (item.isPasswordProtected) {
-                                                    Surface(
-                                                        shape = RoundedCornerShape(6.dp),
-                                                        color = MaterialTheme.colorScheme.secondaryContainer,
-                                                    ) {
-                                                        Text(
-                                                            text = "🔒 PIN",
-                                                            style = MaterialTheme.typography.labelSmall,
-                                                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                                                        )
-                                                    }
-                                                }
-                                            }
-
-                                            // Delete icon button
-                                            FilledTonalIconButton(
-                                                onClick = {
-                                                    UrlShortener.deleteFromHistory(context, item.id)
-                                                    historyList = UrlShortener.getHistory(context)
-                                                },
-                                                modifier = Modifier.size(28.dp),
-                                                colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                                ),
-                                            ) {
-                                                Icon(
-                                                    painter = painterResource(id = R.drawable.rounded_delete_24),
-                                                    contentDescription = "Delete",
-                                                    modifier = Modifier.size(14.dp),
-                                                )
                                             }
                                         }
 
-                                        Text(
-                                            text = item.shortUrl,
-                                            style = MaterialTheme.typography.bodyMedium.copy(
-                                                fontWeight = FontWeight.Bold,
-                                                fontFamily = FontFamily.Monospace,
+                                        FilledIconButton(
+                                            onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
+                                                UrlShortener.deleteFromHistory(context, item.id)
+                                                historyList = UrlShortener.getHistory(context)
+                                            },
+                                            modifier = Modifier.size(28.dp),
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                             ),
-                                            color = MaterialTheme.colorScheme.primary,
-                                        )
-
-                                        Text(
-                                            text = item.originalUrl,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                        )
-
-                                        Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.spacedBy(6.dp),
                                         ) {
-                                            FilledTonalButton(
-                                                onClick = {
-                                                    try {
-                                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                                        val clip = ClipData.newPlainText("Shortened Link", item.shortUrl)
-                                                        clipboard.setPrimaryClip(clip)
-                                                        Toast.makeText(context, context.getString(R.string.action_copy_clipboard), Toast.LENGTH_SHORT).show()
-                                                    } catch (_: Exception) {
-                                                        Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
-                                                    }
-                                                },
-                                                modifier = Modifier.weight(1f).height(36.dp),
-                                                shape = RoundedCornerShape(10.dp),
-                                            ) {
-                                                Text(stringResource(R.string.shorten_copy_link), style = MaterialTheme.typography.labelSmall)
-                                            }
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.rounded_delete_24),
+                                                contentDescription = "Delete",
+                                                modifier = Modifier.size(14.dp),
+                                            )
+                                        }
+                                    }
 
-                                            FilledTonalButton(
-                                                onClick = {
-                                                    try {
-                                                        val sendIntent = Intent().apply {
-                                                            action = Intent.ACTION_SEND
-                                                            putExtra(Intent.EXTRA_TEXT, item.shortUrl)
-                                                            type = "text/plain"
+                                    Text(
+                                        text = item.shortUrl,
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            fontFamily = FontFamily.Monospace,
+                                        ),
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+
+                                    Text(
+                                        text = item.originalUrl,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+
+                                    Row(
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                                                .padding(2.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                                    ) {
+                                        FilledIconButton(
+                                            onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
+                                                try {
+                                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                                    val clip = ClipData.newPlainText("Shortened Link", item.shortUrl)
+                                                    clipboard.setPrimaryClip(clip)
+                                                    Toast.makeText(context, context.getString(R.string.action_copy_clipboard), Toast.LENGTH_SHORT).show()
+                                                } catch (_: Exception) {
+                                                    Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
+                                                }
+                                            },
+                                            modifier = Modifier.weight(1f).height(36.dp),
+                                            shape = ButtonGroupDefaults.connectedLeadingButtonShapes().shape,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.rounded_content_copy_24),
+                                                contentDescription = stringResource(R.string.shorten_copy_link),
+                                                modifier = Modifier.size(16.dp),
+                                            )
+                                        }
+
+                                        FilledIconButton(
+                                            onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
+                                                try {
+                                                    val sendIntent = Intent().apply {
+                                                        action = Intent.ACTION_SEND
+                                                        putExtra(Intent.EXTRA_TEXT, item.shortUrl)
+                                                        type = "text/plain"
+                                                    }
+                                                    context.startActivity(Intent.createChooser(sendIntent, null))
+                                                } catch (_: Exception) {
+                                                    Toast.makeText(context, context.getString(R.string.error_no_share_app), Toast.LENGTH_SHORT).show()
+                                                }
+                                            },
+                                            modifier = Modifier.weight(1f).height(36.dp),
+                                            shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.rounded_share_24),
+                                                contentDescription = stringResource(R.string.shorten_share_link),
+                                                modifier = Modifier.size(16.dp),
+                                            )
+                                        }
+
+                                        FilledIconButton(
+                                            onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
+                                                qrContentUri = item.shortUrl
+                                                showShortenSheet = false
+                                                showQrSheet = true
+                                            },
+                                            modifier = Modifier.weight(1f).height(36.dp),
+                                            shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.rounded_qr_code_24),
+                                                contentDescription = stringResource(R.string.shorten_qr_link),
+                                                modifier = Modifier.size(16.dp),
+                                            )
+                                        }
+
+                                        FilledIconButton(
+                                            onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
+                                                try {
+                                                    val inspectUrl = "${item.shortUrl}+"
+                                                    if (isFloatingSupported) {
+                                                        WindowingUtils.launchOverlayWindow(context, Uri.parse(inspectUrl), isPrivate = true)
+                                                    } else {
+                                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(inspectUrl)).apply {
+                                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                                         }
-                                                        context.startActivity(Intent.createChooser(sendIntent, null))
-                                                    } catch (_: Exception) {
-                                                        Toast.makeText(context, context.getString(R.string.error_no_share_app), Toast.LENGTH_SHORT).show()
+                                                        context.startActivity(intent)
                                                     }
-                                                },
-                                                modifier = Modifier.weight(1f).height(36.dp),
-                                                shape = RoundedCornerShape(10.dp),
-                                            ) {
-                                                Text(stringResource(R.string.shorten_share_link), style = MaterialTheme.typography.labelSmall)
-                                            }
-
-                                            FilledTonalButton(
-                                                onClick = {
-                                                    qrContentUri = item.shortUrl
-                                                    showShortenSheet = false
-                                                    showQrSheet = true
-                                                },
-                                                modifier = Modifier.weight(1f).height(36.dp),
-                                                shape = RoundedCornerShape(10.dp),
-                                            ) {
-                                                Text(stringResource(R.string.shorten_qr_link), style = MaterialTheme.typography.labelSmall)
-                                            }
-
-                                            FilledTonalButton(
-                                                onClick = {
-                                                    try {
-                                                        val inspectUrl = "${item.shortUrl}+"
-                                                        if (isFloatingSupported) {
-                                                            WindowingUtils.launchOverlayWindow(context, Uri.parse(inspectUrl), isPrivate = true)
-                                                        } else {
-                                                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(inspectUrl)).apply {
-                                                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                                            }
-                                                            context.startActivity(intent)
-                                                        }
-                                                    } catch (_: Exception) {
-                                                        Toast.makeText(context, context.getString(R.string.error_open_link_inspector), Toast.LENGTH_SHORT).show()
-                                                    }
-                                                },
-                                                modifier = Modifier.weight(1f).height(36.dp),
-                                                shape = RoundedCornerShape(10.dp),
-                                            ) {
-                                                Icon(
-                                                    painter = painterResource(id = R.drawable.rounded_visibility_24),
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(14.dp),
-                                                )
-                                            }
+                                                } catch (_: Exception) {
+                                                    Toast.makeText(context, context.getString(R.string.error_open_link_inspector), Toast.LENGTH_SHORT).show()
+                                                }
+                                            },
+                                            modifier = Modifier.weight(1f).height(36.dp),
+                                            shape = ButtonGroupDefaults.connectedTrailingButtonShapes().shape,
+                                            colors = IconButtonDefaults.filledIconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.surfaceBright,
+                                                contentColor = MaterialTheme.colorScheme.onSurface,
+                                            ),
+                                        ) {
+                                            Icon(
+                                                painter = painterResource(id = R.drawable.rounded_visibility_24),
+                                                contentDescription = stringResource(R.string.shorten_inspect_link),
+                                                modifier = Modifier.size(16.dp),
+                                            )
                                         }
                                     }
                                 }
@@ -1023,7 +1027,7 @@ fun FloatingWithContent(
         }
     }
 
-    // Shortener Settings Bottom Sheet
+    // Shortener Settings Bottom Sheet (Structured as standard Essentials IconToggleItems in RoundedCardContainer)
     if (showSettingsSheet) {
         EssentialsBottomSheet(
             onDismissRequest = { showSettingsSheet = false },
@@ -1033,7 +1037,7 @@ fun FloatingWithContent(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Text(
@@ -1042,119 +1046,77 @@ fun FloatingWithContent(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                RoundedCardContainer(modifier = Modifier.fillMaxWidth()) {
+                RoundedCardContainer(
+                    modifier = Modifier.fillMaxWidth(),
+                    containerColor = MaterialTheme.colorScheme.surfaceBright,
+                ) {
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(14.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        // Custom Domain
-                        Column {
-                            Text(
-                                text = stringResource(R.string.shorten_settings_custom_domain_title),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            OutlinedTextField(
-                                value = customDomainInput,
-                                onValueChange = {
-                                    customDomainInput = it
-                                    UrlShortener.setCustomDomain(context, it)
-                                },
-                                singleLine = true,
-                                modifier = Modifier.fillMaxWidth(),
-                                placeholder = { Text(UrlShortener.DEFAULT_DOMAIN) },
-                                shape = RoundedCornerShape(12.dp),
-                            )
-                        }
-
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-
-                        // Auto-copy Switch Row
-                        Row(
+                        Text(
+                            text = stringResource(R.string.shorten_settings_custom_domain_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Text(
+                            text = stringResource(R.string.shorten_settings_custom_domain_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        OutlinedTextField(
+                            value = customDomainInput,
+                            onValueChange = {
+                                customDomainInput = it
+                                UrlShortener.setCustomDomain(context, it)
+                            },
+                            singleLine = true,
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = stringResource(R.string.shorten_settings_auto_copy_title),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                Text(
-                                    text = stringResource(R.string.shorten_settings_auto_copy_desc),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Switch(
-                                checked = autoCopySetting,
-                                onCheckedChange = {
-                                    autoCopySetting = it
-                                    UrlShortener.setAutoCopyEnabled(context, it)
-                                },
-                            )
-                        }
-
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-
-                        // Auto-strip tracking Switch Row
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = stringResource(R.string.shorten_settings_auto_strip_title),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                Text(
-                                    text = stringResource(R.string.shorten_settings_auto_strip_desc),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Switch(
-                                checked = autoStripSetting,
-                                onCheckedChange = {
-                                    autoStripSetting = it
-                                    UrlShortener.setAutoStripTrackingEnabled(context, it)
-                                },
-                            )
-                        }
-
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-
-                        // Action Notification Switch Row
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = stringResource(R.string.shorten_settings_notification_title),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                Text(
-                                    text = stringResource(R.string.shorten_settings_notification_desc),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                            Switch(
-                                checked = notificationSetting,
-                                onCheckedChange = {
-                                    notificationSetting = it
-                                    UrlShortener.setNotificationEnabled(context, it)
-                                },
-                            )
-                        }
+                            placeholder = { Text(UrlShortener.DEFAULT_DOMAIN) },
+                            shape = RoundedCornerShape(12.dp),
+                        )
                     }
+                }
+
+                RoundedCardContainer(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    // Auto-copy
+                    IconToggleItem(
+                        title = stringResource(R.string.shorten_settings_auto_copy_title),
+                        description = stringResource(R.string.shorten_settings_auto_copy_desc),
+                        iconRes = R.drawable.rounded_content_copy_24,
+                        isChecked = autoCopySetting,
+                        onCheckedChange = {
+                            autoCopySetting = it
+                            UrlShortener.setAutoCopyEnabled(context, it)
+                        },
+                    )
+
+                    // Auto-strip tracking
+                    IconToggleItem(
+                        title = stringResource(R.string.shorten_settings_auto_strip_title),
+                        description = stringResource(R.string.shorten_settings_auto_strip_desc),
+                        iconRes = R.drawable.rounded_cancel_24,
+                        isChecked = autoStripSetting,
+                        onCheckedChange = {
+                            autoStripSetting = it
+                            UrlShortener.setAutoStripTrackingEnabled(context, it)
+                        },
+                    )
+
+                    // Notification
+                    IconToggleItem(
+                        title = stringResource(R.string.shorten_settings_notification_title),
+                        description = stringResource(R.string.shorten_settings_notification_desc),
+                        iconRes = R.drawable.rounded_notification_settings_24,
+                        isChecked = notificationSetting,
+                        onCheckedChange = {
+                            notificationSetting = it
+                            UrlShortener.setNotificationEnabled(context, it)
+                        },
+                    )
                 }
             }
         }
