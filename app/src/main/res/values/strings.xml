@@ -94,6 +94,12 @@
     <string name="tile_url_shortener_subtitle">Shorten Clipboard</string>
     <string name="shorten_qs_no_url_clipboard">No web link found in clipboard</string>
     <string name="shorten_qs_success">Short link copied: %s</string>
+    <string name="search_apps_placeholder">Search apps</string>
+    <string name="error_could_not_copy">Could not copy to clipboard</string>
+    <string name="error_no_share_app">No app available to share link</string>
+    <string name="error_open_link_inspector">Could not open link inspector</string>
+    <string name="error_share_qr_image">Could not share QR image</string>
+    <string name="error_save_qr_image">Failed to save QR image</string>
 
 
     <!-- App Lock -->

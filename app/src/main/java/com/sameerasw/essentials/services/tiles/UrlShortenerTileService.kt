@@ -23,7 +23,9 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.UrlShortener
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @RequiresApi(Build.VERSION_CODES.N)
 class UrlShortenerTileService : BaseTileService() {
@@ -44,33 +46,31 @@ class UrlShortenerTileService : BaseTileService() {
 
         val isUrlLike = !text.isNullOrBlank() && (text.startsWith("http://", ignoreCase = true) || text.startsWith("https://", ignoreCase = true) || (text.contains(".") && !text.contains(" ")))
         if (!isUrlLike) {
-            Handler(Looper.getMainLooper()).post {
-                Toast.makeText(this, getString(R.string.shorten_qs_no_url_clipboard), Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(this, getString(R.string.shorten_qs_no_url_clipboard), Toast.LENGTH_SHORT).show()
             return
         }
 
-        try {
-            val shortUrl = runBlocking {
-                UrlShortener.shortenUrl(
+        serviceScope.launch(Dispatchers.IO) {
+            try {
+                val shortUrl = UrlShortener.shortenUrl(
                     url = text,
                     expiration = UrlShortener.getDefaultExpiration(this@UrlShortenerTileService),
                     context = this@UrlShortenerTileService,
                 )
-            }
 
-            try {
-                clipboard.setPrimaryClip(ClipData.newPlainText("Shortened Link", shortUrl))
-            } catch (_: Exception) {}
+                withContext(Dispatchers.Main) {
+                    try {
+                        clipboard.setPrimaryClip(ClipData.newPlainText("Shortened Link", shortUrl))
+                    } catch (_: Exception) {}
 
-            HapticUtil.performHapticForService(this, HapticFeedbackType.DOUBLE)
-            Handler(Looper.getMainLooper()).post {
-                Toast.makeText(this, getString(R.string.shorten_qs_success, shortUrl), Toast.LENGTH_SHORT).show()
-            }
-        } catch (e: Exception) {
-            HapticUtil.performHapticForService(this, HapticFeedbackType.TICK)
-            Handler(Looper.getMainLooper()).post {
-                Toast.makeText(this, e.message ?: getString(R.string.shorten_error_generic), Toast.LENGTH_LONG).show()
+                    HapticUtil.performHapticForService(this@UrlShortenerTileService, HapticFeedbackType.DOUBLE)
+                    Toast.makeText(this@UrlShortenerTileService, getString(R.string.shorten_qs_success, shortUrl), Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    HapticUtil.performHapticForService(this@UrlShortenerTileService, HapticFeedbackType.TICK)
+                    Toast.makeText(this@UrlShortenerTileService, e.message ?: getString(R.string.shorten_error_generic), Toast.LENGTH_LONG).show()
+                }
             }
         }
     }

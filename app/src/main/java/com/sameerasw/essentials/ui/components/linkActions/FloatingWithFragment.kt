@@ -84,6 +84,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
@@ -156,184 +157,42 @@ fun FloatingWithContent(
         ) {
             // 1. Preview Web (Only shown when floating mode is supported)
             if (isFloatingSupported) {
-                Row(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                WindowingUtils.launchOverlayWindow(context, uri, isPrivate = true)
-                                onFinish()
-                            }
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceBright,
-                                shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
-                            )
-                            .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .size(48.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_open_in_browser_24),
-                            contentDescription = "Preview Web",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.preview_web_title),
-                            modifier = Modifier.padding(start = 16.dp),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = stringResource(R.string.preview_web_desc),
-                            modifier = Modifier.padding(start = 16.dp),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-
-                    Icon(
-                        painter = painterResource(id = R.drawable.rounded_chevron_right_24),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
+                IconToggleItem(
+                    title = stringResource(R.string.preview_web_title),
+                    description = stringResource(R.string.preview_web_desc),
+                    iconRes = R.drawable.rounded_open_in_browser_24,
+                    showToggle = false,
+                    onClick = {
+                        WindowingUtils.launchOverlayWindow(context, uri, isPrivate = true)
+                        onFinish()
+                    },
+                )
             }
 
             // 2. Instant QR Code Generator
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            qrContentUri = uri.toString()
-                            showQrSheet = true
-                        }
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
-                        )
-                        .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.secondaryContainer),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.rounded_devices_24),
-                        contentDescription = "QR Code",
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
+            IconToggleItem(
+                title = stringResource(R.string.qr_code_title),
+                description = stringResource(R.string.qr_code_desc),
+                iconRes = R.drawable.rounded_devices_24,
+                showToggle = false,
+                onClick = {
+                    qrContentUri = uri.toString()
+                    showQrSheet = true
+                },
+            )
 
-                Column(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(
-                        text = stringResource(R.string.qr_code_title),
-                        modifier = Modifier.padding(start = 16.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Text(
-                        text = stringResource(R.string.qr_code_desc),
-                        modifier = Modifier.padding(start = 16.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-
-                Icon(
-                    painter = painterResource(id = R.drawable.rounded_chevron_right_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
-
-            // 3. Zero-Cost URL Shortener with TTL Expiration & History
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            shortenedUrlResult = null
-                            selectedShortenTab = 0
-                            showShortenSheet = true
-                        }
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                            shape = RoundedCornerShape(MaterialTheme.shapes.extraSmall.bottomEnd),
-                        )
-                        .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.tertiaryContainer),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.rounded_link_24),
-                        contentDescription = "Shorten URL",
-                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                        modifier = Modifier.size(24.dp),
-                    )
-                }
-
-                Column(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(
-                        text = stringResource(R.string.shorten_url_title),
-                        modifier = Modifier.padding(start = 16.dp),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Text(
-                        text = stringResource(R.string.shorten_url_desc),
-                        modifier = Modifier.padding(start = 16.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-
-                Icon(
-                    painter = painterResource(id = R.drawable.rounded_chevron_right_24),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
+            // 3. Expiring URL Shortener
+            IconToggleItem(
+                title = stringResource(R.string.shorten_url_title),
+                description = stringResource(R.string.shorten_url_desc),
+                iconRes = R.drawable.rounded_link_24,
+                showToggle = false,
+                onClick = {
+                    shortenedUrlResult = null
+                    selectedShortenTab = 0
+                    showShortenSheet = true
+                },
+            )
         }
     }
 
@@ -834,7 +693,7 @@ fun FloatingWithContent(
                                                     clipboard.setPrimaryClip(clip)
                                                     Toast.makeText(context, context.getString(R.string.action_copy_clipboard), Toast.LENGTH_SHORT).show()
                                                 } catch (_: Exception) {
-                                                    Toast.makeText(context, "Could not copy to clipboard", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
                                                 }
                                             },
                                             modifier = Modifier.weight(1f).height(36.dp),
@@ -853,7 +712,7 @@ fun FloatingWithContent(
                                                     }
                                                     context.startActivity(Intent.createChooser(sendIntent, null))
                                                 } catch (_: Exception) {
-                                                    Toast.makeText(context, "No app available to share link", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, context.getString(R.string.error_no_share_app), Toast.LENGTH_SHORT).show()
                                                 }
                                             },
                                             modifier = Modifier.weight(1f).height(36.dp),
@@ -887,7 +746,7 @@ fun FloatingWithContent(
                                                         context.startActivity(intent)
                                                     }
                                                 } catch (_: Exception) {
-                                                    Toast.makeText(context, "Could not open link inspector", Toast.LENGTH_SHORT).show()
+                                                    Toast.makeText(context, context.getString(R.string.error_open_link_inspector), Toast.LENGTH_SHORT).show()
                                                 }
                                             },
                                             modifier = Modifier.weight(1f).height(36.dp),
@@ -1064,7 +923,7 @@ fun FloatingWithContent(
                                                         clipboard.setPrimaryClip(clip)
                                                         Toast.makeText(context, context.getString(R.string.action_copy_clipboard), Toast.LENGTH_SHORT).show()
                                                     } catch (_: Exception) {
-                                                        Toast.makeText(context, "Could not copy to clipboard", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
                                                     }
                                                 },
                                                 modifier = Modifier.weight(1f).height(36.dp),
@@ -1083,7 +942,7 @@ fun FloatingWithContent(
                                                         }
                                                         context.startActivity(Intent.createChooser(sendIntent, null))
                                                     } catch (_: Exception) {
-                                                        Toast.makeText(context, "No app available to share link", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(context, context.getString(R.string.error_no_share_app), Toast.LENGTH_SHORT).show()
                                                     }
                                                 },
                                                 modifier = Modifier.weight(1f).height(36.dp),
@@ -1117,7 +976,7 @@ fun FloatingWithContent(
                                                             context.startActivity(intent)
                                                         }
                                                     } catch (_: Exception) {
-                                                        Toast.makeText(context, "Could not open link inspector", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(context, context.getString(R.string.error_open_link_inspector), Toast.LENGTH_SHORT).show()
                                                     }
                                                 },
                                                 modifier = Modifier.weight(1f).height(36.dp),
@@ -1364,7 +1223,7 @@ fun FloatingWithContent(
                                 context.startActivity(Intent.createChooser(sendIntent, null))
                             }
                         } catch (_: Exception) {
-                            Toast.makeText(context, "Could not share QR image", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.error_share_qr_image), Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -1400,7 +1259,7 @@ fun FloatingWithContent(
                                 clipboard.setPrimaryClip(clip)
                                 Toast.makeText(context, context.getString(R.string.action_copy_clipboard), Toast.LENGTH_SHORT).show()
                             } catch (_: Exception) {
-                                Toast.makeText(context, "Could not copy to clipboard", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.error_could_not_copy), Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier.weight(1f).height(44.dp),
@@ -1419,7 +1278,7 @@ fun FloatingWithContent(
                             if (success) {
                                 Toast.makeText(context, context.getString(R.string.qr_saved_success), Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(context, "Failed to save QR image", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.error_save_qr_image), Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier.weight(1f).height(44.dp),

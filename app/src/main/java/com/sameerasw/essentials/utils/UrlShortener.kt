@@ -163,15 +163,23 @@ object UrlShortener {
     ) {
         if (!isNotificationEnabled(context)) return
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val hasPermission = androidx.core.content.ContextCompat.checkSelfPermission(
+                context,
+                android.Manifest.permission.POST_NOTIFICATIONS,
+            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+            if (!hasPermission) return
+        }
+
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "Shortened Links",
+                context.getString(R.string.tile_url_shortener),
                 NotificationManager.IMPORTANCE_LOW,
             ).apply {
-                description = "Quick actions for newly shortened URLs"
+                description = context.getString(R.string.tile_url_shortener_subtitle)
                 setShowBadge(false)
             }
             nm.createNotificationChannel(channel)
@@ -212,11 +220,11 @@ object UrlShortener {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val expiryText = if (expiration.seconds > 0) "Expires in ${expiration.label}" else "Permanent"
+        val expiryText = if (expiration.seconds > 0) expiration.label else context.getString(R.string.shorten_never_expire)
 
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.rounded_link_24)
-            .setContentTitle("Link Shortened ⚡ ($expiryText)")
+            .setContentTitle("${context.getString(R.string.shorten_url_title)} ($expiryText)")
             .setContentText(shortUrl)
             .setContentIntent(openPendingIntent)
             .setAutoCancel(true)

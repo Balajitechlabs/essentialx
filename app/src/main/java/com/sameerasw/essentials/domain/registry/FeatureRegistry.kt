@@ -12,6 +12,7 @@ package com.sameerasw.essentials.domain.registry
 import android.content.Context
 import android.content.Intent
 import com.sameerasw.essentials.EssentialsApp
+import com.sameerasw.essentials.FeatureSettingsActivity
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.Feature
 import com.sameerasw.essentials.domain.model.SearchSetting
@@ -845,7 +846,7 @@ object FeatureRegistry {
                     val intent =
                         Intent(
                             context,
-                            com.sameerasw.essentials.FeatureSettingsActivity::class.java,
+                            FeatureSettingsActivity::class.java,
                         ).apply {
                             putExtra("feature", "URL Shortener")
                         }

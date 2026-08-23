@@ -90,6 +90,7 @@ import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.WindowingUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -227,7 +228,7 @@ fun LinkPickerScreen(
                 .filter { searchQuery.isEmpty() || it.label.contains(searchQuery, ignoreCase = true) }
                 .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
         }
-    val isToolsSupported = remember { com.sameerasw.essentials.utils.WindowingUtils.isFloatingModeSupported(context) }
+    val isToolsSupported = remember { WindowingUtils.isFloatingModeSupported(context) }
     val tabItems = remember(isToolsSupported) {
         if (isToolsSupported) listOf(0, 1, 2) else listOf(0, 1)
     }
@@ -514,11 +515,11 @@ fun LinkPickerScreen(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_edit_24),
-                                contentDescription = "Edit",
+                                contentDescription = stringResource(R.string.action_edit),
                                 modifier = Modifier.size(18.dp),
                             )
                             Spacer(Modifier.size(6.dp))
-                            Text("Edit", maxLines = 1)
+                            Text(stringResource(R.string.action_edit), maxLines = 1)
                         }
 
                         // Shorten Link Button
@@ -533,7 +534,7 @@ fun LinkPickerScreen(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.rounded_link_24),
-                                contentDescription = "Shorten",
+                                contentDescription = stringResource(R.string.shorten_root_button),
                                 modifier = Modifier.size(18.dp),
                             )
                             Spacer(Modifier.size(6.dp))
@@ -549,11 +550,11 @@ fun LinkPickerScreen(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Search apps") },
+                    placeholder = { Text(stringResource(R.string.search_apps_placeholder)) },
                     leadingIcon = {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_search_24),
-                            contentDescription = "Search",
+                            contentDescription = stringResource(R.string.search_apps_placeholder),
                         )
                     },
                     singleLine = true,
