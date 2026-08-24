@@ -4766,7 +4766,7 @@ class MainViewModel : ViewModel() {
      *
      * @param calendarId [Long] Target calendar id.
      */
-    fun toggleCalendarSelection(calendarId: Long) {
+    fun toggleCalendarSelection(calendarId: Long, context: Context? = null) {
         val currentIds = selectedCalendarIds.value.toMutableSet()
         val idString = calendarId.toString()
         if (currentIds.contains(idString)) {
@@ -4782,6 +4782,10 @@ class MainViewModel : ViewModel() {
         if (index != -1) {
             availableCalendars[index] =
                 availableCalendars[index].copy(isSelected = currentIds.contains(idString))
+        }
+
+        context?.let {
+            com.sameerasw.essentials.services.CalendarSyncManager.forceSync(it)
         }
     }
 

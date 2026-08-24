@@ -133,7 +133,7 @@ fun CalendarSyncSettingsUI(
                         CalendarSelectionItem(
                             calendar = calendar,
                             isEnabled = isEnabled,
-                            onToggle = { viewModel.toggleCalendarSelection(calendar.id) },
+                            onToggle = { viewModel.toggleCalendarSelection(calendar.id, context) },
                         )
                     }
                 }

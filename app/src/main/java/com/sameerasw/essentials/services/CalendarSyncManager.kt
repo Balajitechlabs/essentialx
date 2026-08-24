@@ -29,7 +29,9 @@ object CalendarSyncManager {
     private var observer: ContentObserver? = null
 
     fun forceSync(context: Context) {
-        Log.d(TAG, "forceSync: Manually triggering sync")
+        val repo = SettingsRepository(context)
+        isSyncEnabled = repo.getBoolean(SettingsRepository.KEY_CALENDAR_SYNC_ENABLED, false)
+        Log.d(TAG, "forceSync: Manually triggering sync, isSyncEnabled=$isSyncEnabled")
         syncEvents(context)
     }
 
@@ -148,6 +150,7 @@ object CalendarSyncManager {
                 CalendarContract.Instances.END,
                 CalendarContract.Instances.ALL_DAY,
                 CalendarContract.Instances.EVENT_LOCATION,
+                CalendarContract.Instances.CALENDAR_ID,
             )
 
         val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
@@ -161,17 +164,19 @@ object CalendarSyncManager {
 
         val selection =
             if (selectedIds.isNotEmpty()) {
-                "${CalendarContract.Instances.CALENDAR_ID} IN (${selectedIds.joinToString(",")})"
+                val placeholders = selectedIds.map { "?" }.joinToString(",")
+                "${CalendarContract.Instances.CALENDAR_ID} IN ($placeholders)"
             } else {
                 null
             }
+        val selectionArgs = if (selectedIds.isNotEmpty()) selectedIds.toTypedArray() else null
 
         val cursor =
             context.contentResolver.query(
                 builder.build(),
                 projection,
                 selection,
-                null,
+                selectionArgs,
                 CalendarContract.Instances.BEGIN + " ASC",
             )
 
@@ -187,7 +192,7 @@ object CalendarSyncManager {
                 val location = it.getString(5)
 
                 events.add(CalendarEvent(idValue, title, begin, end, allDay, location))
-                if (events.size >= 10) break // Limit to top 10 events for Wear OS
+                if (events.size >= 50) break // Sync up to 50 upcoming events
             }
         }
 
