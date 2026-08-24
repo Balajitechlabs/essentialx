@@ -18,7 +18,7 @@ import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.data.repository.UpdateRepository
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.UpdateNotificationHelper
-
+import com.sameerasw.essentials.viewmodels.MainViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -60,8 +60,8 @@ class AppUpdateWorker(
                     updateRepository.checkForUpdates(context, isPreReleaseEnabled, currentVersion)
 
                 if (updateInfo != null && updateInfo.isUpdateAvailable) {
-                    com.sameerasw.essentials.viewmodels.MainViewModel.cachedIsUpdateAvailable = true
-                    com.sameerasw.essentials.viewmodels.MainViewModel.cachedUpdateInfo = updateInfo
+                    MainViewModel.cachedIsUpdateAvailable = true
+                    MainViewModel.cachedUpdateInfo = updateInfo
 
                     if (updateInfo.downloadUrl.isNotEmpty()) {
                         val isNotifEnabled =

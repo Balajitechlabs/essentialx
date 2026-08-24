@@ -81,7 +81,9 @@ import com.airbnb.lottie.compose.rememberLottieDynamicProperties
 import com.airbnb.lottie.compose.rememberLottieDynamicProperty
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.domain.DIYTabs
+import com.sameerasw.essentials.domain.model.UpdateInfo
 import com.sameerasw.essentials.domain.registry.initPermissionRegistry
+import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.ui.components.EssentialsFloatingToolbar
 import com.sameerasw.essentials.ui.components.ToolbarItem
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
@@ -499,12 +501,12 @@ class MainActivity : AppCompatActivity() {
                             val isUpdateAvailable =
                                 if (repo.mappedPackageName != null) {
                                     val installedVersion =
-                                        com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                                        AppUtil.getAppVersion(
                                             this@MainActivity,
                                             repo.mappedPackageName,
                                         )
                                     if (installedVersion != null && repo.latestTagName.isNotBlank()) {
-                                        com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(
+                                        AppUtil.compareSemanticVersions(
                                             repo.latestTagName,
                                             installedVersion,
                                         ) > 0
@@ -517,7 +519,7 @@ class MainActivity : AppCompatActivity() {
 
                             UpdateBottomSheet(
                                 updateInfo =
-                                    com.sameerasw.essentials.domain.model.UpdateInfo(
+                                    UpdateInfo(
                                         versionName = repo.latestTagName,
                                         releaseNotes = repo.latestReleaseBody ?: "",
                                         downloadUrl = repo.downloadUrl ?: "",

@@ -12,6 +12,7 @@ package com.sameerasw.essentials.data.repository
 import android.content.Context
 import com.google.gson.Gson
 import com.sameerasw.essentials.domain.model.UpdateInfo
+import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.AutoUpdateManagerHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,6 +20,16 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 class UpdateRepository {
+    companion object {
+        const val DEFAULT_REPO_OWNER = "sameerasw"
+        const val DEFAULT_REPO_NAME = "essentials"
+        const val DEFAULT_REPO_FULL_NAME = "$DEFAULT_REPO_OWNER/$DEFAULT_REPO_NAME"
+        const val ESSENTIALS_UPDATE_JSON_URL = "https://sameerasw.com/essentials-update.json"
+        const val ESSENTIALS_UPDATE_HOST = "sameerasw.com"
+        const val GITHUB_RELEASES_URL = "https://github.com/$DEFAULT_REPO_FULL_NAME/releases"
+        const val GITHUB_API_RELEASES_URL = "https://api.github.com/repos/$DEFAULT_REPO_FULL_NAME/releases"
+    }
+
     suspend fun checkForUpdates(
         context: Context,
         isPreReleaseCheckEnabled: Boolean,
@@ -28,7 +39,7 @@ class UpdateRepository {
             try {
                 val autoUpdateHelper = AutoUpdateManagerHelper(context)
                 val updateFeatures =
-                    autoUpdateHelper.checkForUpdate("https://sameerasw.com/essentials-update.json")
+                    autoUpdateHelper.checkForUpdate(ESSENTIALS_UPDATE_JSON_URL)
 
                 if (updateFeatures != null && updateFeatures.latestversion.isNotEmpty()) {
                     val latestVersion = updateFeatures.latestversion
@@ -44,7 +55,7 @@ class UpdateRepository {
                             ) {
                                 updateFeatures.changelog
                             } else {
-                                "https://github.com/sameerasw/essentials/releases"
+                                GITHUB_RELEASES_URL
                             },
                         isUpdateAvailable = hasUpdate,
                     )
@@ -64,9 +75,9 @@ class UpdateRepository {
             try {
                 val urlString =
                     if (isPreReleaseCheckEnabled) {
-                        "https://api.github.com/repos/sameerasw/essentials/releases"
+                        GITHUB_API_RELEASES_URL
                     } else {
-                        "https://api.github.com/repos/sameerasw/essentials/releases/latest"
+                        "$GITHUB_API_RELEASES_URL/latest"
                     }
 
                 val url = URL(urlString)
@@ -89,7 +100,7 @@ class UpdateRepository {
                         releases.maxWithOrNull { rel1, rel2 ->
                             val tag1 = (rel1["tag_name"] as? String)?.removePrefix("v") ?: "0.0.0"
                             val tag2 = (rel2["tag_name"] as? String)?.removePrefix("v") ?: "0.0.0"
-                            com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(tag1, tag2)
+                            AppUtil.compareSemanticVersions(tag1, tag2)
                         }
                     } else {
                         Gson().fromJson(releaseData, Map::class.java) as? Map<String, Any>
@@ -128,5 +139,5 @@ class UpdateRepository {
     private fun isNewerVersion(
         current: String,
         latest: String,
-    ): Boolean = com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(latest, current) > 0
+    ): Boolean = AppUtil.compareSemanticVersions(latest, current) > 0
 }

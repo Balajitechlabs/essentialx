@@ -11,6 +11,7 @@ package com.sameerasw.essentials.data.repository
 
 import android.util.Log
 import com.google.gson.Gson
+import com.sameerasw.essentials.domain.model.github.GitHubPullRequest
 import com.sameerasw.essentials.domain.model.github.GitHubRelease
 import com.sameerasw.essentials.domain.model.github.GitHubRepo
 import com.sameerasw.essentials.domain.model.github.GitHubUser
@@ -355,7 +356,7 @@ class GitHubRepository {
         repo: String,
         author: String,
         token: String? = null,
-    ): List<com.sameerasw.essentials.domain.model.github.GitHubPullRequest> =
+    ): List<GitHubPullRequest> =
         withContext(Dispatchers.IO) {
             try {
                 val url = URL("https://api.github.com/repos/$owner/$repo/pulls?state=open")
@@ -370,7 +371,7 @@ class GitHubRepository {
                         gson
                             .fromJson(
                                 data,
-                                Array<com.sameerasw.essentials.domain.model.github.GitHubPullRequest>::class.java,
+                                Array<GitHubPullRequest>::class.java,
                             ).toList()
                     val targetRef = "translations-$author"
                     allPrs.filter { pr ->

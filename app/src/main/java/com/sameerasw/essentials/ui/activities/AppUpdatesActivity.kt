@@ -57,12 +57,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.sameerasw.essentials.domain.model.UpdateInfo
 import com.sameerasw.essentials.ui.components.ReusableTopAppBar
 import com.sameerasw.essentials.ui.core.cards.TrackedRepoCard
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.AddRepoBottomSheet
 import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
+import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.viewmodels.AppUpdatesViewModel
 import com.sameerasw.essentials.viewmodels.MainViewModel
@@ -224,12 +226,12 @@ class AppUpdatesActivity : AppCompatActivity() {
                         val isUpdateAvailable =
                             if (repo.mappedPackageName != null) {
                                 val installedVersion =
-                                    com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                                    AppUtil.getAppVersion(
                                         this@AppUpdatesActivity,
                                         repo.mappedPackageName,
                                     )
                                 if (installedVersion != null && repo.latestTagName.isNotBlank()) {
-                                    com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(
+                                    AppUtil.compareSemanticVersions(
                                         repo.latestTagName,
                                         installedVersion,
                                     ) > 0
@@ -242,7 +244,7 @@ class AppUpdatesActivity : AppCompatActivity() {
 
                         UpdateBottomSheet(
                             updateInfo =
-                                com.sameerasw.essentials.domain.model.UpdateInfo(
+                                UpdateInfo(
                                     versionName = repo.latestTagName,
                                     releaseNotes = repo.latestReleaseBody ?: "",
                                     downloadUrl = repo.downloadUrl ?: "",

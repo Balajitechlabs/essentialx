@@ -11,6 +11,7 @@ package com.sameerasw.essentials.ui.core.sheets
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -54,9 +55,11 @@ import androidx.core.net.toUri
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.data.repository.UpdateRepository
 import com.sameerasw.essentials.domain.model.UpdateInfo
 import com.sameerasw.essentials.ui.components.text.SimpleMarkdown
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.AutoUpdateManagerHelper
 import com.sameerasw.essentials.utils.HapticUtil
 import kotlinx.coroutines.Dispatchers
@@ -103,14 +106,14 @@ fun UpdateBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState,
     ) {
-        androidx.compose.foundation.layout.Box(
+        Box(
             modifier =
                 Modifier
                     .fillMaxWidth(),
             contentAlignment = Alignment.TopCenter,
         ) {
             if (isChecking || updateInfo == null) {
-                androidx.compose.foundation.layout.Box(
+                Box(
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -124,14 +127,15 @@ fun UpdateBottomSheet(
                     remember(updateInfo, context) {
                         if (!updateInfo.isUpdateAvailable) return@remember false
                         val currentAppVersion =
-                            com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                            AppUtil.getAppVersion(
                                 context,
                                 context.packageName,
                             ) ?: "0.0.0"
-                        if (updateInfo.versionName.isNotEmpty() &&
-                            (updateInfo.releaseUrl.contains("sameerasw/essentials") || updateInfo.releaseUrl.contains("essentials-update"))
-                        ) {
-                            com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(
+                        val isSelfAppUpdate =
+                            updateInfo.releaseUrl.contains(UpdateRepository.DEFAULT_REPO_FULL_NAME) ||
+                                updateInfo.releaseUrl.contains(UpdateRepository.ESSENTIALS_UPDATE_HOST)
+                        if (updateInfo.versionName.isNotEmpty() && isSelfAppUpdate) {
+                            AppUtil.compareSemanticVersions(
                                 updateInfo.versionName,
                                 currentAppVersion,
                             ) > 0
@@ -174,7 +178,7 @@ fun UpdateBottomSheet(
 
                     val currentAppVersion =
                         remember(context) {
-                            com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                            AppUtil.getAppVersion(
                                 context,
                                 context.packageName,
                             ) ?: ""
@@ -182,13 +186,22 @@ fun UpdateBottomSheet(
 
                     if (isActuallyAvailable && currentAppVersion.isNotEmpty()) {
                         Text(
-                            text = "v$currentAppVersion → ${updateInfo.versionName}",
+                            text =
+                                stringResource(
+                                    R.string.format_version_diff,
+                                    currentAppVersion,
+                                    updateInfo.versionName,
+                                ),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                         )
                     } else if (updateInfo.versionName.isNotEmpty()) {
                         Text(
-                            text = "Version ${updateInfo.versionName}",
+                            text =
+                                stringResource(
+                                    R.string.label_version_name,
+                                    updateInfo.versionName,
+                                ),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                         )

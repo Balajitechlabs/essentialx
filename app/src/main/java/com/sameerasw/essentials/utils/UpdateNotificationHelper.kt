@@ -16,9 +16,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.sameerasw.essentials.MainActivity
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.services.receivers.DownloadUpdateReceiver
+import com.sameerasw.essentials.ui.activities.YourAndroidActivity
 
 object UpdateNotificationHelper {
     private const val CHANNEL_ID = "app_updates"
@@ -26,12 +29,12 @@ object UpdateNotificationHelper {
 
     fun hasNotificationPermission(context: Context): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return androidx.core.content.ContextCompat.checkSelfPermission(
+            return ContextCompat.checkSelfPermission(
                 context,
                 android.Manifest.permission.POST_NOTIFICATIONS,
             ) == android.content.pm.PackageManager.PERMISSION_GRANTED
         }
-        return androidx.core.app.NotificationManagerCompat.from(context).areNotificationsEnabled()
+        return NotificationManagerCompat.from(context).areNotificationsEnabled()
     }
 
     fun createNotificationChannel(context: Context) {
@@ -120,7 +123,7 @@ object UpdateNotificationHelper {
 
         val notifId = (repoFullName.hashCode() and 0x7FFFFFFF)
         val mainIntent =
-            Intent(context, com.sameerasw.essentials.ui.activities.YourAndroidActivity::class.java).apply {
+            Intent(context, YourAndroidActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                 putExtra("repo_full_name", repoFullName)
             }

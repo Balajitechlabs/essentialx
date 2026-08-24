@@ -38,9 +38,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import java.util.concurrent.TimeUnit
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.data.repository.UpdateRepository
@@ -61,6 +65,7 @@ import com.sameerasw.essentials.domain.model.UpdateInfo
 import com.sameerasw.essentials.domain.registry.SearchRegistry
 import com.sameerasw.essentials.services.AppUpdateWorker
 import com.sameerasw.essentials.services.CaffeinateWakeLockService
+import com.sameerasw.essentials.services.DailyWallpaperWorker
 import com.sameerasw.essentials.services.NotificationLightingService
 import com.sameerasw.essentials.services.receivers.FlashlightActionReceiver
 import com.sameerasw.essentials.services.receivers.SecurityDeviceAdminReceiver
@@ -1145,7 +1150,7 @@ class MainViewModel : ViewModel() {
                     "0.0"
                 } ?: "0.0"
             val info = cachedUpdateInfo
-            if (info != null && com.sameerasw.essentials.utils.AppUtil.compareSemanticVersions(info.versionName, currentVersion) > 0) {
+            if (info != null && AppUtil.compareSemanticVersions(info.versionName, currentVersion) > 0) {
                 isUpdateAvailable.value = true
                 updateInfo.value = cachedUpdateInfo
             } else {
@@ -7248,58 +7253,73 @@ class MainViewModel : ViewModel() {
                 .putBoolean("force", true)
                 .build()
         val workRequest =
-            androidx.work
-                .OneTimeWorkRequestBuilder<com.sameerasw.essentials.services.DailyWallpaperWorker>()
+            OneTimeWorkRequestBuilder<DailyWallpaperWorker>()
                 .setInputData(data)
                 .build()
-        androidx.work.WorkManager
+        WorkManager
+            .getInstance(context)
+            .enqueue(workRequest)
+    }
+
+    fun triggerDailyWallpaperWorkerNow(
+        context: Context,
+        isRetry: Boolean = false,
+    ) {
+        val data =
+            androidx.work.Data
+                .Builder()
+                .putBoolean("is_retry", isRetry)
+                .build()
+        val workRequest =
+            OneTimeWorkRequestBuilder<DailyWallpaperWorker>()
+                .setInputData(data)
+                .build()
+        WorkManager
             .getInstance(context)
             .enqueue(workRequest)
     }
 
     private fun schedulePeriodicWallpaperCheck(context: Context) {
         val workRequest =
-            androidx.work
-                .PeriodicWorkRequestBuilder<com.sameerasw.essentials.services.DailyWallpaperWorker>(
-                    24,
-                    java.util.concurrent.TimeUnit.HOURS,
-                ).build()
+            PeriodicWorkRequestBuilder<DailyWallpaperWorker>(
+                24,
+                TimeUnit.HOURS,
+            ).build()
 
-        androidx.work.WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "daily_wallpaper_check_work",
-            androidx.work.ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             workRequest,
         )
     }
 
     private fun schedulePeriodicAppUpdateCheck(context: Context) {
         val constraints =
-            androidx.work.Constraints
+            Constraints
                 .Builder()
-                .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                .setRequiredNetworkType(NetworkType.CONNECTED)
                 .setRequiresBatteryNotLow(true)
                 .build()
 
         val workRequest =
-            androidx.work
-                .PeriodicWorkRequestBuilder<AppUpdateWorker>(
-                    15,
-                    java.util.concurrent.TimeUnit.MINUTES,
-                ).setConstraints(constraints)
-                .build()
+            PeriodicWorkRequestBuilder<AppUpdateWorker>(
+                4,
+                TimeUnit.HOURS,
+            ).setConstraints(constraints)
+            .build()
 
-        androidx.work.WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             "app_update_check_work",
-            androidx.work.ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             workRequest,
         )
     }
 
     private fun cancelPeriodicWallpaperCheck(context: Context) {
-        androidx.work.WorkManager
+        WorkManager
             .getInstance(context)
             .cancelUniqueWork("daily_wallpaper_check_work")
-        androidx.work.WorkManager
+        WorkManager
             .getInstance(context)
             .cancelUniqueWork("daily_wallpaper_retry_work")
     }

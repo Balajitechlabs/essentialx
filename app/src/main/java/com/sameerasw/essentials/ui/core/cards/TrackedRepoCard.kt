@@ -55,6 +55,7 @@ import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.TrackedRepo
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenu
 import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
+import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.TimeUtil
 
@@ -184,7 +185,7 @@ fun TrackedRepoCard(
                     val isInstalled = repo.mappedPackageName != null
                     val installedVersion =
                         if (isInstalled) {
-                            com.sameerasw.essentials.utils.AppUtil.getAppVersion(
+                            AppUtil.getAppVersion(
                                 context,
                                 repo.mappedPackageName,
                             )
@@ -203,7 +204,7 @@ fun TrackedRepoCard(
                         )
                         if (isInstalled && installedVersion != null) {
                             Text(
-                                text = " v$installedVersion",
+                                text = stringResource(R.string.format_version_prefix, installedVersion),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                 modifier = Modifier.padding(start = 4.dp),
@@ -212,7 +213,7 @@ fun TrackedRepoCard(
                             val cleanVersion =
                                 repo.latestTagName.removePrefix("v").removePrefix("V")
                             Text(
-                                text = " $cleanVersion",
+                                text = stringResource(R.string.format_version_tag, cleanVersion),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                 modifier = Modifier.padding(start = 4.dp),
