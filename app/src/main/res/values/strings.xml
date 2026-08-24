@@ -2249,4 +2249,27 @@
     <string name="action_preview_web">Preview</string>
     <string name="action_clear">Clear</string>
     <string name="action_send_to_mac">AirSync</string>
+    <string name="watch_watchface_title">Watchface</string>
+    <string name="watch_watchface_desc">Customize the watchface</string>
+    <string name="watchface_category_battery">Battery &amp; Icons</string>
+    <string name="watchface_hide_battery_title">Hide battery</string>
+    <string name="watchface_hide_battery_desc">Hide battery arc tracks and indicators</string>
+    <string name="watchface_hide_device_icons_title">Hide device icons</string>
+    <string name="watchface_hide_device_icons_desc">Hide bottom watch and phone icons</string>
+    <string name="watchface_category_complications">Complications</string>
+    <string name="watchface_show_complications_title">Show complications</string>
+    <string name="watchface_show_complications_desc">Display left and right side widgets</string>
+    <string name="watchface_complication_outline_title">Complication outline</string>
+    <string name="watchface_complication_outline_desc">Show thin circular border around items</string>
+    <string name="watchface_left_complication_title">Left complication</string>
+    <string name="watchface_right_complication_title">Right complication</string>
+    <string name="watchface_comp_heart_rate">Heart Rate</string>
+    <string name="watchface_comp_steps">Steps</string>
+    <string name="watchface_comp_distance">Distance</string>
+    <string name="watchface_comp_none">None</string>
+    <string name="watchface_category_glance">At a Glance &amp; Glow</string>
+    <string name="watchface_show_upcoming_events_title">Show upcoming events</string>
+    <string name="watchface_show_upcoming_events_desc">Show today’s meetings or next alarm at top</string>
+    <string name="watchface_show_glow_title">Show glow</string>
+    <string name="watchface_show_glow_desc">Dynamic top accent gradient approaching events</string>
 </resources>

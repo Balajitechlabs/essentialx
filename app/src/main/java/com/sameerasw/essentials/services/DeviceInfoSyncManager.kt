@@ -159,7 +159,7 @@ object DeviceInfoSyncManager {
             tapToWakeContentObserver!!,
         )
 
-        // Sync on preference change (flashlight pulse, glance, watch controls)
+        // Sync on preference change (flashlight pulse, glance, watch controls, watchface)
         val p = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
         prefChangeListener =
             android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -167,7 +167,8 @@ object DeviceInfoSyncManager {
                     key == "notification_glance_enabled" ||
                     key == "watch_controls_layout" ||
                     key == "watch_sync_sound_mode_enabled" ||
-                    key == "watch_sync_location_reached_enabled"
+                    key == "watch_sync_location_reached_enabled" ||
+                    key?.startsWith("watchface_") == true
                 ) {
                     syncDeviceInfo(context)
                 }
@@ -304,6 +305,15 @@ object DeviceInfoSyncManager {
         dataMap.putString("travel_icon_name", travelIconName)
         dataMap.putBoolean("travel_is_paused", travelIsPaused)
         dataMap.putBoolean("travel_arrived", travelArrived)
+
+        dataMap.putBoolean("watchface_hide_battery", prefs.getBoolean("watchface_hide_battery", false))
+        dataMap.putBoolean("watchface_hide_device_icons", prefs.getBoolean("watchface_hide_device_icons", false))
+        dataMap.putBoolean("watchface_show_complications", prefs.getBoolean("watchface_show_complications", true))
+        dataMap.putBoolean("watchface_complication_outline", prefs.getBoolean("watchface_complication_outline", true))
+        dataMap.putString("watchface_left_complication", prefs.getString("watchface_left_complication", "HEART_RATE") ?: "HEART_RATE")
+        dataMap.putString("watchface_right_complication", prefs.getString("watchface_right_complication", "STEPS") ?: "STEPS")
+        dataMap.putBoolean("watchface_show_upcoming_events", prefs.getBoolean("watchface_show_upcoming_events", true))
+        dataMap.putBoolean("watchface_show_glow", prefs.getBoolean("watchface_show_glow", true))
 
         dataMap.putLong("timestamp", System.currentTimeMillis())
 
