@@ -199,7 +199,7 @@ fun WatchfaceSettingsUI(
             cornerRadius = 24.dp,
         ) {
             IconToggleItem(
-                iconRes = R.drawable.rounded_watch_24,
+                iconRes = R.drawable.rounded_battery_android_frame_6_24,
                 title = stringResource(R.string.watchface_hide_battery_title),
                 description = stringResource(R.string.watchface_hide_battery_desc),
                 isChecked = hideBattery,
