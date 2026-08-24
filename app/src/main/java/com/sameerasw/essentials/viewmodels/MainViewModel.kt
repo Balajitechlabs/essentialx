@@ -7048,12 +7048,32 @@ class MainViewModel : ViewModel() {
             // sysui_qs_tiles is restricted on Android 14+ (API 34+) for apps targeting API 34+
             e.printStackTrace()
         }
-        addedQSTiles.value =
+
+        if (tilesString.isBlank() && ShellUtils.hasPermission(context)) {
+            try {
+                tilesString = ShellUtils.runCommandWithOutput(context, "settings get secure sysui_qs_tiles") ?: ""
+                if (tilesString == "null") tilesString = ""
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        val fromSecureSettings =
             tilesString
                 .split(",")
                 .map { it.trim() }
                 .filter { it.isNotBlank() }
                 .toSet()
+
+        val prefs = context.getSharedPreferences("essentials_prefs", Context.MODE_PRIVATE)
+        val fromPrefs =
+            prefs.all
+                .filter { (key, value) -> key.endsWith("_is_added") && value == true }
+                .keys
+                .map { it.removeSuffix("_is_added") }
+                .toSet()
+
+        addedQSTiles.value = fromSecureSettings + fromPrefs
     }
 
     // Daily Wallpaper Support

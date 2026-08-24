@@ -241,7 +241,12 @@
     <string name="tile_private_dns">Private DNS</string>
     <string name="tile_private_dns_auto">Auto</string>
     <string name="tile_private_dns_off">Off</string>
-    <string name="tile_usb_debugging">USB Debugging</string>
+    <string name="tile_usb_debugging">Debugging</string>
+    <string name="usb">USB</string>
+    <string name="wifi">Wifi</string>
+    <string name="usb_and_wifi">USB &amp; Wifi</string>
+    <string name="usb_debugging_title_short">USB Adb</string>
+    <string name="wireless_debugging_title_short">Wifi Adb</string>
     <string name="tile_color_picker">Color Picker</string>
     <string name="toast_eyedropper_failed">Are you sure you\'re on Androdi 17? (╯°_°）╯</string>
     <string name="subtitle_eye_dropper">Eye Dropper</string>
@@ -1456,4 +1461,7 @@
     <string name="whats_new_apps_desc">The Apps tab is now fully integrated into the Your Android feature, making it easier to manage all your app updates in one cohesive hub.</string>
     <string name="action_restart_shizuku">Restart Shizuku</string>
     <string name="toast_enter_shizuku_token">Please enter Shizuku auth token in settings first</string>
+    <string name="action_preview_web">Preview</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_send_to_mac">AirSync</string>
 </resources>
