@@ -41,6 +41,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
@@ -54,7 +55,10 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -109,6 +113,12 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.text.Collator
 import java.util.Locale
+
+private data class LinkActionItem(
+    val titleRes: Int,
+    val iconRes: Int,
+    val onClick: () -> Unit,
+)
 
 private const val TAG = "LinkPickerScreen"
 
@@ -440,116 +450,112 @@ fun LinkPickerScreen(
                             }
                         }
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
-                        ) {
-                            FilledIconButton(
-                                onClick = {
-                                    val clipboard =
-                                        context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                    clipboard.setPrimaryClip(
-                                        ClipData.newPlainText(
-                                            "Link",
-                                            currentUri.toString(),
-                                        ),
-                                    )
-                                    Toast
-                                        .makeText(
-                                            context,
-                                            "Link copied to clipboard",
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                },
-                                modifier = Modifier.weight(1f).height(44.dp),
-                                shape = ButtonGroupDefaults.connectedLeadingButtonShapes().shape,
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_content_copy_24),
-                                    contentDescription = "Copy",
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            }
-
-                            FilledIconButton(
-                                onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    if (isFloatingSupported) {
-                                        val bubblesEnabled = WindowingUtils.areNotificationBubblesEnabled(context)
-                                        val canWriteSecure = PermissionUtils.canWriteSecureSettings(context)
-                                        if (bubblesEnabled || canWriteSecure) {
-                                            WindowingUtils.launchOverlayWindow(context, currentUri, isPrivate = true)
-                                            onFinish()
-                                        } else {
-                                            Toast.makeText(
+                        val actionItems = remember(isFloatingSupported) {
+                            listOfNotNull(
+                                LinkActionItem(
+                                    titleRes = R.string.shorten_copy_link,
+                                    iconRes = R.drawable.rounded_content_copy_24,
+                                    onClick = {
+                                        val clipboard =
+                                            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                        clipboard.setPrimaryClip(
+                                            ClipData.newPlainText(
+                                                "Link",
+                                                currentUri.toString(),
+                                            ),
+                                        )
+                                        Toast
+                                            .makeText(
                                                 context,
-                                                context.getString(R.string.preview_web_desc_disabled),
+                                                context.getString(R.string.action_copy_clipboard),
                                                 Toast.LENGTH_SHORT,
                                             ).show()
-                                        }
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            context.getString(R.string.preview_web_desc_disabled),
-                                            Toast.LENGTH_SHORT,
-                                        ).show()
-                                    }
-                                },
-                                modifier = Modifier.weight(1f).height(44.dp),
-                                shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_open_in_browser_24),
-                                    contentDescription = stringResource(R.string.preview_web_title),
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            }
+                                    },
+                                ),
+                                LinkActionItem(
+                                    titleRes = R.string.action_edit,
+                                    iconRes = R.drawable.rounded_edit_24,
+                                    onClick = {
+                                        editingText = currentUri.toString()
+                                        showEditSheet = true
+                                    },
+                                ),
+                                if (isFloatingSupported) {
+                                    LinkActionItem(
+                                        titleRes = R.string.action_preview_web,
+                                        iconRes = R.drawable.rounded_open_in_browser_24,
+                                        onClick = {
+                                            val bubblesEnabled = WindowingUtils.areNotificationBubblesEnabled(context)
+                                            val canWriteSecure = PermissionUtils.canWriteSecureSettings(context)
+                                            if (bubblesEnabled || canWriteSecure) {
+                                                WindowingUtils.launchOverlayWindow(context, currentUri, isPrivate = true)
+                                                onFinish()
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    context.getString(R.string.preview_web_desc_disabled),
+                                                    Toast.LENGTH_SHORT,
+                                                ).show()
+                                            }
+                                        },
+                                    )
+                                } else null,
+                                LinkActionItem(
+                                    titleRes = R.string.qr_code_title,
+                                    iconRes = R.drawable.rounded_qr_code_24,
+                                    onClick = {
+                                        showQrSheet = true
+                                    },
+                                ),
+                                LinkActionItem(
+                                    titleRes = R.string.shorten_root_button,
+                                    iconRes = R.drawable.rounded_smart_button_24,
+                                    onClick = {
+                                        showShortenSheet = true
+                                    },
+                                ),
+                            )
+                        }
 
-                            FilledIconButton(
+                        val actionCarouselState = rememberCarouselState { actionItems.size }
+                        HorizontalMultiBrowseCarousel(
+                            state = actionCarouselState,
+                            preferredItemWidth = 110.dp,
+                            itemSpacing = 4.dp,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(44.dp),
+                        ) { index ->
+                            val action = actionItems[index]
+                            Surface(
                                 onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    showQrSheet = true
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    action.onClick()
                                 },
-                                modifier = Modifier.weight(1f).height(44.dp),
-                                shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.fillMaxSize().maskClip(RoundedCornerShape(16.dp)),
                             ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_qr_code_24),
-                                    contentDescription = stringResource(R.string.qr_code_title),
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            }
-
-                            FilledIconButton(
-                                onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    showShortenSheet = true
-                                },
-                                modifier = Modifier.weight(1f).height(44.dp),
-                                shape = ButtonGroupDefaults.connectedMiddleButtonShapes().shape,
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_smart_button_24),
-                                    contentDescription = stringResource(R.string.shorten_root_button),
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            }
-
-                            FilledIconButton(
-                                onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    editingText = currentUri.toString()
-                                    showEditSheet = true
-                                },
-                                modifier = Modifier.weight(1f).height(44.dp),
-                                shape = ButtonGroupDefaults.connectedTrailingButtonShapes().shape,
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_edit_24),
-                                    contentDescription = stringResource(R.string.action_edit),
-                                    modifier = Modifier.size(20.dp),
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = action.iconRes),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp),
+                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        text = stringResource(id = action.titleRes),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        maxLines = 1,
+                                    )
+                                }
                             }
                         }
                     }
