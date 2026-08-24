@@ -2276,8 +2276,18 @@
     <string name="watchface_comp_dynamic">Dynamic</string>
     <string name="watchface_comp_none">None</string>
     <string name="watchface_category_glance">At a Glance &amp; Glow</string>
-    <string name="watchface_show_upcoming_events_title">Show upcoming events</string>
-    <string name="watchface_show_upcoming_events_desc">Show today’s meetings or next alarm at top</string>
+    <string name="watchface_show_glance_title">Show at a glance</string>
+    <string name="watchface_show_glance_desc">Show contextual info or next alarm at top</string>
+    <string name="watchface_glance_complications_title">Complications</string>
+    <string name="watchface_glance_complications_desc">Choose what to show</string>
+    <string name="watchface_glance_comp_battery_alerts_title">Low battery alert</string>
+    <string name="watchface_glance_comp_battery_alerts_desc">Show alert when watch or phone battery is below 20%</string>
+    <string name="watchface_glance_comp_travel_title">Are We There (Travel ETA)</string>
+    <string name="watchface_glance_comp_travel_desc">Show remaining time/distance to destination</string>
+    <string name="watchface_glance_comp_events_title">Calendar events</string>
+    <string name="watchface_glance_comp_events_desc">Show today’s upcoming meetings</string>
+    <string name="watchface_glance_comp_alarm_title">Next alarm</string>
+    <string name="watchface_glance_comp_alarm_desc">Show upcoming alarm time when no events</string>
     <string name="watchface_show_glow_title">Show glow</string>
-    <string name="watchface_show_glow_desc">Dynamic top accent gradient approaching events</string>
+    <string name="watchface_show_glow_desc">Dynamic top accent gradient approaching events and travel</string>
 </resources>
