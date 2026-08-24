@@ -952,21 +952,41 @@ private fun queryShareWithApps(
                         )
                     }
                     shouldInclude
-                }.distinctBy { it.activityInfo.packageName }
+                }.distinctBy { "${it.activityInfo.packageName}/${it.activityInfo.name}" }
 
         Log.d(TAG, "Share apps after filtering: ${filtered.size}")
 
-        // Map to ResolvedAppInfo and sort
+        // Map to ResolvedAppInfo and sort by package/app label first, then by specific action label
         val collator = Collator.getInstance(Locale.getDefault())
         val resolvedList =
             filtered
                 .map {
                     ResolvedAppInfo(it, it.loadLabel(pm).toString())
                 }.sortedWith { o1, o2 ->
-                    collator.compare(
-                        o1.label.lowercase(Locale.getDefault()),
-                        o2.label.lowercase(Locale.getDefault()),
-                    )
+                    val pkg1 = o1.resolveInfo.activityInfo.packageName
+                    val pkg2 = o2.resolveInfo.activityInfo.packageName
+                    if (pkg1 == pkg2) {
+                        collator.compare(
+                            o1.label.lowercase(Locale.getDefault()),
+                            o2.label.lowercase(Locale.getDefault()),
+                        )
+                    } else {
+                        val appLabel1 = try {
+                            pm.getApplicationLabel(o1.resolveInfo.activityInfo.applicationInfo).toString()
+                        } catch (_: Exception) {
+                            pkg1
+                        }
+                        val appLabel2 = try {
+                            pm.getApplicationLabel(o2.resolveInfo.activityInfo.applicationInfo).toString()
+                        } catch (_: Exception) {
+                            pkg2
+                        }
+                        val appComp = collator.compare(
+                            appLabel1.lowercase(Locale.getDefault()),
+                            appLabel2.lowercase(Locale.getDefault()),
+                        )
+                        if (appComp != 0) appComp else collator.compare(pkg1, pkg2)
+                    }
                 }
 
         Log.d(TAG, "Final share with apps: ${resolvedList.size}")
