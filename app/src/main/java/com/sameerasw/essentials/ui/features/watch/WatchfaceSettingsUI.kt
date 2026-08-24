@@ -27,9 +27,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.services.DeviceInfoSyncManager
+import com.sameerasw.essentials.ui.components.menus.SegmentedDropdownMenuItem
+import com.sameerasw.essentials.ui.core.cards.ConfigPickerItem
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
-import com.sameerasw.essentials.ui.core.pickers.SegmentedPicker
 
 @Composable
 fun WatchfaceSettingsUI(
@@ -65,11 +66,14 @@ fun WatchfaceSettingsUI(
         mutableStateOf(prefs.getBoolean("watchface_show_glow", true))
     }
 
-    val complicationOptions = listOf("HEART_RATE", "STEPS", "DISTANCE", "NONE")
+    val complicationOptions = listOf("HEART_RATE", "STEPS", "DISTANCE", "CALORIES", "WATCH_BATTERY", "PHONE_BATTERY", "NONE")
     val complicationLabels = mapOf(
         "HEART_RATE" to stringResource(R.string.watchface_comp_heart_rate),
         "STEPS" to stringResource(R.string.watchface_comp_steps),
         "DISTANCE" to stringResource(R.string.watchface_comp_distance),
+        "CALORIES" to stringResource(R.string.watchface_comp_calories),
+        "WATCH_BATTERY" to stringResource(R.string.watchface_comp_watch_battery),
+        "PHONE_BATTERY" to stringResource(R.string.watchface_comp_phone_battery),
         "NONE" to stringResource(R.string.watchface_comp_none),
     )
 
@@ -148,51 +152,55 @@ fun WatchfaceSettingsUI(
                         DeviceInfoSyncManager.forceSync(context)
                     },
                 )
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                ConfigPickerItem(
+                    title = stringResource(R.string.watchface_left_complication_title),
+                    selectedValue = complicationLabels[leftComplication] ?: leftComplication,
+                    iconRes = when (leftComplication) {
+                        "HEART_RATE" -> R.drawable.rounded_favorite_24
+                        "STEPS" -> R.drawable.rounded_steps_24
+                        "DISTANCE" -> R.drawable.rounded_distance_24
+                        "CALORIES" -> R.drawable.rounded_local_fire_department_24
+                        "WATCH_BATTERY" -> R.drawable.rounded_watch_24
+                        "PHONE_BATTERY" -> R.drawable.rounded_mobile_24
+                        else -> R.drawable.rounded_widgets_24
+                    },
                 ) {
-                    Text(
-                        text = stringResource(R.string.watchface_left_complication_title),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                    )
-                    SegmentedPicker(
-                        items = complicationOptions,
-                        selectedItem = leftComplication,
-                        onItemSelected = { selected ->
-                            leftComplication = selected
-                            prefs.edit().putString("watchface_left_complication", selected).apply()
-                            DeviceInfoSyncManager.forceSync(context)
-                        },
-                        labelProvider = { complicationLabels[it] ?: it },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    complicationOptions.forEach { option ->
+                        val label = complicationLabels[option] ?: option
+                        SegmentedDropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                leftComplication = option
+                                prefs.edit().putString("watchface_left_complication", option).apply()
+                                DeviceInfoSyncManager.forceSync(context)
+                            },
+                        )
+                    }
                 }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                ConfigPickerItem(
+                    title = stringResource(R.string.watchface_right_complication_title),
+                    selectedValue = complicationLabels[rightComplication] ?: rightComplication,
+                    iconRes = when (rightComplication) {
+                        "HEART_RATE" -> R.drawable.rounded_favorite_24
+                        "STEPS" -> R.drawable.rounded_steps_24
+                        "DISTANCE" -> R.drawable.rounded_distance_24
+                        "CALORIES" -> R.drawable.rounded_local_fire_department_24
+                        "WATCH_BATTERY" -> R.drawable.rounded_watch_24
+                        "PHONE_BATTERY" -> R.drawable.rounded_mobile_24
+                        else -> R.drawable.rounded_widgets_24
+                    },
                 ) {
-                    Text(
-                        text = stringResource(R.string.watchface_right_complication_title),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                    )
-                    SegmentedPicker(
-                        items = complicationOptions,
-                        selectedItem = rightComplication,
-                        onItemSelected = { selected ->
-                            rightComplication = selected
-                            prefs.edit().putString("watchface_right_complication", selected).apply()
-                            DeviceInfoSyncManager.forceSync(context)
-                        },
-                        labelProvider = { complicationLabels[it] ?: it },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                    complicationOptions.forEach { option ->
+                        val label = complicationLabels[option] ?: option
+                        SegmentedDropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                rightComplication = option
+                                prefs.edit().putString("watchface_right_complication", option).apply()
+                                DeviceInfoSyncManager.forceSync(context)
+                            },
+                        )
+                    }
                 }
             }
         }

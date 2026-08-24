@@ -2266,6 +2266,9 @@
     <string name="watchface_comp_heart_rate">Heart Rate</string>
     <string name="watchface_comp_steps">Steps</string>
     <string name="watchface_comp_distance">Distance</string>
+    <string name="watchface_comp_calories">Calories</string>
+    <string name="watchface_comp_watch_battery">Watch Battery</string>
+    <string name="watchface_comp_phone_battery">Phone Battery</string>
     <string name="watchface_comp_none">None</string>
     <string name="watchface_category_glance">At a Glance &amp; Glow</string>
     <string name="watchface_show_upcoming_events_title">Show upcoming events</string>
