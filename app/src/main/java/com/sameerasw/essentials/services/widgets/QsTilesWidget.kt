@@ -153,8 +153,10 @@ class QsTilesWidget : GlanceAppWidget() {
                                                 for (colIndex in 0 until columnsCount) {
                                                     val tile = rowTiles.getOrNull(colIndex)
                                                     if (tile != null) {
-                                                        val resolvedTitle =
-                                                            context.getString(tile.titleRes)
+                                                        val resolvedTitle = QsTileRegistry.getTileLabel(
+                                                            context,
+                                                            tile.serviceClass.name
+                                                        )
                                                         val pastelColor =
                                                             ColorUtil.getPastelColorFor(
                                                                 resolvedTitle,

@@ -140,12 +140,13 @@ object ShizukuUtils {
             } else {
                 null
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
 
-    fun stopShizuku(context: android.content.Context) {
+    fun toggleShizuku(context: android.content.Context, start: Boolean) {
+        val action = if (start) "moe.shizuku.privileged.api.START" else "moe.shizuku.privileged.api.STOP"
         val settingsRepository =
             com.sameerasw.essentials.data.repository
                 .SettingsRepository(context)
@@ -156,14 +157,14 @@ object ShizukuUtils {
         }
         try {
             val intent =
-                android.content.Intent("moe.shizuku.privileged.api.STOP").apply {
+                android.content.Intent(action).apply {
                     `package` = "moe.shizuku.privileged.api"
                     putExtra("auth", token)
                     addFlags(android.content.Intent.FLAG_INCLUDE_STOPPED_PACKAGES)
                 }
             context.sendBroadcast(intent)
         } catch (e: Exception) {
-            android.util.Log.e("ShizukuUtils", "Failed to stop Shizuku", e)
+            android.util.Log.e("ShizukuUtils", "Failed to ${if (start) "start" else "stop"} Shizuku", e)
         }
     }
 }

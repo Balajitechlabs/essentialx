@@ -11,15 +11,15 @@ package com.sameerasw.essentials.services.tiles
 
 import android.content.Intent
 import android.graphics.drawable.Icon
-import android.os.Build
 import android.provider.Settings
 import android.service.quicksettings.Tile
-import androidx.annotation.RequiresApi
 import com.sameerasw.essentials.FeatureSettingsActivity
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.utils.PermissionUtils
+import com.sameerasw.essentials.utils.ShizukuUtils.toggleShizuku
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-@RequiresApi(Build.VERSION_CODES.N)
 class UsbDebuggingTileService : BaseTileService() {
     override fun onClick() {
         if (!hasFeaturePermission()) {
@@ -34,30 +34,47 @@ class UsbDebuggingTileService : BaseTileService() {
         super.onClick()
     }
 
-    override fun getTileLabel(): String = getString(R.string.tile_usb_debugging)
+    override fun getTileLabel(): String {
+        val strRef = when (getDefaultAction()) {
+            "usb" -> R.string.usb_debugging_title_short
+            "wireless" -> R.string.wireless_debugging_title_short
+            else -> R.string.tile_usb_debugging
+        }
+        return getString(strRef)
+    }
 
     override fun getTileSubtitle(): String {
         val usbOn = isUsbDebuggingEnabled()
         val wifiOn = isWifiDebuggingEnabled()
-        return when {
-            usbOn && wifiOn -> "USB & WiFi"
-            usbOn -> "USB"
-            wifiOn -> "WiFi"
-            else -> getString(R.string.off)
+        val strRes = when (getDefaultAction()) {
+            "usb" -> if (usbOn) R.string.on else R.string.off
+            "wireless" -> if (wifiOn) R.string.on else R.string.off
+            else -> when {
+                usbOn && wifiOn -> R.string.usb_and_wifi
+                usbOn -> R.string.usb
+                wifiOn -> R.string.wifi
+                else -> R.string.off
+            }
         }
+        return getString(strRes)
     }
 
     override fun hasFeaturePermission(): Boolean = PermissionUtils.canWriteSecureSettings(this)
 
-    override fun getTileIcon(): Icon = Icon.createWithResource(this, R.drawable.rounded_adb_24)
+    override fun getTileIcon(): Icon {
+        val icon = when (getDefaultAction()) {
+            "usb" -> R.drawable.usb_debugging_24
+            "wireless" -> R.drawable.wireless_debugging_24
+            else -> R.drawable.rounded_adb_24
+        }
+        return Icon.createWithResource(this, icon)
+    }
 
     override fun getTileState(): Int {
-        val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
-        val tapAction = prefs.getString("debugging_tile_tap_action", "both") ?: "both"
         val usbOn = isUsbDebuggingEnabled()
         val wifiOn = isWifiDebuggingEnabled()
 
-        return when (tapAction) {
+        return when (getDefaultAction()) {
             "usb" -> if (usbOn) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
             "wireless" -> if (wifiOn) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
             else -> if (usbOn && wifiOn) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
@@ -65,18 +82,18 @@ class UsbDebuggingTileService : BaseTileService() {
     }
 
     override fun onTileClick() {
-        val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
-        val tapAction = prefs.getString("debugging_tile_tap_action", "both") ?: "both"
         val usbOn = isUsbDebuggingEnabled()
         val wifiOn = isWifiDebuggingEnabled()
 
-        when (tapAction) {
+        when (getDefaultAction()) {
             "usb" -> {
                 setUsbDebuggingEnabled(!usbOn)
             }
+
             "wireless" -> {
                 setWifiDebuggingEnabled(!wifiOn)
             }
+
             else -> {
                 val newState = if (usbOn && wifiOn) 0 else 1
                 setUsbDebuggingEnabled(newState == 1)
@@ -85,16 +102,32 @@ class UsbDebuggingTileService : BaseTileService() {
         }
     }
 
+    private fun getDefaultAction(): String {
+        val prefs = getSharedPreferences("essentials_prefs", MODE_PRIVATE)
+        return prefs.getString("debugging_tile_tap_action", "both") ?: "both"
+    }
+
     private fun isUsbDebuggingEnabled(): Boolean =
         try {
             Settings.Global.getInt(contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
 
     private fun setUsbDebuggingEnabled(enabled: Boolean) {
         try {
-            Settings.Global.putInt(contentResolver, Settings.Global.ADB_ENABLED, if (enabled) 1 else 0)
+            if (!enabled) toggleShizuku(this, false)
+            Settings.Global.putInt(
+                contentResolver,
+                Settings.Global.ADB_ENABLED,
+                if (enabled) 1 else 0,
+            )
+            if (enabled) {
+                serviceScope.launch {
+                    kotlinx.coroutines.delay(1000)
+                    toggleShizuku(this@UsbDebuggingTileService, true)
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -103,7 +136,7 @@ class UsbDebuggingTileService : BaseTileService() {
     private fun isWifiDebuggingEnabled(): Boolean =
         try {
             Settings.Global.getInt(contentResolver, "adb_wifi_enabled", 0) == 1
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
 

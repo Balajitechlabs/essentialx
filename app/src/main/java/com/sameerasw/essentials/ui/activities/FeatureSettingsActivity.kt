@@ -141,7 +141,8 @@ class FeatureSettingsActivity : AppCompatActivity() {
         val featureObj = FeatureRegistry.ALL_FEATURES.find { it.id == featureId }
         val highlightSetting = intent.getStringExtra("highlight_setting")
 
-        if (featureId == "Link actions") {
+        if (featureId == "Link actions" || featureId == "URL Shortener") {
+            val isShortenerDirect = featureId == "URL Shortener"
             setContent {
                 val viewModel: MainViewModel = viewModel()
                 val context = LocalContext.current
@@ -154,7 +155,9 @@ class FeatureSettingsActivity : AppCompatActivity() {
                         uri = "https://sameerasw.com".toUri(),
                         onFinish = { finish() },
                         modifier = Modifier.fillMaxSize(),
-                        demo = true,
+                        demo = false,
+                        initialTab = if (isShortenerDirect) 2 else 0,
+                        initialOpenShorten = isShortenerDirect,
                     )
                 }
             }
