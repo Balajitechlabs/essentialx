@@ -258,10 +258,15 @@ fun LinkPickerScreen(
 
     // Sorted and filtered apps
     val openWithApps =
-        remember(baseOpenWithApps, pinnedPackages.value, searchQuery) {
+        remember(baseOpenWithApps, pinnedPackages.value, searchQuery, currentUri) {
             baseOpenWithApps
                 .filter { searchQuery.isEmpty() || it.label.contains(searchQuery, ignoreCase = true) }
-                .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
+                .sortedWith(
+                    compareBy(
+                        { !isAppRecommendedForUri(currentUri, it.resolveInfo.activityInfo.packageName, it.label) },
+                        { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) },
+                    )
+                )
         }
 
     val shareWithApps =
@@ -674,6 +679,9 @@ fun LinkPickerScreen(
                             val appInfo = openWithApps[index]
                             val packageName = appInfo.resolveInfo.activityInfo.packageName
                             val isPinned = pinnedPackages.value.contains(packageName)
+                            val isRecommended = remember(currentUri, packageName, appInfo.label) {
+                                isAppRecommendedForUri(currentUri, packageName, appInfo.label)
+                            }
                             var icon by remember(appInfo.resolveInfo) { mutableStateOf<Drawable?>(null) }
                             LaunchedEffect(appInfo.resolveInfo) {
                                 withContext(Dispatchers.IO) {
@@ -682,7 +690,9 @@ fun LinkPickerScreen(
                             }
 
                             val itemBgColor =
-                                if (isPinned) {
+                                if (isRecommended) {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else if (isPinned) {
                                     if (isDarkTheme) Color.Black else Color.White
                                 } else {
                                     MaterialTheme.colorScheme.surfaceBright
@@ -1263,6 +1273,42 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
             imageUrl = fallbackFavicon,
             faviconUrl = fallbackFavicon,
         )
+    }
+}
+
+private fun isAppRecommendedForUri(uri: Uri, packageName: String, appLabel: String): Boolean {
+    val host = uri.host?.lowercase(Locale.getDefault()) ?: return false
+    val pkg = packageName.lowercase(Locale.getDefault())
+    val label = appLabel.lowercase(Locale.getDefault())
+
+    // Known domain mappings
+    val domainKeywords = when {
+        host.contains("instagram.com") || host.contains("instagr.am") -> listOf("instagram")
+        host.contains("reddit.com") || host.contains("redd.it") -> listOf("reddit")
+        host.contains("facebook.com") || host.contains("fb.com") || host.contains("fb.watch") -> listOf("facebook", "katana", "orca")
+        host.contains("twitter.com") || host.contains("x.com") || host.contains("t.co") -> listOf("twitter")
+        host.contains("youtube.com") || host.contains("youtu.be") -> listOf("youtube", "vanced", "revanced", "newpipe")
+        host.contains("tiktok.com") -> listOf("tiktok", "musically")
+        host.contains("spotify.com") -> listOf("spotify")
+        host.contains("github.com") -> listOf("github", "git")
+        host.contains("telegram.org") || host.contains("t.me") -> listOf("telegram", "nekogram")
+        host.contains("discord.com") || host.contains("discord.gg") -> listOf("discord", "aliucord")
+        host.contains("threads.net") -> listOf("threads", "barcelona")
+        host.contains("pinterest.com") || host.contains("pin.it") -> listOf("pinterest")
+        host.contains("linkedin.com") || host.contains("lnkd.in") -> listOf("linkedin")
+        host.contains("twitch.tv") -> listOf("twitch")
+        host.contains("medium.com") -> listOf("medium")
+        host.contains("netflix.com") -> listOf("netflix")
+        host.contains("amazon.") -> listOf("amazon")
+        else -> {
+            // General domain extractor (e.g., "sub.example.co.uk" -> "example")
+            val parts = host.split('.').filter { it != "www" && it != "m" && it != "mobile" && it != "app" && it.length > 2 }
+            parts
+        }
+    }
+
+    return domainKeywords.any { keyword ->
+        keyword.length >= 3 && (pkg.contains(keyword) || label.contains(keyword))
     }
 }
 
