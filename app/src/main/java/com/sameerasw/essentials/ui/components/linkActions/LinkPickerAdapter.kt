@@ -33,6 +33,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -55,6 +56,7 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -67,6 +69,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -190,7 +193,11 @@ private fun cleanTrackingParams(uri: Uri): Uri {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalFoundationApi::class,
+)
 @Composable
 fun LinkPickerScreen(
     uri: Uri,
@@ -255,6 +262,7 @@ fun LinkPickerScreen(
 
     // Pinned packages state
     val pinnedPackages = remember { mutableStateOf(getPinnedPackages(context)) }
+    var isGridView by remember { mutableStateOf(getShareViewModeGrid(context)) }
 
     // Sorted and filtered apps
     val openWithApps =
@@ -737,12 +745,58 @@ fun LinkPickerScreen(
                         }
                     }
 
-                    Text(
-                        text = stringResource(R.string.label_share_with),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(top = 8.dp, start = 16.dp),
-                    )
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 0.dp, bottom = 0.dp, start = 16.dp, end = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.label_share_with),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            ToggleButton(
+                                checked = !isGridView,
+                                onCheckedChange = {
+                                    HapticUtil.performUIHaptic(view)
+                                    isGridView = false
+                                    setShareViewModeGrid(context, false)
+                                },
+                                shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_view_headline_24),
+                                    contentDescription = stringResource(R.string.label_view_list),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            }
+
+                            ToggleButton(
+                                checked = isGridView,
+                                onCheckedChange = {
+                                    HapticUtil.performUIHaptic(view)
+                                    isGridView = true
+                                    setShareViewModeGrid(context, true)
+                                },
+                                shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_grid_view_24),
+                                    contentDescription = stringResource(R.string.label_view_grid),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            }
+                        }
+                    }
 
                     ShareWithContent(
                         resolveInfos = shareWithApps,
@@ -751,6 +805,7 @@ fun LinkPickerScreen(
                         modifier = Modifier.fillMaxWidth(),
                         togglePin = togglePin,
                         pinnedPackages = pinnedPackages.value,
+                        isGridView = isGridView,
                         demo = demo,
                     )
                 }
@@ -1112,6 +1167,19 @@ private fun setPinnedPackages(
 ) {
     val prefs: SharedPreferences = context.getSharedPreferences("link_prefs", Context.MODE_PRIVATE)
     prefs.edit { putStringSet("pinned_packages", packages) }
+}
+
+private fun getShareViewModeGrid(context: Context): Boolean {
+    val prefs: SharedPreferences = context.getSharedPreferences("link_prefs", Context.MODE_PRIVATE)
+    return prefs.getBoolean("share_view_grid", false)
+}
+
+private fun setShareViewModeGrid(
+    context: Context,
+    isGrid: Boolean,
+) {
+    val prefs: SharedPreferences = context.getSharedPreferences("link_prefs", Context.MODE_PRIVATE)
+    prefs.edit { putBoolean("share_view_grid", isGrid) }
 }
 
 private data class LinkPreviewData(
