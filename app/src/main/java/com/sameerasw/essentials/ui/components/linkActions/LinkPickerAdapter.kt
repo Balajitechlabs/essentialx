@@ -17,6 +17,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.text.Html
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -357,100 +358,34 @@ fun LinkPickerScreen(
             }
 
         val isDarkTheme = isSystemInDarkTheme()
+        var isPreviewImageLoaded by remember { mutableStateOf(false) }
 
         val animatedAlpha by animateFloatAsState(
-            targetValue = if (linkPreviewData?.imageUrl != null) 1f else 0f,
-            animationSpec = tween(durationMillis = 800),
+            targetValue = if (isPreviewImageLoaded) 1f else 0f,
+            animationSpec = tween(durationMillis = 600),
             label = "PreviewAlpha",
         )
 
-        // Background layer: Preview image with progressive blur that fades in seamlessly without jumping scrim
-        if (linkPreviewData?.imageUrl != null || animatedAlpha > 0f) {
-            val topBlurHeightPx = with(density) { (statusBarTop * 1.5f + 48.dp).toPx() }
-            val bottomBlurHeightPx = with(density) { 120.dp.toPx() }
-
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(topAreaHeight)
-                        .align(Alignment.TopCenter)
-                        .alpha(animatedAlpha)
-                        .progressiveBlur(
-                            blurRadius = 40f,
-                            height = topBlurHeightPx,
-                            direction = BlurDirection.TOP,
-                            showGradientOverlay = true,
-                        ).progressiveBlur(
-                            blurRadius = 40f,
-                            height = bottomBlurHeightPx,
-                            direction = BlurDirection.BOTTOM,
-                            showGradientOverlay = true,
-                        ),
-            ) {
-                AsyncImage(
-                    model =
-                        ImageRequest.Builder(context)
-                            .data(linkPreviewData?.imageUrl)
-                            .crossfade(true)
-                            .build(),
-                    contentDescription = "Link Preview",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
-
-                if (!linkPreviewData?.title.isNullOrBlank() || !linkPreviewData?.description.isNullOrBlank()) {
-                    Box(
-                        modifier =
-                            Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 24.dp, vertical = 16.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = MaterialTheme.colorScheme.surfaceContainer,
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                            ) {
-                                if (!linkPreviewData?.title.isNullOrBlank()) {
-                                    Text(
-                                        text = linkPreviewData?.title.orEmpty(),
-                                        style = MaterialTheme.typography.titleSmall,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        maxLines = 2,
-                                        textAlign = TextAlign.Center,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                }
-                                if (!linkPreviewData?.description.isNullOrBlank()) {
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = linkPreviewData?.description.orEmpty(),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        maxLines = 2,
-                                        textAlign = TextAlign.Center,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+        val textExpansionAlpha =
+            if (sheetOffset != null) {
+                val offsetDp = with(density) { sheetOffset.toDp() }
+                ((offsetDp.value - 120f) / 80f).coerceIn(0f, 1f)
+            } else {
+                1f
             }
-        }
 
-        val dynamicScrimColor =
-            if (linkPreviewData?.imageUrl != null) {
-                Color.Transparent
-            } else if (isDarkTheme) {
+        val defaultScrim =
+            if (isDarkTheme) {
                 BottomSheetDefaults.ScrimColor
             } else {
                 MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f)
+            }
+
+        val dynamicScrimColor =
+            if (isPreviewImageLoaded) {
+                defaultScrim.copy(alpha = defaultScrim.alpha * (1f - animatedAlpha))
+            } else {
+                defaultScrim
             }
 
         val pagerScope = rememberCoroutineScope()
@@ -782,6 +717,90 @@ fun LinkPickerScreen(
                 }
             }
         }
+
+        if (linkPreviewData?.imageUrl != null || animatedAlpha > 0f) {
+            val topBlurHeightPx = with(density) { (statusBarTop * 1.5f + 48.dp).toPx() }
+            val bottomBlurHeightPx = with(density) { 120.dp.toPx() }
+
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(topAreaHeight)
+                        .align(Alignment.TopCenter)
+                        .alpha(animatedAlpha)
+                        .progressiveBlur(
+                            blurRadius = 40f,
+                            height = topBlurHeightPx,
+                            direction = BlurDirection.TOP,
+                            showGradientOverlay = false,
+                        ).progressiveBlur(
+                            blurRadius = 40f,
+                            height = bottomBlurHeightPx,
+                            direction = BlurDirection.BOTTOM,
+                            showGradientOverlay = false,
+                        ),
+            ) {
+                AsyncImage(
+                    model =
+                        ImageRequest.Builder(context)
+                            .data(linkPreviewData?.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                    contentDescription = "Link Preview",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    onSuccess = { isPreviewImageLoaded = true },
+                    onError = { isPreviewImageLoaded = false },
+                )
+            }
+
+            if (!linkPreviewData?.title.isNullOrBlank() || !linkPreviewData?.description.isNullOrBlank()) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(topAreaHeight)
+                            .align(Alignment.TopCenter)
+                            .alpha(animatedAlpha * textExpansionAlpha)
+                            .padding(horizontal = 24.dp, vertical = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            if (!linkPreviewData?.title.isNullOrBlank()) {
+                                Text(
+                                    text = linkPreviewData?.title.orEmpty(),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 2,
+                                    textAlign = TextAlign.Center,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                            if (!linkPreviewData?.description.isNullOrBlank()) {
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = linkPreviewData?.description.orEmpty(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 2,
+                                    textAlign = TextAlign.Center,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     if (showShortenSheet) {
@@ -1096,14 +1115,15 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
     return try {
         val url = URL(urlString)
         val connection = (url.openConnection() as HttpURLConnection).apply {
-            connectTimeout = 4000
-            readTimeout = 4000
+            connectTimeout = 5000
+            readTimeout = 5000
             instanceFollowRedirects = true
             setRequestProperty(
                 "User-Agent",
-                "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+                "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
             )
-            setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/*,*/*;q=0.8")
+            setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            setRequestProperty("Accept-Language", "en-US,en;q=0.9")
         }
 
         val contentType = connection.contentType ?: ""
@@ -1115,10 +1135,9 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
         val sb = StringBuilder()
         var line: String?
         var lineCount = 0
-        while (reader.readLine().also { line = it } != null && lineCount < 350) {
+        while (reader.readLine().also { line = it } != null && lineCount < 800) {
             sb.append(line).append("\n")
             lineCount++
-            if (line?.contains("</head>", ignoreCase = true) == true) break
         }
         reader.close()
         val html = sb.toString()
@@ -1128,7 +1147,7 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
             val ogRegex = Regex("""<meta[^>]+(?:property|name|itemprop)=["'](?:og:image|og:image:secure_url|twitter:image|twitter:image:src|image)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
             val ogMatch = ogRegex.find(html)?.groupValues?.get(1)
             if (!ogMatch.isNullOrBlank()) {
-                imageUrl = resolveRelativeUrl(urlString, ogMatch)
+                imageUrl = resolveRelativeUrl(urlString, cleanHtmlEntity(ogMatch))
             }
         }
 
@@ -1136,7 +1155,15 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
             val ogRegexReversed = Regex("""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name|itemprop)=["'](?:og:image|og:image:secure_url|twitter:image|twitter:image:src|image)["']""", RegexOption.IGNORE_CASE)
             val ogMatchReversed = ogRegexReversed.find(html)?.groupValues?.get(1)
             if (!ogMatchReversed.isNullOrBlank()) {
-                imageUrl = resolveRelativeUrl(urlString, ogMatchReversed)
+                imageUrl = resolveRelativeUrl(urlString, cleanHtmlEntity(ogMatchReversed))
+            }
+        }
+
+        if (imageUrl == null) {
+            val jsonLdImgRegex = Regex(""""image"\s*:\s*(?:\[\s*)?"([^"]+)"""", RegexOption.IGNORE_CASE)
+            val jsonLdMatch = jsonLdImgRegex.find(html)?.groupValues?.get(1)
+            if (!jsonLdMatch.isNullOrBlank() && jsonLdMatch.startsWith("http")) {
+                imageUrl = jsonLdMatch.replace("\\/", "/")
             }
         }
 
@@ -1144,7 +1171,7 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
             val touchIconRegex = Regex("""<link[^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["'][^>]+href=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
             val touchIconMatch = touchIconRegex.find(html)?.groupValues?.get(1)
             if (!touchIconMatch.isNullOrBlank()) {
-                imageUrl = resolveRelativeUrl(urlString, touchIconMatch)
+                imageUrl = resolveRelativeUrl(urlString, cleanHtmlEntity(touchIconMatch))
             }
         }
 
@@ -1152,7 +1179,7 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
             val touchIconReversed = Regex("""<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["']""", RegexOption.IGNORE_CASE)
             val touchIconReversedMatch = touchIconReversed.find(html)?.groupValues?.get(1)
             if (!touchIconReversedMatch.isNullOrBlank()) {
-                imageUrl = resolveRelativeUrl(urlString, touchIconReversedMatch)
+                imageUrl = resolveRelativeUrl(urlString, cleanHtmlEntity(touchIconReversedMatch))
             }
         }
 
@@ -1164,12 +1191,12 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
         val ogTitleRegex = Regex("""<meta[^>]+(?:property|name)=["'](?:og:title|twitter:title)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
         val ogTitleMatch = ogTitleRegex.find(html)?.groupValues?.get(1)
         if (!ogTitleMatch.isNullOrBlank()) {
-            title = ogTitleMatch
+            title = cleanHtmlEntity(ogTitleMatch)
         } else {
             val htmlTitleRegex = Regex("""<title[^>]*>([^<]+)</title>""", RegexOption.IGNORE_CASE)
             val htmlTitleMatch = htmlTitleRegex.find(html)?.groupValues?.get(1)
             if (!htmlTitleMatch.isNullOrBlank()) {
-                title = htmlTitleMatch.trim()
+                title = cleanHtmlEntity(htmlTitleMatch.trim())
             }
         }
 
@@ -1177,7 +1204,7 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
         val ogDescRegex = Regex("""<meta[^>]+(?:property|name)=["'](?:og:description|twitter:description|description)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
         val ogDescMatch = ogDescRegex.find(html)?.groupValues?.get(1)
         if (!ogDescMatch.isNullOrBlank()) {
-            description = ogDescMatch.trim()
+            description = cleanHtmlEntity(ogDescMatch.trim())
         }
 
         LinkPreviewData(
@@ -1189,6 +1216,29 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
         LinkPreviewData(
             imageUrl = if (host.isNotBlank()) "https://www.google.com/s2/favicons?domain=$host&sz=128" else null,
         )
+    }
+}
+
+private fun cleanHtmlEntity(text: String): String {
+    return try {
+        val unescaped = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString().trim()
+        unescaped
+            .replace("&#x2F;", "/")
+            .replace("\\/", "/")
+            .replace("&amp;", "&")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'")
+            .replace("&apos;", "'")
+    } catch (_: Exception) {
+        text.replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'")
+            .replace("&apos;", "'")
+            .replace("&#x2F;", "/")
+            .replace("\\/", "/")
+            .trim()
     }
 }
 
