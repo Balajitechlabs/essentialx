@@ -1344,7 +1344,7 @@
     <string name="feat_auto_accessibility_desc">Concede automaticamente l\'autorizzazione di accessibilità all\'avvio dell\'app se manca utilizzando WRITE_SECURE_SETTINGS.</string>
     <string name="label_help_guide">Aiuto e guide</string>
     <string name="tab_your_android">Il tuo Android</string>
-    <string name="label_device_storage">Magazzinaggio</string>
+    <string name="label_device_storage">Archiviazione</string>
     <string name="label_device_ram">Memoria</string>
     <string name="label_use_blur">Usa la sfocatura</string>
     <string name="desc_use_blur">Abilita gli elementi di sfocatura progressiva nell\'interfaccia utente</string>
