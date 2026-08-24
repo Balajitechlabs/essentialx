@@ -66,6 +66,7 @@ import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -88,6 +89,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
@@ -106,6 +108,7 @@ import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.data.repository.SettingsRepository
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
@@ -263,6 +266,30 @@ fun LinkPickerScreen(
     val isFloatingSupported = remember { WindowingUtils.isFloatingModeSupported(context) }
     var showQrSheet by remember { mutableStateOf(false) }
     var showShortenSheet by remember { mutableStateOf(initialOpenShorten) }
+
+    val settingsRepository = remember { SettingsRepository(context) }
+    var isMacConnected by remember {
+        mutableStateOf(
+            settingsRepository.getBoolean(SettingsRepository.KEY_AIRSYNC_CONNECTION_ENABLED, false) &&
+                settingsRepository.getBoolean(SettingsRepository.KEY_AIRSYNC_MAC_CONNECTED, false)
+        )
+    }
+
+    DisposableEffect(Unit) {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == SettingsRepository.KEY_AIRSYNC_CONNECTION_ENABLED ||
+                key == SettingsRepository.KEY_AIRSYNC_MAC_CONNECTED
+            ) {
+                isMacConnected =
+                    settingsRepository.getBoolean(SettingsRepository.KEY_AIRSYNC_CONNECTION_ENABLED, false) &&
+                        settingsRepository.getBoolean(SettingsRepository.KEY_AIRSYNC_MAC_CONNECTED, false)
+            }
+        }
+        settingsRepository.registerOnSharedPreferenceChangeListener(listener)
+        onDispose {
+            settingsRepository.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
 
     // Toggle pin
     val togglePin: (String) -> Unit = { packageName ->
@@ -462,8 +489,44 @@ fun LinkPickerScreen(
                             }
                         }
 
-                        val actionItems = remember(isFloatingSupported) {
+                        val actionItems = remember(isFloatingSupported, isMacConnected) {
                             listOfNotNull(
+                                if (isMacConnected) {
+                                    LinkActionItem(
+                                        titleRes = R.string.action_send_to_mac,
+                                        iconRes = R.drawable.rounded_devices_24,
+                                        onClick = {
+                                            val shareIntent =
+                                                Intent(Intent.ACTION_SEND).apply {
+                                                    type = "text/plain"
+                                                    putExtra(Intent.EXTRA_TEXT, currentUri.toString())
+                                                    setPackage("com.sameerasw.airsync")
+                                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                                }
+                                            try {
+                                                context.startActivity(shareIntent)
+                                                onFinish()
+                                            } catch (_: Exception) {
+                                                try {
+                                                    val broadcastIntent =
+                                                        Intent("com.sameerasw.airsync.action.SEND_LINK").apply {
+                                                            putExtra("url", currentUri.toString())
+                                                            setPackage("com.sameerasw.airsync")
+                                                        }
+                                                    context.sendBroadcast(broadcastIntent)
+                                                    onFinish()
+                                                } catch (e: Exception) {
+                                                    Toast
+                                                        .makeText(
+                                                            context,
+                                                            context.getString(R.string.download_airsync),
+                                                            Toast.LENGTH_SHORT,
+                                                        ).show()
+                                                }
+                                            }
+                                        },
+                                    )
+                                } else null,
                                 LinkActionItem(
                                     titleRes = R.string.shorten_copy_link,
                                     iconRes = R.drawable.rounded_content_copy_24,
@@ -546,7 +609,7 @@ fun LinkPickerScreen(
                                     action.onClick()
                                 },
                                 shape = RoundedCornerShape(16.dp),
-                                color = MaterialTheme.colorScheme.primary,
+                                color = MaterialTheme.colorScheme.surfaceBright,
                                 modifier = Modifier.fillMaxSize().maskClip(RoundedCornerShape(16.dp)),
                             ) {
                                 Row(
@@ -558,13 +621,13 @@ fun LinkPickerScreen(
                                         painter = painterResource(id = action.iconRes),
                                         contentDescription = null,
                                         modifier = Modifier.size(18.dp),
-                                        tint = MaterialTheme.colorScheme.onPrimary,
+                                        tint = MaterialTheme.colorScheme.onSurface,
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
                                         text = stringResource(id = action.titleRes),
                                         style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        color = MaterialTheme.colorScheme.onSurface,
                                         maxLines = 1,
                                     )
                                 }

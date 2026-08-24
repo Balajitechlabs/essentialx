@@ -1463,4 +1463,5 @@
     <string name="toast_enter_shizuku_token">Please enter Shizuku auth token in settings first</string>
     <string name="action_preview_web">Preview</string>
     <string name="action_clear">Clear</string>
+    <string name="action_send_to_mac">AirSync</string>
 </resources>
