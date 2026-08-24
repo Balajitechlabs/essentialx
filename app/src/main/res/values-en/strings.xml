@@ -1462,4 +1462,5 @@
     <string name="action_restart_shizuku">Restart Shizuku</string>
     <string name="toast_enter_shizuku_token">Please enter Shizuku auth token in settings first</string>
     <string name="action_preview_web">Preview</string>
+    <string name="action_clear">Clear</string>
 </resources>

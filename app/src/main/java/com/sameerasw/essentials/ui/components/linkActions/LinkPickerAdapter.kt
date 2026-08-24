@@ -27,6 +27,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,10 +54,12 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
@@ -73,10 +78,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -84,9 +91,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -391,7 +403,7 @@ fun LinkPickerScreen(
                         .imePadding()
                         .clip(RoundedCornerShape(24.dp))
                         .verticalScroll(rememberScrollState())
-                        .padding(16.dp),
+                        .padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 val domain = currentUri.host ?: currentUri.scheme ?: "Link"
@@ -561,43 +573,146 @@ fun LinkPickerScreen(
                     }
                 }
 
-                RoundedCardContainer(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    SegmentedPicker(
-                        items = tabItems,
-                        selectedItem = selectedTab,
-                        onItemSelected = { targetPage ->
-                            selectedTab = targetPage
-                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                            pagerScope.launch {
-                                pagerState.animateScrollToPage(targetPage)
-                            }
-                        },
-                        labelProvider = {
-                            when (it) {
-                                0 -> context.getString(R.string.label_open_with)
-                                else -> context.getString(R.string.label_share_with)
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                val focusManager = LocalFocusManager.current
+                val searchFocusRequester = remember { FocusRequester() }
+                var isSearchActive by remember { mutableStateOf(false) }
+
+                LaunchedEffect(isSearchActive) {
+                    if (isSearchActive) {
+                        try {
+                            searchFocusRequester.requestFocus()
+                        } catch (_: Exception) {
+                        }
+                    }
                 }
 
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(stringResource(R.string.search_apps_placeholder)) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.rounded_search_24),
-                            contentDescription = stringResource(R.string.search_apps_placeholder),
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(IntrinsicSize.Min),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        RoundedCardContainer(
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            SegmentedPicker(
+                                items = tabItems,
+                                selectedItem = selectedTab,
+                                onItemSelected = { targetPage ->
+                                    selectedTab = targetPage
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    pagerScope.launch {
+                                        pagerState.animateScrollToPage(targetPage)
+                                    }
+                                },
+                                labelProvider = {
+                                    when (it) {
+                                        0 -> context.getString(R.string.label_open_with)
+                                        else -> context.getString(R.string.label_share_with)
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+
+                        Surface(
+                            onClick = {
+                                HapticUtil.performVirtualKeyHaptic(view)
+                                isSearchActive = true
+                            },
+                            modifier =
+                                Modifier
+                                    .fillMaxHeight()
+                                    .aspectRatio(1f),
+                            shape = RoundedCornerShape(24.dp),
+                            color = MaterialTheme.colorScheme.surfaceBright,
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_search_24),
+                                    contentDescription = stringResource(R.string.search_apps_placeholder),
+                                    modifier = Modifier.size(20.dp),
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
+                        }
+                    }
+
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = isSearchActive,
+                        modifier = Modifier.fillMaxSize(),
+                        enter =
+                            fadeIn(animationSpec = tween(250)) +
+                                expandHorizontally(
+                                    animationSpec = tween(300),
+                                    expandFrom = Alignment.End,
+                                ),
+                        exit =
+                            fadeOut(animationSpec = tween(200)) +
+                                shrinkHorizontally(
+                                    animationSpec = tween(250),
+                                    shrinkTowards = Alignment.End,
+                                ),
+                    ) {
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier =
+                                Modifier
+                                    .fillMaxSize()
+                                    .focusRequester(searchFocusRequester),
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.search_apps_placeholder),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_search_24),
+                                    contentDescription = stringResource(R.string.search_apps_placeholder),
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = {
+                                        HapticUtil.performVirtualKeyHaptic(view)
+                                        if (searchQuery.isNotEmpty()) {
+                                            searchQuery = ""
+                                        } else {
+                                            isSearchActive = false
+                                            focusManager.clearFocus()
+                                        }
+                                    },
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.rounded_close_24),
+                                        contentDescription = stringResource(R.string.action_clear),
+                                        modifier = Modifier.size(20.dp),
+                                    )
+                                }
+                            },
+                            singleLine = true,
+                            shape = RoundedCornerShape(24.dp),
+                            colors =
+                                OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = Color.Transparent,
+                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
+                                ),
                         )
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(16.dp),
-                )
+                    }
+                }
 
                 // 4. Swipeable Tab Content via HorizontalPager (Clipped with 24.dp corners)
                 if (isLoadingApps) {
