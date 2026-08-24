@@ -66,12 +66,30 @@ fun WatchfaceSettingsUI(
         mutableStateOf(prefs.getBoolean("watchface_show_glow", true))
     }
 
-    val complicationOptions = listOf("HEART_RATE", "STEPS", "DISTANCE", "CALORIES", "WATCH_BATTERY", "PHONE_BATTERY", "NONE")
+    val complicationOptions = listOf(
+        "DYNAMIC",
+        "HEART_RATE",
+        "STEPS",
+        "DISTANCE",
+        "CALORIES",
+        "NOTIFICATIONS",
+        "NOW_PLAYING",
+        "TRAVEL",
+        "SOUND_MODE",
+        "WATCH_BATTERY",
+        "PHONE_BATTERY",
+        "NONE"
+    )
     val complicationLabels = mapOf(
+        "DYNAMIC" to stringResource(R.string.watchface_comp_dynamic),
         "HEART_RATE" to stringResource(R.string.watchface_comp_heart_rate),
         "STEPS" to stringResource(R.string.watchface_comp_steps),
         "DISTANCE" to stringResource(R.string.watchface_comp_distance),
         "CALORIES" to stringResource(R.string.watchface_comp_calories),
+        "NOTIFICATIONS" to stringResource(R.string.watchface_comp_notifications),
+        "NOW_PLAYING" to stringResource(R.string.watchface_comp_now_playing),
+        "TRAVEL" to stringResource(R.string.watchface_comp_travel),
+        "SOUND_MODE" to stringResource(R.string.watchface_comp_sound_mode),
         "WATCH_BATTERY" to stringResource(R.string.watchface_comp_watch_battery),
         "PHONE_BATTERY" to stringResource(R.string.watchface_comp_phone_battery),
         "NONE" to stringResource(R.string.watchface_comp_none),
@@ -156,10 +174,15 @@ fun WatchfaceSettingsUI(
                     title = stringResource(R.string.watchface_left_complication_title),
                     selectedValue = complicationLabels[leftComplication] ?: leftComplication,
                     iconRes = when (leftComplication) {
+                        "DYNAMIC" -> R.drawable.rounded_auto_awesome_24
                         "HEART_RATE" -> R.drawable.rounded_favorite_24
                         "STEPS" -> R.drawable.rounded_steps_24
                         "DISTANCE" -> R.drawable.rounded_distance_24
                         "CALORIES" -> R.drawable.rounded_local_fire_department_24
+                        "NOTIFICATIONS" -> R.drawable.rounded_notifications_unread_24
+                        "NOW_PLAYING" -> R.drawable.rounded_music_note_24
+                        "TRAVEL" -> R.drawable.rounded_directions_bus_24
+                        "SOUND_MODE" -> R.drawable.rounded_volume_up_24
                         "WATCH_BATTERY" -> R.drawable.rounded_watch_24
                         "PHONE_BATTERY" -> R.drawable.rounded_mobile_24
                         else -> R.drawable.rounded_widgets_24
@@ -181,10 +204,15 @@ fun WatchfaceSettingsUI(
                     title = stringResource(R.string.watchface_right_complication_title),
                     selectedValue = complicationLabels[rightComplication] ?: rightComplication,
                     iconRes = when (rightComplication) {
+                        "DYNAMIC" -> R.drawable.rounded_auto_awesome_24
                         "HEART_RATE" -> R.drawable.rounded_favorite_24
                         "STEPS" -> R.drawable.rounded_steps_24
                         "DISTANCE" -> R.drawable.rounded_distance_24
                         "CALORIES" -> R.drawable.rounded_local_fire_department_24
+                        "NOTIFICATIONS" -> R.drawable.rounded_notifications_unread_24
+                        "NOW_PLAYING" -> R.drawable.rounded_music_note_24
+                        "TRAVEL" -> R.drawable.rounded_directions_bus_24
+                        "SOUND_MODE" -> R.drawable.rounded_volume_up_24
                         "WATCH_BATTERY" -> R.drawable.rounded_watch_24
                         "PHONE_BATTERY" -> R.drawable.rounded_mobile_24
                         else -> R.drawable.rounded_widgets_24
