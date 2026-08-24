@@ -17,6 +17,7 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
+import android.text.Html
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -32,6 +33,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,6 +56,7 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -66,6 +69,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -93,6 +97,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -188,7 +193,11 @@ private fun cleanTrackingParams(uri: Uri): Uri {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalFoundationApi::class,
+)
 @Composable
 fun LinkPickerScreen(
     uri: Uri,
@@ -212,8 +221,9 @@ fun LinkPickerScreen(
     var selectedTab by remember { mutableIntStateOf(if (initialOpenShorten) 2 else initialTab) }
     var autoOpenShortenInTools by remember { mutableStateOf(initialOpenShorten) }
 
-    // Preview image state
-    var previewImageUrl by remember { mutableStateOf<String?>(null) }
+    // Preview data state
+    var linkPreviewData by remember { mutableStateOf<LinkPreviewData?>(null) }
+    var isLoadingPreview by remember { mutableStateOf(true) }
 
     // App lists
     var baseOpenWithApps by remember { mutableStateOf<List<ResolvedAppInfo>>(emptyList()) }
@@ -224,7 +234,8 @@ fun LinkPickerScreen(
 
     LaunchedEffect(currentUri) {
         isLoadingApps = true
-        previewImageUrl = null
+        isLoadingPreview = true
+        linkPreviewData = null
 
         withContext(Dispatchers.IO) {
             // Load apps immediately so UI is ready without waiting for web scraping
@@ -240,23 +251,30 @@ fun LinkPickerScreen(
                 isLoadingApps = false
             }
 
-            // Fetch preview image asynchronously and smoothly update when ready
-            val preview = fetchPreviewImageUrl(currentUri)
+            // Fetch preview data asynchronously and smoothly update when ready
+            val preview = fetchLinkPreviewData(currentUri)
             withContext(Dispatchers.Main) {
-                previewImageUrl = preview
+                linkPreviewData = preview
+                isLoadingPreview = false
             }
         }
     }
 
     // Pinned packages state
     val pinnedPackages = remember { mutableStateOf(getPinnedPackages(context)) }
+    var isGridView by remember { mutableStateOf(getShareViewModeGrid(context)) }
 
     // Sorted and filtered apps
     val openWithApps =
-        remember(baseOpenWithApps, pinnedPackages.value, searchQuery) {
+        remember(baseOpenWithApps, pinnedPackages.value, searchQuery, currentUri) {
             baseOpenWithApps
                 .filter { searchQuery.isEmpty() || it.label.contains(searchQuery, ignoreCase = true) }
-                .sortedWith(compareBy { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) })
+                .sortedWith(
+                    compareBy(
+                        { !isAppRecommendedForUri(currentUri, it.resolveInfo.activityInfo.packageName, it.label) },
+                        { !pinnedPackages.value.contains(it.resolveInfo.activityInfo.packageName) },
+                    )
+                )
         }
 
     val shareWithApps =
@@ -357,55 +375,34 @@ fun LinkPickerScreen(
             }
 
         val isDarkTheme = isSystemInDarkTheme()
+        var isPreviewImageLoaded by remember { mutableStateOf(false) }
 
         val animatedAlpha by animateFloatAsState(
-            targetValue = if (previewImageUrl != null) 1f else 0f,
-            animationSpec = tween(durationMillis = 800),
+            targetValue = if (isPreviewImageLoaded) 1f else 0f,
+            animationSpec = tween(durationMillis = 600),
             label = "PreviewAlpha",
         )
 
-        // Background layer: Preview image with progressive blur that fades in seamlessly without jumping scrim
-        if (previewImageUrl != null || animatedAlpha > 0f) {
-            val topBlurHeightPx = with(density) { (statusBarTop * 1.5f + 48.dp).toPx() }
-            val bottomBlurHeightPx = with(density) { 120.dp.toPx() }
-
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(topAreaHeight)
-                        .align(Alignment.TopCenter)
-                        .alpha(animatedAlpha)
-                        .progressiveBlur(
-                            blurRadius = 40f,
-                            height = topBlurHeightPx,
-                            direction = BlurDirection.TOP,
-                            showGradientOverlay = true,
-                        ).progressiveBlur(
-                            blurRadius = 40f,
-                            height = bottomBlurHeightPx,
-                            direction = BlurDirection.BOTTOM,
-                            showGradientOverlay = true,
-                        ),
-            ) {
-                AsyncImage(
-                    model =
-                        ImageRequest.Builder(context)
-                            .data(previewImageUrl)
-                            .crossfade(true)
-                            .build(),
-                    contentDescription = "Link Preview",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                )
+        val textExpansionAlpha =
+            if (sheetOffset != null) {
+                val offsetDp = with(density) { sheetOffset.toDp() }
+                ((offsetDp.value - 120f) / 80f).coerceIn(0f, 1f)
+            } else {
+                1f
             }
-        }
 
-        val dynamicScrimColor =
+        val defaultScrim =
             if (isDarkTheme) {
                 BottomSheetDefaults.ScrimColor
             } else {
                 MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f)
+            }
+
+        val dynamicScrimColor =
+            if (isPreviewImageLoaded) {
+                defaultScrim.copy(alpha = defaultScrim.alpha * (1f - animatedAlpha))
+            } else {
+                defaultScrim
             }
 
         val pagerScope = rememberCoroutineScope()
@@ -467,12 +464,37 @@ fun LinkPickerScreen(
                                         ),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_link_24),
-                                    contentDescription = "Link Icon",
-                                    modifier = Modifier.size(22.dp),
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                )
+                                Crossfade(
+                                    targetState = if (isLoadingPreview) "loading" else (linkPreviewData?.faviconUrl ?: "icon"),
+                                    label = "FaviconCrossfade",
+                                ) { state ->
+                                    if (state == "loading") {
+                                        LoadingIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        )
+                                    } else if (state != "icon" && !linkPreviewData?.faviconUrl.isNullOrBlank()) {
+                                        AsyncImage(
+                                            model =
+                                                ImageRequest.Builder(context)
+                                                    .data(linkPreviewData?.faviconUrl)
+                                                    .crossfade(true)
+                                                    .build(),
+                                            contentDescription = "Website Icon",
+                                            modifier =
+                                                Modifier
+                                                    .size(24.dp)
+                                                    .clip(RoundedCornerShape(6.dp)),
+                                        )
+                                    } else {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.rounded_link_24),
+                                            contentDescription = "Link Icon",
+                                            modifier = Modifier.size(22.dp),
+                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        )
+                                    }
+                                }
                             }
 
                             Column(modifier = Modifier.weight(1f)) {
@@ -665,6 +687,9 @@ fun LinkPickerScreen(
                             val appInfo = openWithApps[index]
                             val packageName = appInfo.resolveInfo.activityInfo.packageName
                             val isPinned = pinnedPackages.value.contains(packageName)
+                            val isRecommended = remember(currentUri, packageName, appInfo.label) {
+                                isAppRecommendedForUri(currentUri, packageName, appInfo.label)
+                            }
                             var icon by remember(appInfo.resolveInfo) { mutableStateOf<Drawable?>(null) }
                             LaunchedEffect(appInfo.resolveInfo) {
                                 withContext(Dispatchers.IO) {
@@ -673,7 +698,9 @@ fun LinkPickerScreen(
                             }
 
                             val itemBgColor =
-                                if (isPinned) {
+                                if (isRecommended) {
+                                    MaterialTheme.colorScheme.primaryContainer
+                                } else if (isPinned) {
                                     if (isDarkTheme) Color.Black else Color.White
                                 } else {
                                     MaterialTheme.colorScheme.surfaceBright
@@ -718,12 +745,58 @@ fun LinkPickerScreen(
                         }
                     }
 
-                    Text(
-                        text = stringResource(R.string.label_share_with),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(top = 8.dp, start = 16.dp),
-                    )
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 0.dp, bottom = 0.dp, start = 16.dp, end = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.label_share_with),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            ToggleButton(
+                                checked = !isGridView,
+                                onCheckedChange = {
+                                    HapticUtil.performUIHaptic(view)
+                                    isGridView = false
+                                    setShareViewModeGrid(context, false)
+                                },
+                                shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_view_headline_24),
+                                    contentDescription = stringResource(R.string.label_view_list),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            }
+
+                            ToggleButton(
+                                checked = isGridView,
+                                onCheckedChange = {
+                                    HapticUtil.performUIHaptic(view)
+                                    isGridView = true
+                                    setShareViewModeGrid(context, true)
+                                },
+                                shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.rounded_grid_view_24),
+                                    contentDescription = stringResource(R.string.label_view_grid),
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            }
+                        }
+                    }
 
                     ShareWithContent(
                         resolveInfos = shareWithApps,
@@ -732,8 +805,94 @@ fun LinkPickerScreen(
                         modifier = Modifier.fillMaxWidth(),
                         togglePin = togglePin,
                         pinnedPackages = pinnedPackages.value,
+                        isGridView = isGridView,
                         demo = demo,
                     )
+                }
+            }
+        }
+
+        if (linkPreviewData?.imageUrl != null || animatedAlpha > 0f) {
+            val topBlurHeightPx = with(density) { (statusBarTop * 1.5f + 48.dp).toPx() }
+            val bottomBlurHeightPx = with(density) { 120.dp.toPx() }
+
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(topAreaHeight)
+                        .align(Alignment.TopCenter)
+                        .alpha(animatedAlpha)
+                        .progressiveBlur(
+                            blurRadius = 40f,
+                            height = topBlurHeightPx,
+                            direction = BlurDirection.TOP,
+                            showGradientOverlay = false,
+                        ).progressiveBlur(
+                            blurRadius = 40f,
+                            height = bottomBlurHeightPx,
+                            direction = BlurDirection.BOTTOM,
+                            showGradientOverlay = false,
+                        ),
+            ) {
+                AsyncImage(
+                    model =
+                        ImageRequest.Builder(context)
+                            .data(linkPreviewData?.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                    contentDescription = "Link Preview",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
+                    onSuccess = { isPreviewImageLoaded = true },
+                    onError = { isPreviewImageLoaded = false },
+                )
+            }
+
+            if (!linkPreviewData?.title.isNullOrBlank() || !linkPreviewData?.description.isNullOrBlank()) {
+                Box(
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(topAreaHeight)
+                            .align(Alignment.TopCenter)
+                            .alpha(animatedAlpha * textExpansionAlpha)
+                            .padding(horizontal = 24.dp, vertical = 16.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainer,
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
+                        ) {
+                            if (!linkPreviewData?.title.isNullOrBlank()) {
+                                Text(
+                                    text = linkPreviewData?.title.orEmpty(),
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    maxLines = 2,
+                                    textAlign = TextAlign.Center,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                            if (!linkPreviewData?.description.isNullOrBlank()) {
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = linkPreviewData?.description.orEmpty(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 2,
+                                    textAlign = TextAlign.Center,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1010,7 +1169,29 @@ private fun setPinnedPackages(
     prefs.edit { putStringSet("pinned_packages", packages) }
 }
 
-private fun fetchPreviewImageUrl(uri: Uri): String? {
+private fun getShareViewModeGrid(context: Context): Boolean {
+    val prefs: SharedPreferences = context.getSharedPreferences("link_prefs", Context.MODE_PRIVATE)
+    return prefs.getBoolean("share_view_grid", false)
+}
+
+private fun setShareViewModeGrid(
+    context: Context,
+    isGrid: Boolean,
+) {
+    val prefs: SharedPreferences = context.getSharedPreferences("link_prefs", Context.MODE_PRIVATE)
+    prefs.edit { putBoolean("share_view_grid", isGrid) }
+}
+
+private data class LinkPreviewData(
+    val imageUrl: String? = null,
+    val faviconUrl: String? = null,
+    val title: String? = null,
+    val description: String? = null,
+)
+
+private val faviconCache = androidx.collection.LruCache<String, String>(100)
+
+private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
     val urlString = uri.toString()
     val lower = urlString.lowercase(Locale.getDefault())
 
@@ -1019,14 +1200,16 @@ private fun fetchPreviewImageUrl(uri: Uri): String? {
         lower.endsWith(".webp") || lower.endsWith(".gif") || lower.endsWith(".svg") ||
         lower.endsWith(".bmp") || lower.endsWith(".ico")
     ) {
-        return urlString
+        return LinkPreviewData(imageUrl = urlString)
     }
 
-    if (uri.scheme != "http" && uri.scheme != "https") return null
+    if (uri.scheme != "http" && uri.scheme != "https") return LinkPreviewData()
 
     val host = uri.host?.lowercase(Locale.getDefault()) ?: ""
+    val cachedFavicon = if (host.isNotBlank()) faviconCache[host] else null
 
     // 2. Fast service-specific thumbnail extraction (YouTube, etc.)
+    var fastImage: String? = null
     if (host.contains("youtube.com") || host.contains("youtu.be")) {
         val videoId =
             if (host.contains("youtu.be")) {
@@ -1037,79 +1220,186 @@ private fun fetchPreviewImageUrl(uri: Uri): String? {
                 } else null
             }
         if (!videoId.isNullOrBlank()) {
-            return "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
+            fastImage = "https://img.youtube.com/vi/$videoId/hqdefault.jpg"
         }
     }
 
     return try {
         val url = URL(urlString)
         val connection = (url.openConnection() as HttpURLConnection).apply {
-            connectTimeout = 4000
-            readTimeout = 4000
+            connectTimeout = 5000
+            readTimeout = 5000
             instanceFollowRedirects = true
             setRequestProperty(
                 "User-Agent",
-                "Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+                "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
             )
-            setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/*,*/*;q=0.8")
+            setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            setRequestProperty("Accept-Language", "en-US,en;q=0.9")
         }
 
         val contentType = connection.contentType ?: ""
         if (contentType.startsWith("image/")) {
-            return urlString
+            return LinkPreviewData(imageUrl = urlString)
         }
 
         val reader = BufferedReader(InputStreamReader(connection.inputStream))
         val sb = StringBuilder()
         var line: String?
         var lineCount = 0
-        while (reader.readLine().also { line = it } != null && lineCount < 300) {
+        while (reader.readLine().also { line = it } != null && lineCount < 800) {
             sb.append(line).append("\n")
             lineCount++
-            if (line?.contains("</head>", ignoreCase = true) == true) break
         }
         reader.close()
         val html = sb.toString()
 
-        // 3. OpenGraph / Twitter Card / Schema image
-        val ogRegex = Regex("""<meta[^>]+(?:property|name|itemprop)=["'](?:og:image|og:image:secure_url|twitter:image|twitter:image:src|image)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
-        val ogMatch = ogRegex.find(html)?.groupValues?.get(1)
-        if (!ogMatch.isNullOrBlank()) {
-            return resolveRelativeUrl(urlString, ogMatch)
+        var imageUrl: String? = fastImage
+        if (imageUrl == null) {
+            val ogRegex = Regex("""<meta[^>]+(?:property|name|itemprop)=["'](?:og:image|og:image:secure_url|twitter:image|twitter:image:src|image)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+            val ogMatch = ogRegex.find(html)?.groupValues?.get(1)
+            if (!ogMatch.isNullOrBlank()) {
+                imageUrl = resolveRelativeUrl(urlString, cleanHtmlEntity(ogMatch))
+            }
         }
 
-        val ogRegexReversed = Regex("""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name|itemprop)=["'](?:og:image|og:image:secure_url|twitter:image|twitter:image:src|image)["']""", RegexOption.IGNORE_CASE)
-        val ogMatchReversed = ogRegexReversed.find(html)?.groupValues?.get(1)
-        if (!ogMatchReversed.isNullOrBlank()) {
-            return resolveRelativeUrl(urlString, ogMatchReversed)
+        if (imageUrl == null) {
+            val ogRegexReversed = Regex("""<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name|itemprop)=["'](?:og:image|og:image:secure_url|twitter:image|twitter:image:src|image)["']""", RegexOption.IGNORE_CASE)
+            val ogMatchReversed = ogRegexReversed.find(html)?.groupValues?.get(1)
+            if (!ogMatchReversed.isNullOrBlank()) {
+                imageUrl = resolveRelativeUrl(urlString, cleanHtmlEntity(ogMatchReversed))
+            }
         }
 
-        // 4. Apple Touch Icon / Large icon from HTML
-        val touchIconRegex = Regex("""<link[^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["'][^>]+href=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
-        val touchIconMatch = touchIconRegex.find(html)?.groupValues?.get(1)
-        if (!touchIconMatch.isNullOrBlank()) {
-            return resolveRelativeUrl(urlString, touchIconMatch)
+        if (imageUrl == null) {
+            val jsonLdImgRegex = Regex(""""image"\s*:\s*(?:\[\s*)?"([^"]+)"""", RegexOption.IGNORE_CASE)
+            val jsonLdMatch = jsonLdImgRegex.find(html)?.groupValues?.get(1)
+            if (!jsonLdMatch.isNullOrBlank() && jsonLdMatch.startsWith("http")) {
+                imageUrl = jsonLdMatch.replace("\\/", "/")
+            }
         }
 
-        val touchIconReversed = Regex("""<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["']""", RegexOption.IGNORE_CASE)
-        val touchIconReversedMatch = touchIconReversed.find(html)?.groupValues?.get(1)
-        if (!touchIconReversedMatch.isNullOrBlank()) {
-            return resolveRelativeUrl(urlString, touchIconReversedMatch)
+        // Favicon extraction
+        var extractedFavicon: String? = cachedFavicon
+        if (extractedFavicon == null) {
+            val touchIconRegex = Regex("""<link[^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["'][^>]+href=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+            val touchIconMatch = touchIconRegex.find(html)?.groupValues?.get(1)
+            if (!touchIconMatch.isNullOrBlank()) {
+                extractedFavicon = resolveRelativeUrl(urlString, cleanHtmlEntity(touchIconMatch))
+            }
         }
 
-        // 5. Fallback for any website: High-resolution domain icon via Google favicon service (128px)
-        if (host.isNotBlank()) {
-            "https://www.google.com/s2/favicons?domain=$host&sz=128"
+        if (extractedFavicon == null) {
+            val touchIconReversed = Regex("""<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["']""", RegexOption.IGNORE_CASE)
+            val touchIconReversedMatch = touchIconReversed.find(html)?.groupValues?.get(1)
+            if (!touchIconReversedMatch.isNullOrBlank()) {
+                extractedFavicon = resolveRelativeUrl(urlString, cleanHtmlEntity(touchIconReversedMatch))
+            }
+        }
+
+        if (extractedFavicon == null && host.isNotBlank()) {
+            extractedFavicon = "https://www.google.com/s2/favicons?domain=$host&sz=128"
+        }
+
+        if (extractedFavicon != null && host.isNotBlank()) {
+            faviconCache.put(host, extractedFavicon)
+        }
+
+        if (imageUrl == null) {
+            imageUrl = extractedFavicon
+        }
+
+        var title: String? = null
+        val ogTitleRegex = Regex("""<meta[^>]+(?:property|name)=["'](?:og:title|twitter:title)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+        val ogTitleMatch = ogTitleRegex.find(html)?.groupValues?.get(1)
+        if (!ogTitleMatch.isNullOrBlank()) {
+            title = cleanHtmlEntity(ogTitleMatch)
         } else {
-            null
+            val htmlTitleRegex = Regex("""<title[^>]*>([^<]+)</title>""", RegexOption.IGNORE_CASE)
+            val htmlTitleMatch = htmlTitleRegex.find(html)?.groupValues?.get(1)
+            if (!htmlTitleMatch.isNullOrBlank()) {
+                title = cleanHtmlEntity(htmlTitleMatch.trim())
+            }
         }
+
+        var description: String? = null
+        val ogDescRegex = Regex("""<meta[^>]+(?:property|name)=["'](?:og:description|twitter:description|description)["'][^>]+content=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
+        val ogDescMatch = ogDescRegex.find(html)?.groupValues?.get(1)
+        if (!ogDescMatch.isNullOrBlank()) {
+            description = cleanHtmlEntity(ogDescMatch.trim())
+        }
+
+        LinkPreviewData(
+            imageUrl = imageUrl,
+            faviconUrl = extractedFavicon,
+            title = title,
+            description = description,
+        )
     } catch (_: Exception) {
-        // Fallback on network/parse failure to domain icon
-        if (host.isNotBlank()) {
-            "https://www.google.com/s2/favicons?domain=$host&sz=128"
-        } else {
-            null
+        val fallbackFavicon = cachedFavicon ?: if (host.isNotBlank()) "https://www.google.com/s2/favicons?domain=$host&sz=128" else null
+        LinkPreviewData(
+            imageUrl = fallbackFavicon,
+            faviconUrl = fallbackFavicon,
+        )
+    }
+}
+
+private fun isAppRecommendedForUri(uri: Uri, packageName: String, appLabel: String): Boolean {
+    val host = uri.host?.lowercase(Locale.getDefault()) ?: return false
+    val pkg = packageName.lowercase(Locale.getDefault())
+    val label = appLabel.lowercase(Locale.getDefault())
+
+    // Known domain mappings
+    val domainKeywords = when {
+        host.contains("instagram.com") || host.contains("instagr.am") -> listOf("instagram")
+        host.contains("reddit.com") || host.contains("redd.it") -> listOf("reddit")
+        host.contains("facebook.com") || host.contains("fb.com") || host.contains("fb.watch") -> listOf("facebook", "katana", "orca")
+        host.contains("twitter.com") || host.contains("x.com") || host.contains("t.co") -> listOf("twitter")
+        host.contains("youtube.com") || host.contains("youtu.be") -> listOf("youtube", "vanced", "revanced", "newpipe")
+        host.contains("tiktok.com") -> listOf("tiktok", "musically")
+        host.contains("spotify.com") -> listOf("spotify")
+        host.contains("github.com") -> listOf("github", "git")
+        host.contains("telegram.org") || host.contains("t.me") -> listOf("telegram", "nekogram")
+        host.contains("discord.com") || host.contains("discord.gg") -> listOf("discord", "aliucord")
+        host.contains("threads.net") -> listOf("threads", "barcelona")
+        host.contains("pinterest.com") || host.contains("pin.it") -> listOf("pinterest")
+        host.contains("linkedin.com") || host.contains("lnkd.in") -> listOf("linkedin")
+        host.contains("twitch.tv") -> listOf("twitch")
+        host.contains("medium.com") -> listOf("medium")
+        host.contains("netflix.com") -> listOf("netflix")
+        host.contains("amazon.") -> listOf("amazon")
+        else -> {
+            // General domain extractor (e.g., "sub.example.co.uk" -> "example")
+            val parts = host.split('.').filter { it != "www" && it != "m" && it != "mobile" && it != "app" && it.length > 2 }
+            parts
         }
+    }
+
+    return domainKeywords.any { keyword ->
+        keyword.length >= 3 && (pkg.contains(keyword) || label.contains(keyword))
+    }
+}
+
+private fun cleanHtmlEntity(text: String): String {
+    return try {
+        val unescaped = Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY).toString().trim()
+        unescaped
+            .replace("&#x2F;", "/")
+            .replace("\\/", "/")
+            .replace("&amp;", "&")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'")
+            .replace("&apos;", "'")
+    } catch (_: Exception) {
+        text.replace("&amp;", "&")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&quot;", "\"")
+            .replace("&#39;", "'")
+            .replace("&apos;", "'")
+            .replace("&#x2F;", "/")
+            .replace("\\/", "/")
+            .trim()
     }
 }
 
