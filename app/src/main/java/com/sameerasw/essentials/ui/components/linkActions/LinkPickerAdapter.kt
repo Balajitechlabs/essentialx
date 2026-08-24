@@ -94,6 +94,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -215,6 +216,7 @@ fun LinkPickerScreen(
 
     // Preview data state
     var linkPreviewData by remember { mutableStateOf<LinkPreviewData?>(null) }
+    var isLoadingPreview by remember { mutableStateOf(true) }
 
     // App lists
     var baseOpenWithApps by remember { mutableStateOf<List<ResolvedAppInfo>>(emptyList()) }
@@ -225,6 +227,7 @@ fun LinkPickerScreen(
 
     LaunchedEffect(currentUri) {
         isLoadingApps = true
+        isLoadingPreview = true
         linkPreviewData = null
 
         withContext(Dispatchers.IO) {
@@ -245,6 +248,7 @@ fun LinkPickerScreen(
             val preview = fetchLinkPreviewData(currentUri)
             withContext(Dispatchers.Main) {
                 linkPreviewData = preview
+                isLoadingPreview = false
             }
         }
     }
@@ -447,12 +451,37 @@ fun LinkPickerScreen(
                                         ),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_link_24),
-                                    contentDescription = "Link Icon",
-                                    modifier = Modifier.size(22.dp),
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                )
+                                Crossfade(
+                                    targetState = if (isLoadingPreview) "loading" else (linkPreviewData?.faviconUrl ?: "icon"),
+                                    label = "FaviconCrossfade",
+                                ) { state ->
+                                    if (state == "loading") {
+                                        LoadingIndicator(
+                                            modifier = Modifier.size(20.dp),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        )
+                                    } else if (state != "icon" && !linkPreviewData?.faviconUrl.isNullOrBlank()) {
+                                        AsyncImage(
+                                            model =
+                                                ImageRequest.Builder(context)
+                                                    .data(linkPreviewData?.faviconUrl)
+                                                    .crossfade(true)
+                                                    .build(),
+                                            contentDescription = "Website Icon",
+                                            modifier =
+                                                Modifier
+                                                    .size(24.dp)
+                                                    .clip(RoundedCornerShape(6.dp)),
+                                        )
+                                    } else {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.rounded_link_24),
+                                            contentDescription = "Link Icon",
+                                            modifier = Modifier.size(22.dp),
+                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        )
+                                    }
+                                }
                             }
 
                             Column(modifier = Modifier.weight(1f)) {
@@ -779,6 +808,7 @@ fun LinkPickerScreen(
                                 Text(
                                     text = linkPreviewData?.title.orEmpty(),
                                     style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface,
                                     maxLines = 2,
                                     textAlign = TextAlign.Center,
@@ -1076,9 +1106,12 @@ private fun setPinnedPackages(
 
 private data class LinkPreviewData(
     val imageUrl: String? = null,
+    val faviconUrl: String? = null,
     val title: String? = null,
     val description: String? = null,
 )
+
+private val faviconCache = androidx.collection.LruCache<String, String>(100)
 
 private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
     val urlString = uri.toString()
@@ -1095,6 +1128,7 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
     if (uri.scheme != "http" && uri.scheme != "https") return LinkPreviewData()
 
     val host = uri.host?.lowercase(Locale.getDefault()) ?: ""
+    val cachedFavicon = if (host.isNotBlank()) faviconCache[host] else null
 
     // 2. Fast service-specific thumbnail extraction (YouTube, etc.)
     var fastImage: String? = null
@@ -1167,24 +1201,34 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
             }
         }
 
-        if (imageUrl == null) {
+        // Favicon extraction
+        var extractedFavicon: String? = cachedFavicon
+        if (extractedFavicon == null) {
             val touchIconRegex = Regex("""<link[^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["'][^>]+href=["']([^"']+)["']""", RegexOption.IGNORE_CASE)
             val touchIconMatch = touchIconRegex.find(html)?.groupValues?.get(1)
             if (!touchIconMatch.isNullOrBlank()) {
-                imageUrl = resolveRelativeUrl(urlString, cleanHtmlEntity(touchIconMatch))
+                extractedFavicon = resolveRelativeUrl(urlString, cleanHtmlEntity(touchIconMatch))
             }
         }
 
-        if (imageUrl == null) {
+        if (extractedFavicon == null) {
             val touchIconReversed = Regex("""<link[^>]+href=["']([^"']+)["'][^>]+rel=["'](?:apple-touch-icon|apple-touch-icon-precomposed|icon|shortcut icon)["']""", RegexOption.IGNORE_CASE)
             val touchIconReversedMatch = touchIconReversed.find(html)?.groupValues?.get(1)
             if (!touchIconReversedMatch.isNullOrBlank()) {
-                imageUrl = resolveRelativeUrl(urlString, cleanHtmlEntity(touchIconReversedMatch))
+                extractedFavicon = resolveRelativeUrl(urlString, cleanHtmlEntity(touchIconReversedMatch))
             }
         }
 
-        if (imageUrl == null && host.isNotBlank()) {
-            imageUrl = "https://www.google.com/s2/favicons?domain=$host&sz=128"
+        if (extractedFavicon == null && host.isNotBlank()) {
+            extractedFavicon = "https://www.google.com/s2/favicons?domain=$host&sz=128"
+        }
+
+        if (extractedFavicon != null && host.isNotBlank()) {
+            faviconCache.put(host, extractedFavicon)
+        }
+
+        if (imageUrl == null) {
+            imageUrl = extractedFavicon
         }
 
         var title: String? = null
@@ -1209,12 +1253,15 @@ private fun fetchLinkPreviewData(uri: Uri): LinkPreviewData {
 
         LinkPreviewData(
             imageUrl = imageUrl,
+            faviconUrl = extractedFavicon,
             title = title,
             description = description,
         )
     } catch (_: Exception) {
+        val fallbackFavicon = cachedFavicon ?: if (host.isNotBlank()) "https://www.google.com/s2/favicons?domain=$host&sz=128" else null
         LinkPreviewData(
-            imageUrl = if (host.isNotBlank()) "https://www.google.com/s2/favicons?domain=$host&sz=128" else null,
+            imageUrl = fallbackFavicon,
+            faviconUrl = fallbackFavicon,
         )
     }
 }
