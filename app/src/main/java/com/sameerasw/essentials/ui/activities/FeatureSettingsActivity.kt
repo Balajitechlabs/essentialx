@@ -761,10 +761,15 @@ class FeatureSettingsActivity : AppCompatActivity() {
                                                                     !isNotificationListenerEnabled
                                                             "Call vibrations" -> !isReadPhoneStateEnabled || !isNotificationListenerEnabled
                                                             "Calendar Sync" ->
-                                                                androidx.core.content.ContextCompat.checkSelfPermission(
-                                                                    context,
+                                                                arrayOf(
                                                                     android.Manifest.permission.READ_CALENDAR,
-                                                                ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                                                                    android.Manifest.permission.WRITE_CALENDAR,
+                                                                ).any {
+                                                                    androidx.core.content.ContextCompat.checkSelfPermission(
+                                                                        context,
+                                                                        it,
+                                                                    ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+                                                                }
 
                                                             "Batteries" -> (
                                                                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&

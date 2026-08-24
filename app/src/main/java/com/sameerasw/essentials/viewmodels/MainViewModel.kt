@@ -4717,12 +4717,18 @@ class MainViewModel : ViewModel() {
         }
 
         viewModelScope.launch(Dispatchers.IO) {
+            val savedSelected = settingsRepository.getCalendarSyncSelectedCalendars()
+            withContext(Dispatchers.Main) {
+                selectedCalendarIds.value = savedSelected
+            }
+
             val calendars = mutableListOf<CalendarAccount>()
             val projection =
                 arrayOf(
                     CalendarContract.Calendars._ID,
                     CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
                     CalendarContract.Calendars.ACCOUNT_NAME,
+                    CalendarContract.Calendars.CALENDAR_COLOR,
                 )
 
             context.contentResolver
@@ -4733,16 +4739,15 @@ class MainViewModel : ViewModel() {
                     null,
                     null,
                 )?.use { cursor ->
-                    val idColumn = cursor.getColumnIndexOrThrow(CalendarContract.Calendars._ID)
-                    val nameColumn =
-                        cursor.getColumnIndexOrThrow(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)
-                    val accountColumn =
-                        cursor.getColumnIndexOrThrow(CalendarContract.Calendars.ACCOUNT_NAME)
+                    val idColumn = cursor.getColumnIndex(CalendarContract.Calendars._ID)
+                    val nameColumn = cursor.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)
+                    val accountColumn = cursor.getColumnIndex(CalendarContract.Calendars.ACCOUNT_NAME)
 
                     while (cursor.moveToNext()) {
                         val id = cursor.getLong(idColumn)
-                        val name = cursor.getString(nameColumn)
-                        val account = cursor.getString(accountColumn)
+                        val name = cursor.getString(nameColumn) ?: "Unnamed Calendar"
+                        val account = cursor.getString(accountColumn) ?: "Local"
+
                         calendars.add(
                             CalendarAccount(
                                 id,
@@ -5631,7 +5636,10 @@ class MainViewModel : ViewModel() {
     fun requestCalendarPermission(activity: androidx.activity.ComponentActivity) {
         androidx.core.app.ActivityCompat.requestPermissions(
             activity,
-            arrayOf(Manifest.permission.READ_CALENDAR),
+            arrayOf(
+                Manifest.permission.READ_CALENDAR,
+                Manifest.permission.WRITE_CALENDAR,
+            ),
             1006,
         )
     }
