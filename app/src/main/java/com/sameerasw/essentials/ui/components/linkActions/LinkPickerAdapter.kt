@@ -15,10 +15,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -184,7 +188,7 @@ private fun cleanTrackingParams(uri: Uri): Uri {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun LinkPickerScreen(
     uri: Uri,
@@ -636,148 +640,6 @@ fun LinkPickerScreen(
                     }
                 }
 
-                val focusManager = LocalFocusManager.current
-                val searchFocusRequester = remember { FocusRequester() }
-                var isSearchActive by remember { mutableStateOf(false) }
-
-                LaunchedEffect(isSearchActive) {
-                    if (isSearchActive) {
-                        try {
-                            searchFocusRequester.requestFocus()
-                        } catch (_: Exception) {
-                        }
-                    }
-                }
-
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .height(IntrinsicSize.Min),
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        RoundedCardContainer(
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            SegmentedPicker(
-                                items = tabItems,
-                                selectedItem = selectedTab,
-                                onItemSelected = { targetPage ->
-                                    selectedTab = targetPage
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    pagerScope.launch {
-                                        pagerState.animateScrollToPage(targetPage)
-                                    }
-                                },
-                                labelProvider = {
-                                    when (it) {
-                                        0 -> context.getString(R.string.label_open_with)
-                                        else -> context.getString(R.string.label_share_with)
-                                    }
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                            )
-                        }
-
-                        Surface(
-                            onClick = {
-                                HapticUtil.performVirtualKeyHaptic(view)
-                                isSearchActive = true
-                            },
-                            modifier =
-                                Modifier
-                                    .fillMaxHeight()
-                                    .aspectRatio(1f),
-                            shape = RoundedCornerShape(24.dp),
-                            color = MaterialTheme.colorScheme.surfaceBright,
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_search_24),
-                                    contentDescription = stringResource(R.string.search_apps_placeholder),
-                                    modifier = Modifier.size(20.dp),
-                                    tint = MaterialTheme.colorScheme.onSurface,
-                                )
-                            }
-                        }
-                    }
-
-                    androidx.compose.animation.AnimatedVisibility(
-                        visible = isSearchActive,
-                        modifier = Modifier.fillMaxSize(),
-                        enter =
-                            fadeIn(animationSpec = tween(250)) +
-                                expandHorizontally(
-                                    animationSpec = tween(300),
-                                    expandFrom = Alignment.End,
-                                ),
-                        exit =
-                            fadeOut(animationSpec = tween(200)) +
-                                shrinkHorizontally(
-                                    animationSpec = tween(250),
-                                    shrinkTowards = Alignment.End,
-                                ),
-                    ) {
-                        OutlinedTextField(
-                            value = searchQuery,
-                            onValueChange = { searchQuery = it },
-                            modifier =
-                                Modifier
-                                    .fillMaxSize()
-                                    .focusRequester(searchFocusRequester),
-                            placeholder = {
-                                Text(
-                                    text = stringResource(R.string.search_apps_placeholder),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.rounded_search_24),
-                                    contentDescription = stringResource(R.string.search_apps_placeholder),
-                                    modifier = Modifier.size(20.dp),
-                                )
-                            },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = {
-                                        HapticUtil.performVirtualKeyHaptic(view)
-                                        if (searchQuery.isNotEmpty()) {
-                                            searchQuery = ""
-                                        } else {
-                                            isSearchActive = false
-                                            focusManager.clearFocus()
-                                        }
-                                    },
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.rounded_close_24),
-                                        contentDescription = stringResource(R.string.action_clear),
-                                        modifier = Modifier.size(20.dp),
-                                    )
-                                }
-                            },
-                            singleLine = true,
-                            shape = RoundedCornerShape(24.dp),
-                            colors =
-                                OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = Color.Transparent,
-                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceBright,
-                                ),
-                        )
-                    }
-                }
-
-                // 4. Swipeable Tab Content via HorizontalPager (Clipped with 24.dp corners)
                 if (isLoadingApps) {
                     Box(
                         modifier =
@@ -789,41 +651,89 @@ fun LinkPickerScreen(
                         LoadingIndicator()
                     }
                 } else {
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(24.dp)),
-                        verticalAlignment = Alignment.Top,
-                    ) { page ->
-                        Box(modifier = Modifier.fillMaxWidth()) {
-                            when (page) {
-                                0 -> {
-                                    OpenWithContent(
-                                        resolveInfos = openWithApps,
-                                        uri = currentUri,
-                                        onFinish = onFinish,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        togglePin = togglePin,
-                                        pinnedPackages = pinnedPackages.value,
-                                        demo = demo,
-                                    )
+                    if (openWithApps.isNotEmpty()) {
+                        val openWithCarouselState = rememberCarouselState { openWithApps.size }
+                        HorizontalMultiBrowseCarousel(
+                            state = openWithCarouselState,
+                            preferredItemWidth = 68.dp,
+                            itemSpacing = 4.dp,
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(68.dp),
+                        ) { index ->
+                            val appInfo = openWithApps[index]
+                            val packageName = appInfo.resolveInfo.activityInfo.packageName
+                            val isPinned = pinnedPackages.value.contains(packageName)
+                            var icon by remember(appInfo.resolveInfo) { mutableStateOf<Drawable?>(null) }
+                            LaunchedEffect(appInfo.resolveInfo) {
+                                withContext(Dispatchers.IO) {
+                                    icon = appInfo.resolveInfo.loadIcon(context.packageManager)
                                 }
-                                else -> {
-                                    ShareWithContent(
-                                        resolveInfos = shareWithApps,
-                                        uri = currentUri,
-                                        onFinish = onFinish,
-                                        modifier = Modifier.fillMaxWidth(),
-                                        togglePin = togglePin,
-                                        pinnedPackages = pinnedPackages.value,
-                                        demo = demo,
-                                    )
+                            }
+
+                            val itemBgColor =
+                                if (isPinned) {
+                                    if (isDarkTheme) Color.Black else Color.White
+                                } else {
+                                    MaterialTheme.colorScheme.surfaceBright
+                                }
+
+                            Surface(
+                                shape = RoundedCornerShape(20.dp),
+                                color = itemBgColor,
+                                modifier =
+                                    Modifier
+                                        .fillMaxSize()
+                                        .maskClip(RoundedCornerShape(20.dp))
+                                        .combinedClickable(
+                                            onClick = {
+                                                HapticUtil.performVirtualKeyHaptic(view)
+                                                val intent = Intent(Intent.ACTION_VIEW, currentUri)
+                                                intent.setClassName(
+                                                    appInfo.resolveInfo.activityInfo.packageName,
+                                                    appInfo.resolveInfo.activityInfo.name,
+                                                )
+                                                context.startActivity(intent)
+                                                onFinish()
+                                            },
+                                            onLongClick = {
+                                                togglePin(packageName)
+                                            },
+                                        ),
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    if (icon != null) {
+                                        AsyncImage(
+                                            model = icon,
+                                            contentDescription = appInfo.label,
+                                            modifier = Modifier.size(42.dp),
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
+
+                    Text(
+                        text = stringResource(R.string.label_share_with),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.padding(top = 8.dp, start = 16.dp),
+                    )
+
+                    ShareWithContent(
+                        resolveInfos = shareWithApps,
+                        uri = currentUri,
+                        onFinish = onFinish,
+                        modifier = Modifier.fillMaxWidth(),
+                        togglePin = togglePin,
+                        pinnedPackages = pinnedPackages.value,
+                        demo = demo,
+                    )
                 }
             }
         }
