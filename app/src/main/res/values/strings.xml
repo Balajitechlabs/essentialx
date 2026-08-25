@@ -2284,6 +2284,8 @@
     <string name="watchface_glance_complications_desc">Choose what to show</string>
     <string name="watchface_glance_comp_battery_alerts_title">Low battery alert</string>
     <string name="watchface_glance_comp_battery_alerts_desc">Show alert when watch or phone battery is below 20%</string>
+    <string name="watchface_glance_comp_flashlight_title">Flashlight</string>
+    <string name="watchface_glance_comp_flashlight_desc">Show when phone flashlight is on</string>
     <string name="watchface_glance_comp_travel_title">Are We There (Travel ETA)</string>
     <string name="watchface_glance_comp_travel_desc">Show remaining time/distance to destination</string>
     <string name="watchface_glance_comp_events_title">Calendar events</string>

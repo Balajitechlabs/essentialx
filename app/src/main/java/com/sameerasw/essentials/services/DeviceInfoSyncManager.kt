@@ -316,6 +316,7 @@ object DeviceInfoSyncManager {
         dataMap.putBoolean("watchface_show_upcoming_events", prefs.getBoolean("watchface_show_upcoming_events", true))
         dataMap.putBoolean("watchface_show_glance", prefs.getBoolean("watchface_show_glance", prefs.getBoolean("watchface_show_upcoming_events", true)))
         dataMap.putBoolean("watchface_glance_battery_alerts", prefs.getBoolean("watchface_glance_battery_alerts", true))
+        dataMap.putBoolean("watchface_glance_flashlight", prefs.getBoolean("watchface_glance_flashlight", true))
         dataMap.putBoolean("watchface_glance_travel", prefs.getBoolean("watchface_glance_travel", true))
         dataMap.putBoolean("watchface_glance_events", prefs.getBoolean("watchface_glance_events", true))
         dataMap.putBoolean("watchface_glance_alarm", prefs.getBoolean("watchface_glance_alarm", true))
