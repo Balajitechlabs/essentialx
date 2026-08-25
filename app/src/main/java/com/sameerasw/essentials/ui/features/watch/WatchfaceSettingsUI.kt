@@ -61,6 +61,9 @@ fun WatchfaceSettingsUI(
     var showComplications by remember {
         mutableStateOf(prefs.getBoolean("watchface_show_complications", true))
     }
+    var complicationsOnAod by remember {
+        mutableStateOf(prefs.getBoolean("watchface_complications_on_aod", true))
+    }
     var complicationOutline by remember {
         mutableStateOf(prefs.getBoolean("watchface_complication_outline", true))
     }
@@ -378,6 +381,17 @@ fun WatchfaceSettingsUI(
                 },
             )
             if (showComplications) {
+                IconToggleItem(
+                    iconRes = R.drawable.rounded_dark_mode_24,
+                    title = stringResource(R.string.watchface_complications_on_aod_title),
+                    description = stringResource(R.string.watchface_complications_on_aod_desc),
+                    isChecked = complicationsOnAod,
+                    onCheckedChange = {
+                        complicationsOnAod = it
+                        prefs.edit().putBoolean("watchface_complications_on_aod", it).apply()
+                        DeviceInfoSyncManager.forceSync(context)
+                    },
+                )
                 IconToggleItem(
                     iconRes = R.drawable.rounded_circles_24,
                     title = stringResource(R.string.watchface_complication_outline_title),

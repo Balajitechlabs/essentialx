@@ -309,6 +309,7 @@ object DeviceInfoSyncManager {
         dataMap.putBoolean("watchface_hide_battery", prefs.getBoolean("watchface_hide_battery", false))
         dataMap.putBoolean("watchface_hide_device_icons", prefs.getBoolean("watchface_hide_device_icons", false))
         dataMap.putBoolean("watchface_show_complications", prefs.getBoolean("watchface_show_complications", true))
+        dataMap.putBoolean("watchface_complications_on_aod", prefs.getBoolean("watchface_complications_on_aod", true))
         dataMap.putBoolean("watchface_complication_outline", prefs.getBoolean("watchface_complication_outline", true))
         dataMap.putString("watchface_left_complication", prefs.getString("watchface_left_complication", "DYNAMIC") ?: "DYNAMIC")
         dataMap.putString("watchface_right_complication", prefs.getString("watchface_right_complication", "STEPS") ?: "STEPS")

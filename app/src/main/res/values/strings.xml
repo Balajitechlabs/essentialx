@@ -2259,6 +2259,8 @@
     <string name="watchface_category_complications">Complications</string>
     <string name="watchface_show_complications_title">Show complications</string>
     <string name="watchface_show_complications_desc">Display left and right side widgets</string>
+    <string name="watchface_complications_on_aod_title">Show on AOD</string>
+    <string name="watchface_complications_on_aod_desc">Keep complications visible on Always on Display</string>
     <string name="watchface_complication_outline_title">Complication outline</string>
     <string name="watchface_complication_outline_desc">Show thin circular border around items</string>
     <string name="watchface_left_complication_title">Left complication</string>
