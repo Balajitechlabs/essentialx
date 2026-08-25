@@ -278,11 +278,16 @@ object CalendarSyncManager {
                 val beginIndex = it.getColumnIndex(CalendarContract.Instances.BEGIN)
                 val endIndex = it.getColumnIndex(CalendarContract.Instances.END)
                 val allDayIndex = it.getColumnIndex(CalendarContract.Instances.ALL_DAY)
+                val statusIndex = it.getColumnIndex(CalendarContract.Instances.SELF_ATTENDEE_STATUS)
                 val calIdIndex = it.getColumnIndex(CalendarContract.Instances.CALENDAR_ID)
 
                 while (it.moveToNext()) {
                     val calId = it.getLong(calIdIndex)
                     if (selectedIds.isNotEmpty() && !selectedIds.contains(calId)) {
+                        continue
+                    }
+
+                    if (statusIndex != -1 && it.getInt(statusIndex) == CalendarContract.Attendees.ATTENDEE_STATUS_DECLINED) {
                         continue
                     }
 
