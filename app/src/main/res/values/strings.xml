@@ -36,6 +36,13 @@
     <string name="check_pre_releases_label">Check for pre-releases</string>
     <string name="check_pre_releases_desc">Might be unstable</string>
     <string name="label_default_tab">Default tab</string>
+    <string name="setting_app_icon_title">App icon</string>
+    <string name="setting_app_icon_desc">Customize the home screen launcher icon</string>
+    <string name="app_icon_default">Default</string>
+    <string name="app_icon_legacy">Legacy</string>
+    <string name="app_icon_black">Dynamic</string>
+    <string name="app_icon_gta">Vice</string>
+    <string name="app_icon_google">Spectrum</string>
     <string name="label_open_with">Open</string>
     <string name="label_share_with">Share</string>
     <string name="label_view_list">List</string>

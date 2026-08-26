@@ -99,6 +99,7 @@ import com.sameerasw.essentials.ui.core.cards.FeatureCard
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.cards.PermissionCard
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
+import com.sameerasw.essentials.ui.core.pickers.AppIconPicker
 import com.sameerasw.essentials.ui.core.pickers.CrashReportingPicker
 import com.sameerasw.essentials.ui.core.pickers.DefaultTabPicker
 import com.sameerasw.essentials.ui.core.pickers.LanguagePicker
@@ -645,6 +646,12 @@ fun SettingsContent(
                 selectedTab = defaultTab,
                 onTabSelected = { viewModel.setDefaultTab(it, context) },
                 options = availableTabs,
+            )
+
+            val selectedAppIcon by viewModel.selectedAppIcon
+            AppIconPicker(
+                selectedIcon = selectedAppIcon,
+                onIconSelected = { viewModel.setAppIcon(it, context) },
             )
 
             IconToggleItem(
