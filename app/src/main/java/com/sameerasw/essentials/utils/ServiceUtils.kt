@@ -120,8 +120,8 @@ object ServiceUtils {
 
             val workRequest =
                 PeriodicWorkRequestBuilder<AppUpdateWorker>(
-                    15,
-                    TimeUnit.MINUTES,
+                    4,
+                    TimeUnit.HOURS,
                 ).setConstraints(constraints).build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(

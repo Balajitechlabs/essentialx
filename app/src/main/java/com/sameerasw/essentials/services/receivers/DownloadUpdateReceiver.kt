@@ -28,7 +28,7 @@ class DownloadUpdateReceiver : BroadcastReceiver() {
             val version = intent.getStringExtra("version") ?: ""
 
             val apkNameExtra = intent.getStringExtra("apk_name")
-            val notifId = intent.getIntExtra("notification_id", 1001)
+            val notifId = intent.getIntExtra("notification_id", 7001)
 
             val pendingResult = goAsync()
             val helper = AutoUpdateManagerHelper(context)

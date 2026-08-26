@@ -25,7 +25,7 @@ import com.sameerasw.essentials.ui.activities.YourAndroidActivity
 
 object UpdateNotificationHelper {
     private const val CHANNEL_ID = "app_updates"
-    private const val NOTIFICATION_ID = 1001
+    private const val NOTIFICATION_ID = 7001
 
     fun hasNotificationPermission(context: Context): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -97,6 +97,7 @@ object UpdateNotificationHelper {
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setContentIntent(contentPendingIntent)
                 .setAutoCancel(true)
+                .setOnlyAlertOnce(true)
                 .addAction(
                     R.drawable.rounded_mobile_arrow_down_24,
                     context.getString(R.string.action_download),
@@ -107,8 +108,6 @@ object UpdateNotificationHelper {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, builder.build())
     }
-
-    private const val GROUP_REPO_UPDATES = "com.sameerasw.essentials.TRACKED_REPO_UPDATES"
 
     fun showTrackedRepoUpdateNotification(
         context: Context,
@@ -146,7 +145,7 @@ object UpdateNotificationHelper {
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setContentIntent(contentPendingIntent)
                 .setAutoCancel(true)
-                .setGroup(GROUP_REPO_UPDATES)
+                .setOnlyAlertOnce(true)
 
         if (!releaseNotes.isNullOrBlank()) {
             val preview = releaseNotes.take(300).trim()

@@ -148,7 +148,11 @@ class AppUpdateWorker(
                                 }
                             }
                         } catch (e: Exception) {
-                            Log.e("AppUpdateWorker", "Error checking update for repo ${repo.fullName}", e)
+                            if (e.message == "RATE_LIMIT") {
+                                Log.w("AppUpdateWorker", "GitHub API rate limit reached while checking ${repo.fullName}")
+                            } else {
+                                Log.e("AppUpdateWorker", "Error checking update for repo ${repo.fullName}", e)
+                            }
                             repo
                         }
                     }

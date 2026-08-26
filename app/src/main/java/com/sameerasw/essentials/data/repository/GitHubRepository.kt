@@ -43,8 +43,10 @@ class GitHubRepository {
                 val connection = (url.openConnection() as HttpURLConnection).apply {
                     connectTimeout = connectTimeoutMs
                     readTimeout = readTimeoutMs
+                    setRequestProperty("User-Agent", "Essentials-Android-App")
+                    setRequestProperty("Accept", "application/vnd.github+json")
                 }
-                if (token != null) {
+                if (!token.isNullOrBlank()) {
                     connection.setRequestProperty("Authorization", "Bearer $token")
                 }
                 if (connection.responseCode == 200) {
@@ -80,8 +82,10 @@ class GitHubRepository {
                 val connection = (url.openConnection() as HttpURLConnection).apply {
                     connectTimeout = connectTimeoutMs
                     readTimeout = readTimeoutMs
+                    setRequestProperty("User-Agent", "Essentials-Android-App")
+                    setRequestProperty("Accept", "application/vnd.github+json")
                 }
-                if (token != null) {
+                if (!token.isNullOrBlank()) {
                     connection.setRequestProperty("Authorization", "Bearer $token")
                 }
                 if (!etag.isNullOrBlank()) {
@@ -123,8 +127,10 @@ class GitHubRepository {
                 val connection = (url.openConnection() as HttpURLConnection).apply {
                     connectTimeout = connectTimeoutMs
                     readTimeout = readTimeoutMs
+                    setRequestProperty("User-Agent", "Essentials-Android-App")
+                    setRequestProperty("Accept", "application/vnd.github+json")
                 }
-                if (token != null) {
+                if (!token.isNullOrBlank()) {
                     connection.setRequestProperty("Authorization", "Bearer $token")
                 }
                 if (!etag.isNullOrBlank()) {
@@ -156,8 +162,13 @@ class GitHubRepository {
         withContext(Dispatchers.IO) {
             try {
                 val url = URL("https://api.github.com/repos/$owner/$repo/readme")
-                val connection = url.openConnection() as HttpURLConnection
-                if (token != null) {
+                val connection = (url.openConnection() as HttpURLConnection).apply {
+                    connectTimeout = connectTimeoutMs
+                    readTimeout = readTimeoutMs
+                    setRequestProperty("User-Agent", "Essentials-Android-App")
+                    setRequestProperty("Accept", "application/vnd.github+json")
+                }
+                if (!token.isNullOrBlank()) {
                     connection.setRequestProperty("Authorization", "Bearer $token")
                 }
                 if (connection.responseCode == 200) {
