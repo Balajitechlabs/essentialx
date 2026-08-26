@@ -106,6 +106,7 @@ import com.sameerasw.essentials.ui.core.pickers.LanguagePicker
 import com.sameerasw.essentials.ui.core.sheets.GitHubAuthSheet
 import com.sameerasw.essentials.ui.core.sheets.ImportConfigConfirmationSheet
 import com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet
+import com.sameerasw.essentials.ui.core.sheets.PreReleaseConfirmationSheet
 import com.sameerasw.essentials.ui.core.sheets.UnsupportedFeaturesConfirmationSheet
 import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
@@ -295,6 +296,8 @@ fun SettingsContent(
     var showInstructionsSheet by remember { mutableStateOf(false) }
     var showShizukuHelpBottomSheet by remember { mutableStateOf(false) }
     var showUnsupportedFeaturesSheet by remember { mutableStateOf(false) }
+    var showPreReleaseConfirmSheet by remember { mutableStateOf(false) }
+    var pendingPreReleaseState by remember { mutableStateOf(false) }
     var showImportConfirmSheet by remember { mutableStateOf(false) }
     var selectedImportUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -421,6 +424,24 @@ fun SettingsContent(
         )
     }
 
+    if (showPreReleaseConfirmSheet) {
+        PreReleaseConfirmationSheet(
+            isEnabling = pendingPreReleaseState,
+            onDismissRequest = { showPreReleaseConfirmSheet = false },
+            onConfirmRestart = {
+                showPreReleaseConfirmSheet = false
+                viewModel.setPreReleaseCheckEnabled(pendingPreReleaseState, context)
+                val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                }
+                if (intent != null) {
+                    context.startActivity(intent)
+                    Runtime.getRuntime().exit(0)
+                }
+            },
+        )
+    }
+
     if (showImportConfirmSheet) {
         ImportConfigConfirmationSheet(
             onDismissRequest = {
@@ -523,7 +544,10 @@ fun SettingsContent(
                 title = context.getString(R.string.check_pre_releases_label),
                 description = context.getString(R.string.check_pre_releases_desc),
                 isChecked = isPreReleaseCheckEnabled,
-                onCheckedChange = { viewModel.setPreReleaseCheckEnabled(it, context) },
+                onCheckedChange = { targetState ->
+                    pendingPreReleaseState = targetState
+                    showPreReleaseConfirmSheet = true
+                },
             )
             IconToggleItem(
                 iconRes = R.drawable.rounded_notifications_unread_24,

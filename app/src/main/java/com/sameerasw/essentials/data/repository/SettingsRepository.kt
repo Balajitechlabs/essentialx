@@ -542,6 +542,11 @@ class SettingsRepository(
         value: Boolean,
     ) = prefs.edit().putBoolean(key, value).apply()
 
+    fun putBooleanSync(
+        key: String,
+        value: Boolean,
+    ) = prefs.edit().putBoolean(key, value).commit()
+
     /**
      * Asynchronously stores a string preference value.
      *

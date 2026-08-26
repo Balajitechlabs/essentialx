@@ -2122,7 +2122,10 @@ class MainViewModel : ViewModel() {
         context: Context,
     ) {
         isPreReleaseCheckEnabled.value = enabled
-        settingsRepository.putBoolean(SettingsRepository.KEY_CHECK_PRE_RELEASES_ENABLED, enabled)
+        settingsRepository.putBooleanSync(SettingsRepository.KEY_CHECK_PRE_RELEASES_ENABLED, enabled)
+        // Enabling pre-releases automatically enables Developer Mode; disabling turns it off
+        isDeveloperModeEnabled.value = enabled
+        settingsRepository.putBooleanSync(SettingsRepository.KEY_DEVELOPER_MODE_ENABLED, enabled)
     }
 
     /**
