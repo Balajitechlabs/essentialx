@@ -40,7 +40,7 @@
     <string name="setting_app_icon_desc">Customize the home screen launcher icon</string>
     <string name="app_icon_default">Default</string>
     <string name="app_icon_legacy">Legacy</string>
-    <string name="app_icon_black">Pitch Black</string>
+    <string name="app_icon_black">Dynamic</string>
     <string name="app_icon_gta">Vice</string>
     <string name="app_icon_google">Spectrum</string>
     <string name="label_open_with">Open</string>

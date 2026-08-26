@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -154,6 +155,13 @@ fun AppIconPicker(
             options.forEach { iconItem ->
                 val isSelected = iconItem == selectedIcon
 
+                val circleBackground =
+                    if (iconItem == AppIcon.BLACK) {
+                        MaterialTheme.colorScheme.surfaceContainerHighest
+                    } else {
+                        Color.White
+                    }
+
                 Box(
                     modifier =
                         Modifier
@@ -176,7 +184,7 @@ fun AppIconPicker(
                                     },
                                 ).padding(if (isSelected) 3.5.dp else 0.dp)
                                 .clip(CircleShape)
-                                .background(Color.White)
+                                .background(circleBackground)
                                 .clickable(
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = ripple(bounded = true),
@@ -189,6 +197,14 @@ fun AppIconPicker(
                         Image(
                             painter = painterResource(id = iconItem.foregroundRes),
                             contentDescription = stringResource(iconItem.titleRes),
+                            colorFilter =
+                                if (iconItem == AppIcon.BLACK) {
+                                    ColorFilter.tint(
+                                        MaterialTheme.colorScheme.primary,
+                                    )
+                                } else {
+                                    null
+                                },
                             modifier =
                                 Modifier
                                     .fillMaxSize()
