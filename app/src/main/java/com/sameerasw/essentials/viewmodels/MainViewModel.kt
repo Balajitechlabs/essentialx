@@ -47,6 +47,7 @@ import com.sameerasw.essentials.data.repository.UpdateRepository
 import com.sameerasw.essentials.domain.HapticFeedbackType
 import com.sameerasw.essentials.domain.MapsState
 import com.sameerasw.essentials.domain.diy.Action
+import com.sameerasw.essentials.domain.model.AppIcon
 import com.sameerasw.essentials.domain.model.AppSelection
 import com.sameerasw.essentials.domain.model.AppStandbyInfo
 import com.sameerasw.essentials.domain.model.DnsPreset
@@ -65,6 +66,7 @@ import com.sameerasw.essentials.services.NotificationLightingService
 import com.sameerasw.essentials.services.receivers.FlashlightActionReceiver
 import com.sameerasw.essentials.services.receivers.SecurityDeviceAdminReceiver
 import com.sameerasw.essentials.services.tiles.ScreenOffAccessibilityService
+import com.sameerasw.essentials.utils.AppIconUtil
 import com.sameerasw.essentials.utils.AppUtil
 import com.sameerasw.essentials.utils.DeviceUtils
 import com.sameerasw.essentials.utils.PermissionUtils
@@ -103,6 +105,7 @@ class MainViewModel : ViewModel() {
     val isNotificationLightingAccessibilityEnabled = mutableStateOf(false)
     val hapticFeedbackType = mutableStateOf(HapticFeedbackType.SUBTLE)
     val defaultTab = mutableStateOf(com.sameerasw.essentials.domain.DIYTabs.ESSENTIALS)
+    val selectedAppIcon = mutableStateOf(AppIcon.DEFAULT)
     val isDefaultBrowserSet = mutableStateOf(false)
     val onlyShowWhenScreenOff = mutableStateOf(true)
     val isAmbientDisplayEnabled = mutableStateOf(false)
@@ -1576,6 +1579,7 @@ class MainViewModel : ViewModel() {
         MapsState.isEnabled = isMapsPowerSavingEnabled.value
         hapticFeedbackType.value = settingsRepository.getHapticFeedbackType()
         defaultTab.value = settingsRepository.getDIYTab()
+        selectedAppIcon.value = settingsRepository.getAppIcon()
         isSwipeTabsEnabled.value =
             settingsRepository.getBoolean(SettingsRepository.KEY_SWIPE_TABS, true)
         sentryReportMode.value =
@@ -5310,7 +5314,15 @@ class MainViewModel : ViewModel() {
     ) {
         defaultTab.value = tab
         settingsRepository.saveDIYTab(tab)
-        settingsRepository.saveDIYTab(tab)
+    }
+
+    fun setAppIcon(
+        appIcon: AppIcon,
+        context: Context,
+    ) {
+        selectedAppIcon.value = appIcon
+        settingsRepository.setAppIcon(appIcon)
+        AppIconUtil.setAppIcon(context, appIcon)
     }
 
     /**
