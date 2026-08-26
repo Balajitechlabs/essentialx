@@ -104,7 +104,7 @@ object UpdateNotificationHelper {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setContentIntent(contentPendingIntent)
-                .setAutoCancel(true)
+                .setAutoCancel(false)
                 .setOnlyAlertOnce(true)
                 .addAction(
                     R.drawable.rounded_mobile_arrow_down_24,
@@ -133,7 +133,8 @@ object UpdateNotificationHelper {
         if (!hasNotificationPermission(context)) return
         createNotificationChannel(context)
 
-        val notifId = (repoFullName.hashCode() and 0x7FFFFFFF)
+        // Unique ID range specifically for tracked repo update notifications to prevent collision with AppFlow or other handlers
+        val notifId = 800000 + (repoFullName.hashCode().let { if (it < 0) -it else it } % 100000)
         val mainIntent =
             Intent(context, YourAndroidActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -157,7 +158,7 @@ object UpdateNotificationHelper {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
                 .setContentIntent(contentPendingIntent)
-                .setAutoCancel(true)
+                .setAutoCancel(false)
                 .setOnlyAlertOnce(true)
 
         if (packageName != null) {
