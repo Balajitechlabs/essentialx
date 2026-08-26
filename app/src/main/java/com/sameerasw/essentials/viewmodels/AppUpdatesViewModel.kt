@@ -623,6 +623,7 @@ class AppUpdatesViewModel : ViewModel() {
                     if (e.message == "RATE_LIMIT") {
                         _errorMessage.value =
                             context.getString(R.string.error_rate_limited)
+                        _refreshingRepoIds.value = emptySet()
                         break
                     }
                 } finally {
@@ -631,6 +632,8 @@ class AppUpdatesViewModel : ViewModel() {
                     _updateProgress.value = completedCount.toFloat() / reposToCheck.size
                 }
             }
+
+            _refreshingRepoIds.value = emptySet()
 
             if (changesMade) {
                 settingsRepo.saveTrackedRepos(updatedRepos)

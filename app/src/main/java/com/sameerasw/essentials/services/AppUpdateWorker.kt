@@ -80,59 +80,59 @@ class AppUpdateWorker(
                 }
             }
 
-            // 2. Tracked GitHub Repositories Update Check in Parallel
+            // 2. Tracked GitHub Repositories Update Check
             val trackedRepos = settingsRepository.getTrackedRepos()
             if (trackedRepos.isNotEmpty()) {
                 val token = settingsRepository.getGitHubToken()
+                val updatedRepos = trackedRepos.toMutableList()
+                var changesMade = false
 
-                val deferredResults = trackedRepos.map { repo ->
-                    async {
-                        try {
-                            val fetchResult =
-                                if (repo.allowPreReleases) {
-                                    gitHubRepository.getReleasesWithETag(repo.owner, repo.name, token, repo.lastETag)
-                                } else {
-                                    gitHubRepository.getLatestReleaseWithETag(repo.owner, repo.name, token, repo.lastETag)
+                for (i in updatedRepos.indices) {
+                    val repo = updatedRepos[i]
+                    try {
+                        val fetchResult =
+                            if (repo.allowPreReleases) {
+                                gitHubRepository.getReleasesWithETag(repo.owner, repo.name, token, repo.lastETag)
+                            } else {
+                                gitHubRepository.getLatestReleaseWithETag(repo.owner, repo.name, token, repo.lastETag)
+                            }
+
+                        if (!fetchResult.isNotModified) {
+                            val release = fetchResult.release
+                            if (release != null) {
+                                var isUpdateAvailable = false
+                                if (repo.mappedPackageName != null) {
+                                    val installedVersion =
+                                        AppUtil.getAppVersion(context, repo.mappedPackageName)
+                                    if (installedVersion != null) {
+                                        isUpdateAvailable =
+                                            AppUtil.compareSemanticVersions(
+                                                release.tagName,
+                                                installedVersion,
+                                            ) > 0
+                                    }
                                 }
 
-                            if (fetchResult.isNotModified) {
-                                // 304 Not Modified - zero bandwidth consumed!
-                                repo
-                            } else {
-                                val release = fetchResult.release
-                                if (release != null) {
-                                    var isUpdateAvailable = false
-                                    if (repo.mappedPackageName != null) {
-                                        val installedVersion =
-                                            AppUtil.getAppVersion(context, repo.mappedPackageName)
-                                        if (installedVersion != null) {
-                                            isUpdateAvailable =
-                                                AppUtil.compareSemanticVersions(
-                                                    release.tagName,
-                                                    installedVersion,
-                                                ) > 0
-                                        }
-                                    }
+                                val downloadUrl =
+                                    release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
+                                        ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl
+                                        ?: ""
 
-                                    val downloadUrl =
-                                        release.assets.find { it.name == repo.selectedApkName }?.downloadUrl
-                                            ?: release.assets.firstOrNull { it.name.endsWith(".apk") }?.downloadUrl
-                                            ?: ""
+                                val hasNewRelease = repo.latestTagName.isNotBlank() && repo.latestTagName != release.tagName
 
-                                    val hasNewRelease = repo.latestTagName.isNotBlank() && repo.latestTagName != release.tagName
+                                if ((isUpdateAvailable || hasNewRelease) && repo.notificationsEnabled) {
+                                    val appName = repo.mappedAppName ?: repo.name
+                                    UpdateNotificationHelper.showTrackedRepoUpdateNotification(
+                                        context = context,
+                                        repoName = appName,
+                                        repoFullName = repo.fullName,
+                                        version = release.tagName,
+                                        downloadUrl = downloadUrl,
+                                        releaseNotes = release.body,
+                                    )
+                                }
 
-                                    if ((isUpdateAvailable || hasNewRelease) && repo.notificationsEnabled) {
-                                        val appName = repo.mappedAppName ?: repo.name
-                                        UpdateNotificationHelper.showTrackedRepoUpdateNotification(
-                                            context = context,
-                                            repoName = appName,
-                                            repoFullName = repo.fullName,
-                                            version = release.tagName,
-                                            downloadUrl = downloadUrl,
-                                            releaseNotes = release.body,
-                                        )
-                                    }
-
+                                val newRepo =
                                     repo.copy(
                                         latestTagName = release.tagName,
                                         latestReleaseName = release.name,
@@ -143,23 +143,24 @@ class AppUpdateWorker(
                                         isUpdateAvailable = isUpdateAvailable,
                                         lastETag = fetchResult.etag ?: repo.lastETag,
                                     )
-                                } else {
-                                    repo
+
+                                if (newRepo != repo) {
+                                    updatedRepos[i] = newRepo
+                                    changesMade = true
                                 }
                             }
-                        } catch (e: Exception) {
-                            if (e.message == "RATE_LIMIT") {
-                                Log.w("AppUpdateWorker", "GitHub API rate limit reached while checking ${repo.fullName}")
-                            } else {
-                                Log.e("AppUpdateWorker", "Error checking update for repo ${repo.fullName}", e)
-                            }
-                            repo
+                        }
+                    } catch (e: Exception) {
+                        if (e.message == "RATE_LIMIT") {
+                            Log.w("AppUpdateWorker", "GitHub API rate limit reached, aborting update checks")
+                            break
+                        } else {
+                            Log.e("AppUpdateWorker", "Error checking update for repo ${repo.fullName}", e)
                         }
                     }
                 }
 
-                val updatedRepos = deferredResults.awaitAll()
-                if (updatedRepos != trackedRepos) {
+                if (changesMade) {
                     settingsRepository.saveTrackedRepos(updatedRepos)
                 }
             }
