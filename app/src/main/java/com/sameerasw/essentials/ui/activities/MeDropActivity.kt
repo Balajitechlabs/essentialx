@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (c) 2026 sameerasw.com
  * License: MIT License
  *
@@ -8,7 +8,6 @@
 
 package com.sameerasw.essentials.ui.activities
 
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -21,7 +20,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.ui.features.system.sheets.MeDropBottomSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
-import com.sameerasw.essentials.utils.MeDropNfcManager
 import com.sameerasw.essentials.viewmodels.MainViewModel
 
 class MeDropActivity : ComponentActivity() {
@@ -49,14 +47,6 @@ class MeDropActivity : ComponentActivity() {
                 mainViewModel.check(context)
             }
 
-            val currentSettings by mainViewModel.meDropSettings
-            LaunchedEffect(currentSettings) {
-                val activity = context as? android.app.Activity
-                if (currentSettings?.contact != null && activity != null) {
-                    MeDropNfcManager.startBroadcast(activity, currentSettings!!)
-                }
-            }
-
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 MeDropBottomSheet(
                     viewModel = mainViewModel,
@@ -66,19 +56,10 @@ class MeDropActivity : ComponentActivity() {
         }
     }
 
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-    }
-
     override fun onPause() {
         super.onPause()
-        if (isFinishing) {
-            MeDropNfcManager.stopBroadcast(this)
+        if (!isChangingConfigurations) {
+            finish()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        MeDropNfcManager.stopBroadcast(this)
     }
 }

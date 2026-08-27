@@ -338,7 +338,7 @@ private fun NonDefaultProfileTabContent(
 
     RoundedCardContainer {
         IconToggleItem(
-            iconRes = R.drawable.rounded_accessibility_new_24,
+            iconRes = R.drawable.rounded_person_24,
             title = stringResource(R.string.feat_medrop_profile_enabled),
             description = stringResource(R.string.feat_medrop_profile_enabled_desc),
             isChecked = profile.enabled,

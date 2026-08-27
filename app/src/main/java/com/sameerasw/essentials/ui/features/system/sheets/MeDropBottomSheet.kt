@@ -34,7 +34,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +47,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +62,10 @@ import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImage
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.domain.model.MeDropProfileType
@@ -71,9 +79,14 @@ import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.MeDropNfcManager
 import com.sameerasw.essentials.viewmodels.MainViewModel
+import java.io.File
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MeDropBottomSheet(
     viewModel: MainViewModel,
@@ -87,36 +100,62 @@ fun MeDropBottomSheet(
     val contact = safeSettings.contact
     val activeProfileType = safeSettings.activeProfileType
 
-    // Start broadcast immediately and update whenever settings or active profile changes
+    // Start broadcast and update whenever settings or active profile changes
+    // Stop broadcast and close bottom sheet when activity loses focus or goes to background
     val activity = context as? android.app.Activity
-    DisposableEffect(safeSettings, activity) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(safeSettings, activity) {
         if (contact != null && activity != null) {
             MeDropNfcManager.startBroadcast(activity, safeSettings)
         }
+    }
+
+    DisposableEffect(activity, lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
+                if (activity != null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        MeDropNfcManager.stopBroadcast(activity)
+                    }
+                }
+                onDismissRequest()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
         onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
             if (activity != null) {
-                MeDropNfcManager.stopBroadcast(activity)
+                CoroutineScope(Dispatchers.IO).launch {
+                    MeDropNfcManager.stopBroadcast(activity)
+                }
             }
         }
     }
 
-    // Subtle repeating haptic feedback every 0.5s while NFC broadcast is advertising
+    // Subtle repeating haptic feedback every 0.5s while NFC broadcast is advertising (performed off main thread)
     LaunchedEffect(contact) {
         if (contact != null) {
             while (true) {
-                HapticUtil.performMicroHaptic(view)
                 delay(500L)
+                withContext(Dispatchers.Default) {
+                    HapticUtil.performLightHaptic(view)
+                }
             }
         }
     }
 
     // Only show available/enabled profiles in the picker
-    val availableProfiles = mutableListOf(MeDropProfileType.CONTACT)
-    if (safeSettings.professionalProfile.enabled) {
-        availableProfiles.add(MeDropProfileType.PROFESSIONAL)
-    }
-    if (safeSettings.customProfile.enabled) {
-        availableProfiles.add(MeDropProfileType.CUSTOM)
+    val availableProfiles = remember(safeSettings) {
+        val list = mutableListOf(MeDropProfileType.CONTACT)
+        if (safeSettings.professionalProfile.enabled) {
+            list.add(MeDropProfileType.PROFESSIONAL)
+        }
+        if (safeSettings.customProfile.enabled) {
+            list.add(MeDropProfileType.CUSTOM)
+        }
+        list
     }
 
     EssentialsBottomSheet(onDismissRequest = onDismissRequest) {
@@ -124,8 +163,7 @@ fun MeDropBottomSheet(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 32.dp)
-                .verticalScroll(rememberScrollState())
-                .animateContentSize(animationSpec = tween(300, easing = LinearOutSlowInEasing)),
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -541,6 +579,106 @@ fun MeDropBottomSheet(
 
                 // NFC Broadcast Indicator placed at very bottom
                 NfcBroadcastIndicator()
+
+                // Action Buttons: 3 equal split buttons (Share vCard, QR Code (disabled), Settings)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+                ) {
+                    val shapesLeading = ButtonGroupDefaults.connectedLeadingButtonShapes()
+                    val shapesMiddle = ButtonGroupDefaults.connectedMiddleButtonShapes()
+                    val shapesTrailing = ButtonGroupDefaults.connectedTrailingButtonShapes()
+
+                    // Share vCard Button
+                    Button(
+                        onClick = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            val vcardString = contact.toVCard(
+                                context = context,
+                                activeEntryIds = safeSettings.getEffectiveEntryIds(activeProfileType),
+                                customPhotoUri = safeSettings.getEffectivePhotoUri(activeProfileType)
+                            )
+                            try {
+                                val cleanName = contact.displayName.replace(Regex("[^a-zA-Z0-9.-]"), "_").ifBlank { "contact" }
+                                val vcardFile = File(context.cacheDir, "$cleanName.vcf").apply {
+                                    writeText(vcardString)
+                                }
+                                val contentUri = FileProvider.getUriForFile(
+                                    context,
+                                    "${context.packageName}.fileprovider",
+                                    vcardFile
+                                )
+                                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/x-vcard"
+                                    putExtra(Intent.EXTRA_STREAM, contentUri)
+                                    putExtra(Intent.EXTRA_SUBJECT, contact.displayName)
+                                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                val shareIntent = Intent.createChooser(sendIntent, context.getString(R.string.feat_medrop_action_share))
+                                context.startActivity(shareIntent)
+                            } catch (_: Exception) {
+                                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/x-vcard"
+                                    putExtra(Intent.EXTRA_TEXT, vcardString)
+                                    putExtra(Intent.EXTRA_SUBJECT, contact.displayName)
+                                }
+                                val shareIntent = Intent.createChooser(sendIntent, context.getString(R.string.feat_medrop_action_share))
+                                context.startActivity(shareIntent)
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = shapesLeading.shape,
+                        colors = ButtonDefaults.filledTonalButtonColors()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_share_24),
+                            contentDescription = stringResource(R.string.feat_medrop_action_share),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    // QR Code Button (Disabled for future)
+                    Button(
+                        onClick = { },
+                        enabled = false,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = shapesMiddle.shape,
+                        colors = ButtonDefaults.filledTonalButtonColors()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_qr_code_24),
+                            contentDescription = stringResource(R.string.feat_medrop_action_qr),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    // Settings Button
+                    Button(
+                        onClick = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            onDismissRequest()
+                            val intent = Intent(context, MeDropSettingsActivity::class.java)
+                            context.startActivity(intent)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp),
+                        shape = shapesTrailing.shape,
+                        colors = ButtonDefaults.filledTonalButtonColors()
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.rounded_settings_24),
+                            contentDescription = stringResource(R.string.feat_medrop_title),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             } else {
                 // Empty state
                 Column(
@@ -605,12 +743,20 @@ private fun NfcBroadcastIndicator() {
         label = "scale"
     )
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
+        Icon(
+            painter = painterResource(id = R.drawable.rounded_contactless_24),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = stringResource(R.string.feat_medrop_hold_near),
             style = MaterialTheme.typography.labelLarge,

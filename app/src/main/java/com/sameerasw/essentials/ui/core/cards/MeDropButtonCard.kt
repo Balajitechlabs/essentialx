@@ -62,15 +62,6 @@ fun MeDropButtonCard(
     val showMeDropSheet by mainViewModel.showMeDropSheet
     val settings by mainViewModel.meDropSettings
 
-    LaunchedEffect(showMeDropSheet, settings) {
-        val activity = context as? Activity
-        if (showMeDropSheet && settings?.contact != null && activity != null) {
-            MeDropNfcManager.startBroadcast(activity, settings!!)
-        } else if (activity != null) {
-            MeDropNfcManager.stopBroadcast(activity)
-        }
-    }
-
     if (showMeDropSheet) {
         MeDropBottomSheet(
             viewModel = mainViewModel,

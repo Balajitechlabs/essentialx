@@ -13,9 +13,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.nfc.NfcAdapter
 import android.nfc.cardemulation.CardEmulation
-import com.sameerasw.essentials.domain.model.MeDropContact
 import com.sameerasw.essentials.domain.model.MeDropSettings
 import com.sameerasw.essentials.services.MeDropHceService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 object MeDropNfcManager {
 
@@ -25,70 +26,22 @@ object MeDropNfcManager {
     fun isNfcEnabled(context: Context): Boolean =
         NfcAdapter.getDefaultAdapter(context)?.isEnabled == true
 
-    fun startBroadcast(activity: Activity, settings: MeDropSettings) {
+    suspend fun startBroadcast(activity: Activity, settings: MeDropSettings) {
         val contact = settings.contact ?: return
         val activeType = settings.activeProfileType
         val activeEntries = settings.getEffectiveEntryIds(activeType)
         val photoUri = settings.getEffectivePhotoUri(activeType)
-
-        val vCard = contact.toVCard(
-            context = activity.applicationContext,
-            activeEntryIds = activeEntries,
-            customPhotoUri = photoUri
-        )
-
         val context = activity.applicationContext
-        MeDropHceService.prepareVCard(vCard)
-        val pm = context.packageManager
-        val component = ComponentName(context, MeDropHceService::class.java)
-        pm.setComponentEnabledSetting(
-            component,
-            android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-            android.content.pm.PackageManager.DONT_KILL_APP
-        )
 
-        // Set as preferred service to override other apps (like Twitter/X) using the same NDEF AID
-        val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
-        if (nfcAdapter != null) {
-            val cardEmulation = CardEmulation.getInstance(nfcAdapter)
-            cardEmulation.setPreferredService(activity, component)
-        }
-    }
-
-    fun stopBroadcast(activity: Activity) {
-        val context = activity.applicationContext
-        MeDropHceService.clearVCard()
-
-        val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
-        if (nfcAdapter != null) {
-            val cardEmulation = CardEmulation.getInstance(nfcAdapter)
-            cardEmulation.unsetPreferredService(activity)
-        }
-
-        val pm = context.packageManager
-        val component = ComponentName(context, MeDropHceService::class.java)
-        pm.setComponentEnabledSetting(
-            component,
-            android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-            android.content.pm.PackageManager.DONT_KILL_APP
-        )
-    }
-
-    fun startBroadcast(context: Context, settings: MeDropSettings) {
-        if (context is Activity) {
-            startBroadcast(context, settings)
-        } else {
-            val contact = settings.contact ?: return
-            val activeType = settings.activeProfileType
-            val activeEntries = settings.getEffectiveEntryIds(activeType)
-            val photoUri = settings.getEffectivePhotoUri(activeType)
-
-            val vCard = contact.toVCard(
+        val vCard = withContext(Dispatchers.IO) {
+            contact.toVCard(
                 context = context,
                 activeEntryIds = activeEntries,
                 customPhotoUri = photoUri
             )
+        }
 
+        withContext(Dispatchers.IO) {
             MeDropHceService.prepareVCard(vCard)
             val pm = context.packageManager
             val component = ComponentName(context, MeDropHceService::class.java)
@@ -98,12 +51,34 @@ object MeDropNfcManager {
                 android.content.pm.PackageManager.DONT_KILL_APP
             )
         }
+
+        // setPreferredService must be called on Main thread with foreground Activity
+        withContext(Dispatchers.Main) {
+            val component = ComponentName(context, MeDropHceService::class.java)
+            val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
+            if (nfcAdapter != null && !activity.isFinishing && !activity.isDestroyed) {
+                try {
+                    val cardEmulation = CardEmulation.getInstance(nfcAdapter)
+                    cardEmulation.setPreferredService(activity, component)
+                } catch (_: Exception) {}
+            }
+        }
     }
 
-    fun stopBroadcast(context: Context) {
-        if (context is Activity) {
-            stopBroadcast(context)
-        } else {
+    suspend fun stopBroadcast(activity: Activity) {
+        val context = activity.applicationContext
+
+        withContext(Dispatchers.Main) {
+            val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
+            if (nfcAdapter != null) {
+                try {
+                    val cardEmulation = CardEmulation.getInstance(nfcAdapter)
+                    cardEmulation.unsetPreferredService(activity)
+                } catch (_: Exception) {}
+            }
+        }
+
+        withContext(Dispatchers.IO) {
             MeDropHceService.clearVCard()
             val pm = context.packageManager
             val component = ComponentName(context, MeDropHceService::class.java)
@@ -112,6 +87,53 @@ object MeDropNfcManager {
                 android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 android.content.pm.PackageManager.DONT_KILL_APP
             )
+        }
+    }
+
+    suspend fun startBroadcast(context: Context, settings: MeDropSettings) {
+        if (context is Activity) {
+            startBroadcast(context, settings)
+        } else {
+            val contact = settings.contact ?: return
+            val activeType = settings.activeProfileType
+            val activeEntries = settings.getEffectiveEntryIds(activeType)
+            val photoUri = settings.getEffectivePhotoUri(activeType)
+
+            val vCard = withContext(Dispatchers.IO) {
+                contact.toVCard(
+                    context = context,
+                    activeEntryIds = activeEntries,
+                    customPhotoUri = photoUri
+                )
+            }
+
+            withContext(Dispatchers.IO) {
+                MeDropHceService.prepareVCard(vCard)
+                val pm = context.packageManager
+                val component = ComponentName(context, MeDropHceService::class.java)
+                pm.setComponentEnabledSetting(
+                    component,
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    android.content.pm.PackageManager.DONT_KILL_APP
+                )
+            }
+        }
+    }
+
+    suspend fun stopBroadcast(context: Context) {
+        if (context is Activity) {
+            stopBroadcast(context)
+        } else {
+            withContext(Dispatchers.IO) {
+                MeDropHceService.clearVCard()
+                val pm = context.packageManager
+                val component = ComponentName(context, MeDropHceService::class.java)
+                pm.setComponentEnabledSetting(
+                    component,
+                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    android.content.pm.PackageManager.DONT_KILL_APP
+                )
+            }
         }
     }
 }
