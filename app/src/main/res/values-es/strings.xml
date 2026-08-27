@@ -1535,4 +1535,9 @@ Cuando llegue un mensaje o alerta de una aplicación seleccionada, la Pantalla s
     <string name="setting_location_reached_full_screen_alarm_desc">Reproduce el tono de alarma y muestra una alerta de pantalla completa</string>
     <string name="label_battery_section_health">Salud</string>
     <string name="label_battery_section_charging">Carga</string>
+    <string name="setting_app_icon_title">Icono de app</string>
+    <string name="setting_app_icon_desc">Personaliza el icono que se muestra en la pantalla de inicio</string>
+    <string name="app_icon_default">Predeterminado</string>
+    <string name="app_icon_legacy">Heredado</string>
+    <string name="app_icon_black">Dinamico</string>
 </resources>
