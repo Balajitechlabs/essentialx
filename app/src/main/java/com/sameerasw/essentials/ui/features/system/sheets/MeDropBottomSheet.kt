@@ -33,8 +33,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -118,14 +120,14 @@ fun MeDropBottomSheet(
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .padding(top = 12.dp)
-                            .size(100.dp)
-                            .clip(CircleShape)
+                            .size(200.dp)
+                            .clip(MaterialShapes.Cookie12Sided.toShape())
                     )
                 } else {
                     Box(
                         modifier = Modifier
                             .padding(top = 12.dp)
-                            .size(100.dp)
+                            .size(200.dp)
                             .clip(CircleShape)
                             .background(MaterialTheme.colorScheme.primaryContainer),
                         contentAlignment = Alignment.Center
