@@ -59,6 +59,10 @@ fun MeDropButtonCard(
     val view = LocalView.current
     val mainViewModel: MainViewModel = viewModel()
     
+    LaunchedEffect(Unit) {
+        mainViewModel.loadMeDropSettings(context)
+    }
+    
     val showMeDropSheet by mainViewModel.showMeDropSheet
     val settings by mainViewModel.meDropSettings
 
@@ -79,6 +83,7 @@ fun MeDropButtonCard(
             SplitButtonDefaults.LeadingButton(
                 onClick = {
                     HapticUtil.performVirtualKeyHaptic(view)
+                    mainViewModel.loadMeDropSettings(context)
                     mainViewModel.showMeDropSheet.value = true
                 },
                 modifier = Modifier

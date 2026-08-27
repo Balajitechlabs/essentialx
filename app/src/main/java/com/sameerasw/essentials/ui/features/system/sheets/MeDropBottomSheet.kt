@@ -119,6 +119,10 @@ fun MeDropBottomSheet(
     val context = LocalContext.current
     val view = LocalView.current
 
+    LaunchedEffect(Unit) {
+        viewModel.loadMeDropSettings(context)
+    }
+
     val safeSettings = settings ?: MeDropSettings()
     val contact = safeSettings.contact
     val activeProfileType = safeSettings.activeProfileType
@@ -128,15 +132,11 @@ fun MeDropBottomSheet(
     val activity = context as? android.app.Activity
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(safeSettings, activity) {
-        if (contact != null && activity != null) {
-            MeDropNfcManager.startBroadcast(activity, safeSettings)
-        }
-    }
-
     DisposableEffect(activity, lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.loadMeDropSettings(context)
+            } else if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
                 if (activity != null) {
                     CoroutineScope(Dispatchers.IO).launch {
                         MeDropNfcManager.stopBroadcast(activity)
@@ -154,6 +154,12 @@ fun MeDropBottomSheet(
                     MeDropNfcManager.stopBroadcast(activity)
                 }
             }
+        }
+    }
+
+    LaunchedEffect(safeSettings, activity) {
+        if (contact != null && activity != null) {
+            MeDropNfcManager.startBroadcast(activity, safeSettings)
         }
     }
 
