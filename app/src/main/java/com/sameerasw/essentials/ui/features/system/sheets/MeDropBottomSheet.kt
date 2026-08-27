@@ -136,7 +136,7 @@ fun MeDropBottomSheet(
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 viewModel.loadMeDropSettings(context)
-            } else if (event == Lifecycle.Event.ON_PAUSE || event == Lifecycle.Event.ON_STOP) {
+            } else if (event == Lifecycle.Event.ON_STOP) {
                 if (activity != null) {
                     CoroutineScope(Dispatchers.IO).launch {
                         MeDropNfcManager.stopBroadcast(activity)
