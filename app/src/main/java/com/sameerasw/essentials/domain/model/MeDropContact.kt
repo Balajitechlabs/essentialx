@@ -63,10 +63,33 @@ data class MeDropContact(
             try {
                 val uri = android.net.Uri.parse(photoUri)
                 context.contentResolver.openInputStream(uri)?.use { stream ->
-                    val bytes = stream.readBytes()
-                    if (bytes.isNotEmpty()) {
-                        val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
-                        sb.appendLine("PHOTO;TYPE=JPEG;ENCODING=b:$base64")
+                    val originalBitmap = android.graphics.BitmapFactory.decodeStream(stream)
+                    if (originalBitmap != null) {
+                        val maxDim = 120
+                        val width = originalBitmap.width
+                        val height = originalBitmap.height
+                        val ratio = if (width > height) {
+                            maxDim.toFloat() / width
+                        } else {
+                            maxDim.toFloat() / height
+                        }
+                        val scaledBitmap = if (ratio < 1.0f) {
+                            android.graphics.Bitmap.createScaledBitmap(
+                                originalBitmap,
+                                (width * ratio).toInt().coerceAtLeast(1),
+                                (height * ratio).toInt().coerceAtLeast(1),
+                                true
+                            )
+                        } else {
+                            originalBitmap
+                        }
+                        val baos = java.io.ByteArrayOutputStream()
+                        scaledBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 60, baos)
+                        val bytes = baos.toByteArray()
+                        if (bytes.isNotEmpty()) {
+                            val base64 = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
+                            sb.appendLine("PHOTO;TYPE=JPEG;ENCODING=b:$base64")
+                        }
                     }
                 }
             } catch (_: Exception) {}

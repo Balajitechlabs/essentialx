@@ -46,16 +46,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.runtime.rememberCoroutineScope
 import coil.compose.AsyncImage
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.ui.core.cards.IconToggleItem
 import com.sameerasw.essentials.ui.core.containers.RoundedCardContainer
 import com.sameerasw.essentials.ui.core.sheets.EssentialsBottomSheet
 import com.sameerasw.essentials.utils.HapticUtil
+import com.sameerasw.essentials.utils.MeDropContactPickerHelper
 import com.sameerasw.essentials.viewmodels.MainViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,6 +74,20 @@ fun MeDropBottomSheet(
     val isAllowWhenLocked by viewModel.isMeDropAllowWhenLocked
     val context = LocalContext.current
     val view = LocalView.current
+    val scope = rememberCoroutineScope()
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val savedUri = MeDropContactPickerHelper.saveCompressedCustomPhoto(uri, context)
+                if (savedUri != null) {
+                    viewModel.updateMeDropCustomPhoto(context, savedUri)
+                }
+            }
+        }
+    }
 
     EssentialsBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
@@ -415,6 +434,55 @@ fun MeDropBottomSheet(
                             onCheckedChange = { viewModel.setMeDropAllowWhenLocked(context, it) }
                         )
                         if (contact != null) {
+                            ListItem(
+                                onClick = {
+                                    HapticUtil.performVirtualKeyHaptic(view)
+                                    photoPickerLauncher.launch("image/*")
+                                },
+                                leadingContent = {
+                                    Icon(
+                                        painter = painterResource(R.drawable.rounded_add_photo_alternate_24),
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                },
+                                colors = ListItemDefaults.colors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceBright
+                                ),
+                                content = {
+                                    Text(
+                                        text = stringResource(R.string.feat_medrop_choose_custom_photo),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            )
+                            if (!contact?.photoUri.isNullOrBlank()) {
+                                ListItem(
+                                    onClick = {
+                                        HapticUtil.performVirtualKeyHaptic(view)
+                                        viewModel.updateMeDropCustomPhoto(context, null)
+                                    },
+                                    leadingContent = {
+                                        Icon(
+                                            painter = painterResource(R.drawable.rounded_delete_24),
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.error,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    },
+                                    colors = ListItemDefaults.colors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceBright
+                                    ),
+                                    content = {
+                                        Text(
+                                            text = stringResource(R.string.feat_medrop_remove_custom_photo),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                    }
+                                )
+                            }
                             ListItem(
                                 onClick = {
                                     HapticUtil.performVirtualKeyHaptic(view)

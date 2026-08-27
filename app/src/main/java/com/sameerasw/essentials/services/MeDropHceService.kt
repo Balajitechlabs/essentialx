@@ -36,16 +36,17 @@ class MeDropHceService : HostApduService() {
         private val NDEF_FILE_ID = byteArrayOf(0xE1.toByte(), 0x04)
 
         // Capability Container (CC) content for Type 4 Tag
+        // Mapping Version 2.0 (0x20), MLe = 0x00FF (255 bytes), MLc = 0x00FF (255 bytes), Max NDEF size = 0x7FFF (32767 bytes)
         private val CC_CONTENT = byteArrayOf(
-            0x00, 0x0F, // CCLEN
+            0x00, 0x0F, // CCLEN (15 bytes)
             0x20, // Mapping Version 2.0
-            0x00, 0x7F, // MLe (max R-APDU)
-            0x00, 0x7F, // MLc (max C-APDU)
-            0x04, 0x06, // NDEF File TLV
-            0xE1.toByte(), 0x04, // NDEF File ID
-            0x04, 0x00, // Max NDEF size (1024 bytes)
-            0x00, // Read Access (granted)
-            0x00 // Write Access (none)
+            0x00, 0xFF.toByte(), // MLe (max R-APDU size: 255 bytes)
+            0x00, 0xFF.toByte(), // MLc (max C-APDU size: 255 bytes)
+            0x04, 0x06, // NDEF File Control TLV: T=0x04, L=0x06
+            0xE1.toByte(), 0x04, // NDEF File ID (0xE104)
+            0x7F, 0xFF.toByte(), // Max NDEF size (32767 bytes)
+            0x00, // Read Access (granted without security)
+            0xFF.toByte() // Write Access (no write access)
         )
 
         // FCI for NDEF AID selection response
@@ -128,9 +129,21 @@ class MeDropHceService : HostApduService() {
                 val data = selectedFile ?: return SW_FILE_NOT_FOUND
                 val offset = ((commandApdu[2].toInt() and 0xFF) shl 8) or (commandApdu[3].toInt() and 0xFF)
                 
-                // Le is at offset 4
-                if (commandApdu.size < 5) return SW_UNKNOWN_CMD
-                val length = commandApdu[4].toInt() and 0xFF
+                // In APDU READ BINARY (00 B0 P1 P2 Le):
+                // If standard APDU (size == 5), Le is commandApdu[4]. If Le == 0, it means 256 bytes.
+                // If extended APDU (size == 7 and commandApdu[4] == 0), Le is 2 bytes at commandApdu[5..6].
+                val length = if (commandApdu.size == 5) {
+                    val rawLe = commandApdu[4].toInt() and 0xFF
+                    if (rawLe == 0) 256 else rawLe
+                } else if (commandApdu.size >= 7 && commandApdu[4] == 0x00.toByte()) {
+                    val extLe = ((commandApdu[5].toInt() and 0xFF) shl 8) or (commandApdu[6].toInt() and 0xFF)
+                    if (extLe == 0) 65536 else extLe
+                } else if (commandApdu.size >= 5) {
+                    val rawLe = commandApdu[4].toInt() and 0xFF
+                    if (rawLe == 0) 256 else rawLe
+                } else {
+                    return SW_UNKNOWN_CMD
+                }
                 
                 if (offset >= data.size) return SW_FILE_NOT_FOUND
                 val end = minOf(offset + length, data.size)

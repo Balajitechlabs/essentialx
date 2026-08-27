@@ -22,6 +22,43 @@ object MeDropContactPickerHelper {
     fun buildPickIntent(): Intent =
         Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
 
+    suspend fun saveCompressedCustomPhoto(uri: Uri, context: Context): String? =
+        withContext(Dispatchers.IO) {
+            try {
+                context.contentResolver.openInputStream(uri)?.use { stream ->
+                    val originalBitmap = android.graphics.BitmapFactory.decodeStream(stream) ?: return@withContext null
+                    val maxDim = 240
+                    val width = originalBitmap.width
+                    val height = originalBitmap.height
+                    val ratio = if (width > height) {
+                        maxDim.toFloat() / width
+                    } else {
+                        maxDim.toFloat() / height
+                    }
+                    val scaledBitmap = if (ratio < 1.0f) {
+                        android.graphics.Bitmap.createScaledBitmap(
+                            originalBitmap,
+                            (width * ratio).toInt().coerceAtLeast(1),
+                            (height * ratio).toInt().coerceAtLeast(1),
+                            true
+                        )
+                    } else {
+                        originalBitmap
+                    }
+
+                    val photosDir = java.io.File(context.filesDir, "medrop")
+                    if (!photosDir.exists()) photosDir.mkdirs()
+                    val photoFile = java.io.File(photosDir, "custom_photo.jpg")
+                    java.io.FileOutputStream(photoFile).use { out ->
+                        scaledBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 70, out)
+                    }
+                    Uri.fromFile(photoFile).toString()
+                }
+            } catch (_: Exception) {
+                null
+            }
+        }
+
     suspend fun processResult(uri: Uri, context: Context): MeDropContact? =
         withContext(Dispatchers.IO) {
             processLegacyUri(uri, context)

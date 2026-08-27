@@ -7642,4 +7642,28 @@ class MainViewModel : ViewModel() {
         )
         setMeDropContact(context, updated)
     }
+
+    fun updateMeDropCustomPhoto(context: Context, newPhotoUri: String?) {
+        val current = meDropContact.value ?: return
+        val currentActive = current.getActiveEntryIds().toMutableSet()
+        if (newPhotoUri != null) {
+            currentActive.add("photo")
+        } else {
+            currentActive.remove("photo")
+        }
+        val updated = com.sameerasw.essentials.domain.model.MeDropContact(
+            lookupKey = current.lookupKey,
+            displayName = current.displayName,
+            photoUri = newPhotoUri,
+            phones = current.getSafePhones(),
+            emails = current.getSafeEmails(),
+            organization = current.organization,
+            jobTitle = current.jobTitle,
+            addresses = current.getSafeAddresses(),
+            urls = current.getSafeUrls(),
+            note = current.note,
+            selectedEntryIds = currentActive
+        )
+        setMeDropContact(context, updated)
+    }
 }
