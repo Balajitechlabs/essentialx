@@ -558,6 +558,12 @@
             android:taskAffinity=""
             android:theme="@style/Theme.Essentials.Translucent" />
 
+        <activity
+            android:name=".ui.activities.MeDropSettingsActivity"
+            android:exported="false"
+            android:label="@string/feat_medrop_title"
+            android:theme="@style/Theme.Essentials" />
+
         <service
             android:name=".services.MeDropHceService"
             android:exported="true"

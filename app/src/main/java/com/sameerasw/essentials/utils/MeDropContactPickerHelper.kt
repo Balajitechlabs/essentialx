@@ -11,9 +11,9 @@ package com.sameerasw.essentials.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.ContactsContract
 import com.sameerasw.essentials.domain.model.MeDropContact
+import com.sameerasw.essentials.domain.model.MeDropProfileType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,7 +22,7 @@ object MeDropContactPickerHelper {
     fun buildPickIntent(): Intent =
         Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI)
 
-    suspend fun saveCompressedCustomPhoto(uri: Uri, context: Context): String? =
+    suspend fun saveCompressedCustomPhoto(uri: Uri, context: Context, profileType: MeDropProfileType): String? =
         withContext(Dispatchers.IO) {
             try {
                 context.contentResolver.openInputStream(uri)?.use { stream ->
@@ -48,7 +48,8 @@ object MeDropContactPickerHelper {
 
                     val photosDir = java.io.File(context.filesDir, "medrop")
                     if (!photosDir.exists()) photosDir.mkdirs()
-                    val photoFile = java.io.File(photosDir, "custom_photo.jpg")
+                    val fileName = "custom_photo_${profileType.name.lowercase()}.jpg"
+                    val photoFile = java.io.File(photosDir, fileName)
                     java.io.FileOutputStream(photoFile).use { out ->
                         scaledBitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 70, out)
                     }
@@ -99,9 +100,8 @@ object MeDropContactPickerHelper {
                 jobTitle = details.jobTitle,
                 role = details.role,
                 addresses = details.addresses.distinct(),
+                addressTypes = details.addressTypes,
                 urls = details.urls.distinct(),
-                impps = details.impps.distinct(),
-                socialProfiles = details.socialProfiles.distinct(),
                 note = details.note
             )
         }
@@ -117,9 +117,8 @@ object MeDropContactPickerHelper {
         val jobTitle: String? = null,
         val role: String? = null,
         val addresses: List<String> = emptyList(),
+        val addressTypes: List<Int> = emptyList(),
         val urls: List<String> = emptyList(),
-        val impps: List<String> = emptyList(),
-        val socialProfiles: List<String> = emptyList(),
         val note: String? = null
     )
 
@@ -134,9 +133,8 @@ object MeDropContactPickerHelper {
         var jobTitle: String? = null
         var role: String? = null
         val addresses = mutableListOf<String>()
+        val addressTypes = mutableListOf<Int>()
         val urls = mutableListOf<String>()
-        val impps = mutableListOf<String>()
-        val socialProfiles = mutableListOf<String>()
         var note: String? = null
 
         context.contentResolver.query(
@@ -173,7 +171,6 @@ object MeDropContactPickerHelper {
                         if (data1.isNotBlank()) nickname = data1
                     }
                     ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE -> {
-                        // Event type 3 is birthday in ContactsContract
                         val eventType = if (data2.isNotBlank()) data2.toIntOrNull() else null
                         if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY && data1.isNotBlank()) {
                             birthday = data1
@@ -187,11 +184,14 @@ object MeDropContactPickerHelper {
                         if (data4.isNotBlank()) jobTitle = data4
                         if (data3.isNotBlank()) role = data3
                     }
-                    ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) addresses.add(data1)
+                    ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE -> {
+                        if (data1.isNotBlank()) {
+                            addresses.add(data1)
+                            val type = if (data2.isNotBlank()) data2.toIntOrNull() ?: ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER else ContactsContract.CommonDataKinds.StructuredPostal.TYPE_OTHER
+                            addressTypes.add(type)
+                        }
+                    }
                     ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) urls.add(data1)
-                    ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) impps.add(data1)
-                    "vnd.android.cursor.item/impp" -> if (data1.isNotBlank()) impps.add(data1)
-                    "vnd.android.cursor.item/socialprofile" -> if (data1.isNotBlank()) socialProfiles.add(data1)
                     "vnd.android.cursor.item/pronouns" -> if (data1.isNotBlank()) pronouns = data1
                     ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) note = data1
                 }
@@ -209,9 +209,8 @@ object MeDropContactPickerHelper {
             jobTitle = jobTitle,
             role = role,
             addresses = addresses,
+            addressTypes = addressTypes,
             urls = urls,
-            impps = impps,
-            socialProfiles = socialProfiles,
             note = note
         )
     }

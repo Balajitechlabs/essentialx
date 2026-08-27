@@ -207,9 +207,6 @@ class MainViewModel : ViewModel() {
     val lockScreenClockSelectedColorId = mutableStateOf("DEFAULT")
     val lockScreenClockSeedColor = mutableIntStateOf(0)
 
-    val meDropContact = mutableStateOf<com.sameerasw.essentials.domain.model.MeDropContact?>(null)
-    val isMeDropAllowWhenLocked = mutableStateOf(false)
-    val showMeDropSheet = mutableStateOf(false)
 
     // Live Wallpaper
     val liveWallpaperSelectedVideo = mutableStateOf(SettingsRepository.LIVE_WALLPAPER_DEFAULT_VIDEO)
@@ -7591,55 +7588,103 @@ class MainViewModel : ViewModel() {
         isLockdownModeEnabled.value = !isLockdownModeEnabled.value
     }
 
+    val meDropSettings = mutableStateOf<com.sameerasw.essentials.domain.model.MeDropSettings?>(null)
+    val isMeDropAllowWhenLocked = mutableStateOf(false)
+    val showMeDropSheet = mutableStateOf(false)
+
     fun loadMeDropSettings(context: Context) {
         val repo = SettingsRepository(context)
-        val json = repo.getMeDropContactJson()
-        meDropContact.value = if (json != null) {
+        val json = repo.getMeDropSettingsJson()
+        meDropSettings.value = if (json != null) {
             try {
                 com.google.gson.Gson().fromJson(
                     json,
-                    com.sameerasw.essentials.domain.model.MeDropContact::class.java
+                    com.sameerasw.essentials.domain.model.MeDropSettings::class.java
                 )
             } catch (_: Exception) { null }
-        } else null
+        } else {
+            com.sameerasw.essentials.domain.model.MeDropSettings()
+        }
         isMeDropAllowWhenLocked.value = repo.isMeDropAllowWhenLocked()
+    }
+
+    fun saveMeDropSettings(
+        context: Context,
+        settings: com.sameerasw.essentials.domain.model.MeDropSettings?
+    ) {
+        val json = if (settings != null) com.google.gson.Gson().toJson(settings) else null
+        SettingsRepository(context).setMeDropSettingsJson(json)
+        meDropSettings.value = settings
     }
 
     fun setMeDropContact(
         context: Context,
         contact: com.sameerasw.essentials.domain.model.MeDropContact?
     ) {
-        val json = if (contact != null) com.google.gson.Gson().toJson(contact) else null
-        SettingsRepository(context).setMeDropContactJson(json)
-        meDropContact.value = contact
+        val current = meDropSettings.value ?: com.sameerasw.essentials.domain.model.MeDropSettings()
+        val updated = current.copy(contact = contact)
+        saveMeDropSettings(context, updated)
     }
 
     fun setMeDropAllowWhenLocked(context: Context, enabled: Boolean) {
         SettingsRepository(context).setMeDropAllowWhenLocked(enabled)
         isMeDropAllowWhenLocked.value = enabled
+        val current = meDropSettings.value ?: com.sameerasw.essentials.domain.model.MeDropSettings()
+        saveMeDropSettings(context, current.copy(allowWhenLocked = enabled))
     }
 
-    fun toggleMeDropContactEntry(context: Context, entryId: String, selected: Boolean) {
-        val current = meDropContact.value ?: return
-        val currentActive = current.getActiveEntryIds().toMutableSet()
+    fun setMeDropProfileEnabled(
+        context: Context,
+        type: com.sameerasw.essentials.domain.model.MeDropProfileType,
+        enabled: Boolean
+    ) {
+        val current = meDropSettings.value ?: return
+        val profile = current.getProfile(type).copy(enabled = enabled)
+        val updated = current.updateProfile(profile)
+        saveMeDropSettings(context, updated)
+    }
+
+    fun setMeDropActiveProfile(
+        context: Context,
+        type: com.sameerasw.essentials.domain.model.MeDropProfileType
+    ) {
+        val current = meDropSettings.value ?: return
+        val updated = current.copy(activeProfileType = type)
+        saveMeDropSettings(context, updated)
+    }
+
+    fun setMeDropUsePhotoForAll(context: Context, enabled: Boolean) {
+        val current = meDropSettings.value ?: return
+        val updated = current.copy(usePhotoForAll = enabled)
+        saveMeDropSettings(context, updated)
+    }
+
+    fun toggleMeDropProfileEntry(
+        context: Context,
+        type: com.sameerasw.essentials.domain.model.MeDropProfileType,
+        entryId: String,
+        selected: Boolean
+    ) {
+        val current = meDropSettings.value ?: return
+        val currentActive = current.getEffectiveEntryIds(type).toMutableSet()
         if (selected) {
             currentActive.add(entryId)
         } else {
             currentActive.remove(entryId)
         }
-        val updated = current.copy(selectedEntryIds = currentActive)
-        setMeDropContact(context, updated)
+        val profile = current.getProfile(type).copy(selectedEntryIds = currentActive)
+        val updated = current.updateProfile(profile)
+        saveMeDropSettings(context, updated)
     }
 
-    fun updateMeDropCustomPhoto(context: Context, newPhotoUri: String?) {
-        val current = meDropContact.value ?: return
-        val currentActive = current.getActiveEntryIds().toMutableSet()
-        if (newPhotoUri != null) {
-            currentActive.add("photo")
-        } else {
-            currentActive.remove("photo")
-        }
-        val updated = current.copy(photoUri = newPhotoUri, selectedEntryIds = currentActive)
-        setMeDropContact(context, updated)
+    fun updateMeDropProfilePhoto(
+        context: Context,
+        type: com.sameerasw.essentials.domain.model.MeDropProfileType,
+        newPhotoUri: String?
+    ) {
+        val current = meDropSettings.value ?: return
+        val profile = current.getProfile(type).copy(photoUri = newPhotoUri)
+        val updated = current.updateProfile(profile)
+        saveMeDropSettings(context, updated)
     }
 }

@@ -26,11 +26,9 @@ data class MeDropContact(
     val jobTitle: String? = null,
     val role: String? = null,
     val addresses: List<String> = emptyList(),
+    val addressTypes: List<Int> = emptyList(), // ContactsContract.CommonDataKinds.StructuredPostal.TYPE_*
     val urls: List<String> = emptyList(),
-    val impps: List<String> = emptyList(),
-    val socialProfiles: List<String> = emptyList(),
-    val note: String? = null,
-    val selectedEntryIds: Set<String>? = null
+    val note: String? = null
 ) {
     @Suppress("SENSELESS_COMPARISON")
     fun getSafePhones(): List<String> = if (phones != null) phones else emptyList()
@@ -39,51 +37,82 @@ data class MeDropContact(
     @Suppress("SENSELESS_COMPARISON")
     fun getSafeAddresses(): List<String> = if (addresses != null) addresses else emptyList()
     @Suppress("SENSELESS_COMPARISON")
+    fun getSafeAddressTypes(): List<Int> = if (addressTypes != null) addressTypes else emptyList()
+    @Suppress("SENSELESS_COMPARISON")
     fun getSafeUrls(): List<String> = if (urls != null) urls else emptyList()
-    @Suppress("SENSELESS_COMPARISON")
-    fun getSafeImpps(): List<String> = if (impps != null) impps else emptyList()
-    @Suppress("SENSELESS_COMPARISON")
-    fun getSafeSocialProfiles(): List<String> = if (socialProfiles != null) socialProfiles else emptyList()
 
-    @Suppress("SENSELESS_COMPARISON")
-    fun getActiveEntryIds(): Set<String> {
-        if (selectedEntryIds != null) return selectedEntryIds
-        val all = mutableSetOf<String>()
-        if (!photoUri.isNullOrBlank()) all.add("photo")
-        if (!nickname.isNullOrBlank()) all.add("nickname")
-        if (!birthday.isNullOrBlank()) all.add("birthday")
-        if (!pronouns.isNullOrBlank()) all.add("pronouns")
-        getSafePhones().forEachIndexed { i, _ -> all.add("phone_$i") }
-        getSafeEmails().forEachIndexed { i, _ -> all.add("email_$i") }
-        if (!organization.isNullOrBlank()) all.add("organization")
-        if (!department.isNullOrBlank()) all.add("department")
-        if (!jobTitle.isNullOrBlank()) all.add("jobTitle")
-        if (!role.isNullOrBlank()) all.add("role")
-        getSafeAddresses().forEachIndexed { i, _ -> all.add("address_$i") }
-        getSafeUrls().forEachIndexed { i, _ -> all.add("url_$i") }
-        getSafeImpps().forEachIndexed { i, _ -> all.add("impp_$i") }
-        getSafeSocialProfiles().forEachIndexed { i, _ -> all.add("social_$i") }
-        if (!note.isNullOrBlank()) all.add("note")
-        return all
+    /**
+     * Contact profile smart defaults:
+     * - Name (implicit)
+     * - Nickname
+     * - First mobile number
+     * - First email
+     * - Company (organization)
+     * - Website (first url)
+     */
+    fun getDefaultContactEntryIds(): Set<String> {
+        val set = mutableSetOf<String>()
+        set.add("photo")
+        if (!nickname.isNullOrBlank()) set.add("nickname")
+        if (getSafePhones().isNotEmpty()) set.add("phone_0")
+        if (getSafeEmails().isNotEmpty()) set.add("email_0")
+        if (!organization.isNullOrBlank()) set.add("organization")
+        if (getSafeUrls().isNotEmpty()) set.add("url_0")
+        return set
     }
 
-    fun isEntrySelected(id: String): Boolean = getActiveEntryIds().contains(id)
+    /**
+     * Professional profile smart defaults:
+     * - Name (implicit)
+     * - First mobile number
+     * - First email
+     * - Company (organization)
+     * - Department & Job Title
+     * - Work address (type 2) if provided
+     * - Website (first url)
+     * (excludes nickname by default)
+     */
+    fun getDefaultProfessionalEntryIds(): Set<String> {
+        val set = mutableSetOf<String>()
+        set.add("photo")
+        if (getSafePhones().isNotEmpty()) set.add("phone_0")
+        if (getSafeEmails().isNotEmpty()) set.add("email_0")
+        if (!organization.isNullOrBlank()) set.add("organization")
+        if (!department.isNullOrBlank()) set.add("department")
+        if (!jobTitle.isNullOrBlank()) set.add("jobTitle")
+        if (!role.isNullOrBlank()) set.add("role")
 
-    fun toVCard(context: android.content.Context? = null): String {
-        val active = getActiveEntryIds()
+        val safeAddresses = getSafeAddresses()
+        val safeTypes = getSafeAddressTypes()
+        // Find first work address (TYPE_WORK = 2)
+        val workIndex = safeTypes.indexOfFirst { it == 2 }
+        if (workIndex != -1 && workIndex < safeAddresses.size) {
+            set.add("address_$workIndex")
+        }
+
+        if (getSafeUrls().isNotEmpty()) set.add("url_0")
+        return set
+    }
+
+    fun toVCard(
+        context: android.content.Context? = null,
+        activeEntryIds: Set<String>,
+        customPhotoUri: String? = null
+    ): String {
+        val effectivePhotoUri = customPhotoUri ?: photoUri
         val sb = StringBuilder()
         sb.appendLine("BEGIN:VCARD")
         sb.appendLine("VERSION:3.0")
         sb.appendLine("FN:$displayName")
         sb.appendLine("N:${buildNField(displayName)}")
 
-        if (active.contains("nickname") && !nickname.isNullOrBlank()) {
+        if (activeEntryIds.contains("nickname") && !nickname.isNullOrBlank()) {
             sb.appendLine("NICKNAME:$nickname")
         }
 
-        if (active.contains("photo") && !photoUri.isNullOrBlank() && context != null) {
+        if (activeEntryIds.contains("photo") && !effectivePhotoUri.isNullOrBlank() && context != null) {
             try {
-                val uri = android.net.Uri.parse(photoUri)
+                val uri = android.net.Uri.parse(effectivePhotoUri)
                 context.contentResolver.openInputStream(uri)?.use { stream ->
                     val originalBitmap = android.graphics.BitmapFactory.decodeStream(stream)
                     if (originalBitmap != null) {
@@ -117,62 +146,52 @@ data class MeDropContact(
             } catch (_: Exception) {}
         }
 
-        if (active.contains("birthday") && !birthday.isNullOrBlank()) {
+        if (activeEntryIds.contains("birthday") && !birthday.isNullOrBlank()) {
             sb.appendLine("BDAY:$birthday")
         }
 
-        if (active.contains("pronouns") && !pronouns.isNullOrBlank()) {
+        if (activeEntryIds.contains("pronouns") && !pronouns.isNullOrBlank()) {
             sb.appendLine("PRONOUNS:$pronouns")
             sb.appendLine("X-PRONOUNS:$pronouns")
         }
 
-        val hasOrg = active.contains("organization") && !organization.isNullOrBlank()
-        val hasDept = active.contains("department") && !department.isNullOrBlank()
+        val hasOrg = activeEntryIds.contains("organization") && !organization.isNullOrBlank()
+        val hasDept = activeEntryIds.contains("department") && !department.isNullOrBlank()
         if (hasOrg || hasDept) {
             val orgPart = if (hasOrg) organization else ""
             val deptPart = if (hasDept) ";$department" else ""
             sb.appendLine("ORG:$orgPart$deptPart")
         }
-        if (active.contains("jobTitle") && !jobTitle.isNullOrBlank()) {
+        if (activeEntryIds.contains("jobTitle") && !jobTitle.isNullOrBlank()) {
             sb.appendLine("TITLE:$jobTitle")
         }
-        if (active.contains("role") && !role.isNullOrBlank()) {
+        if (activeEntryIds.contains("role") && !role.isNullOrBlank()) {
             sb.appendLine("ROLE:$role")
         }
 
         getSafePhones().forEachIndexed { i, phone ->
-            if (active.contains("phone_$i")) {
+            if (activeEntryIds.contains("phone_$i")) {
                 sb.appendLine("TEL;TYPE=CELL:$phone")
             }
         }
         getSafeEmails().forEachIndexed { i, email ->
-            if (active.contains("email_$i")) {
+            if (activeEntryIds.contains("email_$i")) {
                 sb.appendLine("EMAIL;TYPE=INTERNET:$email")
             }
         }
         getSafeAddresses().forEachIndexed { i, addr ->
-            if (active.contains("address_$i")) {
-                sb.appendLine("ADR;TYPE=HOME:;;${addr.replace("\n", ";")};;;")
+            if (activeEntryIds.contains("address_$i")) {
+                val addrType = getSafeAddressTypes().getOrNull(i)
+                val typeTag = if (addrType == 2) "WORK" else "HOME"
+                sb.appendLine("ADR;TYPE=$typeTag:;;${addr.replace("\n", ";")};;;")
             }
         }
         getSafeUrls().forEachIndexed { i, url ->
-            if (active.contains("url_$i")) {
+            if (activeEntryIds.contains("url_$i")) {
                 sb.appendLine("URL:$url")
             }
         }
-        getSafeImpps().forEachIndexed { i, impp ->
-            if (active.contains("impp_$i")) {
-                sb.appendLine("IMPP:$impp")
-                sb.appendLine("X-IMPP:$impp")
-            }
-        }
-        getSafeSocialProfiles().forEachIndexed { i, social ->
-            if (active.contains("social_$i")) {
-                sb.appendLine("X-SOCIALPROFILE:$social")
-                sb.appendLine("URL:$social")
-            }
-        }
-        if (active.contains("note") && !note.isNullOrBlank()) {
+        if (activeEntryIds.contains("note") && !note.isNullOrBlank()) {
             sb.appendLine("NOTE:${note.replace("\n", " ")}")
         }
 

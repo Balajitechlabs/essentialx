@@ -74,13 +74,7 @@ class MeDropHceService : HostApduService() {
             return nlen + ndefData
         }
 
-        fun prepareVCard(context: android.content.Context, contact: MeDropContact) {
-            val vcardString = contact.toVCard(context)
-            pendingVCardBytes = ndefWrap(vcardString.toByteArray(Charsets.UTF_8))
-        }
-
-        fun prepareVCard(contact: MeDropContact) {
-            val vcardString = contact.toVCard(null)
+        fun prepareVCard(vcardString: String) {
             pendingVCardBytes = ndefWrap(vcardString.toByteArray(Charsets.UTF_8))
         }
 
@@ -93,11 +87,18 @@ class MeDropHceService : HostApduService() {
 
     override fun onCreate() {
         super.onCreate()
-        val json = SettingsRepository(this).getMeDropContactJson()
+        val json = SettingsRepository(this).getMeDropSettingsJson()
         if (json != null) {
             try {
-                val contact = Gson().fromJson(json, MeDropContact::class.java)
-                prepareVCard(this, contact)
+                val settings = Gson().fromJson(json, com.sameerasw.essentials.domain.model.MeDropSettings::class.java)
+                val contact = settings.contact
+                if (contact != null) {
+                    val activeType = settings.activeProfileType
+                    val activeEntries = settings.getEffectiveEntryIds(activeType)
+                    val photoUri = settings.getEffectivePhotoUri(activeType)
+                    val vcard = contact.toVCard(this, activeEntries, photoUri)
+                    prepareVCard(vcard)
+                }
             } catch (_: Exception) {}
         }
     }

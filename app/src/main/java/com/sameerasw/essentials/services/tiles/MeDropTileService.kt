@@ -14,7 +14,7 @@ import android.os.Build
 import android.service.quicksettings.Tile
 import com.sameerasw.essentials.R
 import com.sameerasw.essentials.data.repository.SettingsRepository
-import com.sameerasw.essentials.domain.model.MeDropContact
+import com.sameerasw.essentials.domain.model.MeDropSettings
 import com.sameerasw.essentials.ui.activities.MeDropActivity
 
 class MeDropTileService : BaseTileService() {
@@ -22,13 +22,13 @@ class MeDropTileService : BaseTileService() {
     override fun getTileLabel(): String = getString(R.string.feat_medrop_title)
 
     override fun getTileSubtitle(): String {
-        val contactJson = SettingsRepository(this).getMeDropContactJson()
-        return if (contactJson == null) {
+        val settingsJson = SettingsRepository(this).getMeDropSettingsJson()
+        return if (settingsJson == null) {
             getString(R.string.feat_medrop_set_up)
         } else {
             try {
-                val contact = com.google.gson.Gson().fromJson(contactJson, MeDropContact::class.java)
-                contact.displayName
+                val settings = com.google.gson.Gson().fromJson(settingsJson, MeDropSettings::class.java)
+                settings.contact?.displayName ?: getString(R.string.feat_medrop_set_up)
             } catch (_: Exception) {
                 ""
             }
@@ -36,8 +36,14 @@ class MeDropTileService : BaseTileService() {
     }
 
     override fun getTileState(): Int {
-        val contactJson = SettingsRepository(this).getMeDropContactJson()
-        return if (contactJson != null) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
+        val settingsJson = SettingsRepository(this).getMeDropSettingsJson()
+        if (settingsJson != null) {
+            try {
+                val settings = com.google.gson.Gson().fromJson(settingsJson, MeDropSettings::class.java)
+                if (settings.contact != null) return Tile.STATE_ACTIVE
+            } catch (_: Exception) {}
+        }
+        return Tile.STATE_INACTIVE
     }
 
     override fun hasFeaturePermission(): Boolean = true

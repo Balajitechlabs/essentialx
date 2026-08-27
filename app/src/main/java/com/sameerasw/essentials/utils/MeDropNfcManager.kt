@@ -14,6 +14,7 @@ import android.content.Context
 import android.nfc.NfcAdapter
 import android.nfc.cardemulation.CardEmulation
 import com.sameerasw.essentials.domain.model.MeDropContact
+import com.sameerasw.essentials.domain.model.MeDropSettings
 import com.sameerasw.essentials.services.MeDropHceService
 
 object MeDropNfcManager {
@@ -24,9 +25,20 @@ object MeDropNfcManager {
     fun isNfcEnabled(context: Context): Boolean =
         NfcAdapter.getDefaultAdapter(context)?.isEnabled == true
 
-    fun startBroadcast(activity: Activity, contact: MeDropContact) {
+    fun startBroadcast(activity: Activity, settings: MeDropSettings) {
+        val contact = settings.contact ?: return
+        val activeType = settings.activeProfileType
+        val activeEntries = settings.getEffectiveEntryIds(activeType)
+        val photoUri = settings.getEffectivePhotoUri(activeType)
+
+        val vCard = contact.toVCard(
+            context = activity.applicationContext,
+            activeEntryIds = activeEntries,
+            customPhotoUri = photoUri
+        )
+
         val context = activity.applicationContext
-        MeDropHceService.prepareVCard(context, contact)
+        MeDropHceService.prepareVCard(vCard)
         val pm = context.packageManager
         val component = ComponentName(context, MeDropHceService::class.java)
         pm.setComponentEnabledSetting(
@@ -62,12 +74,22 @@ object MeDropNfcManager {
         )
     }
 
-    // Keep legacy signatures if needed or update callers
-    fun startBroadcast(context: Context, contact: MeDropContact) {
+    fun startBroadcast(context: Context, settings: MeDropSettings) {
         if (context is Activity) {
-            startBroadcast(context, contact)
+            startBroadcast(context, settings)
         } else {
-            MeDropHceService.prepareVCard(context, contact)
+            val contact = settings.contact ?: return
+            val activeType = settings.activeProfileType
+            val activeEntries = settings.getEffectiveEntryIds(activeType)
+            val photoUri = settings.getEffectivePhotoUri(activeType)
+
+            val vCard = contact.toVCard(
+                context = context,
+                activeEntryIds = activeEntries,
+                customPhotoUri = photoUri
+            )
+
+            MeDropHceService.prepareVCard(vCard)
             val pm = context.packageManager
             val component = ComponentName(context, MeDropHceService::class.java)
             pm.setComponentEnabledSetting(

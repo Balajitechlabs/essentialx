@@ -9,20 +9,21 @@
 package com.sameerasw.essentials.ui.core.cards
 
 import android.app.Activity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import android.content.Intent
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -32,13 +33,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.R
+import com.sameerasw.essentials.ui.activities.MeDropSettingsActivity
 import com.sameerasw.essentials.ui.features.system.sheets.MeDropBottomSheet
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.HapticUtil
-import com.sameerasw.essentials.utils.MeDropContactPickerHelper
 import com.sameerasw.essentials.utils.MeDropNfcManager
 import com.sameerasw.essentials.viewmodels.MainViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun MeDropButtonCard(
@@ -46,29 +46,15 @@ fun MeDropButtonCard(
 ) {
     val context = LocalContext.current
     val view = LocalView.current
-    val scope = rememberCoroutineScope()
     val mainViewModel: MainViewModel = viewModel()
     
     val showMeDropSheet by mainViewModel.showMeDropSheet
-    val currentContact by mainViewModel.meDropContact
+    val settings by mainViewModel.meDropSettings
 
-    val contactPickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                scope.launch {
-                    val contact = MeDropContactPickerHelper.processResult(uri, context)
-                    mainViewModel.setMeDropContact(context, contact)
-                }
-            }
-        }
-    }
-
-    LaunchedEffect(showMeDropSheet, currentContact) {
+    LaunchedEffect(showMeDropSheet, settings) {
         val activity = context as? Activity
-        if (showMeDropSheet && currentContact != null && activity != null) {
-            MeDropNfcManager.startBroadcast(activity, currentContact!!)
+        if (showMeDropSheet && settings?.contact != null && activity != null) {
+            MeDropNfcManager.startBroadcast(activity, settings!!)
         } else if (activity != null) {
             MeDropNfcManager.stopBroadcast(activity)
         }
@@ -77,31 +63,50 @@ fun MeDropButtonCard(
     if (showMeDropSheet) {
         MeDropBottomSheet(
             viewModel = mainViewModel,
-            onPickContact = {
-                contactPickerLauncher.launch(MeDropContactPickerHelper.buildPickIntent())
-            },
             onDismissRequest = { mainViewModel.showMeDropSheet.value = false }
         )
     }
 
-    FilledTonalButton(
-        onClick = {
-            HapticUtil.performVirtualKeyHaptic(view)
-            mainViewModel.showMeDropSheet.value = true
-        },
+    Row(
         modifier = modifier.fillMaxWidth(),
-        shape = Shapes.medium
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            painter = painterResource(id = R.drawable.rounded_contacts_product_24),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp)
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = stringResource(R.string.feat_medrop_title),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold
-        )
+        FilledTonalButton(
+            onClick = {
+                HapticUtil.performVirtualKeyHaptic(view)
+                mainViewModel.showMeDropSheet.value = true
+            },
+            modifier = Modifier.weight(1f),
+            shape = Shapes.medium
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.rounded_contacts_product_24),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(
+                text = stringResource(R.string.feat_medrop_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        FilledTonalIconButton(
+            onClick = {
+                HapticUtil.performVirtualKeyHaptic(view)
+                val intent = Intent(context, MeDropSettingsActivity::class.java)
+                context.startActivity(intent)
+            },
+            shape = Shapes.medium
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.rounded_settings_24),
+                contentDescription = null,
+                modifier = Modifier.size(20.dp)
+            )
+        }
     }
 }

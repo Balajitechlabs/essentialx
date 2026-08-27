@@ -390,7 +390,7 @@ class SettingsRepository(
 
         const val KEY_LOCKDOWN_MODE = "lockdown_mode"
 
-        const val KEY_MEDROP_CONTACT_JSON = "medrop_contact_json"
+        const val KEY_MEDROP_SETTINGS_JSON = "medrop_settings_v2"
         const val KEY_MEDROP_ALLOW_WHEN_LOCKED = "medrop_allow_when_locked"
     }
 
@@ -2929,9 +2929,9 @@ class SettingsRepository(
      */
     fun setLockScreenClockSeedColor(value: Int) = putInt(KEY_LOCK_SCREEN_CLOCK_SEED_COLOR, value)
 
-    fun getMeDropContactJson(): String? = getString(KEY_MEDROP_CONTACT_JSON)
+    fun getMeDropSettingsJson(): String? = getString(KEY_MEDROP_SETTINGS_JSON)
 
-    fun setMeDropContactJson(json: String?) = putString(KEY_MEDROP_CONTACT_JSON, json)
+    fun setMeDropSettingsJson(json: String?) = putString(KEY_MEDROP_SETTINGS_JSON, json)
 
     fun isMeDropAllowWhenLocked(): Boolean = getBoolean(KEY_MEDROP_ALLOW_WHEN_LOCKED, false)
 

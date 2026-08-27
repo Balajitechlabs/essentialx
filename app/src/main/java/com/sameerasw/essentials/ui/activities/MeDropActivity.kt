@@ -15,17 +15,14 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sameerasw.essentials.ui.features.system.sheets.MeDropBottomSheet
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
-import com.sameerasw.essentials.utils.MeDropContactPickerHelper
 import com.sameerasw.essentials.utils.MeDropNfcManager
 import com.sameerasw.essentials.viewmodels.MainViewModel
-import kotlinx.coroutines.launch
 
 class MeDropActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,43 +41,25 @@ class MeDropActivity : ComponentActivity() {
         }
 
         setContent {
-            val mainViewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+            val mainViewModel: MainViewModel = viewModel()
             val isPitchBlackThemeEnabled by mainViewModel.isPitchBlackThemeEnabled
             val context = LocalContext.current
-            val scope = rememberCoroutineScope()
 
             LaunchedEffect(Unit) {
                 mainViewModel.check(context)
             }
 
-            val contactPickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartActivityForResult()
-            ) { result ->
-                if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri ->
-                        scope.launch {
-                            val contact = MeDropContactPickerHelper.processResult(uri, context)
-                            mainViewModel.setMeDropContact(context, contact)
-                        }
-                    }
-                }
-            }
-
-            val currentContact by mainViewModel.meDropContact
-            LaunchedEffect(currentContact) {
+            val currentSettings by mainViewModel.meDropSettings
+            LaunchedEffect(currentSettings) {
                 val activity = context as? android.app.Activity
-                if (currentContact != null && activity != null) {
-                    MeDropNfcManager.startBroadcast(activity, currentContact!!)
+                if (currentSettings?.contact != null && activity != null) {
+                    MeDropNfcManager.startBroadcast(activity, currentSettings!!)
                 }
             }
 
             EssentialsTheme(pitchBlackTheme = isPitchBlackThemeEnabled) {
                 MeDropBottomSheet(
                     viewModel = mainViewModel,
-                    showSettings = false,
-                    onPickContact = {
-                        contactPickerLauncher.launch(MeDropContactPickerHelper.buildPickIntent())
-                    },
                     onDismissRequest = { finish() }
                 )
             }
@@ -89,7 +68,6 @@ class MeDropActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // Handle NFC intents if needed, though HCE is primary here
     }
 
     override fun onPause() {
