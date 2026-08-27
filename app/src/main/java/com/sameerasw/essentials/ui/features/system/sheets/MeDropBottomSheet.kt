@@ -9,8 +9,10 @@
 package com.sameerasw.essentials.ui.features.system.sheets
 
 import android.content.Intent
+import android.graphics.Matrix
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -47,10 +49,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -59,6 +66,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontVariation
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.graphics.shapes.Morph
+import androidx.graphics.shapes.toPath
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -170,7 +181,48 @@ fun MeDropBottomSheet(
             if (contact != null) {
                 val effectivePhoto = safeSettings.getEffectivePhotoUri(activeProfileType)
 
-                // Top Profile Photo (200dp Cookie shape / Circle)
+                // Profile target shape definition based on profile type
+                val targetPolygon = when (activeProfileType) {
+                    MeDropProfileType.CONTACT -> MaterialShapes.Cookie12Sided
+                    MeDropProfileType.PROFESSIONAL -> MaterialShapes.Pill
+                    MeDropProfileType.CUSTOM -> MaterialShapes.Cookie4Sided
+                }
+
+                val previousPolygon = remember { mutableStateOf(targetPolygon) }
+                val currentPolygon = remember { mutableStateOf(targetPolygon) }
+                val morphProgress = remember { Animatable(1f) }
+
+                LaunchedEffect(targetPolygon) {
+                    if (targetPolygon != currentPolygon.value) {
+                        previousPolygon.value = currentPolygon.value
+                        currentPolygon.value = targetPolygon
+                        morphProgress.snapTo(0f)
+                        morphProgress.animateTo(1f, animationSpec = tween(400, easing = LinearOutSlowInEasing))
+                    }
+                }
+
+                val morph = remember(previousPolygon.value, currentPolygon.value) {
+                    Morph(previousPolygon.value, currentPolygon.value)
+                }
+
+                val animatedShape = remember(morph, morphProgress.value) {
+                    object : Shape {
+                        override fun createOutline(
+                            size: Size,
+                            layoutDirection: LayoutDirection,
+                            density: Density
+                        ): Outline {
+                            val matrix = Matrix().apply {
+                                postScale(size.width, size.height)
+                            }
+                            val androidPath = morph.toPath(morphProgress.value)
+                            androidPath.transform(matrix)
+                            return Outline.Generic(androidPath.asComposePath())
+                        }
+                    }
+                }
+
+                // Top Profile Photo (200dp with animated morphing shape)
                 if (!effectivePhoto.isNullOrBlank()) {
                     AsyncImage(
                         model = effectivePhoto,
@@ -179,14 +231,14 @@ fun MeDropBottomSheet(
                         modifier = Modifier
                             .padding(top = 12.dp)
                             .size(200.dp)
-                            .clip(MaterialShapes.Cookie12Sided.toShape())
+                            .clip(animatedShape)
                     )
                 } else {
                     Box(
                         modifier = Modifier
                             .padding(top = 12.dp)
                             .size(200.dp)
-                            .clip(CircleShape)
+                            .clip(animatedShape)
                             .background(MaterialTheme.colorScheme.primaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
@@ -258,6 +310,18 @@ fun MeDropBottomSheet(
                                     MeDropProfileType.CUSTOM -> context.getString(R.string.feat_medrop_profile_custom)
                                 }
                             },
+                            iconProvider = { type ->
+                                val iconRes = when (type) {
+                                    MeDropProfileType.CONTACT -> R.drawable.rounded_contacts_product_24
+                                    MeDropProfileType.PROFESSIONAL -> R.drawable.rounded_work_24
+                                    MeDropProfileType.CUSTOM -> R.drawable.rounded_id_card_24
+                                }
+                                Icon(
+                                    painter = painterResource(iconRes),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -269,7 +333,8 @@ fun MeDropBottomSheet(
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.surfaceBright)
                             .padding(16.dp)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .animateContentSize(animationSpec = tween(300, easing = LinearOutSlowInEasing)),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         val showOrg = safeSettings.isEntrySelected(activeProfileType, "organization") && !contact.organization.isNullOrBlank()

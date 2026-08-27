@@ -173,6 +173,18 @@ fun MeDropSettingsUI(
                         MeDropProfileType.CUSTOM -> context.getString(R.string.feat_medrop_profile_custom)
                     }
                 },
+                iconProvider = { type ->
+                    val iconRes = when (type) {
+                        MeDropProfileType.CONTACT -> R.drawable.rounded_contacts_product_24
+                        MeDropProfileType.PROFESSIONAL -> R.drawable.rounded_work_24
+                        MeDropProfileType.CUSTOM -> R.drawable.rounded_id_card_24
+                    }
+                    Icon(
+                        painter = painterResource(iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
             )
         }
