@@ -2333,6 +2333,15 @@
     <string name="feat_medrop_include_note">Include note</string>
     <string name="feat_medrop_include_photo">Include profile photo</string>
     <string name="feat_medrop_share_fields_title">What to share</string>
+    <string name="feat_medrop_field_nickname">Nickname</string>
+    <string name="feat_medrop_field_pronouns">Pronouns</string>
+    <string name="feat_medrop_field_birthday">Birthday</string>
+    <string name="feat_medrop_field_organization">Company</string>
+    <string name="feat_medrop_field_department">Department</string>
+    <string name="feat_medrop_field_job_title">Job title</string>
+    <string name="feat_medrop_field_role">Role</string>
+    <string name="feat_medrop_field_social">Social profile</string>
+    <string name="feat_medrop_field_impp">Instant messaging</string>
     <string name="feat_medrop_choose_custom_photo">Choose custom photo</string>
     <string name="feat_medrop_remove_custom_photo">Remove photo</string>
     <string name="feat_medrop_hold_near">Hold near another device</string>

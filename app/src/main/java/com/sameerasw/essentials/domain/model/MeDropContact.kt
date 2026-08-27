@@ -16,12 +16,19 @@ data class MeDropContact(
     val lookupKey: String,
     val displayName: String,
     val photoUri: String? = null,
+    val nickname: String? = null,
+    val birthday: String? = null,
+    val pronouns: String? = null,
     val phones: List<String> = emptyList(),
     val emails: List<String> = emptyList(),
     val organization: String? = null,
+    val department: String? = null,
     val jobTitle: String? = null,
+    val role: String? = null,
     val addresses: List<String> = emptyList(),
     val urls: List<String> = emptyList(),
+    val impps: List<String> = emptyList(),
+    val socialProfiles: List<String> = emptyList(),
     val note: String? = null,
     val selectedEntryIds: Set<String>? = null
 ) {
@@ -33,18 +40,29 @@ data class MeDropContact(
     fun getSafeAddresses(): List<String> = if (addresses != null) addresses else emptyList()
     @Suppress("SENSELESS_COMPARISON")
     fun getSafeUrls(): List<String> = if (urls != null) urls else emptyList()
+    @Suppress("SENSELESS_COMPARISON")
+    fun getSafeImpps(): List<String> = if (impps != null) impps else emptyList()
+    @Suppress("SENSELESS_COMPARISON")
+    fun getSafeSocialProfiles(): List<String> = if (socialProfiles != null) socialProfiles else emptyList()
 
     @Suppress("SENSELESS_COMPARISON")
     fun getActiveEntryIds(): Set<String> {
         if (selectedEntryIds != null) return selectedEntryIds
         val all = mutableSetOf<String>()
         if (!photoUri.isNullOrBlank()) all.add("photo")
+        if (!nickname.isNullOrBlank()) all.add("nickname")
+        if (!birthday.isNullOrBlank()) all.add("birthday")
+        if (!pronouns.isNullOrBlank()) all.add("pronouns")
         getSafePhones().forEachIndexed { i, _ -> all.add("phone_$i") }
         getSafeEmails().forEachIndexed { i, _ -> all.add("email_$i") }
         if (!organization.isNullOrBlank()) all.add("organization")
+        if (!department.isNullOrBlank()) all.add("department")
         if (!jobTitle.isNullOrBlank()) all.add("jobTitle")
+        if (!role.isNullOrBlank()) all.add("role")
         getSafeAddresses().forEachIndexed { i, _ -> all.add("address_$i") }
         getSafeUrls().forEachIndexed { i, _ -> all.add("url_$i") }
+        getSafeImpps().forEachIndexed { i, _ -> all.add("impp_$i") }
+        getSafeSocialProfiles().forEachIndexed { i, _ -> all.add("social_$i") }
         if (!note.isNullOrBlank()) all.add("note")
         return all
     }
@@ -59,13 +77,17 @@ data class MeDropContact(
         sb.appendLine("FN:$displayName")
         sb.appendLine("N:${buildNField(displayName)}")
 
+        if (active.contains("nickname") && !nickname.isNullOrBlank()) {
+            sb.appendLine("NICKNAME:$nickname")
+        }
+
         if (active.contains("photo") && !photoUri.isNullOrBlank() && context != null) {
             try {
                 val uri = android.net.Uri.parse(photoUri)
                 context.contentResolver.openInputStream(uri)?.use { stream ->
                     val originalBitmap = android.graphics.BitmapFactory.decodeStream(stream)
                     if (originalBitmap != null) {
-                        val maxDim = 120
+                        val maxDim = 112
                         val width = originalBitmap.width
                         val height = originalBitmap.height
                         val ratio = if (width > height) {
@@ -95,11 +117,27 @@ data class MeDropContact(
             } catch (_: Exception) {}
         }
 
-        if (active.contains("organization") && !organization.isNullOrBlank()) {
-            sb.appendLine("ORG:$organization")
+        if (active.contains("birthday") && !birthday.isNullOrBlank()) {
+            sb.appendLine("BDAY:$birthday")
+        }
+
+        if (active.contains("pronouns") && !pronouns.isNullOrBlank()) {
+            sb.appendLine("PRONOUNS:$pronouns")
+            sb.appendLine("X-PRONOUNS:$pronouns")
+        }
+
+        val hasOrg = active.contains("organization") && !organization.isNullOrBlank()
+        val hasDept = active.contains("department") && !department.isNullOrBlank()
+        if (hasOrg || hasDept) {
+            val orgPart = if (hasOrg) organization else ""
+            val deptPart = if (hasDept) ";$department" else ""
+            sb.appendLine("ORG:$orgPart$deptPart")
         }
         if (active.contains("jobTitle") && !jobTitle.isNullOrBlank()) {
             sb.appendLine("TITLE:$jobTitle")
+        }
+        if (active.contains("role") && !role.isNullOrBlank()) {
+            sb.appendLine("ROLE:$role")
         }
 
         getSafePhones().forEachIndexed { i, phone ->
@@ -122,8 +160,20 @@ data class MeDropContact(
                 sb.appendLine("URL:$url")
             }
         }
+        getSafeImpps().forEachIndexed { i, impp ->
+            if (active.contains("impp_$i")) {
+                sb.appendLine("IMPP:$impp")
+                sb.appendLine("X-IMPP:$impp")
+            }
+        }
+        getSafeSocialProfiles().forEachIndexed { i, social ->
+            if (active.contains("social_$i")) {
+                sb.appendLine("X-SOCIALPROFILE:$social")
+                sb.appendLine("URL:$social")
+            }
+        }
         if (active.contains("note") && !note.isNullOrBlank()) {
-            sb.appendLine("NOTE:${note.replace("\n", " ") }")
+            sb.appendLine("NOTE:${note.replace("\n", " ")}")
         }
 
         val rev = SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'", Locale.US).format(Date())

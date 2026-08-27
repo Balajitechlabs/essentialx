@@ -7627,19 +7627,7 @@ class MainViewModel : ViewModel() {
         } else {
             currentActive.remove(entryId)
         }
-        val updated = com.sameerasw.essentials.domain.model.MeDropContact(
-            lookupKey = current.lookupKey,
-            displayName = current.displayName,
-            photoUri = current.photoUri,
-            phones = current.getSafePhones(),
-            emails = current.getSafeEmails(),
-            organization = current.organization,
-            jobTitle = current.jobTitle,
-            addresses = current.getSafeAddresses(),
-            urls = current.getSafeUrls(),
-            note = current.note,
-            selectedEntryIds = currentActive
-        )
+        val updated = current.copy(selectedEntryIds = currentActive)
         setMeDropContact(context, updated)
     }
 
@@ -7651,19 +7639,7 @@ class MainViewModel : ViewModel() {
         } else {
             currentActive.remove("photo")
         }
-        val updated = com.sameerasw.essentials.domain.model.MeDropContact(
-            lookupKey = current.lookupKey,
-            displayName = current.displayName,
-            photoUri = newPhotoUri,
-            phones = current.getSafePhones(),
-            emails = current.getSafeEmails(),
-            organization = current.organization,
-            jobTitle = current.jobTitle,
-            addresses = current.getSafeAddresses(),
-            urls = current.getSafeUrls(),
-            note = current.note,
-            selectedEntryIds = currentActive
-        )
+        val updated = current.copy(photoUri = newPhotoUri, selectedEntryIds = currentActive)
         setMeDropContact(context, updated)
     }
 }

@@ -89,33 +89,54 @@ object MeDropContactPickerHelper {
                 lookupKey = lookupKey,
                 displayName = displayName,
                 photoUri = null,
+                nickname = details.nickname,
+                birthday = details.birthday,
+                pronouns = details.pronouns,
                 phones = details.phones.distinct(),
                 emails = details.emails.distinct(),
                 organization = details.organization,
+                department = details.department,
                 jobTitle = details.jobTitle,
+                role = details.role,
                 addresses = details.addresses.distinct(),
                 urls = details.urls.distinct(),
+                impps = details.impps.distinct(),
+                socialProfiles = details.socialProfiles.distinct(),
                 note = details.note
             )
         }
 
     private data class ExtractedDetails(
+        val nickname: String? = null,
+        val birthday: String? = null,
+        val pronouns: String? = null,
         val phones: List<String> = emptyList(),
         val emails: List<String> = emptyList(),
         val organization: String? = null,
+        val department: String? = null,
         val jobTitle: String? = null,
+        val role: String? = null,
         val addresses: List<String> = emptyList(),
         val urls: List<String> = emptyList(),
+        val impps: List<String> = emptyList(),
+        val socialProfiles: List<String> = emptyList(),
         val note: String? = null
     )
 
     private fun fetchContactDetails(context: Context, contactId: String): ExtractedDetails {
+        var nickname: String? = null
+        var birthday: String? = null
+        var pronouns: String? = null
         val phones = mutableListOf<String>()
         val emails = mutableListOf<String>()
         var organization: String? = null
+        var department: String? = null
         var jobTitle: String? = null
+        var role: String? = null
         val addresses = mutableListOf<String>()
         val urls = mutableListOf<String>()
+        val impps = mutableListOf<String>()
+        val socialProfiles = mutableListOf<String>()
         var note: String? = null
 
         context.contentResolver.query(
@@ -123,7 +144,10 @@ object MeDropContactPickerHelper {
             arrayOf(
                 ContactsContract.Data.MIMETYPE,
                 ContactsContract.Data.DATA1,
-                ContactsContract.Data.DATA4
+                ContactsContract.Data.DATA2,
+                ContactsContract.Data.DATA3,
+                ContactsContract.Data.DATA4,
+                ContactsContract.Data.DATA5
             ),
             "${ContactsContract.Data.CONTACT_ID} = ?",
             arrayOf(contactId),
@@ -131,35 +155,63 @@ object MeDropContactPickerHelper {
         )?.use { cursor ->
             val mimeIdx = cursor.getColumnIndex(ContactsContract.Data.MIMETYPE)
             val data1Idx = cursor.getColumnIndex(ContactsContract.Data.DATA1)
+            val data2Idx = cursor.getColumnIndex(ContactsContract.Data.DATA2)
+            val data3Idx = cursor.getColumnIndex(ContactsContract.Data.DATA3)
             val data4Idx = cursor.getColumnIndex(ContactsContract.Data.DATA4)
+            val data5Idx = cursor.getColumnIndex(ContactsContract.Data.DATA5)
 
             while (cursor.moveToNext()) {
                 val mime = if (mimeIdx != -1) cursor.getString(mimeIdx) ?: continue else continue
                 val data1 = if (data1Idx != -1) cursor.getString(data1Idx) ?: "" else ""
+                val data2 = if (data2Idx != -1) cursor.getString(data2Idx) ?: "" else ""
+                val data3 = if (data3Idx != -1) cursor.getString(data3Idx) ?: "" else ""
                 val data4 = if (data4Idx != -1) cursor.getString(data4Idx) ?: "" else ""
+                val data5 = if (data5Idx != -1) cursor.getString(data5Idx) ?: "" else ""
 
                 when (mime) {
+                    ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE -> {
+                        if (data1.isNotBlank()) nickname = data1
+                    }
+                    ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE -> {
+                        // Event type 3 is birthday in ContactsContract
+                        val eventType = if (data2.isNotBlank()) data2.toIntOrNull() else null
+                        if (eventType == ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY && data1.isNotBlank()) {
+                            birthday = data1
+                        }
+                    }
                     ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) phones.add(data1)
                     ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) emails.add(data1)
                     ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE -> {
                         if (data1.isNotBlank()) organization = data1
+                        if (data5.isNotBlank()) department = data5
                         if (data4.isNotBlank()) jobTitle = data4
+                        if (data3.isNotBlank()) role = data3
                     }
                     ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) addresses.add(data1)
                     ContactsContract.CommonDataKinds.Website.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) urls.add(data1)
-                    ContactsContract.CommonDataKinds.Website.URL -> if (data1.isNotBlank()) urls.add(data1)
+                    ContactsContract.CommonDataKinds.Im.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) impps.add(data1)
+                    "vnd.android.cursor.item/impp" -> if (data1.isNotBlank()) impps.add(data1)
+                    "vnd.android.cursor.item/socialprofile" -> if (data1.isNotBlank()) socialProfiles.add(data1)
+                    "vnd.android.cursor.item/pronouns" -> if (data1.isNotBlank()) pronouns = data1
                     ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE -> if (data1.isNotBlank()) note = data1
                 }
             }
         }
 
         return ExtractedDetails(
+            nickname = nickname,
+            birthday = birthday,
+            pronouns = pronouns,
             phones = phones,
             emails = emails,
             organization = organization,
+            department = department,
             jobTitle = jobTitle,
+            role = role,
             addresses = addresses,
             urls = urls,
+            impps = impps,
+            socialProfiles = socialProfiles,
             note = note
         )
     }
