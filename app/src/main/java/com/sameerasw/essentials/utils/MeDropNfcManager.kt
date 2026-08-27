@@ -43,13 +43,6 @@ object MeDropNfcManager {
 
         withContext(Dispatchers.IO) {
             MeDropHceService.prepareVCard(vCard)
-            val pm = context.packageManager
-            val component = ComponentName(context, MeDropHceService::class.java)
-            pm.setComponentEnabledSetting(
-                component,
-                android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                android.content.pm.PackageManager.DONT_KILL_APP
-            )
         }
 
         // setPreferredService must be called on Main thread with foreground Activity
@@ -80,13 +73,6 @@ object MeDropNfcManager {
 
         withContext(Dispatchers.IO) {
             MeDropHceService.clearVCard()
-            val pm = context.packageManager
-            val component = ComponentName(context, MeDropHceService::class.java)
-            pm.setComponentEnabledSetting(
-                component,
-                android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                android.content.pm.PackageManager.DONT_KILL_APP
-            )
         }
     }
 
@@ -109,13 +95,6 @@ object MeDropNfcManager {
 
             withContext(Dispatchers.IO) {
                 MeDropHceService.prepareVCard(vCard)
-                val pm = context.packageManager
-                val component = ComponentName(context, MeDropHceService::class.java)
-                pm.setComponentEnabledSetting(
-                    component,
-                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    android.content.pm.PackageManager.DONT_KILL_APP
-                )
             }
         }
     }
@@ -126,13 +105,6 @@ object MeDropNfcManager {
         } else {
             withContext(Dispatchers.IO) {
                 MeDropHceService.clearVCard()
-                val pm = context.packageManager
-                val component = ComponentName(context, MeDropHceService::class.java)
-                pm.setComponentEnabledSetting(
-                    component,
-                    android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    android.content.pm.PackageManager.DONT_KILL_APP
-                )
             }
         }
     }
