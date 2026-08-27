@@ -10,13 +10,16 @@ package com.sameerasw.essentials.ui.features.system.sheets
 
 import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +41,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +52,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -63,6 +71,7 @@ import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.HapticUtil
 import com.sameerasw.essentials.utils.MeDropNfcManager
 import com.sameerasw.essentials.viewmodels.MainViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,13 +89,23 @@ fun MeDropBottomSheet(
 
     // Start broadcast immediately and update whenever settings or active profile changes
     val activity = context as? android.app.Activity
-    androidx.compose.runtime.DisposableEffect(safeSettings, activity) {
+    DisposableEffect(safeSettings, activity) {
         if (contact != null && activity != null) {
             MeDropNfcManager.startBroadcast(activity, safeSettings)
         }
         onDispose {
             if (activity != null) {
                 MeDropNfcManager.stopBroadcast(activity)
+            }
+        }
+    }
+
+    // Subtle repeating haptic feedback every 0.5s while NFC broadcast is advertising
+    LaunchedEffect(contact) {
+        if (contact != null) {
+            while (true) {
+                HapticUtil.performMicroHaptic(view)
+                delay(500L)
             }
         }
     }
@@ -105,14 +124,15 @@ fun MeDropBottomSheet(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = 32.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .animateContentSize(animationSpec = tween(300, easing = LinearOutSlowInEasing)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (contact != null) {
                 val effectivePhoto = safeSettings.getEffectivePhotoUri(activeProfileType)
 
-                // Top Profile Photo Circle (Bigger 100dp)
+                // Top Profile Photo (200dp Cookie shape / Circle)
                 if (!effectivePhoto.isNullOrBlank()) {
                     AsyncImage(
                         model = effectivePhoto,
@@ -134,9 +154,52 @@ fun MeDropBottomSheet(
                     ) {
                         Text(
                             text = contact.displayName.take(1).uppercase(),
-                            style = MaterialTheme.typography.displaySmall,
+                            style = MaterialTheme.typography.displayLarge,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+
+                // Name & Nickname below photo
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Text(
+                        text = contact.displayName,
+                        modifier = Modifier.basicMarquee(),
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            fontFamily = FontFamily(
+                                Font(
+                                    R.font.google_sans_flex,
+                                    variationSettings = FontVariation.Settings(
+                                        FontVariation.width(150f),
+                                        FontVariation.weight(FontWeight.Normal.weight),
+                                        FontVariation.Setting("ROND", 100f),
+                                    ),
+                                ),
+                            ),
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center
+                    )
+
+                    val showNickname = safeSettings.isEntrySelected(activeProfileType, "nickname") && !contact.nickname.isNullOrBlank()
+                    val showPronouns = safeSettings.isEntrySelected(activeProfileType, "pronouns") && !contact.pronouns.isNullOrBlank()
+                    if (showNickname || showPronouns) {
+                        val nickPart = if (showNickname) "\"${contact.nickname}\"" else null
+                        val pronounPart = if (showPronouns) "(${contact.pronouns})" else null
+                        val subName = listOfNotNull(nickPart, pronounPart).joinToString(" ")
+                        Text(
+                            text = subName,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.basicMarquee()
                         )
                     }
                 }
@@ -162,7 +225,7 @@ fun MeDropBottomSheet(
                     }
                 }
 
-                // Contact Preview Card
+                // Contact Preview Card (Details without redundant name)
                 RoundedCardContainer {
                     Column(
                         modifier = Modifier
@@ -171,53 +234,37 @@ fun MeDropBottomSheet(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Column {
-                                Text(
-                                    text = contact.displayName,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                val showNickname = safeSettings.isEntrySelected(activeProfileType, "nickname") && !contact.nickname.isNullOrBlank()
-                                val showPronouns = safeSettings.isEntrySelected(activeProfileType, "pronouns") && !contact.pronouns.isNullOrBlank()
-                                if (showNickname || showPronouns) {
-                                    val nickPart = if (showNickname) "\"${contact.nickname}\"" else null
-                                    val pronounPart = if (showPronouns) "(${contact.pronouns})" else null
-                                    val subName = listOfNotNull(nickPart, pronounPart).joinToString(" ")
-                                    Text(
-                                        text = subName,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                        val showOrg = safeSettings.isEntrySelected(activeProfileType, "organization") && !contact.organization.isNullOrBlank()
+                        val showDept = safeSettings.isEntrySelected(activeProfileType, "department") && !contact.department.isNullOrBlank()
+                        val showTitle = safeSettings.isEntrySelected(activeProfileType, "jobTitle") && !contact.jobTitle.isNullOrBlank()
+                        val showRole = safeSettings.isEntrySelected(activeProfileType, "role") && !contact.role.isNullOrBlank()
+                        if (showOrg || showDept || showTitle || showRole) {
+                            val roleOrTitle = listOfNotNull(
+                                if (showTitle) contact.jobTitle else null,
+                                if (showRole) contact.role else null
+                            ).filter { it.isNotBlank() }.joinToString(", ")
+                            val orgOrDept = listOfNotNull(
+                                if (showOrg) contact.organization else null,
+                                if (showDept) contact.department else null
+                            ).filter { it.isNotBlank() }.joinToString(" - ")
+                            val orgText = listOfNotNull(
+                                roleOrTitle.ifBlank { null },
+                                orgOrDept.ifBlank { null }
+                            ).joinToString(" • ")
+                            if (orgText.isNotBlank()) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.rounded_work_24),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
-                                }
-                                val showOrg = safeSettings.isEntrySelected(activeProfileType, "organization") && !contact.organization.isNullOrBlank()
-                                val showDept = safeSettings.isEntrySelected(activeProfileType, "department") && !contact.department.isNullOrBlank()
-                                val showTitle = safeSettings.isEntrySelected(activeProfileType, "jobTitle") && !contact.jobTitle.isNullOrBlank()
-                                val showRole = safeSettings.isEntrySelected(activeProfileType, "role") && !contact.role.isNullOrBlank()
-                                if (showOrg || showDept || showTitle || showRole) {
-                                    val roleOrTitle = listOfNotNull(
-                                        if (showTitle) contact.jobTitle else null,
-                                        if (showRole) contact.role else null
-                                    ).filter { it.isNotBlank() }.joinToString(", ")
-                                    val orgOrDept = listOfNotNull(
-                                        if (showOrg) contact.organization else null,
-                                        if (showDept) contact.department else null
-                                    ).filter { it.isNotBlank() }.joinToString(" - ")
-                                    val orgText = listOfNotNull(
-                                        roleOrTitle.ifBlank { null },
-                                        orgOrDept.ifBlank { null }
-                                    ).joinToString(" • ")
-                                    if (orgText.isNotBlank()) {
-                                        Text(
-                                            text = orgText,
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = orgText,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                                 }
                             }
                         }
