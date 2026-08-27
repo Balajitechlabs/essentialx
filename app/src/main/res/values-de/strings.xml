@@ -1249,7 +1249,7 @@ ADB-Debugging-Zugriff direkt über die Schnelleinstellungen aktivieren oder deak
     <string name="feat_sound_haptics_title">Ton und Haptik</string>
     <string name="feat_sound_haptics_desc">Lautstärke und haptische Funktionen</string>
     <string name="feat_security_privacy_title">Sicherheit und Privatsphäre</string>
-    <string name="feat_security_privacy_desc">Schütze und sicher dein Gerät</string>
+    <string name="feat_security_privacy_desc">Schütze und sichere dein Gerät</string>
     <string name="feat_notifications_alerts_title">Benachrichtigungen und Warnungen</string>
     <string name="feat_notifications_alerts_desc">Verpasse nie deine Prioritäten</string>
     <string name="feat_input_actions_title">Eingaben und Aktionen</string>
@@ -1606,7 +1606,7 @@ Für Anpassungen der Skalierung sind möglicherweise zusätzlich Shizuku- oder R
     <string name="tile_restart_systemui">SystemUI neu starten</string>
     <string name="tile_lock">Sperren</string>
     <string name="feat_networks_title">Netzwerke</string>
-    <string name="feat_networks_desc">Funkgeräte und Netzwerke steuern</string>
+    <string name="feat_networks_desc">Antennen und Netzwerke steuern</string>
     <string name="feat_network_download_rate_limit_title">Begrenzung der Netzwerk-Download-Rate</string>
     <string name="feat_network_download_rate_limit_desc">Systemweite Download-Geschwindigkeit begrenzen</string>
     <string name="feat_mobile_data_always_on_title">Mobile Daten immer eingeschaltet</string>
