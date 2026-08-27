@@ -16,7 +16,9 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -27,6 +29,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,6 +45,7 @@ import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -51,10 +56,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asComposePath
@@ -70,6 +78,10 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.graphics.shapes.Morph
 import androidx.graphics.shapes.toPath
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.asImageBitmap
+import com.sameerasw.essentials.utils.QrCodeGenerator
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -169,6 +181,66 @@ fun MeDropBottomSheet(
         list
     }
 
+    var isQrModeActive by remember { mutableStateOf(false) }
+    var qrBitmap by remember { mutableStateOf<android.graphics.Bitmap?>(null) }
+
+    val window = activity?.window
+    val originalBrightness = remember(window) {
+        window?.attributes?.screenBrightness ?: android.view.WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+    }
+
+    val targetBrightness = if (isQrModeActive) 1f else originalBrightness
+    val animatedBrightness by animateFloatAsState(
+        targetValue = if (targetBrightness < 0f) 0.5f else targetBrightness,
+        animationSpec = tween(400, easing = LinearOutSlowInEasing),
+        label = "screen_brightness"
+    )
+
+    LaunchedEffect(isQrModeActive, animatedBrightness) {
+        window?.let { win ->
+            val lp = win.attributes
+            if (isQrModeActive) {
+                lp.screenBrightness = animatedBrightness
+                win.attributes = lp
+            } else {
+                lp.screenBrightness = originalBrightness
+                win.attributes = lp
+            }
+        }
+    }
+
+    DisposableEffect(window) {
+        onDispose {
+            window?.let { win ->
+                val lp = win.attributes
+                lp.screenBrightness = originalBrightness
+                win.attributes = lp
+            }
+        }
+    }
+
+    LaunchedEffect(isQrModeActive, safeSettings, activeProfileType, contact) {
+        if (isQrModeActive && contact != null) {
+            withContext(Dispatchers.IO) {
+                val vcardString = contact.toVCard(
+                    context = context,
+                    activeEntryIds = safeSettings.getEffectiveEntryIds(activeProfileType),
+                    customPhotoUri = null
+                )
+                val generated = QrCodeGenerator.generateQrBitmap(
+                    content = vcardString,
+                    size = 1000,
+                    foregroundColor = android.graphics.Color.BLACK,
+                    backgroundColor = android.graphics.Color.WHITE,
+                    logo = null
+                )
+                withContext(Dispatchers.Main) {
+                    qrBitmap = generated
+                }
+            }
+        }
+    }
+
     EssentialsBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
             modifier = Modifier
@@ -222,32 +294,84 @@ fun MeDropBottomSheet(
                     }
                 }
 
-                // Top Profile Photo (200dp with animated morphing shape)
-                if (!effectivePhoto.isNullOrBlank()) {
-                    AsyncImage(
-                        model = effectivePhoto,
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .padding(top = 12.dp)
-                            .size(200.dp)
-                            .clip(animatedShape)
-                    )
-                } else {
+                val qrContainerSize by animateDpAsState(
+                    targetValue = if (isQrModeActive) 340.dp else 200.dp,
+                    animationSpec = tween(400, easing = LinearOutSlowInEasing),
+                    label = "qr_container_size"
+                )
+                val photoAvatarSize by animateDpAsState(
+                    targetValue = if (isQrModeActive) 80.dp else 200.dp,
+                    animationSpec = tween(400, easing = LinearOutSlowInEasing),
+                    label = "photo_avatar_size"
+                )
+                val qrAlpha by animateFloatAsState(
+                    targetValue = if (isQrModeActive) 1f else 0f,
+                    animationSpec = tween(350, easing = LinearOutSlowInEasing),
+                    label = "qr_alpha"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .padding(top = 12.dp)
+                        .size(qrContainerSize)
+                        .clip(Shapes.large)
+                        .background(if (isQrModeActive) MaterialTheme.colorScheme.surfaceBright else Color.Transparent)
+                        .padding(if (isQrModeActive) 12.dp else 0.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isQrModeActive) {
+                        val bmp = qrBitmap
+                        if (bmp != null) {
+                            Image(
+                                bitmap = bmp.asImageBitmap(),
+                                contentDescription = stringResource(R.string.feat_medrop_action_qr),
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(Shapes.medium)
+                                    .alpha(qrAlpha)
+                            )
+                        } else {
+                            LoadingIndicator()
+                        }
+                    }
+
                     Box(
                         modifier = Modifier
-                            .padding(top = 12.dp)
-                            .size(200.dp)
-                            .clip(animatedShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer),
+                            .size(photoAvatarSize)
+                            .then(
+                                if (isQrModeActive) {
+                                    Modifier
+                                        .background(Color.White, CircleShape)
+                                        .padding(4.dp)
+                                } else Modifier
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = contact.displayName.take(1).uppercase(),
-                            style = MaterialTheme.typography.displayLarge,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            fontWeight = FontWeight.Bold
-                        )
+                        if (!effectivePhoto.isNullOrBlank()) {
+                            AsyncImage(
+                                model = effectivePhoto,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(animatedShape)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(animatedShape)
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = contact.displayName.take(1).uppercase(),
+                                    style = if (isQrModeActive) MaterialTheme.typography.titleLarge else MaterialTheme.typography.displayLarge,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -706,15 +830,17 @@ fun MeDropBottomSheet(
                         )
                     }
 
-                    // QR Code Button (Disabled for future)
+                    // QR Code Toggle Button
                     Button(
-                        onClick = { },
-                        enabled = false,
+                        onClick = {
+                            HapticUtil.performVirtualKeyHaptic(view)
+                            isQrModeActive = !isQrModeActive
+                        },
                         modifier = Modifier
                             .weight(1f)
                             .height(48.dp),
                         shape = shapesMiddle.shape,
-                        colors = ButtonDefaults.filledTonalButtonColors()
+                        colors = if (isQrModeActive) ButtonDefaults.buttonColors() else ButtonDefaults.filledTonalButtonColors()
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.rounded_qr_code_24),
