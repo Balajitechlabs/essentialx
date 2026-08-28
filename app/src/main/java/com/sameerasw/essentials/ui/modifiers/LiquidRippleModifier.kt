@@ -61,12 +61,15 @@ private const val LIQUID_RIPPLE_AGSL = """
 fun Modifier.liquidRipple(
     trigger: Int,
     origin: Offset,
+    enabled: Boolean = true,
     durationMillis: Int = 3000,
     amplitudeDp: Float = 32f,
     frequency: Float = 12f,
     decay: Float = 4.5f,
     speedDp: Float = 1400f,
 ): Modifier = composed {
+    if (!enabled) return@composed Modifier
+
     val density = LocalDensity.current
     val animTime = remember { Animatable(0f) }
 

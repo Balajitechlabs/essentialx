@@ -130,6 +130,7 @@ fun SetupFeatures(
     viewModel.isDynamicNightLightEnabled.value
 
     viewModel.isScreenLockedSecurityEnabled.value
+    val isRippleEnabled by viewModel.isRippleEnabled
     val pinnedFeatureKeys by viewModel.pinnedFeatureKeys
     val context = LocalContext.current
 
@@ -922,6 +923,7 @@ fun SetupFeatures(
             .liquidRipple(
                 trigger = rippleTrigger,
                 origin = textCenterOffset,
+                enabled = isRippleEnabled,
                 durationMillis = 2800,
                 amplitudeDp = 34f,
                 frequency = 12f,

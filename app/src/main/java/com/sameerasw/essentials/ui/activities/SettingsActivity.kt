@@ -180,6 +180,7 @@ class SettingsActivity : AppCompatActivity() {
                     WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
                 val isBlurEnabled by viewModel.isBlurEnabled
+                val isRippleEnabled by viewModel.isRippleEnabled
                 var iconRippleTrigger by remember { mutableStateOf(0) }
                 var iconRippleOrigin by remember { mutableStateOf(Offset.Zero) }
 
@@ -191,6 +192,7 @@ class SettingsActivity : AppCompatActivity() {
                             .liquidRipple(
                                 trigger = iconRippleTrigger,
                                 origin = iconRippleOrigin,
+                                enabled = isRippleEnabled,
                                 durationMillis = 2800,
                                 amplitudeDp = 34f,
                                 frequency = 12f,
@@ -672,13 +674,21 @@ fun SettingsContent(
                 title = stringResource(R.string.label_use_blur),
                 description =
                     if (isBlurProblematic) {
-                        stringResource(R.string.msg_blur_compatibility_error)
+                         stringResource(R.string.msg_blur_compatibility_error)
                     } else {
                         stringResource(R.string.desc_use_blur)
                     },
                 isChecked = viewModel.isBlurSettingEnabled.value,
                 onCheckedChange = { viewModel.setBlurEnabled(it, context) },
                 enabled = !isBlurProblematic,
+            )
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_blur_linear_24,
+                title = stringResource(R.string.label_ripple_animation),
+                description = stringResource(R.string.desc_ripple_animation),
+                isChecked = viewModel.isRippleSettingEnabled.value,
+                onCheckedChange = { viewModel.setRippleEnabled(it, context) },
             )
 
             CrashReportingPicker(
