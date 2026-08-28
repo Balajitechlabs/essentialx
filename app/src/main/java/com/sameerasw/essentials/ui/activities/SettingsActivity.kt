@@ -109,7 +109,9 @@ import com.sameerasw.essentials.ui.core.sheets.InstructionsBottomSheet
 import com.sameerasw.essentials.ui.core.sheets.PreReleaseConfirmationSheet
 import com.sameerasw.essentials.ui.core.sheets.UnsupportedFeaturesConfirmationSheet
 import com.sameerasw.essentials.ui.core.sheets.UpdateBottomSheet
+import androidx.compose.ui.geometry.Offset
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
+import com.sameerasw.essentials.ui.modifiers.liquidRipple
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.ui.theme.Shapes
@@ -178,12 +180,23 @@ class SettingsActivity : AppCompatActivity() {
                     WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
 
                 val isBlurEnabled by viewModel.isBlurEnabled
+                var iconRippleTrigger by remember { mutableStateOf(0) }
+                var iconRippleOrigin by remember { mutableStateOf(Offset.Zero) }
 
                 Box(
                     modifier =
                         Modifier
                             .fillMaxSize()
                             .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .liquidRipple(
+                                trigger = iconRippleTrigger,
+                                origin = iconRippleOrigin,
+                                durationMillis = 2800,
+                                amplitudeDp = 34f,
+                                frequency = 12f,
+                                decay = 4.5f,
+                                speedDp = 1400f,
+                            )
                             .progressiveBlur(
                                 blurRadius = if (isBlurEnabled) 40f else 0f,
                                 height = statusBarHeightPx * 1.15f,
@@ -201,6 +214,10 @@ class SettingsActivity : AppCompatActivity() {
                     SettingsContent(
                         viewModel = viewModel,
                         contentPadding = contentPadding,
+                        onAppIconSelectedWithPosition = { _, pos ->
+                            iconRippleOrigin = pos
+                            iconRippleTrigger++
+                        },
                         modifier =
                             Modifier
                                 .progressiveBlur(
@@ -255,6 +272,7 @@ fun SettingsContent(
     viewModel: MainViewModel,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
+    onAppIconSelectedWithPosition: ((com.sameerasw.essentials.domain.model.AppIcon, Offset) -> Unit)? = null,
 ) {
     val isAccessibilityEnabled by viewModel.isAccessibilityEnabled
     val isWriteSecureSettingsEnabled by viewModel.isWriteSecureSettingsEnabled
@@ -676,6 +694,7 @@ fun SettingsContent(
             AppIconPicker(
                 selectedIcon = selectedAppIcon,
                 onIconSelected = { viewModel.setAppIcon(it, context) },
+                onIconSelectedWithPosition = onAppIconSelectedWithPosition,
             )
 
             IconToggleItem(
