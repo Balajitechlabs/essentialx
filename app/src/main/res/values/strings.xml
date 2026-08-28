@@ -2317,4 +2317,7 @@
     <string name="watchface_clock_outline_desc">Show only font outlines instead of filled text</string>
     <string name="watchface_clock_outline_thickness">Outline thickness</string>
     <string name="app_medrop">MeDrop</string>
+    <string name="action_licenses_and_credits">Licenses and Credits</string>
+    <string name="licenses_credits_title">Licenses &amp; Credits</string>
+    <string name="licenses_credits_subtitle">Open source projects and contributors powering Essentials</string>
 </resources>
