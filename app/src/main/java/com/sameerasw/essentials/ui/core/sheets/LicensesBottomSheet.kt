@@ -224,12 +224,12 @@ fun ExpandableLicenseSection(section: LicenseSection) {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(2.dp))
+                .clip(RoundedCornerShape(4.dp))
                 .clickable {
                     HapticUtil.performUIHaptic(view)
                     expanded = !expanded
                 },
-        shape = RoundedCornerShape(2.dp),
+        shape = RoundedCornerShape(4.dp),
         colors =
             CardDefaults.cardColors(
                 containerColor = if (expanded) MaterialTheme.colorScheme.surfaceBright else MaterialTheme.colorScheme.surfaceContainerLow,
