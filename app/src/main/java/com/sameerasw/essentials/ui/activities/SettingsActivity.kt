@@ -224,6 +224,10 @@ class SettingsActivity : AppCompatActivity() {
                             iconRippleOrigin = pos
                             iconRippleTrigger++
                         },
+                        onRippleToggleEnabledWithPosition = { pos ->
+                            iconRippleOrigin = pos
+                            iconRippleTrigger++
+                        },
                         modifier =
                             Modifier
                                 .progressiveBlur(
@@ -280,6 +284,7 @@ fun SettingsContent(
     modifier: Modifier = Modifier,
     onAppIconSelectedWithPosition: ((com.sameerasw.essentials.domain.model.AppIcon, Offset) -> Unit)? = null,
     onAvatarLongClickWithPosition: ((Offset) -> Unit)? = null,
+    onRippleToggleEnabledWithPosition: ((Offset) -> Unit)? = null,
 ) {
     val isAccessibilityEnabled by viewModel.isAccessibilityEnabled
     val isWriteSecureSettingsEnabled by viewModel.isWriteSecureSettingsEnabled
@@ -689,6 +694,11 @@ fun SettingsContent(
                 description = stringResource(R.string.desc_ripple_animation),
                 isChecked = viewModel.isRippleSettingEnabled.value,
                 onCheckedChange = { viewModel.setRippleEnabled(it, context) },
+                onCheckedChangeWithPosition = { isChecked, pos ->
+                    if (isChecked) {
+                        onRippleToggleEnabledWithPosition?.invoke(pos)
+                    }
+                },
             )
 
             CrashReportingPicker(
