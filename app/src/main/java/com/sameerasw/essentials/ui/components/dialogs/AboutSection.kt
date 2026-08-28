@@ -33,10 +33,17 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -53,6 +60,7 @@ fun AboutSection(
     developerName: String = stringResource(R.string.app_developer_name),
     description: String = stringResource(R.string.app_description),
     onAvatarLongClick: () -> Unit = {},
+    onAvatarLongClickWithPosition: ((Offset) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val versionName =
@@ -81,6 +89,8 @@ fun AboutSection(
                 textAlign = TextAlign.Center,
             )
 
+            var avatarCenterOffset by remember { mutableStateOf(Offset.Zero) }
+
             Image(
                 painter = painterResource(id = R.drawable.avatar),
                 contentDescription = "Developer Avatar",
@@ -88,12 +98,21 @@ fun AboutSection(
                 modifier =
                     Modifier
                         .size(120.dp)
+                        .onGloballyPositioned { coords ->
+                            val pos = coords.positionInRoot()
+                            val size = coords.size
+                            avatarCenterOffset = Offset(
+                                x = pos.x + (size.width / 2f),
+                                y = pos.y + (size.height / 2f)
+                            )
+                        }
                         .clip(RoundedCornerShape(16.dp))
                         .background(MaterialTheme.colorScheme.primary)
                         .combinedClickable(
                             onClick = {},
                             onLongClick = {
                                 onAvatarLongClick()
+                                onAvatarLongClickWithPosition?.invoke(avatarCenterOffset)
                             },
                         ),
             )

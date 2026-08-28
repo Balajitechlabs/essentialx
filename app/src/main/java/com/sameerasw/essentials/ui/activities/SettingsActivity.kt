@@ -218,6 +218,10 @@ class SettingsActivity : AppCompatActivity() {
                             iconRippleOrigin = pos
                             iconRippleTrigger++
                         },
+                        onAvatarLongClickWithPosition = { pos ->
+                            iconRippleOrigin = pos
+                            iconRippleTrigger++
+                        },
                         modifier =
                             Modifier
                                 .progressiveBlur(
@@ -273,6 +277,7 @@ fun SettingsContent(
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
     onAppIconSelectedWithPosition: ((com.sameerasw.essentials.domain.model.AppIcon, Offset) -> Unit)? = null,
+    onAvatarLongClickWithPosition: ((Offset) -> Unit)? = null,
 ) {
     val isAccessibilityEnabled by viewModel.isAccessibilityEnabled
     val isWriteSecureSettingsEnabled by viewModel.isWriteSecureSettingsEnabled
@@ -1284,6 +1289,7 @@ fun SettingsContent(
                             Toast.LENGTH_SHORT,
                         ).show()
                 },
+                onAvatarLongClickWithPosition = onAvatarLongClickWithPosition,
             )
         }
 
