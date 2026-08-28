@@ -2314,4 +2314,5 @@
     <string name="watchface_clock_outline_title">Outline only</string>
     <string name="watchface_clock_outline_desc">Show only font outlines instead of filled text</string>
     <string name="watchface_clock_outline_thickness">Outline thickness</string>
+    <string name="app_medrop">MeDrop</string>
 </resources>
