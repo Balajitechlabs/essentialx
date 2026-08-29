@@ -1638,4 +1638,10 @@ Zudem muss die Einstellung unter Umständen mehrfach angewendet werden, damit si
     <string name="setting_location_reached_full_screen_alarm_desc">Bei Ankunft den Alarmklingelton abspielen und eine Vollbild-Warnmeldung anzeigen</string>
     <string name="smart_pixels_disable_on_cast_title">Während Bildschirmübertragung deaktivieren</string>
     <string name="smart_pixels_disable_on_cast_desc">Pixel-Overlay während Bildschirmübertragung oder -Aufnahme automatisch pausieren</string>
+    <string name="setting_app_icon_title">App Symbol</string>
+    <string name="setting_app_icon_desc">Passe das Home screen symbol an</string>
+    <string name="app_icon_default">Standard</string>
+    <string name="app_icon_legacy">altes Icon</string>
+    <string name="app_icon_black">Dynamisch</string>
+    <string name="app_icon_google">Spektrum</string>
 </resources>
