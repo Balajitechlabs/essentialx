@@ -295,6 +295,8 @@ class MainViewModel : ViewModel() {
     val isBlurSettingEnabled = mutableStateOf(true)
     val isRippleEnabled = mutableStateOf(true)
     val isRippleSettingEnabled = mutableStateOf(true)
+    val isConsoleModeEnabled = mutableStateOf(false)
+    val isConsoleModeSettingEnabled = mutableStateOf(false)
     val isSwipeTabsEnabled = mutableStateOf(true)
     val sentryReportMode = mutableStateOf("auto")
     val isPowerSaveModeEnabled = mutableStateOf(false)
@@ -774,6 +776,10 @@ class MainViewModel : ViewModel() {
 
                     SettingsRepository.KEY_USE_RIPPLE -> {
                         appContext?.let { updateRippleState(it) }
+                    }
+
+                    SettingsRepository.KEY_CONSOLE_MODE -> {
+                        appContext?.let { updateConsoleModeState(it) }
                     }
 
                     SettingsRepository.KEY_PRIVATE_DNS_PRESETS -> {
@@ -1459,6 +1465,7 @@ class MainViewModel : ViewModel() {
         isPowerSaveModeEnabled.value = DeviceUtils.isPowerSaveMode(context)
         updateBlurState(context)
         updateRippleState(context)
+        updateConsoleModeState(context)
         updateAddedQSTiles(context)
 
         if (powerSaveReceiver == null) {
@@ -1473,6 +1480,7 @@ class MainViewModel : ViewModel() {
                                 isPowerSaveModeEnabled.value = DeviceUtils.isPowerSaveMode(it)
                                 updateBlurState(it)
                                 updateRippleState(it)
+                                updateConsoleModeState(it)
                             }
                         }
                     }
@@ -1904,6 +1912,7 @@ class MainViewModel : ViewModel() {
         isPowerSaveModeEnabled.value = DeviceUtils.isPowerSaveMode(context)
         updateBlurState(context)
         updateRippleState(context)
+        updateConsoleModeState(context)
 
         refreshTrackedUpdates(context)
         if (isBatteryNotificationEnabled.value) {
@@ -2453,6 +2462,14 @@ class MainViewModel : ViewModel() {
         updateRippleState(context)
     }
 
+    fun setConsoleModeEnabled(
+        enabled: Boolean,
+        context: Context,
+    ) {
+        settingsRepository.putBoolean(SettingsRepository.KEY_CONSOLE_MODE, enabled)
+        updateConsoleModeState(context)
+    }
+
     /**
      * Executes the set swipe tabs enabled operation.
      *
@@ -2478,6 +2495,15 @@ class MainViewModel : ViewModel() {
 
         isRippleSettingEnabled.value = useRippleSetting
         isRippleEnabled.value = useRippleSetting && !isPowerSave
+    }
+
+    private fun updateConsoleModeState(context: Context) {
+        val useConsoleModeSetting = settingsRepository.getBoolean(SettingsRepository.KEY_CONSOLE_MODE, false)
+        val isProblematic = DeviceUtils.isBlurProblematicDevice()
+        val isPowerSave = DeviceUtils.isPowerSaveMode(context)
+
+        isConsoleModeSettingEnabled.value = useConsoleModeSetting
+        isConsoleModeEnabled.value = useConsoleModeSetting && !isProblematic && !isPowerSave
     }
 
     /**

@@ -113,6 +113,7 @@ import androidx.compose.ui.geometry.Offset
 import com.sameerasw.essentials.ui.modifiers.BlurDirection
 import com.sameerasw.essentials.ui.modifiers.liquidRipple
 import com.sameerasw.essentials.ui.modifiers.progressiveBlur
+import com.sameerasw.essentials.ui.modifiers.scrollMotionBlur
 import com.sameerasw.essentials.ui.theme.EssentialsTheme
 import com.sameerasw.essentials.ui.theme.Shapes
 import com.sameerasw.essentials.utils.DeviceUtils
@@ -524,12 +525,15 @@ fun SettingsContent(
     }
 
     val sentryMode by viewModel.sentryReportMode
+    val isConsoleModeEnabled by viewModel.isConsoleModeEnabled
+    val scrollState = rememberScrollState()
 
     Column(
         modifier =
             modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
+                .scrollMotionBlur(scrollState, enabled = isConsoleModeEnabled)
+                .verticalScroll(scrollState)
                 .padding(contentPadding),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.Start,
@@ -699,6 +703,13 @@ fun SettingsContent(
                         onRippleToggleEnabledWithPosition?.invoke(pos)
                     }
                 },
+            )
+
+            IconToggleItem(
+                iconRes = R.drawable.rounded_settings_motion_mode_24,
+                title = stringResource(R.string.label_motion_blur),
+                isChecked = viewModel.isConsoleModeSettingEnabled.value,
+                onCheckedChange = { viewModel.setConsoleModeEnabled(it, context) },
             )
 
             CrashReportingPicker(
